@@ -1,31 +1,37 @@
-# Stillwell on Cloudflare
+# Live data on Cloudflare, store jobs on Actions
 
-Everything that runs Stillwell moves onto Cloudflare: the poller and every store job in Containers, the live window in D1, the levels API in Workers, and the job queue in a Durable Object. The Parquet files on R2 stay the store's record, in their current layout. Nothing runs on a server of our own or in scheduled GitHub Actions workflows; Actions keeps CI, deploys and the canary.
+Stillwell runs in two places. Live data runs on Cloudflare: a poller in a Container writes D1 and the daily `recent/` files, and the levels API is a Worker. Store jobs run in GitHub Actions, where they run now: compaction, the Monthly refresh and refetch, backfills, and a migrations workflow that runs the store work each merged change needs. R2's Parquet files stay the store's record, in their current layout.
 
-This replaces the Stillwell server in [realtime.md](realtime.md) and [jobs.md](jobs.md): the Hetzner box, ClickHouse, `stillwell-api`, the Cloudflare Tunnel and the systemd job units. The job queue's design carries over unchanged, with lanes, migrations and schedules; only where it runs changes.
+This replaces the Stillwell server in [realtime.md](realtime.md) and [jobs.md](jobs.md): the Hetzner box, ClickHouse, `stillwell-api`, the Cloudflare Tunnel, the job queue and the handover between Actions and the server.
 
 ## Goals
 
-- **One place runs everything.** The poller, every job that writes the store, and the API run on one platform, so no source is split between two systems and no handover guard is needed.
-- **Migrations run themselves**, as [jobs.md](jobs.md#migrations) describes, for every source.
-- **Monthly runs in parallel.** Each source's list and refetch jobs run in containers of their own, as Actions runs them, not queued behind a few slots.
+- **Migrations run themselves.** A change that needs store work after it merges carries it in `src/migrations/`, and a workflow runs it, for every source.
+- **One writer of each kind.** The poller is the only writer of live values, and Actions the only writer of year files, so no source is split between two systems and no handover guard is needed.
+- **Live values within minutes**, from every source, SFWMD included.
 - **No machine to keep up.** No OS, no deploy scripts, nothing to restart after a reboot.
-- **R2 stays the record**, and the public files keep their layout.
+- **R2 stays the record**, and the year files keep their layout.
 
 ## What the spike showed
 
-A spike on 2026-11-20 deployed a Worker and a 4 vCPU, 12 GiB container, ran every source's canary from each, and ran CCO's monthly job in the container against a copy of its store.
+A spike on 2026-11-20 deployed a Worker and a container, ran every source's canary from each, and ran CCO's monthly job in the container.
 
-- **Reach.** From a Container, every source answered except DWR and BSH's `kuestendaten`, which fail from every network. SFWMD, which refuses the Hetzner box and Cloudflare Workers, answered from the container. BOM's FTP and CRMS's range requests worked. Workers can't reach SFWMD, which is why the poller runs in a container, not in Workers.
-- **Batch speed.** CCO's `monthly.sh lists cco --full` took 5 min 55 s at concurrency 2 with a 1.17 GB peak, against 5 min 34 s on the box, and 3 min 39 s at concurrency 8 with a 2.7 GB peak.
+- **Reach.** From a Container, every source answered except DWR and BSH's `kuestendaten`, which fail from every network. SFWMD, which refuses the Hetzner box and Cloudflare Workers, answered from the container. Workers can't reach SFWMD, which is why the poller runs in a container.
+- **Batch speed.** CCO's `monthly.sh lists cco --full` took 5 min 55 s in a 4 vCPU container at concurrency 2, against 5 min 34 s on the box.
 - **Start.** The container answered its first request 1.5 seconds after it was asked to start.
-- **R2 access.** Copying CCO's 268 files, 75 MB, through a Worker's R2 binding took 3 seconds.
 
-## Live ingest
+## The poller
 
-The poller is `server/ingest.ts` as it runs on the box, with its per-source timers, interval groups, passes in child processes and adapter pacing, in one always-on container. Its passes hold up to 1.76 GB between them on the box, more than a Worker's 128 MB, and a Worker can't reach SFWMD, so it stays a Node process. Cloudflare doesn't guarantee how long a container runs, so a cron Worker asks the poller's Durable Object to start it every minute; one that was stopped is back within a minute, and a pass fetches 12 hours back, so nothing is lost.
+The poller is `server/ingest.ts` as it runs on the box, with its per-source timers, interval groups, passes in child processes and adapter pacing, in one always-on container. Its passes hold up to 1.76 GB between them on the box, more than a Worker's 128 MB, so it stays a Node process. Cloudflare doesn't guarantee how long a container runs, so a cron Worker asks the poller's Durable Object to start it every minute; one that was stopped is back within a minute, and a pass fetches 12 hours back, so nothing is lost.
 
-The poller writes to D1 instead of ClickHouse. The live window is the last 8 days: 1.92 million values from 13,642 stations in a day on the box, about 15 million in all.
+It polls every hourly source, including those it reads from `recent/` on the box: CCO, whose key covers one read of each site an hour, is polled hourly, and SFWMD at its stations' intervals. When a source reports a station in another datum, the poller starts that source's Monthly refresh through the GitHub API, as it does on the box.
+
+The poller writes two things:
+
+- **D1**, for the API: the last 8 days, one row per station-day.
+- **`recent/<source>/<YYYY-MM-DD>.parquet`** on R2, for everything else: one file per source per UTC day, with every live station's values.
+
+### D1
 
 ```sql
 CREATE TABLE live (
@@ -38,81 +44,89 @@ CREATE TABLE live (
 CREATE TABLE polls ( ... );  -- one row per pass, as in realtime.md
 ```
 
-A station-day is one row, so a pass writes one row per station it brought new values for, and a day leaves the window as one delete per station. D1 bills a row written for every insert, update and delete. Live stations' intervals come to about 1.92 million station polls a day, most of them USGS's 13,983 gages every 15 minutes, so each write carries about one value either way; a row per value would also delete every value as it ages out, about 116 million writes a month, where a row per station-day is at most about 58 million. The window is a few hundred MB, under D1's 10 GB limit for a database. A pass reads the station-days it covers, merges and QCs as `refreshStation` does now, and writes back only the station-days that changed. One pass at a time per source holds as it does now, so no two writers update one station-day.
+A pass reads the station-days it covers, merges and QCs as `refreshStation` does now, and writes back only the station-days that changed. One pass at a time per source holds as it does now, so no two writers update one station-day. A day older than 8 days is deleted, one row per station.
 
-`recent/<source>.parquet` goes away: D1 is the live window. Its readers move to D1 through the API or the nightly job:
+The live window is about 15 million values: 1.92 million a day from 13,642 stations on the box. That's a few hundred MB, under D1's 10 GB limit for a database. D1 bills a row written for every insert, update and delete. Live stations' intervals come to about 1.92 million station polls a day, most of them USGS's 13,983 gages every 15 minutes, so each write carries about one value either way; a row per value would also delete every value as it ages out, about 116 million writes a month, where a row per station-day is at most about 58 million.
 
-- Compaction folds closed days from D1 into the year files, instead of from `recent/`.
-- The site's level chart and source page read the levels API.
-- The station refresh's epoch discovery and withholding read D1.
-- `scripts/check-files.ts`, the files reference and the guides drop it.
+Containers have no bindings of their own, so the poller reaches D1 and R2 through its Durable Object's outbound handler, which intercepts requests to an internal host and runs them in the Workers runtime with the bindings. No D1 token or R2 key sits in the container.
 
-The hourly `recent` jobs go with it, so the poller is the only writer of live values.
+### The daily files
 
-Containers have no bindings of their own. A container reaches D1 and R2 through its Durable Object's outbound handler, which intercepts requests to an internal host and runs them in the Workers runtime with the bindings, so no D1 token or R2 key sits in the container. Jobs that read and write R2 through DuckDB keep the S3 API with an R2 key in the container's environment, as on the box.
+`recent/<source>/<YYYY-MM-DD>.parquet` holds a source's live stations' values for one UTC day, with the year files' columns plus `station` and `epoch`. They're public and documented:
+
+- **Today's file** is rewritten hourly, so it's up to an hour behind the API.
+- **The 6 days before** are rewritten each night after 00:00 UTC, so values a source revises late reach them. A day is final once it's 6 days old.
+- **Files older than 30 days** are deleted by an R2 lifecycle rule. The year files are the archive.
+
+They replace `recent/<source>.parquet`, and its readers read the last few daily files instead:
+
+- Compaction folds them into the year files.
+- The site's level chart and source page.
+- The station refresh's epoch discovery and withholding.
+- `scripts/check-files.ts`, the files reference and the guides.
+
+The hourly `recent` workflow retires, so the poller is the only writer of live values.
 
 ## The levels API
 
 The whole API is Workers. `workers/api` stays the gateway's `WATER_LEVELS` binding, and does what `stillwell-api` does now:
 
 - **The last 8 days** come from D1: the station's station-days for the range, one indexed read of up to 8 rows.
-- **Older ranges** come from the station's year files on R2, through the Worker's bucket binding, read with a pure-JavaScript Parquet reader. A station-year is a few MB, inside a Worker's 128 MB. That serves any range, which the box reaches only once ClickHouse holds the history.
+- **Older ranges** come from the station's year files on R2, through the Worker's bucket binding, read with a pure-JavaScript Parquet reader. A station-year is a few MB, inside a Worker's 128 MB. That serves any range.
 - **Stations and offsets** come from `stations.parquet` and `stations/offsets.parquet`, read once per isolate and refreshed every 10 minutes.
 - **Datums, steps, flags and caching** work as [realtime.md](realtime.md#the-levels-api) describes, moved from `stillwell-api` into the Worker.
 
 ## Store jobs
 
-The queue in [jobs.md](jobs.md) moves into a Durable Object, `Queue`, with its SQLite holding the same tables: jobs, migrations and the baseline. Lanes, the short-first rule, schedule keys and migrations work as they do on the box. What changes is how a job runs:
+Compaction, the Monthly refresh and refetch, backfills, requalify, analysis, `publish`, `links`, `matches`, `drop` and `withhold` run in Actions as they do now, in their `store-<source>` concurrency groups, dispatched by the cron Worker. Compact daily folds the daily files where it folds `recent/<source>.parquet` now, at 00:40 UTC, after the poller's nightly rewrite.
 
-- **Each job is a container of its own**, started by the queue for the job and stopped when it ends. Its size fits the job: `basic` (1 GiB) for a backfill that waits on a source's pacing, `standard-2` (6 GiB) for compaction, `standard-4` (12 GiB, 4 vCPU) for a monthly list job at concurrency 8.
-- **No slot limit.** Lanes still run one job per source at a time, but jobs in different lanes run at once, so Monthly's list jobs for every source start together on the 2nd, as on Actions.
-- **Long jobs resume.** A container can stop at any time, so the queue runs a job whose container stopped again. Backfill's `--skip-written`, requalify's saved progress and analysis's pending list already make that safe; a job that can't resume isn't a job yet.
-- **Schedules** come from the cron Worker, which asks the queue to run `due()` every minute in place of dispatching workflows.
-- **Migrations** run from the queue after each deploy, which the deploy workflow tells the queue about.
-- **`drop` and `withhold`** run as jobs, deleting through the S3 API instead of the aws CLI.
-- **`publish`, `links` and `matches`** run in the `store` lanes as jobs too, so no store writer is left in Actions.
+### Migrations
+
+A change that needs store work after it merges carries it as a migration in `src/migrations/`: steps of `scripts/ingest.ts` arguments, and checks that read the store and throw when it's wrong, in the format [jobs.md](jobs.md#migrations) describes. The `Migrations` workflow runs them:
+
+- **When.** On each push to `main`, and hourly from the cron Worker, so a step held up by a cancelled run is tried again. The workflow's own concurrency group runs one at a time.
+- **Record.** `migrations.json` on R2 holds each migration's next step and state. A migration that sorts before one already recorded is refused, as now.
+- **Steps.** The workflow runs the next step of the first unfinished migration as a job in the source's `store-<source>` group, waits for it, records it, and runs the next. A check runs as a job of its own.
+- **Cancellation.** GitHub keeps one running and one waiting run per concurrency group, and a new waiting run cancels the older one. A step that's cancelled before it starts stays where it is, and the next trigger runs it. A scheduled run it cancels catches up on its own, as a cancelled hourly or nightly run does now.
+- **Failure.** A step that fails stops every migration after it, and opens an issue through `scripts/alert.sh`. Dispatching the workflow with `retry` or `skip` and a migration's name runs the step again or marks the migration done.
+
+`npm test` keeps checking each migration's steps, as it does now, except for the rule that a step's source must be on the server.
 
 ## Costs
 
-Per month, from Cloudflare's published prices on 2026-11-20 and the box's and Actions' measurements. Memory and disk are billed as provisioned while a container runs, and CPU only while in use.
+Per month, from Cloudflare's published prices on 2026-11-20 and the box's measurements. Memory and disk are billed as provisioned while a container runs, and CPU only while in use.
 
-| Item                        | Size and use                                                                            |   Estimate |
-| --------------------------- | --------------------------------------------------------------------------------------- | ---------: |
-| Workers Paid plan           | Account minimum, shared with the account's other Workers                                |         $5 |
-| Poller                      | `standard-1` (½ vCPU, 4 GiB, 8 GB disk), always on, 0.26 vCPU on average                |        $41 |
-| Nightly compaction          | `standard-2`, about 30 minutes a night                                                  |         $2 |
-| Monthly list jobs, the 2nd  | `standard-4`, 15 to 40 container-hours                                                  |      $5–13 |
-| Monthly refetch, the 9th    | `standard-2` to `standard-4`, 10 to 30 container-hours                                  |      $1–10 |
-| Migrations and one-off jobs | a few container-hours                                                                   |       $1–3 |
-| D1                          | up to 58 million rows written, against 50 million included, and a few hundred MB stored |      $0–10 |
-| Levels API                  | Workers requests and CPU inside the plan's 10 million requests and 30 million CPU ms    |         $0 |
-| Queue Durable Object        | inside the plan's 1 million requests                                                    |         $0 |
-| R2                          | 46 GB stored and the same operations as now                                             |       $1–5 |
-| Logs                        | inside 20 million events now; Observability pricing applies from 2026-12-01             |       $0–5 |
-| **Total**                   |                                                                                         | **$56–94** |
+| Item              | Size and use                                                                            |   Estimate |
+| ----------------- | --------------------------------------------------------------------------------------- | ---------: |
+| Workers Paid plan | Account minimum, shared with the account's other Workers                                |         $5 |
+| Poller            | `standard-1` (½ vCPU, 4 GiB, 8 GB disk), always on, 0.26 vCPU on average                |        $41 |
+| D1                | up to 58 million rows written, against 50 million included, and a few hundred MB stored |       $0–8 |
+| Levels API        | Workers requests and CPU inside the plan's 10 million requests and 30 million CPU ms    |         $0 |
+| R2                | 46 GB stored; the daily files add about 14,000 writes a month                           |       $1–5 |
+| Logs              | inside 20 million events now; Observability pricing applies from 2026-12-01             |       $0–5 |
+| Store jobs        | GitHub Actions, free for a public repository                                            |         $0 |
+| **Total**         |                                                                                         | **$46–64** |
 
-A backfill campaign adds about $0.20 for each 10 hours on a `basic` container, so a lane running all month is about $15.
-
-For comparison, the box costs $69.49 a month, and Actions is free for a public repository, so Cloudflare costs about the same as the box. The poller is two thirds of the Cloudflare cost, because a container is billed for its memory all month, so a leaner poller would bring Cloudflare under the box. A larger poller, `standard-2` with 1 vCPU and 6 GiB, would be about $55 instead of $41.
+The box costs $69.49 a month. The poller is most of the Cloudflare cost, because a container is billed for its memory all month. One that ran a pass at a time would fit `basic`, with 1 GiB and a quarter of a vCPU, for about $20, bringing the total to about $25–43.
 
 ### Assumptions
 
-- **Poller memory.** It holds two passes at once, as on the box, whose peak was 1.76 GB. Passes run one at a time would fit `basic`, with 1 GiB and a quarter of a vCPU, for about $20, though its CPU is under the poller's average.
+- **Poller memory.** It holds two passes at once, as on the box, whose peak was 1.76 GB.
 - **Poller CPU.** The 0.26 vCPU average is the box's, without ClickHouse's 0.16 vCPU, since D1 does that work. A pass on half a vCPU is slower than on the box's shared 8 cores.
-- **Monthly hours.** These are estimates. Only CCO's list job has been measured in a container, and the one-off list runs in Actions took up to 5.5 hours for the largest sources after QC rule changes.
 - **D1 writes.** At most one per station poll, about 1.92 million a day from each live station's `min_interval_s`, fewer where a poll brings nothing new, as when a gage sends its values hourly.
 - **Logs.** Their cost under Observability pricing isn't published in what we've read.
 
 ## Risks
 
-- **Container stops.** Cloudflare doesn't promise a run time. The poller restarts within a minute and catches up 12 hours; jobs run again and resume. A job that can't resume can lose up to its whole run.
+- **Container stops.** Cloudflare doesn't promise a run time. The poller restarts within a minute and catches up 12 hours.
 - **Egress.** Containers' outbound address (104.28.166.198 in the spike) isn't documented as fixed. A source that starts refusing it fails like any outage, and its canary shows it.
 - **D1's 10 GB limit** can't be raised. The live window is a few hundred MB, and a longer window or more sources still fit, but the history never moves into D1.
-- **The store stays files.** Requalify and backfill keep rewriting whole year files, as they do now. A store that takes inserts would be Iceberg tables in Basin Catalog, a separate decision that changes the public format.
+- **The store stays files.** Requalify and backfill keep rewriting whole year files. A store that takes inserts would be Iceberg tables in Basin Catalog, a separate decision that changes the public format.
+- **Actions' limits stay.** Runs stop at 6 hours, Monthly runs within Actions' concurrency, and the migrations workflow inherits the concurrency groups' cancellations, which it tolerates by trying again.
 
 ## Order of work
 
-1. **The levels API.** The Worker reads the year files from R2 for ranges older than 8 days, and serves the rest from the box, until step 2.
-2. **The poller.** It runs in a container, writing D1, beside the box's poller, until the two agree for a week. The API then reads D1, and the box's poller, ClickHouse, `stillwell-api` and the tunnel stop.
-3. **The queue.** The queue Durable Object and per-job containers take the sources the box runs, MI and CCO, then the rest, a few at a time, each after its running campaigns finish, with the PM told before each. Compaction folds from D1 as each source's `recent/` goes.
-4. **The cross-source jobs.** `publish`, `links`, `matches`, `drop` and `withhold` move, the scheduled ingest workflows and the box retire, and the cron Worker becomes the queue's clock.
+1. **The levels API.** The Worker reads the year files from R2 for ranges older than 8 days, and serves the rest from the box until step 2.
+2. **The poller.** It runs in a container, writing D1 and the daily files, beside the box's poller, until the two agree for a week. The API then reads D1, and the box's poller, ClickHouse, `stillwell-api` and the tunnel stop.
+3. **The daily files.** Compaction and the other readers of `recent/<source>.parquet` move to the daily files, and the hourly `recent` workflow retires.
+4. **Migrations.** The `Migrations` workflow runs `src/migrations/`. The Marine Institute and CCO return to Actions, through `returning` in `server.json` and then out of it, and the box retires, with the job queue, `server.json` and the handover guards.
