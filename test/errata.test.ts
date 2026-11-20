@@ -58,7 +58,15 @@ describe("errata files", () => {
       for (const [station, splits] of Object.entries(source.overrides?.splits ?? {}))
         for (const split of splits) {
           assert.match(split.since, /^\d{4}-\d{2}-\d{2}$/, `${station} ${split.since}`);
-          assert.ok(!Number.isNaN(Date.parse(split.since)), `${station} ${split.since}`);
+          // Date rolls 2026-02-30 over to March, so a day must come back the same.
+          for (const day of [split.since, ...(split.from ? [split.from] : [])])
+            assert.ok(
+              /^\d{4}-\d{2}-\d{2}$/.test(day) &&
+                new Date(`${day}T00:00:00Z`).toISOString().startsWith(day),
+              `${station} ${day} isn't a day`,
+            );
+          if (split.from)
+            assert.ok(split.from > split.since, `${station} from ${split.from} isn't after since`);
           // A split stays once its erratum is retired, since its epochs do.
           const { errata: own, retired } = parseErrata(name, errataFiles[name]);
           const ids = [

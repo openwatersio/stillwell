@@ -27,7 +27,7 @@
       "stations": ["refmar/495"],
       "handling": "corrected",
       "error": "REFMAR's Hiva Oa (UHSLC) levels before March 2020 read 1.35 m lower than on the current zero.",
-      "response": "The record splits into datum epochs on 6 March 2020, and the epoch before converts to today's zero by adding 1.35 m. That epoch holds through 4 March and ends at the start of the 5th, as the record's first hour back, from 23:00 UTC that day, is already on the new zero, so that hour belongs to neither epoch. The values stay as served in the earlier epoch's files, no longer flagged.",
+      "response": "The record splits into datum epochs on 5 March 2020, and the epoch before converts to today's zero by adding 1.35 m. That epoch holds through 4 March, as the record's first values back, from 23:00 UTC on the 5th, are already on the new zero. The values stay as served.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against UHSLC's record of the gauge (`uhslc/017`), which has no step: REFMAR's sits 0.24 m above it every year from 2010 to 2015 and 1.59 m above it from 2020 on. UHSLC's record starts in September 2010; REFMAR's yearly medians from 1977 to 2017 stay between 0.68 and 0.91 m, and from 2020 read 2.2 m, so the years before 2010 are on the same zero as 2010 to 2015.",
       "until": "2020-03-05"
     },
@@ -53,21 +53,21 @@
     {
       "id": "refmar-rikitea-2007-datum",
       "stations": ["refmar/43"],
-      "since": "2007-12-26",
-      "until": "2012-05-15",
+      "since": "2007-12-25",
+      "until": "2012-05-14",
       "handling": "flagged",
-      "error": "SHOM's Rikitea levels from 26 December 2007 to 14 May 2012 are on other zeros than the record's later one, about 5 to 6 m apart.",
-      "response": "26 December 2007 to 14 May 2012 is flagged `suspect`, keeping SHOM's own flag as `source_flag`.",
+      "error": "SHOM's Rikitea levels from 25 December 2007 to 13 May 2012 are on other zeros than the record's later one, about 5 to 6 m apart. The record starts at 23:00 UTC on 25 December 2007 and has no values from 18 April to 14 May 2012, whose first value, at 21:54 UTC, is on the later zero.",
+      "response": "25 December 2007 to 13 May 2012 is flagged `suspect`, keeping SHOM's own flag as `source_flag`.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against UHSLC's record of the gauge (`uhslc/016`), 0.6 km away: the difference is 4.93 m to September 2010, 5.86 m to May 2012, and −0.30 m after."
     },
     {
       "id": "refmar-papeete-uhslc-2010-offset",
       "stations": ["refmar/6385"],
-      "since": "2010-09-14",
+      "since": "2010-09-13",
       "until": "2011-09-13",
       "handling": "flagged",
-      "error": "REFMAR's Papeete (UHSLC) levels sit about 0.95 m high from 14 September 2010 to 12 September 2011.",
-      "response": "14 September 2010 to 12 September 2011 is flagged `suspect`, keeping the source's own flag as `source_flag`.",
+      "error": "REFMAR's Papeete (UHSLC) levels sit about 0.95 m high from 22:00 UTC on 13 September 2010 to 12 September 2011.",
+      "response": "13 September 2010 to 12 September 2011 is flagged `suspect`, keeping the source's own flag as `source_flag`. An erratum spans whole UTC days, so the 22 hours of 13 September before the step are flagged with them.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against SHOM's Papeete (`refmar/383`) and Vairao (`refmar/317`): the differences are 0.01 to 0.04 m before and after and 0.96 to 0.99 m over the span."
     },
     {

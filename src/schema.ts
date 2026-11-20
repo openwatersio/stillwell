@@ -204,6 +204,12 @@ export interface EpochDecision {
 export interface EpochSplit {
   /** YYYY-MM-DD: the first local day on the new zero. */
   since: string;
+  /**
+   * YYYY-MM-DD: a day a store's list may already hold this split's epoch at.
+   * That epoch moves to `since`, earlier, and the one before it ends there.
+   * Where no epoch starts at that day, it does nothing.
+   */
+  from?: string;
   note: string;
 }
 
