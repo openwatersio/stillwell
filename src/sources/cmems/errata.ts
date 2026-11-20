@@ -168,6 +168,12 @@ export default {
         await allSuspect(store, id, e.since!, e.until!);
         const high = (await levels(store, id, "2026-02-10")).filter((o) => o.level > 7);
         if (!high.length) throw new Error(`the store holds no ${id} level above 7 m on 2026-02-10`);
+        // CMEMS flags none of them, as the entry says.
+        const flagged = high.filter((o) => (o.source_flag ?? Flag.good) >= Flag.suspect);
+        if (flagged.length)
+          throw new Error(
+            `CMEMS flags ${flagged.length} of ${id}'s ${high.length} levels above 7 m on 2026-02-10`,
+          );
         for (const day of ["2026-01-25", "2026-02-25"]) {
           const top = Math.max(...(await levels(store, id, day)).map((o) => o.level));
           if (top > 6.7) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 6.7 m`);
@@ -194,6 +200,12 @@ export default {
         await allSuspect(store, id, e.since!, e.until!);
         const high = (await levels(store, id, "2026-04-10")).filter((o) => o.level > 7);
         if (!high.length) throw new Error(`the store holds no ${id} level above 7 m on 2026-04-10`);
+        // CMEMS flags none of them, as the entry says.
+        const flagged = high.filter((o) => (o.source_flag ?? Flag.good) >= Flag.suspect);
+        if (flagged.length)
+          throw new Error(
+            `CMEMS flags ${flagged.length} of ${id}'s ${high.length} levels above 7 m on 2026-04-10`,
+          );
         for (const day of ["2026-04-05", "2026-04-20"]) {
           const top = Math.max(...(await levels(store, id, day)).map((o) => o.level));
           if (top > 6.7) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 6.7 m`);
