@@ -17,7 +17,7 @@ import {
  */
 const API = "https://environment.data.gov.uk/flood-monitoring";
 const DAY_MS = 86_400_000;
-/** Days back the archive's files are sure to reach; it kept about 380 in November 2026. */
+/** Days back the archive's files are sure to reach; it keeps about 380. */
 const ARCHIVE_DAYS = 350;
 /** Whole days back the readings API still answers for, two short of what it keeps. */
 const API_DAYS = 28;
@@ -35,8 +35,8 @@ export const metadata: SourceMetadata = {
   },
   attribution:
     "This uses Environment Agency flood and river level data from the real-time data API (Beta)",
+  // Where the API reference (`url`) sends questions and problems.
   contact: { url: "https://environment.data.gov.uk/support" },
-  terms: "Real-time readings, not quality-controlled.",
   chart_datum: "CD",
   // Admiralty Chart Datum.
   datum_aliases: { CD: "ACD" },
@@ -80,12 +80,12 @@ const UNITS: Record<string, string> = { mAOD: "AOD", m: "CD" };
  * Every `TideGauge` station with a tidal level in meters. Most National Tide
  * Gauge Network gauges are listed twice, once in mAOD and once in meters above
  * chart datum, with the same readings, so a gauge's chart datum series is kept
- * only where it has no mAOD one, which none has had since November 2026. An
+ * only where it has no mAOD one. An
  * mAOD station names in `same_as` its gauge's chart datum series the store
  * lists, and keeps a link it had. Series in millimeters copy one in meters. A station is inactive
  * and not polled when the measures list gives its series no latest reading,
  * as for one that has never reported (Mumbles and Stornoway) or stopped months
- * ago (Jersey and Washpile, in November 2026), and its readings hold nothing in
+ * ago (Jersey and Washpile), and its readings hold nothing in
  * the API's 28 days, so a day's outage retires nothing. A series the list
  * leaves out keeps its station active.
  */
@@ -142,7 +142,7 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
   if (kept.length && stopped.size === kept.length) throw new Error("EA reported no tidal readings");
   if (stopped.size)
     console.log(`  ea: no readings in ${API_DAYS} days: ${[...stopped].join(", ")}`);
-  // A chart datum series the store lists, such as Bournemouth's until November 2026, is the
+  // A chart datum series the store lists, such as Bournemouth's `E71924`, is the
   // same gauge as the listed mAOD station with its label, or else the nearest within about
   // 2 km, and keeps its history in that station's group. A link the store holds stays.
   const aodListed = kept.filter((k) => k.datum === "AOD").map((k) => k.s);

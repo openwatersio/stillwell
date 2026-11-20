@@ -30,6 +30,9 @@ export const metadata: SourceMetadata = {
   id: "dwr",
   name: "California Department of Water Resources (Water Data Library)",
   url: "https://wdl.water.ca.gov/ContinuousData.aspx",
+  // WDL states no license, and the CNRA portal gives the dataset's as "not
+  // specified". DWR's Conditions of Use are a privacy notice and a disclaimer,
+  // and restrict neither redistribution nor commercial use.
   license: {
     id: "CA-DWR-public-records",
     name: "California public records, no license stated",
@@ -38,9 +41,11 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "California Department of Water Resources",
+  // The Water Data Library's contact page gives this address for questions
+  // about the data or the site.
   contact: { email: "wdlweb@water.ca.gov", url: "https://wdl.water.ca.gov/ContactUs.aspx" },
   terms:
-    "DWR publishes the Water Data Library without a license or a restriction on reuse. Its conditions of use disclaim any guarantee of accuracy, completeness or timeliness, and DWR edits its data after publishing it. Changes in the store: levels converted from feet to meters and rounded to the millimeter, missing readings dropped, and quality flags added; values from the last four calendar months are marked preliminary.",
+    "DWR publishes the Water Data Library without a license or a restriction on reuse. Its conditions of use disclaim any guarantee of accuracy, completeness or timeliness.",
   // Files are rewritten daily and run a day or more behind, too late for the
   // hourly window; Monthly's refetch brings each station up to date instead.
   hourly: false,
@@ -383,7 +388,8 @@ export function parse(text: string, number: string): Observation[] {
       flag,
     });
   }
-  // Files are in time order; an edited one that isn't would break the slicing in `levels`.
+  // Files are in time order; an edited one that isn't would break the slicing in
+  // `levels`, so it's sorted, and a repeated time keeps its last row.
   return out.every((o, i) => i === 0 || o.time > out[i - 1]!.time)
     ? out
     : [...new Map(out.map((o) => [o.time, o])).values()].sort((a, b) => a.time - b.time);

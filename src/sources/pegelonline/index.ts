@@ -36,6 +36,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE",
+  // The form is "Kontakt & Rückmeldung"; the address is from the imprint, https://www.pegelonline.wsv.de/gast/impressum.
   contact: { email: "pegelonline@itzbund.de", url: "https://pegelonline.wsv.de/adminmail" },
   chart_datum: "SKN",
   // Raw values only: neither the feed nor the download ever finalizes them.
@@ -43,7 +44,6 @@ export const metadata: SourceMetadata = {
   finalizes: false,
   // Central European time, standard or summer.
   utc_offsets: [1, 2],
-  terms: "Raw, unchecked values.",
   // The download shows no step at any gauge zero's validFrom it covers (README).
   archive: "current",
 };

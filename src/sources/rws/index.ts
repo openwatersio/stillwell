@@ -36,6 +36,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Rijkswaterstaat",
+  // The data portal's contact page, which its water data page points to; RWS publishes no mailbox for data questions.
   contact: { url: "https://rijkswaterstaatdata.nl/contact/" },
   // Unchecked values are checked later.
   hourly: true,
@@ -235,7 +236,10 @@ export async function stations(): Promise<ListedStation[]> {
           lon: l.Lon,
           // The Caribbean Netherlands (Bonaire, Sint Eustatius, Saba) has its own code.
           country_code: l.Lon < -30 ? "BQ" : "NL",
-          // The only water RWS's catalog names is the sea of its offshore platforms.
+          // The only water RWS's catalog names is the sea of its offshore platforms. Its
+          // descriptions are mostly a river kilometer or a former name, and no RWS dataset
+          // names each location's water: Meetnet Noordzee's `gebied` covers 77 sea sites
+          // under codes of its own.
           kind: /platform/i.test(l.Omschrijving ?? "") ? "coastal" : null,
           interval_s: measured ? 600 : null,
           datum,

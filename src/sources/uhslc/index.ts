@@ -37,12 +37,13 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "University of Hawaii Sea Level Center (UHSLC)",
+  // UHSLC's contact page, https://uhslc.soest.hawaii.edu/contact/. Its data metadata names only staff members.
   contact: { url: "https://uhslc.soest.hawaii.edu/contact/" },
   // Fast-delivery files arrive monthly, and research-quality values replace them a year or two later.
   hourly: false,
   finalizes: true,
   terms:
-    "The data may be used and redistributed for free but is not intended for legal use, since it may contain inaccuracies; no warranty. Cite Caldwell, Merrifield and Thompson (2015), doi:10.7289/V5V40S7W, and for fast-delivery data the date through which it was obtained. Fast-delivery values are preliminary and are replaced by research-quality values about once a year.",
+    "The data may be used and redistributed for free but is not intended for legal use, since it may contain inaccuracies; no warranty. Cite Caldwell, Merrifield and Thompson (2015), doi:10.7289/V5V40S7W, and for fast-delivery data the date through which it was obtained. Some stations carry their contributor's own terms, which set the station's commercial use and add the contributor's credit to its attribution.",
 };
 
 /** What UHSLC measures every level from; its `reference_datum`. */

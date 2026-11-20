@@ -34,11 +34,11 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "U.S. Geological Survey",
+  // The service contact in the Water Data API's OpenAPI description, https://api.waterdata.usgs.gov/ogcapi/v1/openapi?f=json.
   contact: { email: "wdfn@usgs.gov", url: "https://waterdata.usgs.gov/questions-comments/" },
   // Provisional values are approved months to years later.
   hourly: true,
   finalizes: true,
-  terms: "Provisional data are subject to revision until USGS approves them.",
 };
 
 /** The gage's own zero, which gage height (00065) is measured from. */
@@ -308,6 +308,7 @@ export const GAGE_DATUMS: Record<
   },
 };
 
+// The international foot; the survey foot differs by 2 parts per million, a quarter of a millimeter at 400 ft.
 const FEET = 0.3048;
 const DAY_MS = 86_400_000;
 
@@ -572,7 +573,7 @@ function toStation(
   } else if (datum === GAGE && surveyed && vertical && typeof location.altitude === "number")
     datums[vertical] = Math.round(location.altitude * FEET * 1000) / 1000 + 0; // + 0 turns -0 into 0
   // An unsurveyed altitude, or an unsurveyed method with no altitude, says the stored offsets aren't the gage's zero.
-  // A survey method with the altitude missing is a gap too, and keeps them.
+  // A survey method with the altitude missing, or a surveyed altitude in a datum VERTICAL_DATUMS lacks, keeps them.
   else if (datum === GAGE && !decided && !gap)
     noDatums =
       typeof location.altitude === "number"
