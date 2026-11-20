@@ -161,10 +161,10 @@ const asked = new Map<string, Promise<Record<string, number> | null>>();
 
 /**
  * Throws `DatumChanged` with `seriesChanged`'s reason as the reference, so
- * Ingest hourly starts a refresh, which opens or holds the epoch, and a
+ * The poller starts a refresh, which opens or holds the epoch, and a
  * rejected change matches its epoch and asks for none. Offsets that can't be
  * read refuse a backfill, which writes the store's years, but only warn for
- * `strict` false, so an outage of `stationlevels` doesn't stop hourly ingest.
+ * `strict` false, so an outage of `stationlevels` doesn't stop the poller.
  */
 async function checkChartDatum(
   code: string,

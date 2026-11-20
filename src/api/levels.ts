@@ -5,9 +5,26 @@ const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
-/** How far back `levels` reaches until the history moves onto the server (docs/plans/realtime.md, step 2). */
+/** The range a request gets when it gives no `start`, or no `end`, and how long a range's values can still change. */
 export const WINDOW_MS = 7 * DAY;
-// A start a few minutes past the window still passes, for clocks and a Worker's rounding.
+/** The longest range a request may ask for at `raw`, and at any other step. */
+export const MAX_RANGE_MS = { raw: 31 * DAY, step: 366 * DAY };
+/**
+ * The most stored values a request may decode, and hold at once: two
+ * year files of 1-minute values, which a range of a year at a step can
+ * reach into, and about 30 MB of values, which fit a Worker's 128 MB beside
+ * the station list. A station reporting more often has to be asked for a
+ * shorter range.
+ */
+export const MAX_VALUES = { read: 1_100_000, held: 270_000 };
+
+/** A range with more values than `MAX_VALUES` allows. */
+export class TooManyValues extends Error {
+  constructor() {
+    super("the station has too many values in the range; ask for a shorter one");
+  }
+}
+// A range a few minutes over its limit still passes, for clocks and a Worker's rounding.
 const SLACK_MS = 5 * MINUTE;
 
 /** Each `step`'s length; `raw` is every value. */
@@ -41,7 +58,7 @@ export interface LevelsQuery {
   includeBad: boolean;
 }
 
-/** One value as ClickHouse holds it. */
+/** One stored value, as D1 and the year files hold it. */
 export interface StoredLevel {
   epoch: number;
   time: number;
@@ -114,20 +131,19 @@ export function parseLevels(
   let start = time("start");
   end ??= start === undefined ? now : start + WINDOW_MS;
   start ??= end - WINDOW_MS;
-  if (start > end) errors.push({ path: "start", message: "start must be before end" });
-  else if (start > now + SLACK_MS)
-    errors.push({ path: "start", message: "start must not be in the future" });
-  else if (end - start > WINDOW_MS + SLACK_MS)
-    errors.push({ path: "end", message: "start and end must be at most 7 days apart" });
-  if (start < now - WINDOW_MS - SLACK_MS)
-    errors.push({
-      path: "start",
-      message: "start must be within the last 7 days, until the archive moves onto the server",
-    });
-
   const stepName = one("step") ?? "6m";
   if (!Object.hasOwn(STEPS, stepName))
     errors.push({ path: "step", message: `step must be one of ${Object.keys(STEPS).join(", ")}` });
+
+  const longest = stepName === "raw" ? MAX_RANGE_MS.raw : MAX_RANGE_MS.step;
+  if (start > end) errors.push({ path: "start", message: "start must be before end" });
+  else if (start > now + SLACK_MS)
+    errors.push({ path: "start", message: "start must not be in the future" });
+  else if (end - start > longest + SLACK_MS)
+    errors.push({
+      path: "end",
+      message: `start and end must be at most ${longest / DAY} days apart at ${stepName === "raw" ? "raw" : "a step"}`,
+    });
 
   const units = one("units") ?? "meters";
   if (units !== "meters" && units !== "feet")
@@ -207,6 +223,43 @@ function convert(station: CatalogStation, conversion: Conversion, v: StoredLevel
   return offset === null || offset === undefined ? null : v.level + offset;
 }
 
+/** Whether `sample` can show a value: one that converts, and isn't bad unless bad ones are asked for. */
+export function usableFor(
+  station: CatalogStation,
+  conversion: Conversion,
+  includeBad: boolean,
+): (v: StoredLevel) => boolean {
+  return (v) => (includeBad || v.flag !== Flag.bad) && convert(station, conversion, v) !== null;
+}
+
+/**
+ * A sink for values, in any order, that keeps only those `sample` could
+ * pick at `step`: for each multiple of the step, the usable value nearest
+ * it within half a step, the earlier of two as near. It holds a value per
+ * step time, however many it's given.
+ */
+export function stepSampler(
+  step: number,
+  usable: (v: StoredLevel) => boolean,
+): { add(v: StoredLevel): void; values(): StoredLevel[] } {
+  const nearest = new Map<number, StoredLevel>();
+  return {
+    add(v) {
+      if (!usable(v)) return;
+      // The step times within half a step: the nearest, or the two either side at exactly half.
+      for (const n of new Set([Math.floor(v.time / step), Math.ceil(v.time / step)])) {
+        const away = Math.abs(v.time - n * step);
+        if (away > step / 2) continue;
+        const kept = nearest.get(n);
+        const keptAway = kept && Math.abs(kept.time - n * step);
+        if (!kept || away < keptAway! || (away === keptAway && v.time < kept.time))
+          nearest.set(n, v);
+      }
+    },
+    values: () => [...new Set(nearest.values())],
+  };
+}
+
 /**
  * The values between `start` and `end` that convert: every one at `raw`,
  * otherwise the one nearest each multiple of the step in the range, within
@@ -221,12 +274,13 @@ export function sample(
   values: StoredLevel[],
   query: LevelsQuery,
 ): { time: number; level: number; flag: number; received: number | null }[] {
+  // Converted only once picked, so a station-year's values aren't copied.
+  const converted = (v: StoredLevel) => ({ ...v, level: convert(station, conversion, v)! });
   const usable = values
-    .filter((v) => query.includeBad || v.flag !== Flag.bad)
-    .map((v) => ({ ...v, level: convert(station, conversion, v) }))
-    .filter((v): v is StoredLevel => v.level !== null)
+    .filter(usableFor(station, conversion, query.includeBad))
     .sort((a, b) => a.time - b.time);
-  if (!query.step) return usable.filter((v) => v.time >= query.start && v.time <= query.end);
+  if (!query.step)
+    return usable.filter((v) => v.time >= query.start && v.time <= query.end).map(converted);
 
   const picked: StoredLevel[] = [];
   const half = query.step / 2;
@@ -244,13 +298,13 @@ export function sample(
     const v = usable[i];
     if (v && Math.abs(v.time - at) <= half && picked.at(-1) !== v) picked.push(v);
   }
-  return picked;
+  return picked.map(converted);
 }
 
 /**
  * `reporting`; `stale` past three of the station's intervals, and never
  * under two hours, as the poller's alert counts, since many sources send a
- * station's values in hourly batches and the server fills some only hourly;
+ * station's values in hourly batches and the poller fills some only hourly;
  * or `offline` past a day, as of the newest value.
  */
 export function statusOf(station: CatalogStation, asOf: number | null, now: number): string {
@@ -258,7 +312,7 @@ export function statusOf(station: CatalogStation, asOf: number | null, now: numb
   return now - asOf > Math.max(3 * intervalOf(station), 2 * HOUR) ? "stale" : "reporting";
 }
 
-/** How long a response may be cached, in seconds: a day once the range has passed the poller's window, else the station's interval up to 5 minutes. */
+/** How long a response may be cached, in seconds: a day once the range ended over 7 days ago, when its values have settled, else the station's interval up to 5 minutes. */
 export function maxAge(station: CatalogStation, end: number, now: number): number {
   if (end < now - WINDOW_MS) return 86_400;
   return Math.min(station.min_interval_s ?? 300, 300);

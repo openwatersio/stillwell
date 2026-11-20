@@ -1,0 +1,8 @@
+.git
+node_modules
+data
+.cache
+site
+docs
+test
+**/*.md

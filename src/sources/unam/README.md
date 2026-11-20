@@ -15,8 +15,8 @@ One-minute sea levels from each sensor at 26 of the 27 tide gauges of Mexico's S
 
 - **Station list:** the stations come from the menu of a station page (`estaciones/?estacion=1`), which leaves out the page's own station, so that one comes from the page's heading. A new station without a position, a column the adapter doesn't know, or a page whose heading it can't read fails the list's refresh rather than be left out silently.
 - **Files:** `estaciones/grdata/data-<number>_metros.csv`, rewritten every minute, about 300 KB: a header, `Tiempo,Pronostico,` then a column per sensor, and a line per minute for the last 5 days and a few hours, blank where a sensor has no value.
-- **Reading files:** the adapter reads the header (the first 512 bytes), then the end of the file by a byte range big enough for the hours asked for, at most 80 bytes a minute, about 60 KB for hourly ingest's 12 hours; the cut first line is skipped, and so is a last line without its newline, which the file's rewrite can leave cut mid-value. A station's sensors share both requests. A request that starts more than 5 days back is refused (see below).
-- **Gaps:** hourly ingest reads the last 12 hours, so after a longer gap, run the backfill below within 5 days of its start, or the values are lost for good. A whole file that starts more than 2 minutes after the hours asked for, as when SMN restarts its logger, is refused, and so is one that ends more than 30 minutes before them, as a read caught mid-rewrite can, so a fetch doesn't replace stored values with fewer. A station whose file can't be read fails the list's refresh, which keeps the list it had.
+- **Reading files:** the adapter reads the header (the first 512 bytes), then the end of the file by a byte range big enough for the hours asked for, at most 80 bytes a minute, about 60 KB for the poller's 12 hours; the cut first line is skipped, and so is a last line without its newline, which the file's rewrite can leave cut mid-value. A station's sensors share both requests. A request that starts more than 5 days back is refused (see below).
+- **Gaps:** the poller reads the last 12 hours, so after a longer gap, run the backfill below within 5 days of its start, or the values are lost for good. A whole file that starts more than 2 minutes after the hours asked for, as when SMN restarts its logger, is refused, and so is one that ends more than 30 minutes before them, as a read caught mid-rewrite can, so a fetch doesn't replace stored values with fewer. A station whose file can't be read fails the list's refresh, which keeps the list it had.
 - **Limits:** SMN publishes no rate limit and has no robots.txt. Its pages refresh themselves every 5 minutes, so `min_interval_s` is 300. Requests start half a second apart.
 
 ### Backfill
@@ -31,4 +31,4 @@ That's 26 stations, two requests each; 4 days' range is bigger than the file, so
 
 ### Scheduled runs
 
-Monthly refreshes SMN's list on the 2nd, and Ingest hourly takes the stations from its next run.
+Monthly refreshes SMN's list on the 2nd, and the poller takes the stations from its next run.

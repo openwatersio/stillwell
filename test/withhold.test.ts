@@ -20,7 +20,8 @@ import {
   boundsPath,
   analysisHistoryPath,
   emptyYearsPath,
-  recentPath,
+  recentDayPath,
+  recentDays,
   requalifyLeftPath,
   backfilledPath,
   seriesPath,
@@ -125,7 +126,7 @@ beforeEach(async () => {
 afterEach(() => rm(store, { recursive: true }));
 
 describe("refreshSource with withheld stations", () => {
-  it("drops them from the list, its snapshot, bounds and recent window, without tripping the shrink guard", async () => {
+  it("drops them from the list, its snapshot, bounds and daily files, without tripping the shrink guard", async () => {
     // 20 active stations, 12 of them withheld: the 8 left would be a sharp shrink.
     const codes = Array.from({ length: 20 }, (_, i) => (i < 12 ? `x${i}` : `k${i}`));
     const all = codes.map((c) => listed("test", c));
@@ -140,15 +141,18 @@ describe("refreshSource with withheld stations", () => {
         screened: true,
       })),
     );
-    await writeRecent(recentPath(store, "test"), [
-      ["test/x0", "test/k12"].map((station) => ({
-        station,
-        epoch: 1,
-        time: T,
-        level: 1,
-        flag: Flag.preliminary,
-      })),
-    ]);
+    // Yesterday and today, and a day older than the last 30 that only a listing finds; the day between has no file.
+    const days = [...recentDays(Date.now(), 3).filter((_, i) => i !== 1), "2020-01-01"];
+    for (const day of days)
+      await writeRecent(recentDayPath(store, "test", day), [
+        ["test/x0", "test/k12"].map((station) => ({
+          station,
+          epoch: 1,
+          time: T,
+          level: 1,
+          flag: Flag.preliminary,
+        })),
+      ]);
     await writeJsonArray(emptyYearsPath(store, "test"), [
       { key: "test/x0 levels 1 1990", seen: NOW },
       { key: "test/k12 levels 1 1990", seen: NOW },
@@ -225,10 +229,12 @@ describe("refreshSource with withheld stations", () => {
       [...(await readStationBounds(boundsPath(store, "test"))).keys()],
       ["test/k12"],
     );
-    assert.deepEqual(
-      (await readRecent(recentPath(store, "test"))).map((r) => r.station),
-      ["test/k12"],
-    );
+    for (const day of days)
+      assert.deepEqual(
+        (await readRecent(recentDayPath(store, "test", day))).map((r) => r.station),
+        ["test/k12"],
+        day,
+      );
     assert.deepEqual(
       JSON.parse(await readFile(emptyYearsPath(store, "test"), "utf8")).map(
         (r: { key: string }) => r.key,

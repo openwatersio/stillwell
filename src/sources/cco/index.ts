@@ -46,8 +46,8 @@ export const metadata: SourceMetadata = {
   datum_aliases: { CD: "ACD" },
   // The API has each reading within 10 minutes.
   hourly: true,
-  // The key is for one read of each site an hour, which the hourly job makes (README.md).
-  poller: "recent",
+  // The key is for one read of each site an hour (README.md).
+  poller: "hourly",
   // Readings carry no flag until the monthly check, which can flag them.
   finalizes: true,
   // An outage is an error, so a year with no readings has none.
