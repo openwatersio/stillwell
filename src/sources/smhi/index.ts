@@ -31,9 +31,10 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "SMHI",
+  // Named for questions on the oceanographic observations API, https://opendata-download-ocobs.smhi.se/api.
   contact: { email: "dataleveranser@smhi.se" },
   terms:
-    "SMHI's open data is licensed under CC BY 4.0 (Sweden), commercial use included. Name SMHI as the source and say whether you changed the data. SMHI asks users not to download the same data repeatedly and to use its latest update. Changes in the store: levels converted from centimeters to meters, and quality flags added; values from the current and previous calendar months are marked preliminary.",
+    "SMHI asks users not to download the same data again and again, and to use its latest update. About half the gauges belong to others, among them the Swedish Maritime Administration, the Port of Gothenburg, the Ports of Stockholm and Chalmers, and SMHI publishes them under the same terms.",
   archive: "current",
   // `latest-day` has values within about an hour of their time.
   hourly: true,

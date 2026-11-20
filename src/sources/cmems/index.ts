@@ -29,6 +29,8 @@ export const metadata: SourceMetadata = {
   id: "cmems",
   name: "Copernicus Marine Service, In Situ TAC global near-real-time observations",
   url: `https://data.marine.copernicus.eu/product/${PRODUCT}/description`,
+  // Section 2.2 allows redistribution "via any media" and derived products "for any purpose", and
+  // 2.4 asks for the credit with the DOI. GESLA's research-only label for CMEMS is GESLA's own term.
   license: {
     id: "LicenseRef-Copernicus-Marine",
     name: "Copernicus Marine Service licence",
@@ -37,9 +39,10 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: `E.U. Copernicus Marine Service Information; ${DOI}`,
+  // Copernicus Marine's user support; each file also names its production unit (`publisher_email`) and provider.
   contact: { url: "https://marine.copernicus.eu/contact" },
   terms:
-    "The Copernicus Marine Service licence allows redistribution and derived products for any purpose, crediting \"E.U. Copernicus Marine Service Information\" with the product's DOI, and asks licensees to keep records of their use. Each station's attribution adds the institution that provides the gauge and any credit line that institution asks for, such as SHOM's DOI. Changes in the store: quality flags mapped to the store's and missing values dropped.",
+    "The Copernicus Marine Service licence asks licensees to keep records of their use (section 2.6). Each station's attribution adds the institution that provides the gauge and any credit line that institution asks for, such as SHOM's DOI.",
   // Values reach the store's sources within 24 to 48 hours, too late for the hourly window.
   hourly: false,
   // The latest window's values are replaced by the history copy about two months later.
@@ -260,6 +263,7 @@ export async function stations(previous: Station[] = []): Promise<CmemsStation[]
       first: null,
       last: null,
       // A provider's credit line, such as SHOM's DOI, is a condition of use, so it goes where users read credits.
+      // None found (SHOM's DOI, the Open Government Licence, DL-DE Zero 2.0) restricts republishing or commercial use.
       attribution: [metadata.attribution, institution, details.citation].filter(Boolean).join("; "),
       tide_station: null,
       same_as: [],

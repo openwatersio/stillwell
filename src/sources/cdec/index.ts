@@ -31,13 +31,18 @@ export const metadata: SourceMetadata = {
     commercial_use: true,
     redistribution: true,
   },
+  // Operators' terms restrict no reuse: the Bureau of Reclamation's data is a U.S. Government
+  // work, and the City of Petaluma's Terms of Use (https://cityofpetaluma.org/terms-of-use/)
+  // call its site's information "provided as a public service", its records public under
+  // California's Public Records Act.
   attribution: "California Department of Water Resources (CDEC)",
+  // The help desk address CDEC's contact page gives.
   contact: {
     email: "flood.webmaster@water.ca.gov",
     url: "https://cdec.water.ca.gov/CDECContact.html",
   },
   terms:
-    "CDEC publishes its data without a license or a restriction on reuse, under DWR's conditions of use, which disclaim any guarantee of accuracy, completeness or timeliness. CDEC's data is preliminary and subject to revision. Each station credits its operator. Changes in the store: levels converted from feet to meters and rounded to the millimeter, times converted from Pacific time to UTC, missing readings dropped, and quality flags added.",
+    "CDEC publishes its data without a license or a restriction on reuse, under DWR's conditions of use, which disclaim any guarantee of accuracy, completeness or timeliness. Each station credits its operator.",
   // Readings arrive within the hour.
   hourly: true,
   // CDEC never marks a reading reviewed; DWR's reviewed record is the Water Data Library.

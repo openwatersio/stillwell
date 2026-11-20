@@ -37,6 +37,8 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "NOAA National Ocean Service, CO-OPS",
+  // The Stakeholder Services Branch, which the contact page (`url`) names for oceanographic data
+  // requests. CO-OPS publishes no channel for data errors as such.
   contact: {
     email: "Tide.Predictions@noaa.gov",
     url: "https://tidesandcurrents.noaa.gov/contact.html",
@@ -47,7 +49,6 @@ export const metadata: SourceMetadata = {
   finalizes: true,
   // `rowsOf` returns nothing only for "No data was found"; any other error body or status throws.
   empty_means_none: true,
-  terms: "Preliminary data are unverified and may change once CO-OPS verifies them.",
 };
 
 const DATUM = "STND";

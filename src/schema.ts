@@ -258,7 +258,10 @@ export interface SourceMetadata {
    * address, since `sources.json` publishes it.
    */
   contact: { email: string; url?: string } | { email?: string; url: string };
-  /** Anything a user of the data should know about the terms. */
+  /**
+   * Conditions of use beyond the license and credit. The changes Stillwell
+   * makes to every source are stated in the `sources.json` schema.
+   */
   terms?: string;
   /**
    * `current` when the source serves past values measured from each station's
