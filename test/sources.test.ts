@@ -1737,12 +1737,12 @@ describe("coops", () => {
       new Date("1953-01-01Z"),
       span,
     );
-    // October's hourly height gives way to its 6-minute value; every other month keeps its own.
+    // October's verified 6-minute value joins its hourly height; every other month has only its own.
     assert.deepEqual(
       [asked, leap.map((l) => l.level)],
       [
         ["19520101 00:00-19520630 23:59", "19520701 00:00-19521231 23:59"],
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 6, 11, 12],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 6, 10, 11, 12],
       ],
     );
     asked.length = 0;
@@ -1756,6 +1756,167 @@ describe("coops", () => {
     assert.deepEqual(
       [asked, plain.map((l) => l.level)],
       [["19510501 00:00-19510731 23:59"], [5, 6, 7]],
+    );
+  });
+
+  it("prefers verified hourly heights to preliminary 6-minute values before 1997", async () => {
+    // Anchorage 1996: every 6-minute value is preliminary and sits well off the verified hours.
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({
+          data: [
+            { t: "1996-03-01 00:00", v: "10.119", f: "0,0,0,0", q: "p" },
+            { t: "1996-03-01 00:06", v: "10.18", f: "0,0,0,0", q: "p" },
+            { t: "1996-03-01 01:00", v: "10.0", f: "0,0,0,0", q: "p" },
+            // The hourly record has nothing for 02:00, so its preliminary value stays.
+            { t: "1996-03-01 02:00", v: "10.4", f: "0,0,0,0", q: "p" },
+            { t: "1996-03-01 02:06", v: "", f: "1,1,1,1", q: "p" },
+            // A verified 6-minute value keeps its time against the hourly height.
+            { t: "1996-03-01 03:00", v: "10.5", f: "0,0,0,0", q: "v" },
+          ],
+        }),
+      ],
+      [
+        /product=hourly_height/,
+        JSON.stringify({
+          data: [
+            { t: "1996-03-01 00:00", v: "9.103", f: "0,0" },
+            { t: "1996-03-01 01:00", v: "9.473", f: "0,0" },
+            { t: "1996-03-01 02:00", v: "", f: "0,0" },
+            { t: "1996-03-01 03:00", v: "9.6", f: "0,0" },
+            { t: "1996-03-01 04:00", v: "9.7", f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const levels = await coops.levels("9455920", new Date("1996-03-01Z"), new Date("1996-04-01Z"));
+    assert.deepEqual(
+      levels.map((r) => [new Date(r.time).toISOString().slice(11, 16), r.level, r.flag]),
+      [
+        ["00:00", 9.103, Flag.good],
+        ["01:00", 9.473, Flag.good],
+        ["02:00", 10.4, Flag.preliminary],
+        ["03:00", 10.5, Flag.good],
+        ["04:00", 9.7, Flag.good],
+      ],
+    );
+  });
+
+  it("keeps preliminary 6-minute values in hours the hourly record doesn't reach before 1997", async () => {
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({
+          data: [{ t: "1996-03-01 00:06", v: "10.18", f: "0,0,0,0", q: "p" }],
+        }),
+      ],
+      [/product=hourly_height/, JSON.stringify({ error: { message: "No data was found." } })],
+    ]);
+    const levels = await coops.levels("9468756", new Date("1996-03-01Z"), new Date("1996-04-01Z"));
+    assert.deepEqual(
+      levels.map((r) => [r.level, r.flag]),
+      [[10.18, Flag.preliminary]],
+    );
+  });
+
+  it("ignores hourly rows with no level, an impossible level or an impossible date", async () => {
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({
+          data: [
+            { t: "1996-03-01 00:06", v: "10.18", f: "0,0,0,0", q: "p" },
+            { t: "1996-03-01 01:06", v: "10.2", f: "0,0,0,0", q: "p" },
+          ],
+        }),
+      ],
+      [
+        /product=hourly_height/,
+        JSON.stringify({
+          data: [
+            { t: "1996-03-01 00:00", v: " ", f: "0,0" },
+            { t: "1996-03-01 01:00", v: "99999", f: "0,0" },
+            { t: "1996-02-30 00:00", v: "9.1", f: "0,0" },
+            { t: "1996-02-30 00:00", v: null, f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const levels = await coops.levels("9455920", new Date("1996-03-01Z"), new Date("1996-04-01Z"));
+    // No usable hourly height, so the hours keep their preliminary values.
+    assert.deepEqual(
+      levels.map((r) => [r.level, r.flag]),
+      [
+        [10.18, Flag.preliminary],
+        [10.2, Flag.preliminary],
+      ],
+    );
+  });
+
+  it("adds an hourly height only to an hour the 6-minute record has no value in", async () => {
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({ data: [{ t: "1995-03-01 05:06", v: "1.1", f: "0,0,0,0", q: "v" }] }),
+      ],
+      [
+        /product=hourly_height/,
+        JSON.stringify({
+          data: [
+            { t: "1995-03-01 05:00", v: "1.0", f: "0,0" },
+            { t: "1995-03-01 06:00", v: "1.2", f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const levels = await coops.levels("9435380", new Date("1995-03-01Z"), new Date("1995-04-01Z"));
+    assert.deepEqual(
+      levels.map((r) => r.level),
+      [1.1, 1.2],
+    );
+  });
+
+  it("fills every hour the 6-minute record lacks before 1997, not only those before its first value", async () => {
+    // 9435380 1995: the 6-minute record has the month's first and last days and nothing between.
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({
+          data: [
+            { t: "1995-03-01 00:00", v: "1.0", f: "0,0,0,0", q: "v" },
+            { t: "1995-03-01 00:06", v: "1.1", f: "0,0,0,0", q: "v" },
+            { t: "1995-03-31 23:00", v: "2.0", f: "0,0,0,0", q: "v" },
+          ],
+        }),
+      ],
+      [
+        /product=hourly_height/,
+        JSON.stringify({
+          data: [
+            { t: "1995-03-01 00:00", v: "1.0", f: "0,0" },
+            { t: "1995-03-01 01:00", v: "1.2", f: "0,0" },
+            { t: "1995-03-15 12:00", v: "1.5", f: "0,0" },
+            { t: "1995-03-31 23:00", v: "2.0", f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const levels = await coops.levels("9435380", new Date("1995-03-01Z"), new Date("1995-04-01Z"));
+    assert.deepEqual(
+      levels.map((r) => [new Date(r.time).toISOString().slice(0, 16), r.level]),
+      [
+        ["1995-03-01T00:00", 1.0],
+        ["1995-03-01T00:06", 1.1],
+        ["1995-03-01T01:00", 1.2],
+        ["1995-03-15T12:00", 1.5],
+        ["1995-03-31T23:00", 2.0],
+      ],
     );
   });
 
@@ -1799,7 +1960,7 @@ describe("coops", () => {
     );
   });
 
-  it("fills in hourly heights only before the 6-minute record starts", async () => {
+  it("keeps a verified 6-minute value over the hourly height at the same time", async () => {
     serve([
       [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
       [

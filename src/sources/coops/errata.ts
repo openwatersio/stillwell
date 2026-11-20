@@ -121,6 +121,34 @@ export default {
         }
       },
     },
+    {
+      id: "coops-preliminary-offset-before-1997",
+      stations: ["coops/1840000", "coops/9455920"],
+      since: "1994-01-01",
+      until: "1997-01-01",
+      handling: "dropped",
+      error:
+        "CO-OPS's preliminary 6-minute water levels from 1994 to 1996 sit well above its verified hourly heights at the same times, by a near-constant 0.66 m at Chuuk, Moen Island (1840000) and by 1.7 to 1.9 m on average at Anchorage (9455920), whose 1996 differences run from -2.3 to 7.9 m. Its verified record for those years is the hourly heights.",
+      response:
+        "In an hour with a verified hourly height, the store keeps none of the preliminary 6-minute values and reads the hourly height instead. An hour with no hourly height keeps its preliminary values, flagged `preliminary`.",
+      evidence:
+        "Found November 2026 at Anchorage, and measured the same month against CO-OPS's API with `datum=STND`, pairing each preliminary 6-minute value with the hourly height at the same minute over every month the store holds as preliminary: 1840000 in 1994 (8,554 pairs, mean +0.66 m) and 1995 (2,020 pairs, +0.664 m), Anchorage in 1995 (4,055 pairs, mean +1.73 m) and 1996 (8,757 pairs, mean +1.87 m). Every preliminary hour at these two stations has an hourly height, and these are the only 1994 to 1996 station-years the store holds preliminary where CO-OPS has hourly heights. Two others hold preliminary values with no hourly heights to compare: Nome (9468756) in 1994 to 1996, and Skagway (9452400) in September to December 1996.",
+      // An hourly height replaces every preliminary hour at these stations, so none stays in the months read.
+      check: async (store) => {
+        for (const [id, since, until] of [
+          ["coops/1840000", "1994-03-01", "1994-04-01"],
+          ["coops/9455920", "1996-03-01", "1996-04-01"],
+        ] as const) {
+          const rows = await store.levels(id, since, until);
+          if (!rows.length) throw new Error(`the store holds no ${id} levels from ${since}`);
+          const preliminary = rows.filter((o) => o.flag === Flag.preliminary).length;
+          if (preliminary)
+            throw new Error(
+              `${preliminary} of ${id}'s ${rows.length} levels from ${since} are preliminary`,
+            );
+        }
+      },
+    },
   ],
   retired: [],
 } satisfies ErrataFile;
