@@ -5,7 +5,8 @@
  *
  *   node server/export.ts <source> <YYYY-MM-DD,...>
  *
- * A day with no values writes no file, so a missing day stays missing rather than empty.
+ * A day with no values writes an empty file, so values the live store no longer holds, as after a withholding,
+ * leave the day's file too.
  */
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -35,12 +36,8 @@ try {
     }
     const local = join(dir, `${day}.parquet`);
     await writeRecent(local, pages());
-    if (!values) {
-      console.error(`${source} ${day}: no values`);
-      continue;
-    }
     await store.put(recentDayPath("", source, day).slice(1), readFileSync(local));
-    console.error(`${source} ${day}: ${values} values`);
+    console.error(`${source} ${day}: ${values ? `${values} values` : "no values"}`);
   }
 } finally {
   rmSync(dir, { recursive: true, force: true });

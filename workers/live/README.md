@@ -13,6 +13,7 @@ Run these from this directory after `npx wrangler@4 login`. The build needs Dock
 1. **The database.** `npx wrangler@4 d1 create stillwell-live`, put its ID in [wrangler.jsonc](wrangler.jsonc), then `npx wrangler@4 d1 execute stillwell-live --remote --file schema.sql`.
 2. **The secrets.** `npx wrangler@4 secret put <name>` for `CCO_API_KEY`, `CCO_REFERER` and `USGS_API_KEY`, the sources' keys, and `GITHUB_TOKEN`, a token that may start the Monthly workflow and write issues in openwatersio/stillwell, and `STORE_TOKEN`, any long random string, such as `openssl rand -hex 32`.
 3. **The lifecycle rule.** `npx wrangler@4 r2 bucket lifecycle add water-levels recent-days recent/ --expire-days 30`, so the daily files go after 30 days.
-4. **Deploy.** `npx wrangler@4 deploy`. The cron starts the container within a minute.
+4. **The address.** Set `ORIGIN` in [wrangler.jsonc](wrangler.jsonc)'s `vars` to this Worker's workers.dev URL on the account it deploys to, where the container reaches `/store/`.
+5. **Deploy.** `npx wrangler@4 deploy`. The cron starts the container within a minute.
 
 The container's output is in the Worker's logs, which `npx wrangler@4 tail` streams.

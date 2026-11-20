@@ -6,7 +6,7 @@ GESLA often holds a gauge more than once, from two contributors or in several ve
 
 The usgs and coops history backfills were still running when this was generated (coops 874 of 2930 stations with years, usgs 12044 of 13983 stations with years), so their gaps will shrink. 61 records' series are marked in the years file (`years_marked`): a run was rewriting them, or stopped partway or couldn't read a file, so their years may be short. Regenerate with `npm run gesla:coverage` after a backfill campaign, first taking a finished source out of `BACKFILLING` and updating `REACH` in [the script](../../../scripts/gesla-coverage.ts); it reads the public store, or a local one through `STILLWELL_STORE`.
 
-- **5104** of 6358 records are linked to the originator's series, and **2386** of those to one the poller polls. Another **143** have only UHSLC's copy.
+- **5104** of 6358 records are linked to the originator's series, and **2386** of those to one that the poller polls. Another **143** have only UHSLC's copy.
 - **1379** linked records have years their originator lacks: **8413** station-years over 1152 gauges. **1254** records have no originator series, **16111** station-years.
 - Originators have **4766** station-years GESLA lacks, 1434 of them after GESLA's last year.
 

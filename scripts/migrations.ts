@@ -101,7 +101,9 @@ switch (command) {
     break;
   case "baseline": {
     if (record) throw new Error(`${path} already has a baseline, ${record.baseline || "none"}`);
-    await write(begin(migrations, id === "none" ? "" : id!));
+    // `none` begins with no migration done; a missing name is a mistake, not none.
+    if (!id) throw new Error("usage: migrations.ts baseline <id|none>");
+    await write(begin(migrations, id === "none" ? "" : id));
     break;
   }
   case "list":

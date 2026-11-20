@@ -108,11 +108,21 @@ async function health(env: Env, minute: number): Promise<void> {
  * scripts/alert.sh does for the workflows. A source with no pass in the last week drops out, with its issue left open.
  */
 async function alert(env: Env, now: number): Promise<void> {
-  const { results } = await env.LIVE.prepare(
+  const { results: passes } = await env.LIVE.prepare(
     "SELECT source, max(finished) AS last, max(CASE WHEN ok = 1 THEN finished END) AS last_ok FROM polls WHERE finished > ? GROUP BY source",
   )
     .bind(now - 7 * DAY_MS)
     .all<{ source: string; last: number; last_ok: number | null }>();
+  // Every source with live values too, so one whose passes never record still opens its issue.
+  const { results: held } = await env.LIVE.prepare(
+    "SELECT DISTINCT substr(station, 1, instr(station, '/') - 1) AS source FROM live",
+  ).all<{ source: string }>();
+  const results = [
+    ...passes,
+    ...held
+      .filter((h) => !passes.some((p) => p.source === h.source))
+      .map((h) => ({ source: h.source, last: 0, last_ok: null })),
+  ];
   if (!env.GITHUB_TOKEN) throw new Error("GITHUB_TOKEN isn't set, so stale sources open no issue");
   const github = async (path: string, init: RequestInit = {}) => {
     const response = await fetch(`https://api.github.com/repos/${REPO}/${path}`, {

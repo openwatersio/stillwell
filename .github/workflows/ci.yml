@@ -43,6 +43,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "CLOUDFLARE_API_TOKEN isn't set in the cloudflare environment, so nothing deploys"
+            exit 0
+          fi
           for worker in live api cron; do
             (cd "workers/$worker" && npx wrangler deploy)
           done
