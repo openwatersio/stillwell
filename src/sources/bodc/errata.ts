@@ -1,7 +1,7 @@
-import { dayAfter, flaggedSpan, type ErrataFile, type StoreReader } from "../../errata.ts";
+import { dayAfter, type ErrataFile, type StoreReader } from "../../errata.ts";
 import { POSITIONS } from "../../positions.ts";
 import { Flag } from "../../schema.ts";
-import { distanceKm, median } from "../../stats.ts";
+import { distanceKm } from "../../stats.ts";
 
 /** A station's stored levels, throwing when there are none. */
 async function levels(store: StoreReader, id: string, since: string, until = dayAfter(since, 1)) {
@@ -63,7 +63,7 @@ export default {
       error:
         "BODC's ERDDAP datasets for the UK National Tide Gauge Network hold less than its processed files. About one value in 32 is missing, so a 31-day month has 2,880 values, not 2,976. Whole months are missing. Most gauges' records end in December 2024, February 2026 or September 2026, though BODC's processed data page offers the network to August 2026.",
       response:
-        "The store keeps what ERDDAP serves and leaves the gaps. Monthly's refetch reads every station's last two years again, so months BODC adds later reach the store. GESLA's `-bodc` records hold BODC's processed files to 2024 or 2025 without these gaps.",
+        "The store keeps what ERDDAP serves and leaves the gaps. Monthly's refetch reads every station's last three calendar years again, so months BODC adds later reach the store. GESLA's `-bodc` records hold BODC's processed files to 2024 or 2025 without these gaps.",
       evidence:
         "At Lowestoft (`LOW_ukcff_3942_001`) on 1 June 2024, ERDDAP has 93 of the day's 96 quarter hours. 07:30, 15:15 and 23:00 are missing; GESLA's copy has them (07:30 is 1.956 m). Over May 2024, ERDDAP has no Lowestoft values at all, while GESLA's copy has 2,976.\n\nAt Lerwick (`LER_ukcff_4109_001`), the months present have 2,880 values in 31-day months, 2,788 in 30-day ones and 2,602 in February. These months are missing: May to December 2022, October 2023 to February 2024, May 2024, July 2024, and April to September 2025. Holyhead has no values in March 2026.\n\nRecords end on 2024-12-31 at 16 gauges, 2026-02-28 at 9, 2026-09-30 at 15, 2024-12-07 at Mumbles and 2025-11-30 at Workington. Checked on 2026-11-09.",
       reported: "2026-11-09",
@@ -99,7 +99,7 @@ export default {
       until: "2025-10-15",
       handling: "kept",
       error:
-        "BODC's ERDDAP gives St. Helier 0.000 m at 19:15 UTC on 14 October 2025, between 5.559 m at 19:00 and 6.77 m after a one-hour gap.",
+        "BODC's ERDDAP gives St. Helier 0.000 m at 19:15 UTC on 14 October 2025, between 5.559 m at 19:00 and 6.772 m after a one-hour gap.",
       response:
         "The value is kept as served, with BODC's good flag as `source_flag`. QC flags it `suspect` with the two values before it. Its residual-jump rule flags the 0.000 m, and its spike rule flags the 5.383 m at 18:45 and 5.559 m at 19:00, which it judges against the 0.000 m. No erratum span flags it, since spans are whole days and would mark the rest of the day suspect too.",
       evidence:
@@ -127,12 +127,22 @@ export default {
             `St. Helier doesn't hold 5.383 m at 18:45, 5.559 m at 19:00, 0.000 m at 19:15 and 6.772 m after an hour's gap on ${day}`,
           );
         for (const o of [first, before, zero])
-          if (o.source_flag !== Flag.good || o.flag !== Flag.suspect)
+          if (o.source_flag !== Flag.good)
             throw new Error(
-              `St. Helier's ${o.level} m at ${new Date(o.time).toISOString()} is flagged ${o.flag}, source flag ${o.source_flag}, not suspect by QC over BODC's good flag`,
+              `St. Helier's ${o.level} m at ${new Date(o.time).toISOString()} has source flag ${o.source_flag}, not BODC's good`,
             );
-        if (after.flag !== Flag.good)
-          throw new Error(`St. Helier's ${after.level} m after the gap is flagged ${after.flag}`);
+        // QC flags these three and no other value that day.
+        const suspect = rows.filter((o) => o.flag >= Flag.suspect).map((o) => o.time);
+        const all = (await levels(store, e.stations![0]!, day)).filter(
+          (o) => o.flag >= Flag.suspect,
+        );
+        const expected = [first.time, before.time, zero.time];
+        if (all.map((o) => o.time).join() !== expected.join() || suspect.length !== 3)
+          throw new Error(
+            `St. Helier's suspect levels on ${day} are at ${all.map((o) => new Date(o.time).toISOString()).join(", ") || "no time"}, not 18:45, 19:00 and 19:15`,
+          );
+        if (after.time !== Date.parse(`${day}T20:15Z`))
+          throw new Error(`St. Helier's first level after the gap isn't at 20:15 UTC on ${day}`);
       },
     },
     {
