@@ -1760,7 +1760,7 @@ describe("coops", () => {
   });
 
   it("prefers verified hourly heights to preliminary 6-minute values before 1997", async () => {
-    // Anchorage 1996: every 6-minute value is preliminary and sits a meter off the verified hours.
+    // Anchorage 1996: every 6-minute value is preliminary and sits well off the verified hours.
     serve([
       [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
       [
@@ -1770,7 +1770,7 @@ describe("coops", () => {
             { t: "1996-03-01 00:00", v: "10.119", f: "0,0,0,0", q: "p" },
             { t: "1996-03-01 00:06", v: "10.18", f: "0,0,0,0", q: "p" },
             { t: "1996-03-01 01:00", v: "10.0", f: "0,0,0,0", q: "p" },
-            // The hourly record has nothing for 02:00, so the preliminary value stays.
+            // The hourly record has nothing for 02:00, so its preliminary value stays.
             { t: "1996-03-01 02:00", v: "10.4", f: "0,0,0,0", q: "p" },
             { t: "1996-03-01 02:06", v: "", f: "1,1,1,1", q: "p" },
             // A verified 6-minute value keeps its time against the hourly height.
@@ -1801,6 +1801,83 @@ describe("coops", () => {
         ["03:00", 10.5, Flag.good],
         ["04:00", 9.7, Flag.good],
       ],
+    );
+  });
+
+  it("keeps preliminary 6-minute values in hours the hourly record doesn't reach before 1997", async () => {
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({
+          data: [{ t: "1996-03-01 00:06", v: "10.18", f: "0,0,0,0", q: "p" }],
+        }),
+      ],
+      [/product=hourly_height/, JSON.stringify({ error: { message: "No data was found." } })],
+    ]);
+    const levels = await coops.levels("9468756", new Date("1996-03-01Z"), new Date("1996-04-01Z"));
+    assert.deepEqual(
+      levels.map((r) => [r.level, r.flag]),
+      [[10.18, Flag.preliminary]],
+    );
+  });
+
+  it("ignores hourly rows with no level, an impossible level or an impossible date", async () => {
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({
+          data: [
+            { t: "1996-03-01 00:06", v: "10.18", f: "0,0,0,0", q: "p" },
+            { t: "1996-03-01 01:06", v: "10.2", f: "0,0,0,0", q: "p" },
+          ],
+        }),
+      ],
+      [
+        /product=hourly_height/,
+        JSON.stringify({
+          data: [
+            { t: "1996-03-01 00:00", v: " ", f: "0,0" },
+            { t: "1996-03-01 01:00", v: "99999", f: "0,0" },
+            { t: "1996-02-30 00:00", v: "9.1", f: "0,0" },
+            { t: "1996-02-30 00:00", v: null, f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const levels = await coops.levels("9455920", new Date("1996-03-01Z"), new Date("1996-04-01Z"));
+    // No usable hourly height, so the hours keep their preliminary values.
+    assert.deepEqual(
+      levels.map((r) => [r.level, r.flag]),
+      [
+        [10.18, Flag.preliminary],
+        [10.2, Flag.preliminary],
+      ],
+    );
+  });
+
+  it("adds an hourly height only to an hour the 6-minute record has no value in", async () => {
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({ data: [{ t: "1995-03-01 05:06", v: "1.1", f: "0,0,0,0", q: "v" }] }),
+      ],
+      [
+        /product=hourly_height/,
+        JSON.stringify({
+          data: [
+            { t: "1995-03-01 05:00", v: "1.0", f: "0,0" },
+            { t: "1995-03-01 06:00", v: "1.2", f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const levels = await coops.levels("9435380", new Date("1995-03-01Z"), new Date("1995-04-01Z"));
+    assert.deepEqual(
+      levels.map((r) => r.level),
+      [1.1, 1.2],
     );
   });
 
