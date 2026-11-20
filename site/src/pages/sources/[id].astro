@@ -91,11 +91,23 @@ const first = list.reduce<Date | undefined>(
       <td>{s.attribution}</td>
     </tr>
     <tr>
-      <th>Checks its values</th>
+      <th>Finalizes preliminary data</th>
+      <td>{s.finalizes ? "yes" : "no"}</td>
+    </tr>
+    <tr>
+      <th>Changes in the store</th>
       <td>
-        {s.finalizes
-          ? "yes: preliminary values are checked later"
-          : "no: its preliminary values stay preliminary"}
+        <a href={sitePath("/docs/reference/sources/#column-terms")}>the same for every source</a>,
+        plus what <a href="#about">How Stillwell reads it</a> and the <a href="#errata">errata</a>
+        below describe
+      </td>
+    </tr>
+    <tr>
+      <th>Report errors to</th>
+      <td>
+        {s.contact?.email && <a href={`mailto:${s.contact.email}`}>{s.contact.email}</a>}
+        {s.contact?.email && s.contact?.url && " or "}
+        {s.contact?.url && <a href={s.contact.url}>contact page</a>}
       </td>
     </tr>
   </table>

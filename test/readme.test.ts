@@ -75,6 +75,24 @@ describe("readmeText", () => {
         !sections.includes("Errata"),
         `${id.name}: errata belong in errata.json, not the README`,
       );
+      // The page shows these from metadata, and links between sources on each gauge's page.
+      for (const label of [
+        "License",
+        "Licence",
+        "Credit",
+        "Terms",
+        "Contact",
+        "Contact for errors",
+        "Same gauge elsewhere",
+      ])
+        assert.ok(
+          !markdown.includes(`- **${label}:**`),
+          `${id.name}: the page already shows what a ${label} bullet would say`,
+        );
+      assert.ok(
+        !/checks its values/i.test(markdown),
+        `${id.name}: the Terms table says whether the source finalizes its data`,
+      );
       // What the page shows: none of the runbook, and no link a reader can't follow.
       checked++;
       const shown = readmeText(markdown);

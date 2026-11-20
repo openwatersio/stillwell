@@ -27,6 +27,7 @@ export const metadata: SourceMetadata = {
   id: "cco",
   name: "Channel Coastal Observatory, National Network of Regional Coastal Monitoring Programmes",
   url: "https://www.coastalmonitoring.org/ccoresources/api/",
+  // The API page (`url`) names and links the license.
   license: {
     id: "OGL-UK-3.0",
     name: "Open Government Licence v3.0",
@@ -36,9 +37,10 @@ export const metadata: SourceMetadata = {
   },
   attribution:
     "Real time data are from the National Network of Regional Coastal Monitoring Programmes, made freely available under the terms of the Open Government Licence v3.0. Data are not quality-controlled in real time.",
+  // The contact the API page (`url`) gives.
   contact: { url: "https://www.coastalmonitoring.org/contact_us", email: "cco@channelcoast.org" },
   terms:
-    "Open Government Licence v3.0. Real-time data are not quality-controlled; the observatory checks each month in arrears.",
+    "The API page asks for the credit, and the note that data are not quality-controlled in real time, on pages and other outputs that use the data.",
   chart_datum: "CD",
   // The Admiralty Tide Tables' offset added to Ordnance Datum levels (tide QC manual, 2.4).
   datum_aliases: { CD: "ACD" },

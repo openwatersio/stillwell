@@ -29,9 +29,8 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Danish Meteorological Institute (DMI)",
+  // The open-data team, named in DMI's terms of use (`license.url`).
   contact: { email: "friedata_kontakt@dmi.dk" },
-  terms:
-    "DMI's open data is licensed under CC BY 4.0: give appropriate credit, link to the license (https://creativecommons.org/licenses/by/4.0/) and indicate if changes were made. DMI says its observations are raw measurements that may be faulty, that its databases may change as errors are found, and that it gives no warranty. Changes in the store: levels converted from centimeters to meters, and quality flags added.",
   // Values arrive a minute or two after they're measured.
   hourly: true,
   // Hand checks stopped in 2013, so `auto` values stay as they are; a refetch would find nothing new.
