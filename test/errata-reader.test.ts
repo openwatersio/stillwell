@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
-import { mkdtempSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import { flaggedSpan, impossibleDropped, utcDay, type StoreReader } from "../src/errata.ts";
 import { Flag, type Observation, type StoredStation } from "../src/schema.ts";
-import { errataReader } from "../src/store/errata-reader.ts";
+import { errataReader, StoreReadError } from "../src/store/errata-reader.ts";
 import { writeObservations, writeStationList } from "../src/store/parquet.ts";
 import { seriesPath, stationListPath } from "../src/store/paths.ts";
 
@@ -73,6 +73,15 @@ describe("errataReader", () => {
     await assert.rejects(reader.levels("coops/2", "2021-01-01", "2021-01-02"), /doesn't list/);
     await assert.rejects(reader.levels("coops/1", "2021-01-02", "2021-01-01"), /span/);
     await assert.rejects(reader.station("coops"), /station ID/);
+  });
+
+  it("marks a store it can't read, and reads a missing file as empty", async () => {
+    const store = mkdtempSync(join(tmpdir(), "stillwell-errata-"));
+    mkdirSync(join(store, "stations"), { recursive: true });
+    writeFileSync(stationListPath(store, "coops"), "not parquet");
+    const reader = errataReader(() => store, store);
+    await assert.rejects(reader.station("coops/1"), StoreReadError);
+    assert.deepEqual(await reader.rows("missing.parquet"), []);
   });
 });
 

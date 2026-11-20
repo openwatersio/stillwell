@@ -6,6 +6,22 @@ import { readObservationsBetween, readRows, readStationList } from "./parquet.ts
 import { seriesPath, stationListPath } from "./paths.ts";
 import { STORE, storeOfSource } from "./stores.ts";
 
+/** The store couldn't be read, as against holding something a check didn't expect. */
+export class StoreReadError extends Error {
+  constructor(cause: unknown) {
+    super(`couldn't read the store: ${(cause as Error)?.message ?? cause}`, { cause });
+  }
+}
+
+/** `read`, with any failure marked as the store's: a file that isn't there reads as empty, not as a failure. */
+async function unreadable<T>(read: () => Promise<T>): Promise<T> {
+  try {
+    return await read();
+  } catch (error) {
+    throw error instanceof StoreReadError ? error : new StoreReadError(error);
+  }
+}
+
 /**
  * A reader over the store, each source's list read once. `rootOf` gives the
  * store a source's series are in, and `root` the public store `rows` reads.
@@ -24,14 +40,16 @@ export function errataReader(
         lists.set(
           source,
           // A failed read isn't kept, so the next check asks again.
-          readStationList(stationListPath(rootOf(source), source)).catch((error) => {
-            lists.delete(source);
-            throw error;
-          }),
+          unreadable(() => readStationList(stationListPath(rootOf(source), source))).catch(
+            (error) => {
+              lists.delete(source);
+              throw error;
+            },
+          ),
         );
       return (await lists.get(source))?.find((s) => s.id === id) ?? null;
     },
-    rows: (path) => readRows(`${root}/${path}`),
+    rows: (path) => unreadable(() => readRows(`${root}/${path}`)),
     async levels(id, since, until) {
       const listed = await reader.station(id);
       if (!listed) throw new Error(`the store doesn't list ${id}`);
@@ -56,17 +74,19 @@ export function errataReader(
           year <= new Date(hi - 1).getUTCFullYear();
           year++
         )
-          for (const o of await readObservationsBetween(
-            seriesPath(
-              rootOf(listed.source),
-              "levels",
-              listed.source,
-              listed.source_id,
-              year,
-              epoch.id,
+          for (const o of await unreadable(() =>
+            readObservationsBetween(
+              seriesPath(
+                rootOf(listed.source),
+                "levels",
+                listed.source,
+                listed.source_id,
+                year,
+                epoch.id,
+              ),
+              lo,
+              hi,
             ),
-            lo,
-            hi,
           ))
             out.push({ ...o, epoch: epoch.id });
       }

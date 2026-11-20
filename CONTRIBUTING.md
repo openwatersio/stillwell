@@ -47,7 +47,7 @@ workers/live/          the Cloudflare Worker and container that run the poller, 
 workers/api/           the Cloudflare Worker that caches and serves levels at api.openwaters.io
 docs/                  the contributing guides (docs/contributing/), the plan, the API design, the store's layout and the evaluations
 site/                  the site for people using the data: its docs and a page per source (Astro)
-.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled compact-daily.yml, monthly.yml (station lists, refetches, each source's own backfills, level matches for linking, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket, and a check of a sample of its files against their definitions), site.yml (the site's build and its deploy to GitHub Pages) and canary.yml (a weekly live request per adapter)
+.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled compact-daily.yml, monthly.yml (station lists, refetches, each source's own backfills, level matches for linking, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket, and a check of a sample of its files against their definitions), errata-check.yml (each erratum's check after every full Monthly run, with an issue for each that fails), site.yml (the site's build and its deploy to GitHub Pages) and canary.yml (a weekly live request per adapter)
 ```
 
 ## Getting started
