@@ -7,7 +7,7 @@
  *
  *   node server/ingest.ts [source...]
  *
- * STILLWELL_LIVE is the live store's endpoint (src/realtime/live.ts), and
+ * STILLWELL_LIVE is the live store's endpoint (src/realtime/live.ts), STILLWELL_LIVE_TOKEN its token, and
  * STILLWELL_STORE the store it reads the station lists from. With PORT set, it
  * answers `GET /health` there, which the Worker asks to know it's up. With
  * GITHUB_TOKEN set, a source reporting a station in another datum starts the
@@ -54,9 +54,20 @@ if (!chosen.length) throw new Error("no hourly source named");
 // Unset, the store would be a local `data` with no lists, and every pass would find none.
 if (!process.env.STILLWELL_STORE) throw new Error("set STILLWELL_STORE to the store");
 
+// The last lines of output, the passes' and exports' included, which `GET /log` answers, since a container's own
+// output is hard to reach.
+const recent: string[] = [];
+const write = process.stderr.write.bind(process.stderr);
+process.stderr.write = ((chunk: string | Uint8Array, ...rest: never[]) => {
+  for (const line of String(chunk).split("\n"))
+    if (line) recent.push(`${new Date().toISOString()} ${line}`);
+  recent.splice(0, recent.length - 300);
+  return write(chunk, ...rest);
+}) as typeof process.stderr.write;
 const health = process.env.PORT
   ? createServer((request, response) => {
-      response.writeHead(request.url === "/health" ? 200 : 404).end();
+      if (request.url === "/log") response.writeHead(200).end(recent.join("\n"));
+      else response.writeHead(request.url === "/health" ? 200 : 404).end();
     }).listen(Number(process.env.PORT))
   : null;
 
@@ -112,7 +123,10 @@ async function exportSource(id: string, days: string[]): Promise<void> {
   await passSlots.acquire();
   try {
     await new Promise<void>((resolve) => {
-      const child = spawn(process.execPath, [EXPORT, id, days.join(",")], { stdio: "inherit" });
+      const child = spawn(process.execPath, [EXPORT, id, days.join(",")], {
+        stdio: ["ignore", "inherit", "pipe"],
+      });
+      child.stderr!.on("data", (chunk) => process.stderr.write(chunk));
       running.add(child);
       const timer = setTimeout(() => child.kill("SIGKILL"), PASS_TIMEOUT_MS);
       child.on("close", (code) => {
@@ -198,7 +212,7 @@ async function pass(id: string, intervals: number[] | null, seeding: boolean): P
       child = spawn(
         process.execPath,
         [PASS, id, String(started), intervals?.join(",") || "all", seeding ? "1" : "0"],
-        { stdio: ["ignore", "pipe", "inherit"] },
+        { stdio: ["ignore", "pipe", "pipe"] },
       );
     } catch (error) {
       passSlots.release();
@@ -208,6 +222,7 @@ async function pass(id: string, intervals: number[] | null, seeding: boolean): P
     const timer = setTimeout(() => child.kill("SIGKILL"), PASS_TIMEOUT_MS);
     let out = "";
     child.stdout!.on("data", (chunk) => (out += chunk));
+    child.stderr!.on("data", (chunk) => process.stderr.write(chunk));
     let done = false;
     const finish = () => {
       if (done) return;

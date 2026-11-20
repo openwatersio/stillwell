@@ -19,7 +19,7 @@ const PAGE = 500;
 
 const [source, days] = process.argv.slice(2);
 if (!source || !days) throw new Error("usage: export.ts <source> <YYYY-MM-DD,...>");
-const store = liveStore(process.env.STILLWELL_LIVE ?? "http://store.internal");
+const store = liveStore(process.env.STILLWELL_LIVE ?? "");
 const dir = mkdtempSync(join(tmpdir(), "export-"));
 try {
   for (const day of days.split(",")) {

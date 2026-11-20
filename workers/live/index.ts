@@ -1,13 +1,13 @@
-// The live Worker: runs the poller (server/ingest.ts) in a Container, gives it the live store at
-// http://store.internal (store.ts), and every minute makes sure it's running (docs/plans/cloudflare.md).
+// The live Worker: runs the poller (server/ingest.ts) in a Container, answers the live store (store.ts) under /store/
+// for it, and every minute makes sure it's running (docs/plans/cloudflare.md).
 
 import { Container } from "@cloudflare/containers";
-// The outbound handler (store.internal) runs through it.
-export { ContainerProxy } from "@cloudflare/containers";
 import { handleStore, prune, type StoreEnv } from "./store.ts";
 
 export interface Env extends StoreEnv {
   POLLER: DurableObjectNamespace<Poller>;
+  /** The bearer token the poller sends to /store/, so only it reads and writes the live store. */
+  STORE_TOKEN: string;
   /** Starts a source's Monthly refresh on a datum change, and opens and closes the stale-source issues. */
   GITHUB_TOKEN?: string;
   CCO_API_KEY?: string;
@@ -16,6 +16,8 @@ export interface Env extends StoreEnv {
 }
 
 const REPO = "openwatersio/stillwell";
+/** Where the container reaches this Worker. */
+const ORIGIN = "https://stillwell-live.brandon-782.workers.dev";
 const HOUR_MS = 3_600_000;
 const DAY_MS = 24 * HOUR_MS;
 /** A source with no clean pass for this long has an issue open. */
@@ -25,17 +27,14 @@ export class Poller extends Container<Env> {
   defaultPort = 8080;
   // The cron asks every minute, so it sleeps only if the cron stops.
   sleepAfter = "15m";
-  static outboundByHost = {
-    "store.internal": (request: Request, env: Env) => handleStore(request, env),
-  };
-
   constructor(ctx: DurableObjectState<{}>, env: Env) {
     super(ctx, env);
     const secrets = ["GITHUB_TOKEN", "CCO_API_KEY", "CCO_REFERER", "USGS_API_KEY"] as const;
     this.envVars = {
       PORT: "8080",
       STILLWELL_STORE: "https://stillwell.openwaters.io",
-      STILLWELL_LIVE: "http://store.internal",
+      STILLWELL_LIVE: `${ORIGIN}/store`,
+      STILLWELL_LIVE_TOKEN: env.STORE_TOKEN,
       ...Object.fromEntries(secrets.flatMap((k) => (env[k] ? [[k, env[k]!]] : []))),
     };
   }
@@ -46,14 +45,26 @@ export class Poller extends Container<Env> {
 }
 
 export default {
-  async fetch(): Promise<Response> {
-    return new Response("Not found", { status: 404 });
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+    if (!url.pathname.startsWith("/store/")) return new Response("Not found", { status: 404 });
+    if (!env.STORE_TOKEN || request.headers.get("authorization") !== `Bearer ${env.STORE_TOKEN}`)
+      return new Response("Forbidden", { status: 403 });
+    url.pathname = url.pathname.slice("/store".length);
+    return handleStore(new Request(url, request), env);
   },
 
   async scheduled(controller: ScheduledController, env: Env): Promise<void> {
     // Starts the container if it isn't running; its health answer means the poller is up.
     const health = await env.POLLER.getByName("poller").fetch("http://poller/health");
     if (!health.ok) console.error(`poller health: ${health.status} ${await health.text()}`);
+    // Every 10 minutes, the poller's last lines, so its output reaches the Worker's logs.
+    else if (new Date(controller.scheduledTime).getUTCMinutes() % 10 === 0)
+      console.log(
+        (await (await env.POLLER.getByName("poller").fetch("http://poller/log")).text()).slice(
+          -6000,
+        ),
+      );
     const now = controller.scheduledTime;
     const minute = new Date(now).getUTCMinutes();
     if (minute === 30) await alert(env, now);

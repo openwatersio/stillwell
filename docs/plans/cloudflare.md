@@ -48,7 +48,7 @@ A pass reads the station-days it covers, merges and QCs as `refreshStation` does
 
 The live window is about 15 million values: 1.92 million a day from 13,642 stations on the box. That's a few hundred MB, under D1's 10 GB limit for a database. D1 bills a row written for every insert, update and delete. Live stations' intervals come to about 1.92 million station polls a day, most of them USGS's 13,983 gages every 15 minutes, so each write carries about one value either way; a row per value would also delete every value as it ages out, about 116 million writes a month, where a row per station-day is at most about 58 million.
 
-Containers have no bindings of their own, so the poller reaches D1 and R2 through its Durable Object's outbound handler, which intercepts requests to an internal host and runs them in the Workers runtime with the bindings. No D1 token or R2 key sits in the container.
+Containers have no bindings of their own, so the poller reaches D1 and R2 through the live Worker, which answers the store under `/store/` with its bindings, behind a bearer token only the poller holds. No D1 token or R2 key sits in the container.
 
 ### The daily files
 

@@ -1,6 +1,6 @@
 // The live store's endpoint: D1's `live` and `polls` tables (schema.sql) and the daily files on R2, which the poller's
-// container reaches at http://store.internal through its outbound handler (index.ts), so it holds no D1 token or
-// R2 key. The client is liveStore in src/realtime/live.ts.
+// container reaches under /store/ on the live Worker (index.ts), so it holds no D1 token or R2 key. The client is
+// liveStore in src/realtime/live.ts.
 
 import type { LiveCell, PollRow } from "./types.ts";
 

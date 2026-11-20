@@ -43,10 +43,13 @@ export function fromCell(station: string, c: LiveCell): StationObservation {
 const CHUNK = 2000;
 
 /**
- * The live store at `base`, the live Worker's store endpoint (workers/live/store.ts), which the poller's
- * container reaches at http://store.internal through its outbound handler.
+ * The live store at `base`, the live Worker's store endpoint (workers/live/store.ts), sending `token` as its bearer
+ * token.
  */
-export function liveStore(base: string): ObservationStore & {
+export function liveStore(
+  base: string,
+  token = process.env.STILLWELL_LIVE_TOKEN ?? "",
+): ObservationStore & {
   poll(row: PollRow): Promise<void>;
   day(
     source: string,
@@ -59,7 +62,10 @@ export function liveStore(base: string): ObservationStore & {
   async function call<T>(path: string, body?: unknown, init: RequestInit = {}): Promise<T> {
     const response = await fetch(`${base}${path}`, {
       method: body === undefined ? "GET" : "POST",
-      headers: body === undefined ? {} : { "content-type": "application/json" },
+      headers: {
+        authorization: `Bearer ${token}`,
+        ...(body === undefined ? {} : { "content-type": "application/json" }),
+      },
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: AbortSignal.timeout(120_000),
       ...init,
@@ -115,6 +121,7 @@ export function liveStore(base: string): ObservationStore & {
     async put(key, body) {
       const response = await fetch(`${base}/files/${key}`, {
         method: "PUT",
+        headers: { authorization: `Bearer ${token}` },
         body: body as BodyInit,
         signal: AbortSignal.timeout(300_000),
       });

@@ -2,8 +2,8 @@
   "name": "stillwell-live",
   "main": "index.ts",
   "compatibility_date": "2026-10-01",
-  // Cron only; nothing answers HTTP.
-  "workers_dev": false,
+  // The cron, and /store/ for the poller, behind its token.
+  "workers_dev": true,
   "preview_urls": false,
   "triggers": { "crons": ["* * * * *"] },
   "d1_databases": [

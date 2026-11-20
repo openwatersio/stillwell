@@ -30,7 +30,7 @@ if (!id || !nowArg || !intervals || seeding === undefined)
 const now = Number(nowArg);
 const source = sourceOf(id);
 const due = intervals === "all" ? null : new Set(intervals.split(",").map(Number));
-const store = liveStore(process.env.STILLWELL_LIVE ?? "http://store.internal");
+const store = liveStore(process.env.STILLWELL_LIVE ?? "");
 
 let summary: RunSummary;
 let groups: number[] = [];
