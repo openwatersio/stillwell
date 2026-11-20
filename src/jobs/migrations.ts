@@ -5,8 +5,8 @@ import { MAX_TIMEOUT, commandProblems, laneOf, words } from "./commands.ts";
 
 /**
  * The work a merged change needs done to the store, which the Migrations
- * workflow runs once, one step at a time, in the order of the files in
- * src/migrations/ (src/migrations/README.md).
+ * workflow runs once, one step at a time, after the change merges
+ * (src/migrations/README.md).
  */
 export interface Migration {
   description: string;
@@ -73,26 +73,23 @@ export function problems(migration: Migration): string[] {
   return out;
 }
 
-/** Every migration in src/migrations/, by ID (its file name), in order. */
+/** Every migration in src/migrations/, by ID (its file name), sorted. */
 export async function loadMigrations(
   dir = new URL("../migrations/", import.meta.url),
-  now = new Date(),
 ): Promise<[string, Migration][]> {
   const names = (await readdir(dir)).filter((f) => f !== "README.md" && !f.startsWith("."));
-  // A date after today would sort after every migration written until then, which would then be refused.
-  const tomorrow = new Date(now.getTime() + 86_400_000).toISOString().slice(0, 10);
   const bad = names.filter((f) => {
     const m = /^(\d{4})(\d{2})(\d{2})-[a-z0-9-]+\.ts$/.exec(f);
     const date = m && `${m[1]}-${m[2]}-${m[3]}`;
-    const valid =
-      date && !Number.isNaN(Date.parse(date)) && new Date(date).toISOString().startsWith(date);
-    return !valid || date > tomorrow;
+    return !(
+      date &&
+      !Number.isNaN(Date.parse(date)) &&
+      new Date(date).toISOString().startsWith(date)
+    );
   });
   if (bad.length)
-    throw new Error(
-      `src/migrations/ holds ${bad.join(", ")}, not named YYYYMMDD-name.ts with a date up to today`,
-    );
-  // By ID, the name without .ts, as advance and setBaseline compare them: "-" sorts before "." in a name.
+    throw new Error(`src/migrations/ holds ${bad.join(", ")}, not named YYYYMMDD-name.ts`);
+  // By ID, the name without .ts, so migrations merged together run in one order: "-" sorts before "." in a name.
   const byId = names.map((f) => f.replace(/\.ts$/, "")).sort();
   return Promise.all(
     byId.map(async (id) => {
@@ -117,7 +114,7 @@ export interface Progress {
 
 /**
  * The record: the last migration done before it began, '' for none, and each migration's progress, those up to the
- * baseline included as done, so one merged later under an earlier name is caught as sorting before them.
+ * baseline included as done, so they never run.
  */
 export interface Record {
   baseline: string;
@@ -132,47 +129,52 @@ export type Next =
   | null;
 
 /**
- * The next step to run: the first unfinished step of the first migration after the baseline that isn't done. A
- * failed migration stops every one after it until it's retried or skipped, and one that sorts before a migration
- * already started stops them until it's renamed to sort after.
+ * The next step to run, whatever order migrations were written or merged in: a failed migration stops every one
+ * until it's retried or skipped; otherwise a migration partway through its steps finishes first, so another's steps
+ * never run between its own; and then the first, by name, that the record doesn't have.
  */
 export function next(migrations: [string, Migration][], record: Record): Next {
   const rows = new Map(record.migrations.map((r) => [r.id, r]));
-  const last = [...rows.keys()].sort().at(-1);
-  for (const [id, migration] of migrations) {
-    const row = rows.get(id);
-    if (row?.state === "done") continue;
-    if (row?.state === "failed") return { stopped: `${id} failed: ${row.error}` };
-    if (!row && last !== undefined && id < last)
-      return { stopped: `${id} sorts before ${last}, which has started; rename it to sort after` };
-    const found = problems(migration);
-    if (found.length) return { stopped: `${id} can't run: ${found.join("; ")}` };
-    const index = row?.step ?? 0;
-    const step = migration.steps[index];
-    if (!step)
-      return {
-        stopped: `${id} has ${migration.steps.length} steps, but its record is at step ${index}`,
-      };
-    if ("check" in step)
-      return { id, step: index, kind: "check", lane: "check", timeout: step.timeout ?? 30 };
-    const args = argsOf(step);
+  // A failed or unfinished migration whose file is gone, as when one is renamed, stops them all: its record would
+  // otherwise be passed over, and the renamed file run again from its first step.
+  const files = new Set(migrations.map(([id]) => id));
+  const lost = record.migrations.find((r) => r.state !== "done" && !files.has(r.id));
+  if (lost)
     return {
-      id,
-      step: index,
-      kind: "ingest",
-      args,
-      lane: laneOf(args),
-      timeout: step.timeout ?? 180,
+      stopped: `the record has ${lost.id} ${lost.state}, but src/migrations/ has no such file: restore it, or skip ${lost.id}`,
     };
-  }
-  return null;
+  const known = migrations.filter(([id]) => rows.has(id));
+  const failed = known.find(([id]) => rows.get(id)!.state === "failed");
+  if (failed) return { stopped: `${failed[0]} failed: ${rows.get(failed[0])!.error}` };
+  const running = known.find(([id]) => rows.get(id)!.state === "running");
+  const [id, migration] = running ?? migrations.find(([id]) => !rows.has(id)) ?? [];
+  if (!id || !migration) return null;
+  const found = problems(migration);
+  if (found.length) return { stopped: `${id} can't run: ${found.join("; ")}` };
+  const index = rows.get(id)?.step ?? 0;
+  const step = migration.steps[index];
+  if (!step)
+    return {
+      stopped: `${id} has ${migration.steps.length} steps, but its record is at step ${index}`,
+    };
+  if ("check" in step)
+    return { id, step: index, kind: "check", lane: "check", timeout: step.timeout ?? 30 };
+  const args = argsOf(step);
+  return {
+    id,
+    step: index,
+    kind: "ingest",
+    args,
+    lane: laneOf(args),
+    timeout: step.timeout ?? 180,
+  };
 }
 
 function put(record: Record, row: Progress): Record {
   return { ...record, migrations: [...record.migrations.filter((r) => r.id !== row.id), row] };
 }
 
-/** A new record whose baseline is `id` ('' for none), with every migration up to it done. */
+/** A new record whose baseline is `id` ('' for none), with every migration named up to it done. */
 export function begin(migrations: [string, Migration][], id: string, now = new Date()): Record {
   if (id && !migrations.some(([m]) => m === id)) throw new Error(`no migration ${id}`);
   return {
@@ -209,7 +211,7 @@ export function done(
   });
 }
 
-/** The record after step `step` of `id` failed, which stops every migration after it. */
+/** The record after step `step` of `id` failed, which stops every migration not yet done. */
 export function fail(
   record: Record,
   id: string,
@@ -227,15 +229,18 @@ export function retry(record: Record, id: string, now = new Date()): Record {
   return put(record, { ...row, state: "running", error: null, updated: now.toISOString() });
 }
 
-/** The record with a migration that failed or hasn't finished marked done without its remaining steps. */
+/**
+ * The record with a migration that failed or hasn't finished marked done without its remaining steps: one in
+ * src/migrations/, or one the record has whose file is gone.
+ */
 export function skip(
   record: Record,
   migrations: [string, Migration][],
   id: string,
   now = new Date(),
 ): Record {
-  if (!migrations.some(([m]) => m === id)) throw new Error(`no migration ${id}`);
   const row = record.migrations.find((r) => r.id === id);
+  if (!row && !migrations.some(([m]) => m === id)) throw new Error(`no migration ${id}`);
   if (row?.state === "done") throw new Error(`${id} is done`);
   return put(record, {
     id,

@@ -115,6 +115,12 @@ switch (command) {
         : "not started";
       console.log(`${m}\t${state}`);
     }
+    // Rows whose file is gone: a failed or unfinished one stops every migration until it's restored or skipped.
+    for (const row of record?.migrations ?? [])
+      if (!migrations.some(([m]) => m === row.id))
+        console.log(
+          `${row.id}\t${row.state}, step ${row.step}, no file${row.error ? `: ${row.error}` : ""}`,
+        );
     break;
   default:
     throw new Error(
