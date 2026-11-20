@@ -30,4 +30,4 @@ At a second a request, a backfill of every station (`all --with-inactive`) from 
 
 ### Scheduled runs
 
-Ingest hourly reads the last 12 hours at the live stations, and its sweep takes about 5 minutes. A block there fails the stations after it, which keep what they had, and fails the run. On the 9th the Monthly workflow refetches each station from its earliest preliminary value, from January three years back on, so verified values replace preliminary ones.
+The poller reads the last 12 hours at the live stations, and its sweep takes about 5 minutes. A block there fails the stations after it, which keep what they had, and fails the run. On the 9th the Monthly workflow refetches each station from its earliest preliminary value, from January three years back on, so verified values replace preliminary ones.

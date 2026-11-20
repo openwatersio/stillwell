@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { readBackfilled } from "../src/backfilled.ts";
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, it } from "node:test";
-import { DatumChanged } from "../src/epochs.ts";
+import { DatumChanged, isHeld } from "../src/epochs.ts";
 import { Blocked, fetchText, setTransport } from "../src/http.ts";
 import { upsert } from "../src/store/merge.ts";
 import { DuckDBInstance } from "@duckdb/node-api";
@@ -12,21 +12,23 @@ import { isMissing } from "../src/store/parquet.ts";
 import {
   readDatums,
   readObservations,
-  readRecent,
+  type StationObservation,
   readStationBounds,
   setConnections,
   writeObservations,
   writeRecent,
   writeStationBounds,
 } from "../src/store/parquet.ts";
-import { boundsPath, recentPath, seriesPath } from "../src/store/paths.ts";
+import { boundsPath, recentDayPath, seriesPath } from "../src/store/paths.ts";
 import {
   compactRecent,
   formatSummary,
   timer,
   lastDays,
-  updateRecent,
+  emptySummary,
+  refreshStation,
   writePreliminary,
+  type RunSummary,
 } from "../src/store/recent.ts";
 import {
   Flag,
@@ -114,32 +116,73 @@ const at = (time: number, level: number, received?: number): Observation =>
     ? { time, level, flag: Flag.preliminary }
     : { time, level, flag: Flag.preliminary, received };
 
-describe("updateRecent", () => {
+/**
+ * A poller's pass over in-memory windows: a sweep where the source has one, then
+ * `refreshStation` for each live, active station with levels, its rows sorted as a daily file's.
+ */
+async function refresh({
+  source,
+  stations,
+  previous = [],
+  since,
+}: {
+  source: Source;
+  stations: StoredStation[];
+  previous?: StationObservation[];
+  since: Date;
+}): Promise<{ rows: StationObservation[]; summary: RunSummary }> {
+  const live = stations.filter(
+    (s) => s.live && s.status === "active" && s.products.includes("levels"),
+  );
+  const fetching = live.filter((s) => !isHeld(s.epochs));
+  const summary = emptySummary("refresh test", fetching.length);
+  let swept: Map<string, Observation[] | Error> | Error | undefined;
+  if (source.recent)
+    swept = await source
+      .recent(fetching, since, new Date(NOW))
+      .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
+  const had = Map.groupBy(previous, (r) => r.station);
+  const rows: StationObservation[] = [];
+  for (const station of live) {
+    const result = await refreshStation({
+      source,
+      station,
+      previous: had.get(station.id) ?? [],
+      swept,
+      since: since.getTime(),
+      now: NOW,
+      keepFrom: NOW - 7 * DAY,
+      summary,
+    });
+    rows.push(...result.rows);
+    if (result.fresh) summary.updated++;
+  }
+  rows.sort((a, b) => (a.station < b.station ? -1 : a.station > b.station ? 1 : a.time - b.time));
+  return { rows, summary };
+}
+
+describe("refreshStation", () => {
   it("says when the source blocked this client", async () => {
-    const root = store();
     const [a, b] = [station("a"), station("b")];
-    const summary = await updateRecent({
+    const { summary } = await refresh({
       source: source({ [a.id]: [at(NOW - HOUR, 0.3)], [b.id]: new Blocked("refused") }),
       stations: [a, b],
-      storeFor: () => root,
       since: new Date(NOW - 6 * HOUR),
-      now: NOW,
     });
     assert.equal(summary.blocked, true);
     assert.equal(summary.updated, 1);
   });
 
   it("says when a station failed because its source moved it to another datum", async () => {
-    const root = store();
     const [a, b] = [station("a"), station("b")];
-    const run = (answer: Error) =>
-      updateRecent({
-        source: source({ [a.id]: [at(NOW - HOUR, 0.3)], [b.id]: answer }),
-        stations: [a, b],
-        storeFor: () => root,
-        since: new Date(NOW - 6 * HOUR),
-        now: NOW,
-      });
+    const run = async (answer: Error) =>
+      (
+        await refresh({
+          source: source({ [a.id]: [at(NOW - HOUR, 0.3)], [b.id]: answer }),
+          stations: [a, b],
+          since: new Date(NOW - 6 * HOUR),
+        })
+      ).summary;
     assert.equal((await run(new DatumChanged("now in NHN", "NHN"))).datumChanged, true);
     assert.equal((await run(new Error("timed out"))).datumChanged, undefined);
     // A rejected change stays rejected, however often the list is
@@ -160,11 +203,11 @@ describe("updateRecent", () => {
   });
 
   it("merges the fetch into the window, trims it, and stamps only new values", async () => {
-    const root = store();
-    const path = recentPath(root, "test");
     const a = station("a");
-    await writeRecent(path, [
-      [
+    const { rows, summary } = await refresh({
+      source: source({ [a.id]: [at(NOW - 3 * HOUR, 0.25), at(NOW - HOUR, 0.3)] }),
+      stations: [a],
+      previous: [
         { ...at(NOW - 8 * DAY, 0.1, NOW - 8 * DAY), station: a.id, epoch: 1 }, // past the 7 days
         // Before the fetch, with a flag QC may have marked.
         {
@@ -175,21 +218,10 @@ describe("updateRecent", () => {
         },
         { ...at(NOW - 3 * HOUR, 0.2, NOW - 3 * HOUR), station: a.id, epoch: 1 }, // seen before
       ],
-    ]);
-    const summary = await updateRecent({
-      source: source({ [a.id]: [at(NOW - 3 * HOUR, 0.25), at(NOW - HOUR, 0.3)] }),
-      stations: [a],
-      storeFor: () => root,
       since: new Date(NOW - 6 * HOUR),
-      now: NOW,
     });
     assert.deepEqual(
-      (await readRecent(path)).map((r) => [
-        r.time - NOW,
-        r.level,
-        r.received! - NOW,
-        r.source_flag,
-      ]),
+      rows.map((r) => [r.time - NOW, r.level, r.received! - NOW, r.source_flag]),
       [
         // Only fetched values carry the source's flag.
         [-10 * HOUR, 0.15, -10 * HOUR, undefined],
@@ -199,53 +231,28 @@ describe("updateRecent", () => {
       ],
     );
     assert.deepEqual(
-      {
-        ...summary,
-        stale: summary.stale.length,
-        failed: summary.failed.length,
-        waiting: summary.waiting.length,
-      },
-      {
-        title: "recent test",
-        stations: 1,
-        updated: 1,
-        stale: 0,
-        failed: 0,
-        waiting: 0,
-        values: 1,
-        files: 1,
-      },
+      [summary.updated, summary.values, summary.stale, summary.failed],
+      [1, 1, [], []],
     );
   });
 
   it("keeps a failed or silent station's window, and counts it failed or stale", async () => {
-    const root = store();
-    const path = recentPath(root, "test");
     const [ok, broken, quiet] = [station("ok"), station("broken"), station("quiet")];
     const old = (s: Station) => ({
       ...at(NOW - 10 * HOUR, 1, NOW - 10 * HOUR),
       station: s.id,
       epoch: 1,
     });
-    await writeRecent(path, [[old(broken), old(quiet)]]);
     const src = source({ [ok.id]: [at(NOW - HOUR, 2)], [broken.id]: new Error("timed out") });
-    const summary = await updateRecent({
+    const { rows, summary } = await refresh({
       source: src,
-      // Stations that aren't live, or aren't active, aren't asked.
-      stations: [
-        ok,
-        broken,
-        quiet,
-        station("retired", { status: "inactive" }),
-        station("predicted", { live: false }),
-      ],
-      storeFor: () => root,
+      stations: [ok, broken, quiet],
+      previous: [old(broken), old(quiet)],
       since: new Date(NOW - 6 * HOUR),
-      now: NOW,
     });
     assert.deepEqual(src.asked.sort(), ["test/broken", "test/ok", "test/quiet"]);
     assert.deepEqual(
-      (await readRecent(path)).map((r) => [r.station, r.level]),
+      rows.map((r) => [r.station, r.level]),
       [
         ["test/broken", 1],
         ["test/ok", 2],
@@ -259,66 +266,17 @@ describe("updateRecent", () => {
   });
 
   it("gives a station three of its intervals before it's stale", async () => {
-    const root = store();
     const daily = station("daily", { interval_s: 86_400 });
-    await writeRecent(recentPath(root, "test"), [
-      [{ ...at(NOW - 2 * DAY, 1, NOW - 2 * DAY), station: daily.id, epoch: 1 }],
-    ]);
-    const summary = await updateRecent({
+    const { summary } = await refresh({
       source: source({}),
       stations: [daily],
-      storeFor: () => root,
+      previous: [{ ...at(NOW - 2 * DAY, 1, NOW - 2 * DAY), station: daily.id, epoch: 1 }],
       since: new Date(NOW - 6 * HOUR),
-      now: NOW,
     });
     assert.deepEqual(summary.stale, []);
   });
 
-  it("carries rows of stations it no longer fetches, until they age out", async () => {
-    const root = store();
-    const path = recentPath(root, "test");
-    const [live, retired, quiet, gone, moved] = [
-      station("live"),
-      station("retired", { status: "inactive" }),
-      station("quiet", { live: false }),
-      station("gone"),
-      station("moved", { live: false, commercial_use: false }),
-    ];
-    const row = (s: Station, ago: number) => ({
-      ...at(NOW - ago, 1, NOW - ago),
-      station: s.id,
-      epoch: 1,
-    });
-    await writeRecent(path, [
-      [
-        row(retired, 2 * HOUR),
-        row(retired, 8 * DAY), // aged out
-        row(quiet, 3 * HOUR),
-        row(gone, 4 * HOUR), // no longer listed, so nowhere to fold it
-        row(moved, 5 * HOUR), // now restricted: never stays in the public store
-      ],
-    ]);
-    const restricted = store();
-    await updateRecent({
-      source: source({ [live.id]: [at(NOW - HOUR, 2)] }),
-      stations: [live, retired, quiet, moved],
-      storeFor: (s) => (s.commercial_use ? root : restricted),
-      since: new Date(NOW - 6 * HOUR),
-      now: NOW,
-    });
-    assert.deepEqual(
-      (await readRecent(path)).map((r) => [r.station, (NOW - r.time) / HOUR]),
-      [
-        ["test/live", 1],
-        ["test/quiet", 3],
-        ["test/retired", 2],
-      ],
-    );
-  });
-
   it("tags rows with their epoch, and fetches only from the current epoch's start", async () => {
-    const root = store();
-    const path = recentPath(root, "test");
     const since = NOW - 3 * HOUR;
     const moved = station("moved", {
       datum: "NHN",
@@ -333,14 +291,6 @@ describe("updateRecent", () => {
         epoch(2, "MSL", { state: "held", since: new Date(since).toISOString() }),
       ],
     });
-    await writeRecent(path, [
-      [
-        { ...at(NOW - 5 * HOUR, 1, NOW - 5 * HOUR), station: moved.id, epoch: 1 },
-        // Fetched in the new reference before the epoch opened: it moves into it.
-        { ...at(NOW - 2 * HOUR, 2, NOW - 2 * HOUR), station: moved.id, epoch: 1 },
-        { ...at(NOW - 2 * HOUR, 3, NOW - 2 * HOUR), station: held.id, epoch: 1 },
-      ],
-    ]);
     const asked: [string, number][] = [];
     const src = source({ [moved.id]: [at(NOW - 2 * HOUR, 2), at(NOW - HOUR, 4)] });
     const observations = src.observations!;
@@ -348,22 +298,20 @@ describe("updateRecent", () => {
       asked.push([s.id, (NOW - from.getTime()) / HOUR]);
       return observations(s, from, to);
     };
-    const summary = await updateRecent({
+    const { rows } = await refresh({
       source: src,
       stations: [moved, held],
-      storeFor: () => root,
+      previous: [
+        { ...at(NOW - 5 * HOUR, 1, NOW - 5 * HOUR), station: moved.id, epoch: 1 },
+        // Fetched in the new reference before the epoch opened: it moves into it.
+        { ...at(NOW - 2 * HOUR, 2, NOW - 2 * HOUR), station: moved.id, epoch: 1 },
+        { ...at(NOW - 2 * HOUR, 3, NOW - 2 * HOUR), station: held.id, epoch: 1 },
+      ],
       since: new Date(NOW - 12 * HOUR),
-      now: NOW,
     });
     assert.deepEqual(asked, [["test/moved", 3]]);
-    assert.equal(summary.stations, 1);
     assert.deepEqual(
-      (await readRecent(path)).map((r) => [
-        r.station,
-        (NOW - r.time) / HOUR,
-        r.epoch,
-        (NOW - r.received!) / HOUR,
-      ]),
+      rows.map((r) => [r.station, (NOW - r.time) / HOUR, r.epoch, (NOW - r.received!) / HOUR]),
       [
         ["test/held", 2, 1, 2],
         ["test/moved", 5, 1, 5],
@@ -374,31 +322,10 @@ describe("updateRecent", () => {
     );
   });
 
-  it("fails a station whose store can't be named alone", async () => {
-    const root = store();
-    const [a, b] = [station("a"), station("b", { commercial_use: false })];
-    const summary = await updateRecent({
-      source: source({ [a.id]: [at(NOW - HOUR, 1)] }),
-      stations: [a, b],
-      storeFor: (s) => {
-        if (!s.commercial_use) throw new Error("no restricted store");
-        return root;
-      },
-      since: new Date(NOW - 6 * HOUR),
-      now: NOW,
-    });
-    assert.deepEqual(summary.failed, ["test/b: no restricted store"]);
-    assert.deepEqual(
-      (await readRecent(recentPath(root, "test"))).map((r) => r.station),
-      ["test/a"],
-    );
-  });
-
   it("looks back two intervals for a station fetched on its own", async () => {
-    const root = store();
     const asked: [string, number][] = [];
     const daily = station("daily", { interval_s: 86_400 });
-    await updateRecent({
+    const { rows } = await refresh({
       source: {
         metadata: { id: "test" } as Source["metadata"],
         stations: async () => [],
@@ -409,133 +336,21 @@ describe("updateRecent", () => {
         },
       },
       stations: [daily, station("tenminute")],
-      storeFor: () => root,
       since: new Date(NOW - 12 * HOUR),
-      now: NOW,
     });
     assert.deepEqual(asked.sort(), [
       ["test/daily", 48],
       ["test/tenminute", 12],
     ]);
     assert.deepEqual(
-      (await readRecent(recentPath(root, "test"))).map((r) => r.station),
+      rows.map((r) => r.station),
       ["test/daily"],
     );
   });
 
-  it("merges across batches of 500 stations", async () => {
-    const root = store();
-    const path = recentPath(root, "test");
-    const stations = Array.from({ length: 1001 }, (_, i) => station(String(i).padStart(4, "0")));
-    // Before the fetched hours, so the merge keeps it.
-    const old = (s: Station) => ({
-      ...at(NOW - 8 * HOUR, 1, NOW - 8 * HOUR),
-      station: s.id,
-      epoch: 1,
-    });
-    await writeRecent(path, [stations.map(old)]);
-    const summary = await updateRecent({
-      source: source(Object.fromEntries(stations.map((s) => [s.id, [at(NOW - HOUR, 2)]]))),
-      stations,
-      storeFor: () => root,
-      since: new Date(NOW - 6 * HOUR),
-      now: NOW,
-      concurrency: 8,
-    });
-    const rows = await readRecent(path);
-    assert.equal(rows.length, 2002);
-    for (const s of [stations[0]!, stations[499]!, stations[500]!, stations[1000]!])
-      assert.deepEqual(
-        rows.filter((r) => r.station === s.id).map((r) => r.level),
-        [1, 2],
-      );
-    assert.equal(summary.updated, 1001);
-    assert.equal(summary.values, 1001);
-  });
-
-  it("leaves the old file when a batch fails partway", async () => {
-    const root = store();
-    const path = recentPath(root, "test");
-    const stations = Array.from({ length: 600 }, (_, i) => station(String(i).padStart(4, "0")));
-    await writeRecent(path, [
-      [{ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: "test/0000", epoch: 1 }],
-    ]);
-    // A sweep whose second batch breaks after the first was merged.
-    class Breaking extends Map<string, Observation[]> {
-      override delete(id: string): boolean {
-        if (id === "test/0500") throw new Error("broken batch");
-        return super.delete(id);
-      }
-    }
-    await assert.rejects(
-      updateRecent({
-        source: { ...source({}), recent: async () => new Breaking() },
-        stations,
-        storeFor: () => root,
-        since: new Date(NOW - 6 * HOUR),
-        now: NOW,
-      }),
-      /broken batch/,
-    );
-    assert.deepEqual(
-      (await readRecent(path)).map((r) => [r.station, r.level]),
-      [["test/0000", 1]],
-    );
-  });
-
-  it("writes restricted stations' window to their own store", async () => {
-    const [open, restricted] = [store(), store()];
-    const [a, b] = [station("a"), station("b", { commercial_use: false })];
-    await updateRecent({
-      source: source({ [a.id]: [at(NOW - HOUR, 1)], [b.id]: [at(NOW - HOUR, 2)] }),
-      stations: [a, b],
-      storeFor: (s) => (s.commercial_use ? open : restricted),
-      since: new Date(NOW - 6 * HOUR),
-      now: NOW,
-    });
-    assert.deepEqual(
-      (await readRecent(recentPath(open, "test"))).map((r) => r.station),
-      ["test/a"],
-    );
-    assert.deepEqual(
-      (await readRecent(recentPath(restricted, "test"))).map((r) => r.station),
-      ["test/b"],
-    );
-  });
-
-  it("fails on an unreadable window before the sweep spends any requests", async () => {
-    const root = store();
-    const path = recentPath(root, "test");
-    mkdirSync(dirname(path), { recursive: true });
-    writeFileSync(path, "not parquet");
-    let swept = false;
-    await assert.rejects(
-      updateRecent({
-        source: {
-          ...source({}),
-          recent: async () => {
-            swept = true;
-            return new Map();
-          },
-        },
-        stations: [station("a")],
-        storeFor: () => root,
-        since: new Date(NOW - 6 * HOUR),
-        now: NOW,
-      }),
-    );
-    assert.equal(swept, false);
-    assert.equal(readFileSync(path, "utf8"), "not parquet");
-  });
-
   it("keeps every station's window when a sweep throws", async () => {
-    const root = store();
-    const path = recentPath(root, "test");
     const [a, b] = [station("a"), station("b")];
-    await writeRecent(path, [
-      [a, b].map((s) => ({ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: s.id, epoch: 1 })),
-    ]);
-    const summary = await updateRecent({
+    const { rows, summary } = await refresh({
       source: {
         ...source({}),
         recent: async () => {
@@ -543,15 +358,18 @@ describe("updateRecent", () => {
         },
       },
       stations: [a, b],
-      storeFor: () => root,
+      previous: [a, b].map((s) => ({
+        ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR),
+        station: s.id,
+        epoch: 1,
+      })),
       since: new Date(NOW - 6 * HOUR),
-      now: NOW,
     });
     assert.deepEqual(summary.failed, ["test/a: sweep down", "test/b: sweep down"]);
-    assert.equal((await readRecent(path)).length, 2);
+    assert.equal(rows.length, 2);
   });
 
-  it("writes USGS's batched sweep into the window, one request for every station", async () => {
+  it("takes USGS's batched sweep, one request for every station", async () => {
     usgs.pacing.requestMs = 0;
     const asked: string[] = [];
     setTransport(async (url) => {
@@ -588,24 +406,16 @@ describe("updateRecent", () => {
         ...extra,
         ...({ time_series_id: `${id}-00065`, parameter_code: "00065" } as object),
       });
-    const root = store();
-    const summary = await updateRecent({
+    const { rows, summary } = await refresh({
       source: usgs.source,
       // c answers nothing; d is committed in another datum and fails alone.
       stations: [gage("a"), gage("b"), gage("c"), gage("d", { datum: "NAVD88" })],
-      storeFor: () => root,
       since: new Date(NOW - 6 * HOUR),
-      now: NOW,
     });
     assert.equal(asked.length, 1);
     assert.match(asked[0]!, /collections\/continuous\/items\?.*parameter_code=00065/);
     assert.deepEqual(
-      (await readRecent(recentPath(root, "usgs"))).map((r) => [
-        r.station,
-        (r.time - NOW) / HOUR,
-        r.level,
-        r.received,
-      ]),
+      rows.map((r) => [r.station, (r.time - NOW) / HOUR, r.level, r.received]),
       [
         ["usgs/a", -2, 3.048, NOW],
         ["usgs/a", -1, 3.2004, NOW],
@@ -623,27 +433,28 @@ describe("updateRecent", () => {
     setTransport(async () =>
       JSON.stringify({ type: "FeatureCollection", features: [], links: [] }),
     );
-    const root = store();
     const a = station("a", {
       id: "usgs/a",
       source: "usgs",
       datum: "GAGE",
       ...({ time_series_id: "a-00065", parameter_code: "00065" } as object),
     });
-    await writeRecent(recentPath(root, "usgs"), [
-      [{ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: a.id, epoch: 1 }],
-    ]);
-    const summary = await updateRecent({
+    const { rows, summary } = await refresh({
       source: usgs.source,
       stations: [a],
-      storeFor: () => root,
+      previous: [{ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: a.id, epoch: 1 }],
       since: new Date(NOW - 6 * HOUR),
-      now: NOW,
     });
     assert.match(summary.failed[0]!, /usgs\/a: USGS returned no values/);
-    assert.equal((await readRecent(recentPath(root, "usgs"))).length, 1);
+    assert.equal(rows.length, 1);
   });
 });
+
+/** Rows written to the daily files of their UTC days, as the poller writes them. */
+async function writeDays(root: string, batches: StationObservation[][]): Promise<void> {
+  const days = Map.groupBy(batches.flat(), (r) => new Date(r.time).toISOString().slice(0, 10));
+  for (const [day, rows] of days) await writeRecent(recentDayPath(root, "test", day), [rows]);
+}
 
 describe("compactRecent", () => {
   const [start, end] = lastDays(NOW);
@@ -660,7 +471,7 @@ describe("compactRecent", () => {
     const root = store();
     const a = station("a");
     const day = Date.UTC(2027, 0, 1);
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [
         { ...at(day - HOUR, 1, day), station: a.id, epoch: 1 },
         { ...at(day + 10 * 60_000, 1, day + HOUR), station: a.id, epoch: 1 },
@@ -688,7 +499,7 @@ describe("compactRecent", () => {
     const b = station("b", { interval_s: null });
     const day = Date.UTC(2027, 0, 1);
     // Two-hourly, from 02:00.
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [2, 4, 6].map((h) => ({ ...at(day + h * HOUR, 1, day + h * HOUR), station: b.id, epoch: 1 })),
     ]);
     await compactRecent({
@@ -715,7 +526,7 @@ describe("compactRecent", () => {
       ],
       "NAP",
     );
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [
         { ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id, epoch: 1 },
         // Fetched before fetches dropped such levels.
@@ -742,7 +553,7 @@ describe("compactRecent", () => {
     const file = seriesPath(root, "levels", "test", "a", 2026);
     // The stored fill comes after the window's first row, so the fold reads it.
     await writeObservations(file, [at(start + 2 * HOUR, 30479.695)], "NAP");
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [{ ...at(start + HOUR, 30479.695, start + 3 * HOUR), station: a.id, epoch: 1 }],
     ]);
     await compactRecent({ source: source({}), stations: [a], storeFor: () => root, start, end });
@@ -766,7 +577,7 @@ describe("compactRecent", () => {
       ],
       "NAP",
     );
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [
         { ...at(start - HOUR, 9, start), station: a.id, epoch: 1 }, // the day before: not folded
         { ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id, epoch: 1 },
@@ -825,6 +636,52 @@ describe("compactRecent", () => {
     assert.equal(statSync(file).mtimeMs, written);
   });
 
+  it("folds each day it covers from that day's file, a day with no file having nothing", async () => {
+    const root = store();
+    const a = station("a");
+    const [from, to] = lastDays(NOW, 3);
+    const day = (n: number) => new Date(from + n * DAY).toISOString().slice(0, 10);
+    const row = (time: number, level: number) => ({
+      ...at(time, level, time),
+      station: a.id,
+      epoch: 1,
+    });
+    // The first and last of the three days; the second has no file.
+    await writeRecent(recentDayPath(root, "test", day(0)), [[row(from + HOUR, 1)]]);
+    await writeRecent(recentDayPath(root, "test", day(2)), [[row(from + 2 * DAY + HOUR, 3)]]);
+    // Days outside the fold aren't read.
+    await writeRecent(recentDayPath(root, "test", day(-1)), [[row(from - DAY + HOUR, 9)]]);
+    await writeRecent(recentDayPath(root, "test", day(3)), [[row(to + HOUR, 9)]]);
+    const summary = await compactRecent({
+      source: source({}),
+      stations: [a],
+      storeFor: () => root,
+      start: from,
+      end: to,
+    });
+    assert.deepEqual([summary.failed, summary.stale, summary.values], [[], [], 2]);
+    assert.deepEqual(
+      (await readObservations(seriesPath(root, "levels", "test", "a", 2026))).map((r) => [
+        (r.time - from) / HOUR,
+        r.level,
+      ]),
+      [
+        [1, 1],
+        [49, 3],
+      ],
+    );
+
+    // With no file for any day it covers, a live station is stale.
+    const quiet = await compactRecent({
+      source: source({}),
+      stations: [a],
+      storeFor: () => root,
+      start: from + DAY,
+      end: from + 2 * DAY,
+    });
+    assert.deepEqual([quiet.failed, quiet.stale, quiet.values], [[], [a.id], 0]);
+  });
+
   it("writes each station's first and last over its epochs to the source's bounds", async () => {
     const root = store();
     const a = station("a", {
@@ -850,7 +707,7 @@ describe("compactRecent", () => {
       [at(Date.UTC(2024, 4, 1), 3), at(Date.UTC(2024, 5, 1), 3)],
       "NAP",
     );
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [{ ...at(start + 3 * HOUR, 2, start + 3 * HOUR), station: a.id, epoch: 2 }],
     ]);
     const run = () =>
@@ -878,7 +735,7 @@ describe("compactRecent", () => {
       [at(Date.UTC(2019, 6, 1), 1)],
       "NAP",
     );
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [{ ...at(start + 5 * HOUR, 2, start + 5 * HOUR), station: a.id, epoch: 2 }],
     ]);
     await run();
@@ -1025,9 +882,7 @@ describe("compactRecent", () => {
     const a = station("a");
     const file = seriesPath(root, "levels", "test", "a", 2026);
     await writeObservations(file, [at(start - DAY, 1)], "NAP");
-    await writeRecent(recentPath(root, "test"), [
-      [{ ...at(start + HOUR, 1, start + HOUR), station: a.id, epoch: 1 }],
-    ]);
+    await writeDays(root, [[{ ...at(start + HOUR, 1, start + HOUR), station: a.id, epoch: 1 }]]);
     // A read-only file in a read-only directory makes the write fail.
     chmodSync(file, 0o444);
     chmodSync(dirname(file), 0o555);
@@ -1117,9 +972,7 @@ describe("compactRecent", () => {
 
     // Once known, it's kept without a read, and a later one folded doesn't move it.
     await write(2024, 2, [good(Date.UTC(2024, 3, 1))]);
-    await writeRecent(recentPath(root, "test"), [
-      [{ ...at(start + HOUR, 1, start + HOUR), station: p.id, epoch: 2 }],
-    ]);
+    await writeDays(root, [[{ ...at(start + HOUR, 1, start + HOUR), station: p.id, epoch: 2 }]]);
     await run();
     assert.equal(await preliminary(), "2024-04-01T00:00:00Z");
 
@@ -1169,7 +1022,7 @@ describe("compactRecent", () => {
         },
       ]);
     const fold = (flag: Flag) =>
-      writeRecent(recentPath(root, "test"), [
+      writeDays(root, [
         [{ time: start + HOUR, level: 1, flag, received: start + HOUR, station: s.id, epoch: 1 }],
       ]);
 
@@ -1275,7 +1128,7 @@ describe("compactRecent", () => {
     const root = store();
     const a = station("a");
     const newYear = Date.UTC(2026, 0, 1);
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [
         { ...at(newYear - HOUR, 1, newYear), station: a.id, epoch: 1 },
         { ...at(newYear + HOUR, 2, newYear + 2 * HOUR), station: a.id, epoch: 1 },
@@ -1306,7 +1159,7 @@ describe("compactRecent", () => {
       epochs: [epoch(1, "PNP", { state: "closed" }), epoch(2, "NHN")],
     });
     const lost = station("lost");
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [
         { ...at(start + HOUR, 1, start + HOUR), station: lost.id, epoch: 3 },
         { ...at(start + HOUR, 1, start + HOUR), station: moved.id, epoch: 1 },
@@ -1354,7 +1207,7 @@ describe("compactRecent", () => {
       ],
     });
     // The hourly run tagged every row epoch 1 before the refresh opened epoch 2 in the past.
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [held, moved].flatMap((s) => [
         { ...at(start + HOUR, 1, start + HOUR), station: s.id, epoch: 1 },
         { ...at(start + 8 * HOUR, 2, start + 8 * HOUR), station: s.id, epoch: 1 },
@@ -1402,7 +1255,7 @@ describe("compactRecent", () => {
   it("folds a station retired since its values arrived", async () => {
     const root = store();
     const retired = station("retired", { status: "inactive", live: false });
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [{ ...at(start + HOUR, 1, start + HOUR), station: retired.id, epoch: 1 }],
     ]);
     const summary = await compactRecent({
@@ -1428,7 +1281,7 @@ describe("compactRecent", () => {
       station("dropped", { products: ["predictions"] }),
       station("gone", { products: ["predictions"] }),
     ];
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [{ ...at(start + HOUR, 1, start + HOUR), station: dropped.id, epoch: 1 }],
     ]);
     const summary = await compactRecent({
@@ -1458,7 +1311,7 @@ describe("compactRecent", () => {
       source_flag: Flag.good,
     };
     await writeObservations(file, [verified], "NAP");
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [
         {
           ...at(start + HOUR, 1, start + HOUR),
@@ -1494,7 +1347,7 @@ describe("compactRecent", () => {
       [{ time, level: 0.5, flag: Flag.suspect, source_flag: Flag.preliminary, received: time }],
       "NAP",
     );
-    await writeRecent(recentPath(root, "test"), [
+    await writeDays(root, [
       [
         {
           ...at(time, 0.5, time),
@@ -1529,9 +1382,7 @@ describe("compactRecent", () => {
     ];
     const file = seriesPath(root, "levels", "test", "a", 2026);
     await writeObservations(file, [at(start - DAY, 0.5)], "MSL");
-    await writeRecent(recentPath(root, "test"), [
-      [{ ...at(start + HOUR, 1, start + HOUR), station: a.id, epoch: 1 }],
-    ]);
+    await writeDays(root, [[{ ...at(start + HOUR, 1, start + HOUR), station: a.id, epoch: 1 }]]);
     const summary = await compactRecent({
       source: source({}),
       stations: [a, quiet, archive],

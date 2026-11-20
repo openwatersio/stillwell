@@ -1,9 +1,7 @@
 import type { ParseArgsOptionsConfig } from "node:util";
 
-/** scripts/ingest.ts's options, which the job queue parses arguments with too (src/jobs/commands.ts). */
+/** scripts/ingest.ts's options, which a migration's steps are parsed with too (src/jobs/commands.ts). */
 export const INGEST_OPTIONS = {
-  hours: { type: "string", default: "24" },
-  "keep-days": { type: "string", default: "7" },
   days: { type: "string", default: "1" },
   concurrency: { type: "string", default: "4" },
   "accept-epochs": { type: "boolean", default: false },

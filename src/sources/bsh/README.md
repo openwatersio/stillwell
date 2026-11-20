@@ -17,7 +17,7 @@ Predicted high and low waters and 10-minute curves for German gauges, from the [
 
 ## Running ingest
 
-- **Refresh:** the Monthly workflow's BSH refresh fetches the station list on the 2nd, and the same job fetches the predictions: this year's for every gauge, and from August to December next year's too (`backfill bsh all <this year> <next year + 1>`). A gauge added in the year, or a month whose run failed, is filled the next month. BSH `finalizes` nothing and has no live feed, so neither Ingest hourly nor the Monthly refetch reads it.
+- **Refresh:** the Monthly workflow's BSH refresh fetches the station list on the 2nd, and the same job fetches the predictions: this year's for every gauge, and from August to December next year's too (`backfill bsh all <this year> <next year + 1>`). A gauge added in the year, or a month whose run failed, is filled the next month. BSH `finalizes` nothing and has no live feed, so neither the poller nor the Monthly refetch reads it.
 - **Publication date:** the adapter asks for no year before 1 August of the year before, whoever runs the backfill. A year BSH hasn't published yet answers 404 and writes nothing, and an unchanged year rewrites no file.
 - **Datums:** a backfill refuses a year whose file names a datum other than the station's.
 - **Gauges without heights:** a file whose `C02` line lists only times (`Zeiten : HW NW`) is read as having no heights, and any other header without a unit or datum still fails. BSH's per-year `has_height` and `has_curve` flags don't mark these gauges reliably, so the adapter goes by the file.

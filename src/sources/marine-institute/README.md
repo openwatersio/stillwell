@@ -18,14 +18,14 @@ Sea levels every 5 minutes from the Irish National Tide Gauge Network, which the
 
 ### Backfill
 
-A backfill is a job on [the server's queue](../../../docs/plans/jobs.md), queued on the box:
+A backfill is an Ingest run, started from Actions:
 
 ```bash
-stillwell-jobs enqueue backfill marine-institute all 2006 2026 --skip-written
+node scripts/ingest.ts backfill marine-institute all 2006 2026 --skip-written
 ```
 
-That's about 300 station-years, each one request of about 5 seconds and 560 KB compressed (about 170 MB in all), so under half an hour: one job. The current year is fetched whole on every run, so it's backfilled on its own, `backfill marine-institute all 2026 2027`.
+That's about 300 station-years, each one request of about 5 seconds and 560 KB compressed (about 170 MB in all), so under half an hour: one run. The current year is fetched whole on every run, so it's backfilled on its own, `backfill marine-institute all 2026 2027`.
 
 ### Scheduled runs
 
-The Marine Institute is on the server's job queue ([src/sources/server.json](../server.json)), which runs its hourly, nightly and monthly jobs at Actions' times. Monthly refreshes the list on the 2nd. Its refetch on the 9th runs the default `schedule.refetch`, which `node scripts/schedule.ts refetch marine-institute` prints: each station from its earliest preliminary value, from January three years back to this month, which brings in values the institute has checked since.
+The Marine Institute's nightly and monthly jobs run in Actions like every other source's, and the poller reads it hourly. Monthly refreshes the list on the 2nd. Its refetch on the 9th runs the default `schedule.refetch`, which `node scripts/schedule.ts refetch marine-institute` prints: each station from its earliest preliminary value, from January three years back to this month, which brings in values the institute has checked since.

@@ -23,8 +23,8 @@ Observed water levels, observed high and low waters, and RWS's astronomical tide
 
 ## Running ingest
 
-- **Limits:** at most 160,000 values per request, so requests go a year at a time. RWS publishes no rate. Throttling comes back as 429 or 503, which [`src/http.ts`](../../http.ts) retries. An empty range comes back as an empty body. During an outage the whole host answers every path, the catalog and the root included, with the body `404 page not found`, so the adapter waits out such a 404 on a catalog request or a read of a range over 7 days, then stops the run as blocked, as `outage` in [`index.ts`](index.ts) sets. A shorter read, as in the hourly run, the realtime poller and the canary, fails at once and the next run reads the same hours. RWS publishes no status page, and its [documentation](https://github.com/Rijkswaterstaat/WaterWebservices) lists no maintenance calendar.
-- **Workflows:** Ingest hourly reads the last 12 hours at the stations with levels, and Compact daily folds the last 6 days into the year files. The Monthly workflow re-reads each station from its earliest preliminary value on the 9th and refreshes the station list on the 2nd.
+- **Limits:** at most 160,000 values per request, so requests go a year at a time. RWS publishes no rate. Throttling comes back as 429 or 503, which [`src/http.ts`](../../http.ts) retries. An empty range comes back as an empty body. During an outage the whole host answers every path, the catalog and the root included, with the body `404 page not found`, so the adapter waits out such a 404 on a catalog request or a read of a range over 7 days, then stops the run as blocked, as `outage` in [`index.ts`](index.ts) sets. A shorter read, as in the poller and the canary, fails at once and the next run reads the same hours. RWS publishes no status page, and its [documentation](https://github.com/Rijkswaterstaat/WaterWebservices) lists no maintenance calendar.
+- **Workflows:** The poller reads the last 12 hours at the stations with levels, and Compact daily folds the last 6 days into the year files. The Monthly workflow re-reads each station from its earliest preliminary value on the 9th and refreshes the station list on the 2nd.
 
 ### Backfill
 
@@ -42,4 +42,4 @@ Backfill to 1990 asks for every product a station lists, a year per request, so 
    node scripts/ingest.ts backfill rws all 1990 2026 --skip-written --first docs/ticon-inventory.csv
    ```
 
-Each run holds the `store-rws` group for up to 6 hours. A job that finds the group taken waits, and the next hourly run cancels it, so start each run between 01:00 and 18:30 UTC, so it ends before Compact daily at 00:40, and not on the 2nd, when Monthly refreshes the station list at 01:25.
+Each run holds the `store-rws` group for up to 6 hours. A job that finds the group taken waits, and the next run cancels it, so start each run between 01:00 and 18:30 UTC, so it ends before Compact daily at 00:40, and not on the 2nd, when Monthly refreshes the station list at 01:25.

@@ -1,10 +1,9 @@
 import { tooManyWithheld, withheldReason } from "../withhold.ts";
 import { isHeld } from "../epochs.ts";
 import type { Observation, Source, StoredStation } from "../schema.ts";
-import { readRecent, type StationObservation } from "../store/parquet.ts";
-import { recentPath } from "../store/paths.ts";
+import type { StationObservation } from "../store/parquet.ts";
 import { chunks, emptySummary, pool, refreshStation, type RunSummary } from "../store/recent.ts";
-import type { ObservationStore } from "./clickhouse.ts";
+import type { ObservationStore } from "./live.ts";
 
 const DAY_MS = 86_400_000;
 
@@ -12,11 +11,9 @@ const DAY_MS = 86_400_000;
 const BATCH = 100;
 
 /**
- * One pass over a source's live stations into `store`, the steps of
- * `updateRecent` with ClickHouse in place of recent/<source>.parquet: each
+ * One pass over a source's live stations into the live store: each
  * station's window is read, refreshed from the source and QC'd by
- * `refreshStation`, and only the values that changed are written, as a new
- * version. Values the source no longer sends are deleted, and so is every
+ * `refreshStation`, and only the values that changed are written. Values the source no longer sends are deleted, and so is every
  * value of a station the adapter now withholds, within the limit every other
  * withholding keeps (`tooManyWithheld`). Only the stations `due` says are
  * fetched; by default every live one.
@@ -98,8 +95,7 @@ export async function pollSource({
       changed.push(...diff.changed);
       vanished.push(...diff.vanished.map((time) => ({ station: station.id, time })));
     });
-    // Versioned by the pass's start: a value another writer stores after the pass read its window outranks it.
-    await store.write(changed, now);
+    await store.write(changed);
     await store.remove(vanished);
     if (swept instanceof Map) for (const s of batch) swept.delete(s.id);
   }
@@ -107,64 +103,11 @@ export async function pollSource({
 }
 
 /**
- * One pass for a source that refuses the server, from the
- * recent/<source>.parquet the hourly workflow writes rather than from the
- * source: each live station's window in `store` is made to match the
- * file's, so a value the source revised, a flag QC or errata changed, and a
- * value the source dropped all reach `store`, written as a new version. A
- * station the file has no values for keeps what `store` holds, so a missing
- * or empty file deletes nothing. Every value of a station the adapter now
- * withholds is deleted, within the limit `pollSource` keeps.
+ * The interval group a station is polled in: its `min_interval_s`, 0 for none, which the scheduler asks hourly, and 0
+ * for every station of a source whose metadata sets `poller: "hourly"`.
  */
-export async function fillFromRecent({
-  source,
-  stations: all,
-  storeFor,
-  store,
-  now,
-  keepDays = 7,
-  accept = false,
-}: {
-  source: Source;
-  stations: StoredStation[];
-  storeFor: (station: StoredStation) => string;
-  store: ObservationStore;
-  now: number;
-  keepDays?: number;
-  accept?: boolean;
-}): Promise<RunSummary> {
-  const id = source.metadata.id;
-  const keepFrom = now - keepDays * DAY_MS;
-  const held = await store.stations(id);
-  const withheld = held.filter((s) => withheldReason(source, s) !== null);
-  const known = new Set([...held, ...all.map((s) => s.id)]).size;
-  const refused = tooManyWithheld(id, withheld.length, known);
-  if (refused && !accept) throw new Error(refused);
-  await store.removeStations(withheld);
-  // The stations a poll would ask, so the counts mean what a poll's do.
-  const listed = polled(source, all);
-  const summary = emptySummary(`fill ${id} from recent/`, listed.length);
-  for (const [path, members] of Map.groupBy(listed, (s) => recentPath(storeFor(s), id)))
-    for (const batch of chunks(members, BATCH)) {
-      const ids = batch.map((s) => s.id);
-      const had = Map.groupBy(await store.read(ids, keepFrom), (r) => r.station);
-      const next = Map.groupBy(
-        (await readRecent(path, ids)).filter((r) => r.time >= keepFrom && Number.isFinite(r.level)),
-        (r) => r.station,
-      );
-      const changed: StationObservation[] = [];
-      const vanished: { station: string; time: number }[] = [];
-      for (const [station, rows] of next) {
-        const diff = difference(had.get(station) ?? [], rows);
-        if (diff.changed.length) summary.updated++;
-        summary.values += diff.changed.length;
-        changed.push(...diff.changed);
-        vanished.push(...diff.vanished.map((time) => ({ station, time })));
-      }
-      await store.write(changed, now);
-      await store.remove(vanished);
-    }
-  return summary;
+export function intervalOf(source: Source, station: StoredStation): number {
+  return source.metadata.poller === "hourly" ? 0 : (station.min_interval_s ?? 0);
 }
 
 /** The stations of a source's list the poller fetches: live, active, with levels and not withheld. */
@@ -202,45 +145,4 @@ export function difference(
     );
   });
   return { changed, vanished: had.filter((r) => !times.has(r.time)).map((r) => r.time) };
-}
-
-/**
- * Add to `store` the values in each recent/<source>.parquet that `stations`
- * belong to and that it lacks, `received` included, so a server that starts
- * without them, new or back after the hourly workflow wrote the window, keeps
- * that window in its first export. A batch of stations at a time, since a
- * whole USGS window is too large to hold. Values `store` holds are left as
- * they are. Returns the values it added.
- */
-export async function seedFromRecent({
-  source,
-  stations,
-  storeFor,
-  store,
-  now,
-  keepDays = 7,
-}: {
-  source: Source;
-  stations: StoredStation[];
-  storeFor: (station: StoredStation) => string;
-  store: ObservationStore;
-  now: number;
-  keepDays?: number;
-}): Promise<number> {
-  const id = source.metadata.id;
-  const keepFrom = now - keepDays * DAY_MS;
-  const listed = stations.filter((s) => withheldReason(source, s.id) === null);
-  let values = 0;
-  for (const [path, members] of Map.groupBy(listed, (s) => recentPath(storeFor(s), id)))
-    for (const batch of chunks(members, BATCH)) {
-      const ids = batch.map((s) => s.id);
-      const held = new Set((await store.read(ids, keepFrom)).map((r) => `${r.station} ${r.time}`));
-      const missing = (await readRecent(path, ids)).filter(
-        (r) =>
-          r.time >= keepFrom && Number.isFinite(r.level) && !held.has(`${r.station} ${r.time}`),
-      );
-      await store.write(missing, 0);
-      values += missing.length;
-    }
-  return values;
 }

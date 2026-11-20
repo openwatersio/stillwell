@@ -38,7 +38,7 @@ export const metadata: SourceMetadata = {
     "Content under the Public Data License 1.0 may be used under CC BY 4.0 instead. Credit the source as 出典：気象庁ホームページ (Source: Japan Meteorological Agency website) with the page's URL, and say the data was edited.",
   // The historical files are shifted to each station's current observation datum.
   archive: "current",
-  // Provisional values appear around noon the next day, too late for hourly ingest.
+  // Provisional values appear around noon the next day, too late for the poller.
   hourly: false,
   // Provisional values are replaced by final ones around the 20th of the next month.
   finalizes: true,

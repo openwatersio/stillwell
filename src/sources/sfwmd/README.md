@@ -23,7 +23,7 @@ Stage at the District's tidal gauges in South Florida, from [DBHYDRO](https://ww
 
 ### Backfill
 
-Monthly refreshes SFWMD's list on the 2nd, and Ingest hourly and Compact daily skip SFWMD until its list is in the store, so a first run dispatches Monthly with `sources: sfwmd`. Then backfill through the Ingest workflow, active stations first and the inactive ones in a second run. Check the inactive list in the store after the refresh against the second command's:
+Monthly refreshes SFWMD's list on the 2nd, and the poller and Compact daily skip SFWMD until its list is in the store, so a first run dispatches Monthly with `sources: sfwmd`. Then backfill through the Ingest workflow, active stations first and the inactive ones in a second run. Check the inactive list in the store after the refresh against the second command's:
 
 ```bash
 node scripts/ingest.ts backfill sfwmd all 1974 2026 --skip-written
@@ -37,4 +37,4 @@ That is about 1,400 station-years, at about 0.8 MB and 20 seconds a year, so abo
 
 ### Scheduled runs
 
-Ingest hourly fetches each active station's telemetry. Monthly's refetch on the 9th reads again from each station's earliest provisional value, back to the refetch's three-year cutoff: three years of each active station at 20 seconds a year, roughly 40 minutes.
+The poller fetches each active station's telemetry. Monthly's refetch on the 9th reads again from each station's earliest provisional value, back to the refetch's three-year cutoff: three years of each active station at 20 seconds a year, roughly 40 minutes.

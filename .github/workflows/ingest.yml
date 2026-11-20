@@ -1,8 +1,8 @@
 name: Ingest
 
 # Run any ingest command against the R2 store by hand, e.g.
-# `backfill rws hoekvanholland 2024 2025`. Ingest hourly and Compact daily run
-# `recent` and `compact` on a schedule.
+# `backfill rws hoekvanholland 2024 2025`. Compact daily runs `compact` on a
+# schedule.
 run-name: Ingest ${{ inputs.args }}
 on:
   workflow_dispatch:
@@ -50,7 +50,7 @@ jobs:
             # links reads levels and writes only its own file, in the group Monthly's job takes.
             links) group=links ;;
             matches) group=matches ;;
-            backfill | recent | compact | requalify | withhold | drop | misplaced | years | analyze) [ -n "${words[1]:-}" ] && group="store-${words[1]}" || group=store ;;
+            backfill | compact | requalify | withhold | drop | misplaced | years | analyze) [ -n "${words[1]:-}" ] && group="store-${words[1]}" || group=store ;;
             stations)
               echo "::error::Refresh station lists with the Monthly workflow, which runs each source in its own group and then publishes"
               exit 1
@@ -66,6 +66,7 @@ jobs:
     concurrency:
       group: ${{ needs.group.outputs.name }}
       cancel-in-progress: false
+      queue: max
     # The `lake` environment only deploys from main; this stops a run from another
     # branch before it waits on that rule.
     if: github.ref == 'refs/heads/main'
@@ -90,15 +91,6 @@ jobs:
           node-version-file: .mise.toml
           cache: npm
       - run: npm ci
-      # A source whose writers run on the server's job queue is written only there (docs/plans/jobs.md), by
-      # main's list, so a run that waited in its group from before the source moved doesn't write it.
-      - run: |
-          lane=$(node --input-type=module -e '
-            import { laneOf } from "./src/jobs/commands.ts";
-            console.log(laneOf(process.env.ARGS.split(/\s+/).filter(Boolean)));')
-          case "$lane" in store-*) scripts/server-owns.sh "${lane#store-}" ;; esac
-        env:
-          ARGS: ${{ inputs.args }}
       # The arguments come through the environment, never into the script text.
       - run: |
           set -f
