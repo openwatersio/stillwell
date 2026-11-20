@@ -2,6 +2,8 @@
 // http://store.internal (store.ts), and every minute makes sure it's running (docs/plans/cloudflare.md).
 
 import { Container } from "@cloudflare/containers";
+// The outbound handler (store.internal) runs through it.
+export { ContainerProxy } from "@cloudflare/containers";
 import { handleStore, prune, type StoreEnv } from "./store.ts";
 
 export interface Env extends StoreEnv {
@@ -51,7 +53,7 @@ export default {
   async scheduled(controller: ScheduledController, env: Env): Promise<void> {
     // Starts the container if it isn't running; its health answer means the poller is up.
     const health = await env.POLLER.getByName("poller").fetch("http://poller/health");
-    if (!health.ok) console.error(`poller health: ${health.status}`);
+    if (!health.ok) console.error(`poller health: ${health.status} ${await health.text()}`);
     const now = controller.scheduledTime;
     const minute = new Date(now).getUTCMinutes();
     if (minute === 30) await alert(env, now);

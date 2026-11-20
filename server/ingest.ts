@@ -54,10 +54,11 @@ if (!chosen.length) throw new Error("no hourly source named");
 // Unset, the store would be a local `data` with no lists, and every pass would find none.
 if (!process.env.STILLWELL_STORE) throw new Error("set STILLWELL_STORE to the store");
 
-if (process.env.PORT)
-  createServer((request, response) => {
-    response.writeHead(request.url === "/health" ? 200 : 404).end();
-  }).listen(Number(process.env.PORT));
+const health = process.env.PORT
+  ? createServer((request, response) => {
+      response.writeHead(request.url === "/health" ? 200 : 404).end();
+    }).listen(Number(process.env.PORT))
+  : null;
 
 let stopping = false;
 const wake = new Set<() => void>();
@@ -84,6 +85,8 @@ await Promise.all([
   ...chosen.map((source, i) => sleep(i * 20_000).then(() => run(source))),
   exports(),
 ]);
+// The loops end only when the process is told to stop; the health server would keep it running.
+health?.close();
 
 /**
  * Write the daily files until the process stops: the last 7 days at start, so a restart misses none, then today's
