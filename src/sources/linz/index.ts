@@ -389,7 +389,7 @@ async function listing(code: string, sensor: string, year: number): Promise<stri
     { fresh: true, pace },
   );
   if (!Array.isArray(files)) throw new Error(`LINZ ${code} ${year}: no file list`);
-  // Scott Base's 2026 listing holds a file with an empty name.
+  // A listing can hold a file with an empty name, as Scott Base's last year's does.
   return files.map((f) => f.name).filter(Boolean);
 }
 

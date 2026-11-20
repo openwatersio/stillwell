@@ -21,10 +21,10 @@ One-minute sea levels from each sensor at 26 of the 27 tide gauges of Mexico's S
 
 ### Backfill
 
-There's no history to backfill: SMN serves 5 days. The adapter refuses a request that starts earlier, since backfill replaces every month it brings values for, and a year's backfill would replace a month the store holds with its last 5 days. To keep the days SMN serves, run one backfill over them through the Ingest workflow, from 4 days back to tomorrow, with the dates written out, such as on 12 November 2026:
+There's no history to backfill: SMN serves 5 days. The adapter refuses a request that starts earlier, since backfill replaces every month it brings values for, and a year's backfill would replace a month the store holds with its last 5 days. To keep the days SMN serves, run one backfill over them through the Ingest workflow, from 4 days back to tomorrow, with the dates written out:
 
 ```bash
-node scripts/ingest.ts backfill unam all 2026-11-08 2026-11-13
+node scripts/ingest.ts backfill unam all <4 days ago> <tomorrow>
 ```
 
 That's 26 stations, two requests each; 4 days' range is bigger than the file, so each answers with all of it, about 8 MB in all, in one run. A wider range, or `backfill unam preliminary`, is refused for every station.
