@@ -615,6 +615,7 @@ function readings(location: string, series: Series[], hourly = false): Series[] 
         how === "GEMH" &&
         hourly &&
         HOURLY_MEANS.has(location) &&
+        valueTimes(s).length > 0 &&
         valueTimes(s).every((t) => t >= MEANS_SINCE && t < MEANS_UNTIL)
       )
         return true;

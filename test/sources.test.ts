@@ -360,14 +360,19 @@ describe("rws", () => {
       [9.11, 9.12],
     );
     // The window runs from 23:00 UTC on 31 December 1999 up to, not including, 1 January 2005.
-    const edge = (time: string) => {
-      serve([[/OphalenWaarnemingen/, answer([mean, [[time, 910]]])]]);
+    const edge = (time: string, value = 910) => {
+      serve([[/OphalenWaarnemingen/, answer([mean, [[time, value]]])]]);
       return rws.levels(
         "dehaandrik.boven",
         new Date("1999-12-01T00:00:00Z"),
         new Date("2005-02-01T00:00:00Z"),
       );
     };
+    // A series of only missing-value sentinels isn't accepted as means either.
+    await assert.rejects(
+      edge("2002-01-01T00:00:00+01:00", 999_999_999),
+      /unknown WaardeBewerkingsMethode GEMH/,
+    );
     assert.deepEqual(
       (await edge("2000-01-01T00:00:00+01:00")).map((l) => l.level),
       [9.1],
