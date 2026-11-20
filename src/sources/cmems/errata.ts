@@ -16,6 +16,17 @@ async function levels(store: StoreReader, id: string, day: string) {
   return rows;
 }
 
+/** Throws unless every level the store holds for `id` from `since` to before `until` is suspect or worse, and it holds some. */
+async function allSuspect(store: StoreReader, id: string, since: string, until: string) {
+  const rows = await store.levels(id, since, until);
+  if (!rows.length) throw new Error(`the store holds no ${id} levels from ${since} to ${until}`);
+  const missed = rows.filter((o) => o.flag < Flag.suspect);
+  if (missed.length)
+    throw new Error(
+      `${missed.length} of ${id}'s ${rows.length} levels from ${since} to ${until} aren't suspect, the first at ${iso(missed[0]!.time)}`,
+    );
+}
+
 export default {
   errata: [
     {
@@ -104,27 +115,101 @@ export default {
       until: "2026-10-30",
       handling: "flagged",
       error:
-        "CMEMS's copy of the WSV's Wangerooge West gauge reads −7.45 m from 25 to 29 October 2026, as PEGELONLINE's −2.40 m (erratum `pegelonline-wangerooge-west-2026-dropout`). CMEMS flags most of these values, not all.",
+        "CMEMS's copy of the WSV's Wangerooge West gauge reads −7.45 m from 20:30 UTC on 25 October 2026 to 13:40 UTC on 29 October, as PEGELONLINE's −2.40 m (erratum `pegelonline-wangerooge-west-2026-dropout`). CMEMS flags 293 of the 363 values below −4 m probably bad and leaves the other 70 unflagged, with its preliminary flag. The store holds no value on 28 October.",
       response:
-        "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. CMEMS flags the −7.45 m values of 25 October itself.",
+        "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. QC flags the 20 unflagged −7.45 m values of 25 October, and the span flags the 50 of 26 and 27 October.",
       evidence:
-        "Found with erratum `pegelonline-wangerooge-west-2026-dropout`, November 2026: of 2,564 values below −4 m, CMEMS flags 2,465 and QC 98, and one, at 12:00 UTC on 27 October, is left unflagged.",
+        "Found with erratum `pegelonline-wangerooge-west-2026-dropout`, November 2026. The store's 2026 file for the gauge has 363 values below −4 m, none before 20:30 UTC on 25 October and none after 13:40 UTC on 29 October: 20 on 25 October, 116 on 26, 144 on 27 and 83 on 29. CMEMS flags 90 of the 26th's, 120 of the 27th's and all of the 29th's, and none of the 25th's. The 20 on 25 October are from 20:30 to 23:50 UTC, the 26 on 26 October from 00:00 to 16:10, and the 24 on 27 October from 12:00 to 15:50. A fresh fetch of the gauge's 2026 levels in November 2026 returns none for 28 October either, while PEGELONLINE's has 1,440, all −2.40 or −2.41 m.",
+      reported: null,
+      report: null,
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
+        await allSuspect(store, id, e.since!, e.until!);
         const low = (await levels(store, id, dayAfter(e.since!, 1))).filter(
           (o) => o.level < -7,
         ).length;
         if (low < 100)
           throw new Error(`the store holds ${low} Wangerooge levels below −7 m on 27 October 2026`);
+        // CMEMS leaves 25 October's dropout unflagged; QC flags it.
         const first = (await levels(store, id, dayAfter(e.since!, -1))).filter((o) => o.level < -7);
         if (!first.length)
           throw new Error("the store holds no Wangerooge levels below −7 m on 25 October 2026");
-        const unflaggedBySource = first.filter((o) => (o.source_flag ?? Flag.good) < Flag.suspect);
-        if (unflaggedBySource.length)
+        const missed = first.filter((o) => o.flag < Flag.suspect);
+        if (missed.length)
           throw new Error(
-            `${unflaggedBySource.length} of ${first.length} Wangerooge levels below −7 m on 25 October 2026 don't carry CMEMS's flag, the first at ${iso(unflaggedBySource[0]!.time)}`,
+            `${missed.length} of ${first.length} Wangerooge levels below −7 m on 25 October 2026 aren't suspect, the first at ${iso(missed[0]!.time)}`,
           );
+        if (!first.some((o) => (o.source_flag ?? Flag.good) < Flag.suspect))
+          throw new Error("CMEMS flags every Wangerooge level below −7 m on 25 October 2026");
+        const held = await store.levels(id, "2026-10-28", "2026-10-29");
+        if (held.length)
+          throw new Error(`the store holds ${held.length} Wangerooge levels on 28 October 2026`);
+        for (const day of ["2026-10-27", "2026-10-29"]) await levels(store, id, day);
+      },
+    },
+    {
+      id: "cmems-holyhead-2026-erratic",
+      stations: ["cmems/Holyhead"],
+      since: "2026-02-03",
+      until: "2026-02-21",
+      handling: "flagged",
+      error:
+        "CMEMS's copy of the Holyhead gauge carries the erratic readings of the EA's record of it from 3 to 20 February 2026: 86 of the 430 values it holds read above 7 m, up to 12.05 m, where the highest water in the rest of 2026, outside 1 to 20 February and 8 to 14 April, is 6.51 m. CMEMS flags none of them.",
+      response:
+        "3 to 20 February 2026 is flagged `suspect`, keeping the source flag as `source_flag`. QC flags 14 of the 86 values above 7 m, so the span flags the rest and the readings between them.",
+      evidence:
+        "Found in November 2026 while reading back the EA's Holyhead record (`ea/E70539`), whose readings from 1 to 20 February are erratic, between the −3.05 m floor and 8.94 m above Ordnance Datum, 3.46 m being the highest water in the rest of 2026. CMEMS's values agree with the EA's at −3.05 m, its datum difference, through 31 January and from 21 February. The store holds no CMEMS value on 1 February and 9 on 2 February, all within the tide. BODC's record of the gauge (`bodc/hol`) stays between 0.4 and 6.2 m on those days.",
+      reported: null,
+      report: null,
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        await allSuspect(store, id, e.since!, e.until!);
+        const high = (await levels(store, id, "2026-02-10")).filter((o) => o.level > 7);
+        if (!high.length) throw new Error(`the store holds no ${id} level above 7 m on 2026-02-10`);
+        // CMEMS flags none of them, as the entry says.
+        const flagged = high.filter((o) => (o.source_flag ?? Flag.good) >= Flag.suspect);
+        if (flagged.length)
+          throw new Error(
+            `CMEMS flags ${flagged.length} of ${id}'s ${high.length} levels above 7 m on 2026-02-10`,
+          );
+        for (const day of ["2026-01-25", "2026-02-25"]) {
+          const top = Math.max(...(await levels(store, id, day)).map((o) => o.level));
+          if (top > 6.7) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 6.7 m`);
+        }
+      },
+    },
+    {
+      id: "cmems-holyhead-2026-april-erratic",
+      stations: ["cmems/Holyhead"],
+      since: "2026-04-10",
+      until: "2026-04-11",
+      handling: "flagged",
+      error:
+        "CMEMS's copy of the Holyhead gauge reads 7.88, 10.37, 8.82 and 9.81 m at 14:00, 15:00, 16:00 and 19:00 UTC on 10 April 2026, above 6.51 m, the highest water in the rest of 2026 outside 1 to 20 February and 8 to 14 April. CMEMS flags none of them.",
+      response:
+        "10 April 2026 is flagged `suspect`, keeping the source flag as `source_flag`. QC flags the 9.81 m value, so the span flags the other three and the day's other readings.",
+      evidence:
+        "Found in November 2026 while reading back the EA's Holyhead record (`ea/E70539`), which is erratic from 8 to 14 April. The store holds 10 CMEMS values on 10 April, from 14:00 to 23:00 UTC, and no value from 8 to 14 April outside 0.3 to 6.5 m on any other day.",
+      reported: null,
+      report: null,
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        await allSuspect(store, id, e.since!, e.until!);
+        const high = (await levels(store, id, "2026-04-10")).filter((o) => o.level > 7);
+        if (!high.length) throw new Error(`the store holds no ${id} level above 7 m on 2026-04-10`);
+        // CMEMS flags none of them, as the entry says.
+        const flagged = high.filter((o) => (o.source_flag ?? Flag.good) >= Flag.suspect);
+        if (flagged.length)
+          throw new Error(
+            `CMEMS flags ${flagged.length} of ${id}'s ${high.length} levels above 7 m on 2026-04-10`,
+          );
+        for (const day of ["2026-04-05", "2026-04-20"]) {
+          const top = Math.max(...(await levels(store, id, day)).map((o) => o.level));
+          if (top > 6.7) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 6.7 m`);
+        }
       },
     },
     {
