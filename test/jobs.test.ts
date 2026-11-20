@@ -218,7 +218,7 @@ describe("Monthly workflow", () => {
   });
 
   it("puts no job but the lists and refetch in a source's group", () => {
-    // A new job queued in a source's group would cancel the one waiting there, such as a compaction.
+    // A new job queued in a source's group waits behind every one there, such as a compaction.
     const grouped = Object.entries(jobs)
       .filter(([, job]) => job.concurrency?.group.startsWith("store-"))
       .map(([name]) => name);
@@ -251,5 +251,27 @@ describe("backfill over an empty station list", () => {
     );
     assert.notEqual(run.status, 0);
     assert.match(run.stderr, /crms: no station to backfill/);
+  });
+});
+
+describe("concurrency groups", () => {
+  it("queue every run that waits on the store, rather than replace the one waiting", () => {
+    const files = ["ingest", "compact-daily", "monthly", "migrations"].map(
+      (name) => [name, parse(readFileSync(`.github/workflows/${name}.yml`, "utf8"))] as const,
+    );
+    for (const [name, workflow] of files) {
+      const groups = [
+        ["workflow", workflow.concurrency],
+        ...Object.entries(workflow.jobs as Record<string, { concurrency?: unknown }>).map(
+          ([job, j]) => [job, j.concurrency] as const,
+        ),
+      ].filter(([, c]) => c && typeof c === "object") as [
+        string,
+        { group: string; queue?: string },
+      ][];
+      for (const [job, c] of groups)
+        if (!c.group.startsWith("alert-") && !/^\$\{\{.*alert-/.test(c.group))
+          assert.equal(c.queue, "max", `${name} ${job}`);
+    }
   });
 });

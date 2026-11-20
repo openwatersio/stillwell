@@ -116,6 +116,7 @@ jobs:
     concurrency:
       group: store-${{ matrix.source }}
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     # CO-OPS's datums take up to 2 hours (refreshBudgetMs) and analysis's
     # requalify 2 hours. The requalify of the last two months starts stations
@@ -191,6 +192,7 @@ jobs:
     concurrency:
       group: matches
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 300
     environment: lake
@@ -230,6 +232,7 @@ jobs:
     concurrency:
       group: links
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 180
     environment: lake
@@ -260,6 +263,7 @@ jobs:
     concurrency:
       group: store
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: lake
@@ -305,6 +309,7 @@ jobs:
     concurrency:
       group: store-${{ matrix.source }}
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 360
     environment: lake

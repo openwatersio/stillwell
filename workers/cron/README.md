@@ -10,7 +10,7 @@ GitHub's `schedule` trigger runs this repo's workflows hours late, or skips them
 | `20 * * * *`      | Migrations ([`migrations.yml`](../../.github/workflows/migrations.yml)), `next`  | `25 * * * *`          |
 | `0 7 * * MON`     | Canary ([`canary.yml`](../../.github/workflows/canary.yml))                      | `5 7 * * MON`         |
 
-Each workflow keeps its `schedule` as a backup, five minutes after the Worker's. A scheduled run checks first whether a dispatched one on `main` already started (in the last 23 hours, or day, with Monthly's matching its title, Monthly or Refetch for every source) and if so runs nothing. A failed check runs the backup. Without that check, the second run would wait in each source's `store-<source>` group and cancel any job already waiting there, since GitHub keeps one waiting job per group. When the Worker fails, the schedule still runs, late as it may be.
+Each workflow keeps its `schedule` as a backup, five minutes after the Worker's. A scheduled run checks first whether a dispatched one on `main` already started (in the last 23 hours, or day, with Monthly's matching its title, Monthly or Refetch for every source) and if so runs nothing. A failed check runs the backup. Without that check, the second run would queue in each source's `store-<source>` group and run each source's jobs again. When the Worker fails, the schedule still runs, late as it may be.
 
 The Bucket check workflow stays on GitHub's schedule only: it writes nothing, and a late weekly run is fine.
 

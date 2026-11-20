@@ -25,11 +25,10 @@ permissions:
 jobs:
   # The Worker in workers/cron dispatches this workflow, since GitHub's
   # schedule runs late or not at all. The schedule is a backup, skipped when a
-  # dispatched run on main started in the last 23 hours: a second run would wait in each
-  # source's group, and cancel any job already waiting there, such as a
-  # compaction or a station refresh. A dispatched run counts even when one of
-  # its jobs was cancelled while waiting, since a backup would cancel whatever
-  # replaced it. A failed lookup runs the backup.
+  # dispatched run on main started in the last 23 hours: a second run would
+  # queue in each source's group and compact every source again. A dispatched
+  # run counts even when one of its jobs was cancelled. A failed lookup runs
+  # the backup.
   gate:
     # The `lake` environment only deploys from main; this stops a run from another
     # branch before it waits on that rule.
@@ -88,6 +87,7 @@ jobs:
       # can't touch a job waiting in the source's.
       group: ${{ needs.gate.outputs.run == 'true' && format('store-{0}', matrix.source) || format('skipped-{0}', github.run_id) }}
       cancel-in-progress: false
+      queue: max
     needs: gate
     if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
@@ -133,6 +133,7 @@ jobs:
     concurrency:
       group: ${{ needs.gate.outputs.run == 'true' && 'store' || format('skipped-publish-{0}', github.run_id) }}
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: lake
@@ -167,6 +168,7 @@ jobs:
     concurrency:
       group: ${{ needs.gate.outputs.run == 'true' && format('alert-{0}', github.workflow) || format('skipped-alert-{0}', github.run_id) }}
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

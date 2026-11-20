@@ -42,7 +42,7 @@ analyze() {
 # over the whole year, not the poller's 7 days that compaction folds in. Compaction folds last month's
 # final days again for a few nights after this, with the window's flags, so each month is judged whole by the
 # next month's run, December's by February's. Only a full refresh runs it. As a step of the list job, not a job
-# of its own, it puts no job in the source's lane to cancel one waiting there, such as a compaction. It takes
+# of its own, it puts no job in the source's lane to wait ahead of one waiting there, such as a compaction. It takes
 # only stations with a year file in range, and starts them for at most 90 minutes, and none once the job has
 # run 5 hours, so the job ends within its time limit; USGS's, the most, took about 25 minutes in a local
 # measurement. The stations it didn't finish, and every one when no time is left, are saved in the store with

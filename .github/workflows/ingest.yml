@@ -66,6 +66,7 @@ jobs:
     concurrency:
       group: ${{ needs.group.outputs.name }}
       cancel-in-progress: false
+      queue: max
     # The `lake` environment only deploys from main; this stops a run from another
     # branch before it waits on that rule.
     if: github.ref == 'refs/heads/main'

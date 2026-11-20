@@ -2,7 +2,7 @@ name: Migrations
 
 # Runs src/migrations/ one step at a time (src/migrations/README.md), recording each in the store's migrations.json.
 # A run takes one step and starts the next run when it succeeds; a push to main and the cron Worker's hourly dispatch
-# start it too, so a step cancelled while it waited in its source's group runs again.
+# start it too, so a step whose run didn't start the next still goes on.
 run-name: Migrations ${{ inputs.action || '' }} ${{ inputs.migration || '' }}
 on:
   push:
@@ -22,10 +22,12 @@ on:
         description: "The migration to retry or skip"
         required: false
 
-# One run at a time, so two never take the same step; a run waiting replaces an older one waiting, which does the same.
+# One run at a time, so two never take the same step, and runs wait in order, so a retry or skip dispatched while a
+# step runs waits its turn.
 concurrency:
   group: migrations
   cancel-in-progress: false
+  queue: max
 
 jobs:
   plan:
@@ -92,6 +94,7 @@ jobs:
     concurrency:
       group: ${{ needs.plan.outputs.lane }}
       cancel-in-progress: false
+      queue: max
     timeout-minutes: ${{ fromJSON(needs.plan.outputs.timeout) }}
     permissions:
       contents: read
@@ -168,7 +171,7 @@ jobs:
       - if: steps.result.outputs.result == 'failure'
         run: |
           node scripts/migrations.ts fail "$ID" "$STEP" "step $STEP failed in $RUN"
-          gh issue create --repo "$GITHUB_REPOSITORY" --title "Migration $ID failed" --body "Step $STEP of \`src/migrations/$ID.ts\` failed in [this run]($RUN), and every migration after it waits. Fix the cause, then run the Migrations workflow with \`retry\` and \`$ID\`, or with \`skip\` if the remaining steps can't or needn't run. A run waiting for the workflow's group is replaced by the next one to queue, so check that the dispatch ran, and dispatch it again if it was cancelled."
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "Migration $ID failed" --body "Step $STEP of \`src/migrations/$ID.ts\` failed in [this run]($RUN), and every migration after it waits. Fix the cause, then run the Migrations workflow with \`retry\` and \`$ID\`, or with \`skip\` if the remaining steps can't or needn't run."
         env:
           ID: ${{ needs.plan.outputs.id }}
           STEP: ${{ needs.plan.outputs.step }}
