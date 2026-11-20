@@ -1,13 +1,13 @@
 name: Errata check
 
 # Run every erratum's check against the public store (scripts/errata-check.ts)
-# after each full Monthly or Refetch run on main, when ingest has refreshed,
-# requalified or refetched what the checks read, and bring the
-# `errata-check` issues in line (scripts/errata-issues.ts): one open issue for
-# each failing erratum, closed when its check passes. A failing check opens
-# an issue and leaves the run green; the run fails when the checks can't run
-# or the errata files have problems. Dispatch it with sources or erratum IDs
-# to check only those, such as after a backfill.
+# after each full Monthly or Refetch run on main that refreshed or refetched a
+# source, and bring the `errata-check` issues in line
+# (scripts/errata-issues.ts): one open issue for each failing erratum, closed
+# when its check passes. A failing check opens an issue and leaves the run
+# green; the run fails when the checks can't run, can't read the store, or the
+# errata files have problems. Dispatch it with sources or erratum IDs to check
+# only those, such as after a backfill.
 on:
   workflow_run:
     workflows: [Monthly]
@@ -22,8 +22,9 @@ on:
 
 permissions: {}
 
+# A dispatch waits in its own group, so it never replaces a check queued after Monthly.
 concurrency:
-  group: errata-check
+  group: errata-check-${{ github.event_name }}
 
 jobs:
   check:
@@ -35,24 +36,44 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
+      actions: read
       contents: read
       issues: write
     steps:
-      - uses: actions/checkout@v7
+      # A backup run that found the dispatched one, or a run cancelled before
+      # its work, refreshed and refetched nothing, so its store is no newer.
+      - id: ran
+        run: |
+          if [ "$EVENT" = workflow_dispatch ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          done=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/jobs?per_page=100" --paginate \
+            --jq '.jobs[] | select((.name | test("^(lists|refetch)( |$)")) and .conclusion == "success") | .name' | wc -l)
+          echo "$done lists or refetch jobs succeeded in the Monthly run"
+          echo "run=$([ "$done" -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+        env:
+          EVENT: ${{ github.event_name }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          GH_TOKEN: ${{ github.token }}
+      - if: steps.ran.outputs.run == 'true'
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - if: steps.ran.outputs.run == 'true'
+        uses: actions/setup-node@v7
         with:
           node-version-file: .mise.toml
           cache: npm
-      - run: npm ci
+      - if: steps.ran.outputs.run == 'true'
+        run: npm ci
       # A failing check exits 1 too; the report says which, and a missing report fails the next step.
-      - run: |
+      - if: steps.ran.outputs.run == 'true'
+        run: |
+          set -f
           node scripts/errata-check.ts --report report.json $ONLY | tee check.txt || true
           { echo '```'; cat check.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
         env:
           ONLY: ${{ inputs.only }}
           STILLWELL_STORE: https://stillwell.openwaters.io
-      - run: node scripts/errata-issues.ts report.json
+      - if: steps.ran.outputs.run == 'true'
+        run: node scripts/errata-issues.ts report.json
         env:
           GH_TOKEN: ${{ github.token }}
