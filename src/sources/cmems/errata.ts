@@ -106,7 +106,7 @@ export default {
       error:
         "CMEMS's copy of the WSV's Wangerooge West gauge reads −7.45 m from 25 to 29 October 2026, as PEGELONLINE's −2.40 m (erratum `pegelonline-wangerooge-west-2026-dropout`). CMEMS flags most of these values, not all.",
       response:
-        "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. CMEMS flags the −7.45 m values of 25 October itself.",
+        "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. The store's QC flags the −7.45 m values of 25 October `suspect`.",
       evidence:
         "Found with erratum `pegelonline-wangerooge-west-2026-dropout`, November 2026: of 2,564 values below −4 m, CMEMS flags 2,465 and QC 98, and one, at 12:00 UTC on 27 October, is left unflagged.",
       check: async (store, e) => {
@@ -120,10 +120,10 @@ export default {
         const first = (await levels(store, id, dayAfter(e.since!, -1))).filter((o) => o.level < -7);
         if (!first.length)
           throw new Error("the store holds no Wangerooge levels below −7 m on 25 October 2026");
-        const unflaggedBySource = first.filter((o) => (o.source_flag ?? Flag.good) < Flag.suspect);
-        if (unflaggedBySource.length)
+        const unflagged = first.filter((o) => o.flag < Flag.suspect);
+        if (unflagged.length)
           throw new Error(
-            `${unflaggedBySource.length} of ${first.length} Wangerooge levels below −7 m on 25 October 2026 don't carry CMEMS's flag, the first at ${iso(unflaggedBySource[0]!.time)}`,
+            `${unflagged.length} of ${first.length} Wangerooge levels below −7 m on 25 October 2026 aren't suspect, the first at ${iso(unflagged[0]!.time)}`,
           );
       },
     },

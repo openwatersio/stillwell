@@ -1,4 +1,5 @@
 import { dayAfter, flaggedSpan, impossibleDropped, type ErrataFile } from "../../errata.ts";
+import { Flag } from "../../schema.ts";
 import {
   differences,
   held,
@@ -334,14 +335,22 @@ export default {
       error:
         "PEGELONLINE gives Este Inneres Sperrwerk BP 3.20 m at 08:10 UTC on 3 June 2025, after 6.51 and 6.40 m at 08:08 and 08:09, followed by a gap.",
       response:
-        "The value is kept as served. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark about 1,400 good one-minute values suspect.",
+        "The value is kept, with PEGELONLINE's flag as `source_flag`. The store's QC flags it `suspect`, with the 6.40 m before it.",
       evidence:
         "In PEGELONLINE's raw-data download for the gauge, as the store holds it, checked in November 2026: 6.51 m at 08:08 UTC, 6.40 m at 08:09, 3.20 m at 08:10, then a gap. The gauge also jumps for a minute or two to fixed values such as 5.19, 4.99 and 4.19 m dozens of times a year, which the store's spike test mostly catches.",
       check: async (store, e) => {
         const [station, day] = [e.stations![0]!, e.since!];
         const values = await levels(store, station, day);
-        kept(values, station, `${day}T08:09Z`, 6.4);
-        kept(values, station, `${day}T08:10Z`, 3.2);
+        for (const [hm, level] of [
+          ["08:09", 6.4],
+          ["08:10", 3.2],
+        ] as const) {
+          const o = values.find((v) => v.time === Date.parse(`${day}T${hm}Z`));
+          if (!o || Math.abs(o.level - level) >= 0.005)
+            throw new Error(`the store holds no ${level} m at ${hm} on ${day} at ${station}`);
+          if (o.source_flag == null || o.flag < Flag.suspect)
+            throw new Error(`${station}'s ${level} m at ${hm} is flagged ${o.flag}, not suspect`);
+        }
       },
     },
     {

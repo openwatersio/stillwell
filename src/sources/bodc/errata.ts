@@ -1,7 +1,7 @@
 import { dayAfter, flaggedSpan, type ErrataFile, type StoreReader } from "../../errata.ts";
 import { POSITIONS } from "../../positions.ts";
 import { Flag } from "../../schema.ts";
-import { distanceKm, median } from "../../stats.ts";
+import { distanceKm } from "../../stats.ts";
 
 /** A station's stored levels, throwing when there are none. */
 async function levels(store: StoreReader, id: string, since: string, until = dayAfter(since, 1)) {
@@ -86,44 +86,6 @@ export default {
       },
     },
     {
-      id: "bodc-ilfracombe-2023-offsets",
-      stations: ["bodc/ilf"],
-      since: "2023-09-30",
-      until: "2025-03-21",
-      handling: "flagged",
-      error:
-        "BODC's Ilfracombe levels sit 0.9 to 1.6 m off GESLA's CMEMS copy of the gauge on and off from 30 September 2023 to 20 March 2025.",
-      response:
-        "30 September 2023 to 20 March 2025 is flagged `suspect` whole, keeping BODC's own flag as `source_flag`. The store's QC already flags 82 to 93% of it.",
-      evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's CMEMS copy of the gauge (`gesla/ilfracombe-ilf-gbr-cmems`): the difference is −0.01 m before and −0.02 m after and −0.88 to −1.56 m over the spans.",
-      check: async (store, e) => {
-        await flaggedSpan(store, e);
-        const [since, until] = [e.since!, e.until!];
-        const cmems = new Map(
-          (await store.levels("gesla/ilfracombe-ilf-gbr-cmems", since, until)).map((o) => [
-            o.time,
-            o.level,
-          ]),
-        );
-        const days = Map.groupBy(
-          (await levels(store, e.stations![0]!, since, until)).filter((o) => cmems.has(o.time)),
-          (o) => Math.floor(o.time / 86_400_000),
-        );
-        if (!days.size) throw new Error("Ilfracombe and its CMEMS copy share no times in the span");
-        // A day's median difference, from at least four shared times so a day half missing can't pass for an offset.
-        const off = [...days.values()].filter(
-          (day) =>
-            day.length >= 4 &&
-            Math.abs(median(day.map((o) => o.level - cmems.get(o.time)!))) > 0.75,
-        );
-        if (!off.length)
-          throw new Error(
-            `no day of the ${days.size} Ilfracombe shares with its CMEMS copy in the span sits more than 0.75 m off it`,
-          );
-      },
-    },
-    {
       id: "bodc-st-helier-2025-zero",
       stations: ["bodc/jer"],
       since: "2025-10-14",
@@ -132,9 +94,9 @@ export default {
       error:
         "BODC's ERDDAP gives St. Helier 0.000 m at 19:15 UTC on 14 October 2025, between 5.559 m at 19:00 and 6.77 m after a one-hour gap.",
       response:
-        "The value is kept as served, with BODC's good flag. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark the rest of the day suspect too.",
+        "The value is kept, with BODC's good flag as `source_flag`. The store's QC flags it `suspect`, with the two values before it.",
       evidence:
-        "In BODC's ERDDAP record of St. Helier, as the store holds it, checked in November 2026: 5.559 m at 19:00, 0.000 m at 19:15 with BODC's good flag, nothing until 20:30, then 6.77 m.",
+        "In BODC's ERDDAP record of St. Helier, as the store holds it, checked in November 2026: 5.559 m at 19:00, 0.000 m at 19:15 with BODC's good flag, nothing until 20:15, then 6.772 m.",
       check: async (store, e) => {
         const day = e.since!;
         const rows = (await levels(store, e.stations![0]!, day)).filter(
@@ -153,9 +115,9 @@ export default {
           throw new Error(
             `St. Helier doesn't hold 5.559 m at 19:00, 0.000 m at 19:15 and 6.77 m after an hour's gap on ${day}`,
           );
-        if (zero.source_flag !== Flag.good || zero.flag !== Flag.good)
+        if (zero.source_flag !== Flag.good || zero.flag < Flag.suspect)
           throw new Error(
-            `St. Helier's 0.000 m is flagged ${zero.flag}, source flag ${zero.source_flag}, not kept with BODC's good flag`,
+            `St. Helier's 0.000 m is flagged ${zero.flag}, source flag ${zero.source_flag}, not suspect over BODC's good flag`,
           );
       },
     },
@@ -189,5 +151,5 @@ export default {
       },
     },
   ],
-  retired: [],
+  retired: ["bodc-ilfracombe-2023-offsets"],
 } satisfies ErrataFile;
