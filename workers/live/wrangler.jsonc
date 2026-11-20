@@ -1,0 +1,30 @@
+{
+  "name": "stillwell-live",
+  "main": "index.ts",
+  "compatibility_date": "2026-10-01",
+  // Cron only; nothing answers HTTP.
+  "workers_dev": false,
+  "preview_urls": false,
+  "triggers": { "crons": ["* * * * *"] },
+  "d1_databases": [
+    {
+      "binding": "LIVE",
+      "database_name": "stillwell-live",
+      "database_id": "5a6967f3-67b7-4522-b393-a08282aac76a",
+    },
+  ],
+  "r2_buckets": [{ "binding": "STORE", "bucket_name": "water-levels" }],
+  "containers": [
+    {
+      "class_name": "Poller",
+      // The repository is the image's build context; Dockerfile.dockerignore keeps it small.
+      "image": "./Dockerfile",
+      "image_build_context": "../..",
+      "instance_type": "standard-1",
+      "max_instances": 1,
+    },
+  ],
+  "durable_objects": { "bindings": [{ "name": "POLLER", "class_name": "Poller" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Poller"] }],
+  "observability": { "enabled": true },
+}

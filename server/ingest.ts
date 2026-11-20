@@ -1,15 +1,15 @@
 /**
- * stillwell-ingest: polls every hourly source's live stations into ClickHouse,
- * each station at its `min_interval_s`, hourly where it gives none
- * (docs/plans/realtime.md). Each pass runs in a process of its own (server/pass.ts).
+ * The poller: polls every public hourly source's live stations into the live
+ * store, each station at its `min_interval_s`, hourly where it gives none, and
+ * writes each source's daily files from it (docs/plans/cloudflare.md). It runs
+ * in the live Worker's container (workers/live). Each pass runs in a process of
+ * its own (server/pass.ts), as does each source's export (server/export.ts).
  *
  *   node server/ingest.ts [source...]
  *
- * CLICKHOUSE_URL (default http://127.0.0.1:8123), CLICKHOUSE_USER and
- * CLICKHOUSE_PASSWORD reach ClickHouse; public sources go to the database
- * `stillwell` and sources that bar republishing to `stillwell_restricted`.
- * STILLWELL_STORE and STILLWELL_RESTRICTED_STORE are the stores, as for
- * scripts/ingest.ts; the server reads them and never writes them. With
+ * STILLWELL_LIVE is the live store's endpoint (src/realtime/live.ts), and
+ * STILLWELL_STORE the store it reads the station lists from. With PORT set, it
+ * answers `GET /health` there, which the Worker asks to know it's up. With
  * GITHUB_TOKEN set, a source reporting a station in another datum starts the
  * Monthly refresh of that source, unless one started in the last day; for a
  * source on the server's job queue, the job service does. With
@@ -17,14 +17,14 @@
  * after every pass, in Prometheus's text format.
  */
 import { spawn } from "node:child_process";
+import { createServer } from "node:http";
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { sources, sourceOf } from "../src/sources/index.ts";
-import { storeOfSource } from "../src/store/stores.ts";
 import { PHASES, SERVER_SOURCES } from "../src/sources/jobs.ts";
 import type { Source } from "../src/schema.ts";
-import { clickhouse, databaseFor, migrate } from "../src/realtime/clickhouse.ts";
+import { recentDays } from "../src/store/paths.ts";
 import { PassError, schedule, slots, type PassResult } from "../src/realtime/schedule.ts";
 import {
   metricsText,
@@ -39,22 +39,25 @@ const HOUR_MS = 3_600_000;
 /** How long a pass may run before it's stopped, as the hourly workflow's 50-minute limit stopped a run. */
 const PASS_TIMEOUT_MS = 50 * MINUTE_MS;
 const PASS = fileURLToPath(new URL("pass.ts", import.meta.url));
+const EXPORT = fileURLToPath(new URL("export.ts", import.meta.url));
+/** Minutes past each hour when the daily files are written: today's every hour, the 6 days before after midnight. */
+const EXPORT_MINUTE = 5;
 /** How many passes run at once: each is a process of its own, holding up to about 800 MB. */
 const PASSES_AT_ONCE = 2;
 
 const names = process.argv.slice(2);
+// The live store and the daily files are public, so a source whose terms bar republishing isn't polled.
 const chosen = (names.length ? names.map(sourceOf) : Object.values(sources)).filter(
-  (s) => s.metadata.hourly,
+  (s) => s.metadata.hourly && s.metadata.license.redistribution,
 );
 if (!chosen.length) throw new Error("no hourly source named");
 // Unset, the store would be a local `data` with no lists, and every pass would find none.
 if (!process.env.STILLWELL_STORE) throw new Error("set STILLWELL_STORE to the store");
 
-for (const source of chosen) storeOfSource(source.metadata); // a restricted source with no restricted store fails now
-// A misspelled name would quietly poll a source that refuses the server, so an unknown one fails now.
-for (const name of (process.env.STILLWELL_FROM_RECENT ?? "").split(",").map((s) => s.trim()))
-  if (name) sourceOf(name);
-for (const name of new Set(chosen.map(databaseFor))) await migrate(clickhouse(name));
+if (process.env.PORT)
+  createServer((request, response) => {
+    response.writeHead(request.url === "/health" ? 200 : 404).end();
+  }).listen(Number(process.env.PORT));
 
 let stopping = false;
 const wake = new Set<() => void>();
@@ -76,8 +79,50 @@ for (const { metadata } of chosen)
   metrics.set(metadata.id, startMetrics(Date.now(), saved.get(metadata.id)));
 writeMetrics();
 
-// Started a few seconds apart, so a restart doesn't run every source's first pass, with its seed, at once.
-await Promise.all(chosen.map((source, i) => sleep(i * 20_000).then(() => run(source))));
+// Started a few seconds apart, so a restart doesn't run every source's first pass at once.
+await Promise.all([
+  ...chosen.map((source, i) => sleep(i * 20_000).then(() => run(source))),
+  exports(),
+]);
+
+/**
+ * Write the daily files until the process stops: the last 7 days at start, so a restart misses none, then today's
+ * every hour at `EXPORT_MINUTE`, and the 7 days up to today after midnight, so a day's late values reach its file.
+ */
+async function exports(): Promise<void> {
+  // After the first passes, so a start doesn't export an empty today.
+  await sleep(10 * MINUTE_MS);
+  for (let first = true; !stopping; first = false) {
+    const now = Date.now();
+    const days =
+      first || new Date(now).getUTCHours() === 0 ? recentDays(now, 7) : recentDays(now, 1);
+    for (const { metadata } of chosen) if (!stopping) await exportSource(metadata.id, days);
+    const next =
+      Math.ceil((Date.now() - EXPORT_MINUTE * MINUTE_MS) / HOUR_MS) * HOUR_MS +
+      EXPORT_MINUTE * MINUTE_MS;
+    await sleep(next - Date.now());
+  }
+}
+
+/** Run server/export.ts for one source, in a pass slot so it shares the passes' memory budget. */
+async function exportSource(id: string, days: string[]): Promise<void> {
+  await passSlots.acquire();
+  try {
+    await new Promise<void>((resolve) => {
+      const child = spawn(process.execPath, [EXPORT, id, days.join(",")], { stdio: "inherit" });
+      running.add(child);
+      const timer = setTimeout(() => child.kill("SIGKILL"), PASS_TIMEOUT_MS);
+      child.on("close", (code) => {
+        clearTimeout(timer);
+        running.delete(child);
+        if (code !== 0) console.error(`${id}: export ended with ${code}`);
+        resolve();
+      });
+    });
+  } finally {
+    passSlots.release();
+  }
+}
 
 /** Poll one source until the process stops (`schedule`). */
 async function run(source: Source): Promise<void> {

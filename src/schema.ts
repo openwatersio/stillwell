@@ -299,13 +299,10 @@ export interface SourceMetadata {
    */
   utc_offsets?: [number, number];
   /**
-   * `recent` when the realtime poller never asks the source and fills its
-   * window hourly from the recent/ files the hourly job writes instead
-   * (server/pass.ts), for a source whose terms allow only the hourly job's
-   * reads. A source that refuses one server's address is named in that
-   * server's STILLWELL_FROM_RECENT instead.
+   * `hourly` when the poller asks each station once an hour whatever its
+   * interval, for a source whose terms allow one read of each site an hour.
    */
-  poller?: "recent";
+  poller?: "hourly";
   /**
    * The chart datum the source's own offsets give, for a station
    * slackwater-database has no record of (src/datums.ts).

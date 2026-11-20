@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS live (
 ) WITHOUT ROWID;
 
 -- One row per poller pass. `intervals` is a JSON array of the `min_interval_s` groups it asked for, empty for every
--- station; `failed` a JSON array of messages. Times are epoch ms.
+-- station; `stale` and `failed` JSON arrays of station IDs and messages. Times are epoch ms.
 CREATE TABLE IF NOT EXISTS polls (
   source TEXT NOT NULL,
   started INTEGER NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS polls (
   stations INTEGER NOT NULL,
   updated INTEGER NOT NULL,
   "values" INTEGER NOT NULL,
-  stale INTEGER NOT NULL,
+  stale TEXT NOT NULL,
   failed TEXT NOT NULL,
   blocked INTEGER NOT NULL,
   datum_changed INTEGER NOT NULL

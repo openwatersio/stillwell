@@ -260,7 +260,7 @@ describe("job service", () => {
   it("declares nothing below a service's loop, which never returns", () => {
     for (const [file, loopStart] of [
       ["server/jobs.ts", "while (!stopping)"],
-      ["server/ingest.ts", "await Promise.all(chosen.map("],
+      ["server/ingest.ts", "await Promise.all(["],
     ]) {
       const lines = readFileSync(file, "utf8").split("\n");
       const loop = lines.findIndex((l) => l.startsWith(loopStart));
