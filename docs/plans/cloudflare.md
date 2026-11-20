@@ -93,7 +93,7 @@ Per month, from Cloudflare's published prices on 2026-11-20 and the box's and Ac
 
 A backfill campaign adds about $0.20 for each 10 hours on a `basic` container, so a lane running all month is about $15.
 
-For comparison, the box is a Hetzner CX43 at €18.49 a month, and Actions is free for a public repository. The poller is two thirds of the Cloudflare cost, because a container is billed for its memory all month. A larger poller, `standard-2` with 1 vCPU and 6 GiB, would be about $55 instead of $41.
+For comparison, the box costs $69.49 a month, and Actions is free for a public repository, so Cloudflare costs about the same as the box. The poller is two thirds of the Cloudflare cost, because a container is billed for its memory all month, so a leaner poller would bring Cloudflare under the box. A larger poller, `standard-2` with 1 vCPU and 6 GiB, would be about $55 instead of $41.
 
 ### Assumptions
 
