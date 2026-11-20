@@ -21,6 +21,10 @@ import { storeOfSource } from "../src/store/stores.ts";
 import { liveStore } from "../src/realtime/live.ts";
 import { intervalOf, polled, pollSource } from "../src/realtime/poll.ts";
 
+/** The first 100 of a list, and how many more there were. */
+const capped = (list: string[]): string[] =>
+  list.length > 100 ? [...list.slice(0, 100), `and ${list.length - 100} more`] : list;
+
 /** How far back every pass asks, as the hourly workflow's `--hours 12` did, for values sources send late. */
 const LOOKBACK_MS = 12 * 3_600_000;
 
@@ -73,8 +77,9 @@ try {
     stations: summary.stations,
     updated: summary.updated,
     values: summary.values,
-    stale: summary.stale,
-    failed: summary.failed,
+    // At most the first 100 of each, so a whole-source outage stays inside D1's 2 MB row.
+    stale: capped(summary.stale),
+    failed: capped(summary.failed),
     blocked: summary.blocked ?? false,
     datum_changed: summary.datumChanged ?? false,
   });

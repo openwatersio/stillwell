@@ -7,7 +7,7 @@ It also becomes slackwater-database's source of observations, from each originat
 ## Where it stands
 
 - Adapters for the 19 sources the [README](../../README.md#sources) lists, writing to the store on R2, with each source's station list, datum epochs and links between sources in the store ([stations.md](../stations.md)).
-- Scheduled jobs in GitHub Actions: hourly ingest into `recent/`, a nightly fold into the year files, a monthly refresh of station lists and refetch of values sources finalize, and a weekly canary. [Operations](../contributing/operations.md) covers them.
+- A poller on Cloudflare writing live values to D1 and the daily files under `recent/`, and scheduled jobs in GitHub Actions: a nightly fold into the year files, a monthly refresh of station lists and refetch of values sources finalize, and a weekly canary. [Operations](../contributing/operations.md) covers them.
 - Offsets to MSL, LAT and chart datum from slackwater-database or a linked series of the gauge ([where offsets come from](https://openwatersio.github.io/stillwell/docs/guides/datums/#where-offsets-come-from)).
 - QC with per-station tidal analysis and errata per source ([qc/](../qc/README.md)).
 - An HRoI implementation and evaluation against BSH predictions and RWS observations ([hroi-evaluation.md](../hroi-evaluation.md)).

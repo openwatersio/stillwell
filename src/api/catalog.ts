@@ -1,5 +1,3 @@
-import { USER_AGENT } from "../http.ts";
-
 /** What the levels API needs of a station from `stations.parquet`. */
 export interface CatalogStation {
   id: string;
