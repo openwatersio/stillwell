@@ -18,7 +18,7 @@ The API this repo will serve at `https://api.openwaters.io/water-levels`, and th
 - **Source.** The code is AGPL-3.0, whose section 13 has a modified version offer its source to its network users. The API docs and a `/water-levels` root response, to be added to the endpoints below, link to its source, [openwatersio/stillwell](https://github.com/openwatersio/stillwell).
 - **Requests** need a descriptive `User-Agent`. The open API allows 100 requests a minute and 10,000 a day per IP address, as the tides API does. Enforcing them is the api.openwaters.io gateway's job, for every API, so neither `workers/api` nor `stillwell-api` does.
 - **Parameters** are camelCase, as in the tides API (`maxResults`, `includeBad`). Responses use the tides API's field names where they overlap (`latitude`, `longitude`, `distance`, `datums`), and snake_case for fields of their own.
-- **Errors** are JSON like the tides API's: `{"message": "…"}`, with `errors` listing each bad parameter on a 400. Status is 400 for bad parameters or a range too long, 404 for an unknown station, 451 for a station whose terms bar commercial use, as the tides API refuses a station whose source forbids redistribution, and 503 when the server doesn't answer and nothing is cached.
+- **Errors** are JSON like the tides API's: `{"message": "…"}`, with `errors` listing each bad parameter on a 400. Status is 400 for bad parameters or a range too long, 404 for an unknown station, 451 for a station whose terms bar commercial use, as the tides API refuses a station whose source forbids redistribution, and 503 when the levels can't be read and nothing is cached.
 - **Versioning.** Fields are only ever added. A breaking change gets a new path.
 - Values in the examples are illustrative.
 
@@ -108,16 +108,16 @@ One station in full: the fields above plus
 
 ### `GET /water-levels/stations/{source}/{id}/levels`
 
-Observed levels, from the last minutes back through the archive, for apps, station pages and analysis. Until the archive moves onto the realtime server ([realtime.md](realtime.md#order-of-work), step 2), a range must lie within the last 7 days, and one reaching further back is a 400 that says so. Stations with `live` true are polled at their source's interval, so their newest values are minutes old.
+Observed levels, from the last minutes back through the archive, for apps, station pages and analysis. The last 8 days come from the poller's D1 database and older ones from the year files ([cloudflare.md](cloudflare.md#the-levels-api)). Stations with `live` true are polled at their source's interval, so their newest values are minutes old.
 
-| Parameter      | Default               | Meaning                                                                                                                                                                         |
-| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `start`, `end` | The 7 days before now | ISO 8601, as in the tides API. At most 1 year per request at 6-minute steps or coarser, 31 days at `raw` for 1-minute sources                                                   |
-| `step`         | `6m`                  | `6m`, `15m`, `1h`, `1d`, or `raw` for the source's own interval. Each step takes the sample nearest its time, not a mean                                                        |
-| `datum`        | Chart datum           | As above                                                                                                                                                                        |
-| `units`        | `meters`              | `meters` or `feet`                                                                                                                                                              |
-| `include`      | none                  | Comma-separated: `predicted` (Slackwater's prediction from the linked slackwater-database station), `residual` (observed minus predicted), `received` (when each value arrived) |
-| `includeBad`   | `false`               | `true` to include values flagged `bad`                                                                                                                                          |
+| Parameter      | Default               | Meaning                                                                                                                                                                                         |
+| -------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `start`, `end` | The 7 days before now | ISO 8601, as in the tides API. At most 366 days per request at a step, and 31 days at `raw`. A range that would read more than 1.1 million stored values, or return more than 270,000, is a 400 |
+| `step`         | `6m`                  | `6m`, `15m`, `1h`, `1d`, or `raw` for the source's own interval. Each step takes the sample nearest its time, not a mean                                                                        |
+| `datum`        | Chart datum           | As above                                                                                                                                                                                        |
+| `units`        | `meters`              | `meters` or `feet`                                                                                                                                                                              |
+| `include`      | none                  | Comma-separated: `predicted` (Slackwater's prediction from the linked slackwater-database station), `residual` (observed minus predicted), `received` (when each value arrived)                 |
+| `includeBad`   | `false`               | `true` to include values flagged `bad`                                                                                                                                                          |
 
 ```json
 {
@@ -142,7 +142,7 @@ Observed levels, from the last minutes back through the archive, for apps, stati
 
 Each row is `{time, level, flag}`, plus `predicted`, `residual` and `received` when asked for. At a step, each row is the value nearest a step time in the range, within half a step, with the value's own time, which can lie up to half a step outside the range, so a station reporting less often than the step lists each value once. `predicted` and `residual` aren't served yet, and asking for them is a 400. When `include` asks for predictions, the response names the slackwater-database version it used (`"database": "2026.11.01"`). `predicted` and `residual` come from the linked slackwater-database station, which has a license of its own: until tokens exist they are served only where that station's terms allow commercial use, as well as the series', and otherwise left out, with the response saying why.
 
-`status` is `reporting`; `stale` when the newest value is older than three of the station's intervals and at least two hours, since many sources send values in hourly batches, or when the server didn't answer and this is the last good copy; or `offline` when the station has sent nothing for a day. `as_of` is the newest value's time and `updated` is when the poller last finished asking the source for the station. A range that ends within the last 7 days, which late values and QC can still change, carries `Cache-Control: public, max-age=<min_interval_s>`, at most 300, or the time left on the copy a cache answers with, and one that ended before that is cached for a day.
+`status` is `reporting`; `stale` when the newest value is older than three of the station's intervals and at least two hours, since many sources send values in hourly batches, or when the levels couldn't be read and this is the last good copy; or `offline` when the station has sent nothing for a day. `as_of` is the newest value's time and `updated` is when the poller last finished asking the source for the station. A range that ends within the last 7 days, which late values and QC can still change, carries `Cache-Control: public, max-age=<min_interval_s>`, at most 300, or the time left on the copy a cache answers with, and one that ended before that is cached for a day.
 
 Slackwater asks for the last 96 hours (`start` 96 hours back) and computes the residual against its own bundled prediction, so the number matches the curve the user sees.
 

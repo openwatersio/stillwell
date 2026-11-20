@@ -33,6 +33,8 @@
     "@openwaters/almanac": "^0.13.0",
     "@slackwater/database": "^1.0.1-beta.20261107",
     "@slackwater/engine": "^1.0.0-beta.12",
+    "fzstd": "^0.1.1",
+    "hyparquet": "^1.33.1",
     "ml-matrix": "^6.15.1",
     "yaml": "^2.9.1"
   },

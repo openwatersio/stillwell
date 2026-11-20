@@ -9,6 +9,8 @@ import {
   parseLevels,
   sample,
   statusOf,
+  stepSampler,
+  usableFor,
   type LevelsQuery,
   type StoredLevel,
 } from "../src/api/levels.ts";
@@ -128,9 +130,16 @@ describe("parseLevels", () => {
     ]);
   });
 
-  it("refuses a range reaching back past the window, given twice, reversed or too long", () => {
+  it("takes a range any time back, and refuses one given twice, reversed or too long", () => {
+    for (const search of [
+      "start=2001-01-01&end=2002-01-01",
+      "start=2001-01-01&end=2001-02-01&step=raw",
+      `start=${new Date(NOW - 8 * DAY).toISOString()}`,
+    ])
+      assert.ok("query" in parseLevels(new URLSearchParams(search), NOW), search);
     for (const [search, path] of [
-      [`start=${new Date(NOW - 8 * DAY).toISOString()}`, "start"],
+      ["start=2001-01-01&end=2002-01-03", "end"],
+      ["start=2001-01-01&end=2001-02-02&step=raw", "end"],
       [
         `start=${new Date(NOW - DAY).toISOString()}&start=${new Date(NOW - DAY).toISOString()}`,
         "start",
@@ -220,6 +229,42 @@ describe("sample", () => {
     );
     // MSL has no row for epoch 1, so its value drops out there.
     assert.equal(sample(seattle(), { named: "MSL" }, values, raw).length, 0);
+  });
+});
+
+describe("stepSampler", () => {
+  it("keeps the values sample picks, whatever their order", () => {
+    // Irregular values in both epochs, some bad, some at exactly half a step, shuffled.
+    let seed = 7;
+    const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const times = [...Array(9 * 120).keys()]
+      .filter(() => random() < 0.4)
+      .map((half) => NOW - 9 * HOUR + half * 30_000);
+    const values = times
+      .map((time) =>
+        value(
+          time,
+          random(),
+          random() < 0.2 ? Flag.bad : Flag.preliminary,
+          time < NOW - 6 * HOUR ? 1 : 2,
+        ),
+      )
+      .sort(() => random() - 0.5);
+    for (const step of [6 * MIN, 15 * MIN, HOUR])
+      for (const includeBad of [false, true])
+        for (const conversion of [{ named: null }, { named: "MLLW" }]) {
+          const q = query({ start: NOW - 8 * HOUR, end: NOW - HOUR, step, includeBad });
+          const sampler = stepSampler(step, usableFor(seattle(), conversion, includeBad));
+          for (const v of values) sampler.add(v);
+          assert.ok(sampler.values().length <= 2 * ((9 * HOUR) / step + 1));
+          const picked = sample(seattle(), conversion, values, q);
+          assert.ok(picked.length >= 5);
+          assert.deepEqual(
+            sample(seattle(), conversion, sampler.values(), q),
+            picked,
+            `${step} ${includeBad} ${conversion.named}`,
+          );
+        }
   });
 });
 
@@ -373,12 +418,12 @@ describe("stillwell-api on ClickHouse", { skip: !process.env.CLICKHOUSE_URL }, (
       const encoded = await handle("GET", `/water-levels/stations/coops/9447130%2Fx/levels`);
       assert.equal(encoded.status, 404);
       assert.equal((await handle("GET", `/water-levels/stations/smhi/2130/levels`)).status, 451);
-      const unpolled = catalog({ live: false });
-      const notPolled = await apiHandler({ ch, catalog: () => unpolled, now: () => now })(
+      const noLevels = catalog({ products: [] });
+      const without = await apiHandler({ ch, catalog: () => noLevels, now: () => now })(
         "GET",
         `/water-levels/stations/coops/9447130/levels`,
       );
-      assert.equal(notPolled.status, 404);
+      assert.equal(without.status, 404);
       const bad = await handle("GET", `/water-levels/stations/coops/9447130/levels?datum=NAVD88`);
       assert.equal(bad.status, 400);
       assert.equal(JSON.parse(bad.body).errors[0].path, "datum");

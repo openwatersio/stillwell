@@ -1,6 +1,6 @@
 import type { ClickHouse } from "../realtime/clickhouse.ts";
 import { Flag } from "../schema.ts";
-import type { Catalog } from "./catalog.ts";
+import type { Catalog, CatalogStation } from "./catalog.ts";
 import {
   conversionFor,
   convertibleEpochs,
@@ -9,6 +9,8 @@ import {
   parseLevels,
   type ParamError,
   type StoredLevel,
+  TooManyValues,
+  usableFor,
 } from "./levels.ts";
 
 export interface ApiResponse {
@@ -19,16 +21,46 @@ export interface ApiResponse {
 
 const LEVELS = /^\/water-levels\/stations\/([^/]+)\/([^/]+)\/levels$/;
 
-/**
- * stillwell-api's routes over ClickHouse's `stillwell` database and the
- * catalog of public stations: `levels`, and `/health`.
- */
-export function apiHandler(deps: {
-  ch: ClickHouse;
-  catalog: () => Catalog | null;
-  now?: () => number;
-}): (method: string, url: string) => Promise<ApiResponse> {
+/** An epoch's span in ms, either end null when open. */
+export interface EpochSpan {
+  id: number;
+  since: number | null;
+  until: number | null;
+}
+
+/** Where `levels` reads its values: D1 and the year files in the Worker, ClickHouse on the server. */
+export interface LevelsData {
+  /**
+   * The station's values from `from` to `to`, inclusive. With `sampling`, it
+   * may leave out any value that `stepSampler` wouldn't keep.
+   */
+  readLevels(
+    station: CatalogStation,
+    from: number,
+    to: number,
+    sampling?: { step: number; usable: (v: StoredLevel) => boolean },
+  ): Promise<StoredLevel[]>;
+  /**
+   * The time of the station's newest value that isn't bad and that the
+   * response could show: in one of `epochs`, within its span. A value in an
+   * epoch opened since the list was published, or one that doesn't convert,
+   * isn't shown, so it isn't counted either.
+   */
+  newest(station: string, epochs: EpochSpan[]): Promise<number | null>;
+  /** When the last pass that ended cleanly and asked for the station's interval group finished, or null. */
+  lastPass(source: string, group: number): Promise<number | null>;
+}
+
+/** The `levels` route over the catalog of public stations and `data`, and `/health`. */
+export function apiHandler(
+  // shortcut: `ch` keeps server/api.ts serving from ClickHouse; drop it when the server retires.
+  deps: ({ data: LevelsData } | { ch: ClickHouse }) & {
+    catalog: () => Catalog | null;
+    now?: () => number;
+  },
+): (method: string, url: string) => Promise<ApiResponse> {
   const now = deps.now ?? Date.now;
+  const data = "data" in deps ? deps.data : clickhouseData(deps.ch);
   return async (method, url) => {
     if (method !== "GET" && method !== "HEAD") return json(405, { message: "Only GET is served" });
     const { pathname, searchParams } = new URL(url, "http://localhost");
@@ -55,8 +87,7 @@ export function apiHandler(deps: {
         message: `${id}'s terms bar commercial use, and the open API serves only stations whose terms allow it`,
       });
 
-    if (!station.polled)
-      return json(404, { message: `${id} has no recent levels: the server doesn't poll it` });
+    if (!station.levels) return json(404, { message: `${id} has no observed levels` });
 
     const at = now();
     const parsed = parseLevels(searchParams, at);
@@ -71,11 +102,20 @@ export function apiHandler(deps: {
     let updated: number | null;
     try {
       [values, asOf, updated] = await Promise.all([
-        readLevels(deps.ch, id, query.start - half, query.end + half),
-        newest(deps.ch, id, convertibleEpochs(station, conversion)),
-        lastPass(deps.ch, station.source, station.min_interval_s ?? 0),
+        data.readLevels(
+          station,
+          query.start - half,
+          query.end + half,
+          query.step
+            ? { step: query.step, usable: usableFor(station, conversion, query.includeBad) }
+            : undefined,
+        ),
+        data.newest(id, convertibleEpochs(station, conversion)),
+        data.lastPass(station.source, station.min_interval_s ?? 0),
       ]);
     } catch (error) {
+      if (error instanceof TooManyValues)
+        return invalid([{ path: "end", message: `${id}: ${error.message}` }]);
       console.error(`levels ${id}: ${(error as Error).message}`);
       return json(503, { message: "Levels are unavailable; try again shortly" });
     }
@@ -108,7 +148,15 @@ interface Row {
   received_ms: string | null;
 }
 
-/** A station's values from `from` to `to`, inclusive. */
+/** The server's ClickHouse database `stillwell` as `LevelsData`. */
+function clickhouseData(ch: ClickHouse): LevelsData {
+  return {
+    readLevels: (station, from, to) => readLevels(ch, station.id, from, to),
+    newest: (station, epochs) => newest(ch, station, epochs),
+    lastPass: (source, group) => lastPass(ch, source, group),
+  };
+}
+
 async function readLevels(
   ch: ClickHouse,
   station: string,
@@ -134,16 +182,10 @@ async function readLevels(
   }));
 }
 
-/**
- * The time of the station's newest value that isn't bad and that the
- * response could show: in an epoch that converts as asked, within its span.
- * A value in an epoch opened since the list was published, or one that
- * doesn't convert, isn't shown, so it isn't counted either.
- */
 async function newest(
   ch: ClickHouse,
   station: string,
-  epochs: { id: number; since: number | null; until: number | null }[],
+  epochs: EpochSpan[],
 ): Promise<number | null> {
   if (!epochs.length) return null;
   // Each epoch's span as arrays in step with its id; an open end is the widest time there is.
@@ -165,7 +207,6 @@ async function newest(
   return row?.t == null ? null : Number(row.t);
 }
 
-/** When the last pass that ended cleanly and asked for the station's interval group finished, or null. */
 async function lastPass(ch: ClickHouse, source: string, group: number): Promise<number | null> {
   const [row] = await ch.query<{ t: string | null }>(
     `SELECT toUnixTimestamp64Milli(maxOrNull(finished)) AS t
