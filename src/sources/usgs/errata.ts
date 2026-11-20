@@ -1,17 +1,85 @@
-{
-  "errata": [
+import { impossibleDropped, type ErrataFile, type StoreReader } from "../../errata.ts";
+import type { StoredStation } from "../../schema.ts";
+import { median } from "../../stats.ts";
+
+const HOUR_MS = 3_600_000;
+/** The week the altitude errata were measured over. */
+const WEEK = ["2026-11-08", "2026-11-15"] as const;
+
+/** A station as the store lists it, with a USGS site's altitude kept as `ground_m`; throws where it isn't listed. */
+async function listed(
+  store: StoreReader,
+  id: string,
+): Promise<StoredStation & { ground_m?: number }> {
+  const station = await store.station(id);
+  if (!station) throw new Error(`the store doesn't list ${id}`);
+  return station;
+}
+
+/** Throws where the store gives a station a NAVD88 or NGVD29 offset, on its own or any epoch. */
+async function noOffsets(store: StoreReader, ...ids: string[]): Promise<void> {
+  for (const id of ids) {
+    const station = await listed(store, id);
+    for (const datums of [station.datums, ...station.epochs.map((e) => e.datums)])
+      if (datums.NAVD88 !== undefined || datums.NGVD29 !== undefined)
+        throw new Error(`the store gives ${id} offsets ${JSON.stringify(datums)}`);
+  }
+}
+
+/** A station's median level over `WEEK`; throws where the store holds none. */
+async function weekMedian(store: StoreReader, id: string): Promise<number> {
+  const rows = await store.levels(id, ...WEEK);
+  if (!rows.length)
+    throw new Error(`the store holds no ${id} levels from ${WEEK[0]} to ${WEEK[1]}`);
+  return median(rows.map((o) => o.level));
+}
+
+/** The median of a's hourly median level, plus `addA`, less b's, plus `addB`, over the hours of `WEEK` both have. */
+async function hourlyDifference(
+  store: StoreReader,
+  [a, addA]: [string, number],
+  [b, addB]: [string, number],
+): Promise<number> {
+  const hourly = async (id: string, add: number) =>
+    new Map(
+      [...Map.groupBy(await store.levels(id, ...WEEK), (o) => Math.floor(o.time / HOUR_MS))].map(
+        ([hour, rows]) => [hour, median(rows.map((o) => o.level)) + add],
+      ),
+    );
+  const [x, y] = [await hourly(a, addA), await hourly(b, addB)];
+  const differences = [...x].filter(([h]) => y.has(h)).map(([h, v]) => v - y.get(h)!);
+  if (!differences.length)
+    throw new Error(`${a} and ${b} share no hours from ${WEEK[0]} to ${WEEK[1]}`);
+  return median(differences);
+}
+
+/** Throws unless a station's datum offset is defined, and returns it. */
+async function datum(store: StoreReader, id: string, name: string): Promise<number> {
+  const m = (await listed(store, id)).datums[name];
+  if (m === undefined) throw new Error(`the store gives ${id} no ${name} offset`);
+  return m;
+}
+
+export default {
+  errata: [
     {
-      "id": "usgs-fill-values",
-      "stations": ["usgs/08042515", "usgs/09519800", "usgs/16620500"],
-      "since": "2026-01-01",
-      "handling": "dropped",
-      "error": "These 3 USGS series hold levels no gauge can read, outside the store's span of −500 to 9,000 m: 10 values in 2026, −99,999 ft (−30,479.695 m) and values from −3,032 to −34,253 m.",
-      "response": "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. A year file of nothing else keeps its rows, flagged `bad`, with a warning.",
-      "evidence": "November 2026. A scan of the range of levels in every year file of every source in the store (335,320 files) found 383 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span."
+      id: "usgs-fill-values",
+      stations: ["usgs/08042515", "usgs/09519800", "usgs/16620500"],
+      since: "2026-01-01",
+      handling: "dropped",
+      error:
+        "These 3 USGS series hold levels no gauge can read, outside the store's span of −500 to 9,000 m: 10 values in 2026, −99,999 ft (−30,479.695 m) and values from −3,032 to −34,253 m.",
+      response:
+        "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. A year file of nothing else keeps its rows, flagged `bad`, with a warning.",
+      evidence:
+        "November 2026. A scan of the range of levels in every year file of every source in the store (335,320 files) found 383 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span.",
+      check: async (store, e) => {
+        for (const id of e.stations!) await impossibleDropped(store, id, 2026);
+      },
     },
     {
-      "id": "usgs-unsurveyed-altitudes",
-      "stations": [
+      id: "usgs-unsurveyed-altitudes",
+      stations: [
         "usgs/01011500",
         "usgs/01012960",
         "usgs/01018000",
@@ -2701,16 +2769,29 @@
         "usgs/50093090",
         "usgs/50129000",
         "usgs/50131990",
-        "usgs/644255147180200"
+        "usgs/644255147180200",
       ],
-      "handling": "avoided",
-      "error": "`monitoring-locations` gives one `altitude` per site, which the store reads as the gage datum's, but at sites where `altitude_method_code` says it was interpolated from a map (M) or a digital elevation model (N), taken from lidar (J) or an altimeter (A), it's the ground at the site's coordinates. At First Mallard Branch in Suisun Marsh (381142122015801) the altitude is 6 ft from a DEM while the gage height averages 27 ft, putting tidal water 10 m above NAVD88's zero. At tidal sites, 17 of 38 offsets from such altitudes put the water more than 2 m from NAVD88's zero, against 10 of 223 from surveyed ones. 2,690 of the 12,703 USGS gage-height stations the store held a USGS offset for in November 2026 have an altitude whose method isn't a survey (levels, GPS or GNSS), 2,328 of them M or N; they're the stations listed. A station USGS lists later with such an altitude gets no offsets either, without being named here.",
-      "response": "A station whose altitude wasn't surveyed has no offsets, and a refresh clears the ones the store held for a station it lists. Its altitude is kept as the site's ground for the tidal judgment's sea-level guard only.",
-      "evidence": "Each USGS station's `altitude_method_code` and the mean of its stored levels over the 7 days to 15 November 2026 (the last year file for one not live), November 2026."
+      handling: "avoided",
+      error:
+        "`monitoring-locations` gives one `altitude` per site, which the store reads as the gage datum's, but at sites where `altitude_method_code` says it was interpolated from a map (M) or a digital elevation model (N), taken from lidar (J) or an altimeter (A), it's the ground at the site's coordinates. At First Mallard Branch in Suisun Marsh (381142122015801) the altitude is 6 ft from a DEM while the gage height averages 27 ft, putting tidal water 10 m above NAVD88's zero. At tidal sites, 17 of 38 offsets from such altitudes put the water more than 2 m from NAVD88's zero, against 10 of 223 from surveyed ones. 2,690 of the 12,703 USGS gage-height stations the store held a USGS offset for in November 2026 have an altitude whose method isn't a survey (levels, GPS or GNSS), 2,328 of them M or N; they're the stations listed. A station USGS lists later with such an altitude gets no offsets either, without being named here.",
+      response:
+        "A station whose altitude wasn't surveyed has no offsets, and a refresh clears the ones the store held for a station it lists. Its altitude is kept as the site's ground for the tidal judgment's sea-level guard only.",
+      evidence:
+        "Each USGS station's `altitude_method_code` and the mean of its stored levels over the 7 days to 15 November 2026 (the last year file for one not live), November 2026.",
+      // First Mallard Branch keeps its 6 ft DEM altitude as ground, under water that reads about 27 ft.
+      check: async (store, e) => {
+        await noOffsets(store, "usgs/381142122015801", ...e.stations!.slice(0, 2));
+        const { ground_m } = await listed(store, "usgs/381142122015801");
+        if (ground_m === undefined || Math.abs(ground_m - 6 * 0.3048) > 0.01)
+          throw new Error(`the store keeps First Mallard Branch's ground as ${ground_m}, not 6 ft`);
+        const level = await weekMedian(store, "usgs/381142122015801");
+        if (level < 7)
+          throw new Error(`First Mallard Branch's median level is ${level} m, not about 27 ft`);
+      },
     },
     {
-      "id": "usgs-imprecise-altitudes",
-      "stations": [
+      id: "usgs-imprecise-altitudes",
+      stations: [
         "usgs/01173000",
         "usgs/01315170",
         "usgs/01315227",
@@ -2893,24 +2974,44 @@
         "usgs/431533086161901",
         "usgs/431556086161001",
         "usgs/442656083202301",
-        "usgs/50129935"
+        "usgs/50129935",
       ],
-      "handling": "avoided",
-      "error": "`monitoring-locations` gives some altitudes found by a survey method with an `altitude_accuracy` of a foot or more, up to 141 ft, against 0.1 to 0.2 ft at most surveyed sites: 35 of 170 sites with plain GPS (G), 28 of 513 with differentially corrected GPS (D) and 4 of 52 with survey-grade GPS (F), and among sites with levels or survey-grade GNSS (L, W, X, Y, Z) that the store held offsets for, 119. An altitude that far out isn't a usable gage datum.",
-      "response": "A surveyed altitude counts as the gage datum only with an accuracy under a foot, or, where none is given, from differentially corrected or survey-grade GPS. The 183 stations listed, which the store held offsets for in November 2026 (35 G, 25 D, 4 F, 67 L, 31 X, 11 Z, 7 Y and 3 W), have no offsets, and a refresh clears the ones it held.",
-      "evidence": "Each USGS site's `altitude_method_code` and `altitude_accuracy` from `monitoring-locations`, November 2026."
+      handling: "avoided",
+      error:
+        "`monitoring-locations` gives some altitudes found by a survey method with an `altitude_accuracy` of a foot or more, up to 141 ft, against 0.1 to 0.2 ft at most surveyed sites: 35 of 170 sites with plain GPS (G), 28 of 513 with differentially corrected GPS (D) and 4 of 52 with survey-grade GPS (F), and among sites with levels or survey-grade GNSS (L, W, X, Y, Z) that the store held offsets for, 119. An altitude that far out isn't a usable gage datum.",
+      response:
+        "A surveyed altitude counts as the gage datum only with an accuracy under a foot, or, where none is given, from differentially corrected or survey-grade GPS. The 183 stations listed, which the store held offsets for in November 2026 (35 G, 25 D, 4 F, 67 L, 31 X, 11 Z, 7 Y and 3 W), have no offsets, and a refresh clears the ones it held.",
+      evidence:
+        "Each USGS site's `altitude_method_code` and `altitude_accuracy` from `monitoring-locations`, November 2026.",
+      check: (store, e) => noOffsets(store, ...e.stations!.slice(0, 3)),
     },
     {
-      "id": "usgs-boston-dam-datums",
-      "stations": ["usgs/422206071033901", "usgs/422340071043201"],
-      "handling": "corrected",
-      "error": "USGS lists the Charles River below the New Charles River Dam (422206071033901) and the Mystic River below the Amelia Earhart Dam (422340071043201) at -5 ft NAVD88 from a digital elevation model, but their gage heights average 107.3 ft: the gages read the Metropolitan District Commission datum, as the Charles River Dam gage (01104715) does, which USGS lists at a surveyed -106.68 ft NAVD88.",
-      "response": "Both are given NAVD88 -32.516 m (-106.68 ft) in `GAGE_DATUMS`. With it they read 4 and 5 cm below NOAA's Boston gauge (8443970) in its NAVD88, with 1 cm spread.",
-      "evidence": "1,678 and 335 readings shared with NOAA's Boston gauge, 8 to 15 November 2026; USGS's altitude for 01104715."
+      id: "usgs-boston-dam-datums",
+      stations: ["usgs/422206071033901", "usgs/422340071043201"],
+      handling: "corrected",
+      error:
+        "USGS lists the Charles River below the New Charles River Dam (422206071033901) and the Mystic River below the Amelia Earhart Dam (422340071043201) at -5 ft NAVD88 from a digital elevation model, but their gage heights average 107.3 ft: the gages read the Metropolitan District Commission datum, as the Charles River Dam gage (01104715) does, which USGS lists at a surveyed -106.68 ft NAVD88.",
+      response:
+        "Both are given NAVD88 -32.516 m (-106.68 ft) in `GAGE_DATUMS`. With it they read 4 and 5 cm below NOAA's Boston gauge (8443970) in its NAVD88, with 1 cm spread.",
+      evidence:
+        "1,678 and 335 readings shared with NOAA's Boston gauge, 8 to 15 November 2026; USGS's altitude for 01104715.",
+      check: async (store, e) => {
+        const boston = await datum(store, "coops/8443970", "NAVD88");
+        for (const id of e.stations!) {
+          const navd88 = await datum(store, id, "NAVD88");
+          if (Math.abs(navd88 + 32.516) > 0.001)
+            throw new Error(`the store gives ${id} NAVD88 ${navd88}, not −32.516 m`);
+          const below = await hourlyDifference(store, [id, navd88], ["coops/8443970", boston]);
+          if (below < -0.08 || below > -0.01)
+            throw new Error(
+              `${id} reads ${below.toFixed(3)} m from Boston in NAVD88, not 4 or 5 cm below`,
+            );
+        }
+      },
     },
     {
-      "id": "usgs-gage-reads-elevation",
-      "stations": [
+      id: "usgs-gage-reads-elevation",
+      stations: [
         "usgs/01389802",
         "usgs/02266291",
         "usgs/02266292",
@@ -2934,28 +3035,67 @@
         "usgs/11507200",
         "usgs/15278000",
         "usgs/182827067040500",
-        "usgs/423000088164401"
+        "usgs/423000088164401",
       ],
-      "handling": "avoided",
-      "error": "At these sites the gage height is the water's elevation itself, close to the ground's altitude in USGS's 3DEP elevation model, while `monitoring-locations` gives a surveyed altitude near the same value, so adding the altitude counts the elevation twice: San Carlos Reservoir (09469000) reads 2,448.5 ft with an altitude of 2,502 ft, and the Colorado above the Dirty Devil (09328990) reads Lake Powell's 3,568 ft with an altitude of 3,785 ft.",
-      "response": "No offsets, by `GAGE_DATUMS`, since nothing says which vertical datum the gage reads.",
-      "evidence": "Each site's mean stored level over the 7 days to 15 November 2026 (the last year file for one not live) against its altitude and the 3DEP ground at its coordinates, November 2026."
+      handling: "avoided",
+      error:
+        "At these sites the gage height is the water's elevation itself, close to the ground's altitude in USGS's 3DEP elevation model, while `monitoring-locations` gives a surveyed altitude near the same value, so adding the altitude counts the elevation twice: San Carlos Reservoir (09469000) reads 2,448.5 ft with an altitude of 2,502 ft, and the Colorado above the Dirty Devil (09328990) reads Lake Powell's 3,568 ft with an altitude of 3,785 ft.",
+      response:
+        "No offsets, by `GAGE_DATUMS`, since nothing says which vertical datum the gage reads.",
+      evidence:
+        "Each site's mean stored level over the 7 days to 15 November 2026 (the last year file for one not live) against its altitude and the 3DEP ground at its coordinates, November 2026.",
+      // The gage height itself is near the altitude, as an elevation would be.
+      check: async (store) => {
+        for (const id of ["usgs/09469000", "usgs/09328990"]) {
+          await noOffsets(store, id);
+          const { ground_m } = await listed(store, id);
+          const level = await weekMedian(store, id);
+          if (ground_m === undefined || Math.abs(level - ground_m) > 100)
+            throw new Error(`${id} reads ${level} m against an altitude of ${ground_m} m`);
+        }
+      },
     },
     {
-      "id": "usgs-altitude-contradicts-levels",
-      "stations": [
+      id: "usgs-altitude-contradicts-levels",
+      stations: [
         "usgs/08015910",
         "usgs/08470500",
         "usgs/08474395",
         "usgs/11312676",
         "usgs/11313405",
-        "usgs/11313433"
+        "usgs/11313433",
       ],
-      "handling": "avoided",
-      "error": "These sites' surveyed altitudes put their water where other gauges show it isn't. Brazos Santiago Pass (08474395) reads 0.68 m below NOAA's co-located gauge (8779749) in its NAVD88. Middle River (11312676), Old River at Bacon Island (11313405) and Dutch Slough (11313433), listed at 0.0 ft NAVD88, read 2.9 to 5.2 ft above Old River near Byron (11313315) on the same tidal channels. The Calcasieu at Moss Bluff, Louisiana (08015910), and Arroyo Colorado at FM 106, Texas (08470500), read 51 and 28 ft above water the 3DEP model shows near 0 ft.",
-      "response": "No offsets, by `GAGE_DATUMS`.",
-      "evidence": "Hourly means shared with the neighbors named over the 7 days to 15 November 2026, and 3DEP ground at the Calcasieu and Arroyo Colorado sites, November 2026."
-    }
+      handling: "avoided",
+      error:
+        "These sites' surveyed altitudes put their water where other gauges show it isn't. Brazos Santiago Pass (08474395) reads 0.68 m below NOAA's co-located gauge (8779749) in its NAVD88. Middle River (11312676), Old River at Bacon Island (11313405) and Dutch Slough (11313433), listed at 0.0 ft NAVD88, read 2.9 to 5.2 ft above Old River near Byron (11313315) on the same tidal channels. The Calcasieu at Moss Bluff, Louisiana (08015910), and Arroyo Colorado at FM 106, Texas (08470500), read 51 and 28 ft above water the 3DEP model shows near 0 ft.",
+      response: "No offsets, by `GAGE_DATUMS`.",
+      evidence:
+        "Hourly means shared with the neighbors named over the 7 days to 15 November 2026, and 3DEP ground at the Calcasieu and Arroyo Colorado sites, November 2026.",
+      check: async (store, e) => {
+        await noOffsets(store, ...e.stations!);
+        const brazos = await listed(store, "usgs/08474395");
+        if (brazos.ground_m === undefined)
+          throw new Error("the store keeps no altitude for Brazos Santiago Pass");
+        const below = await hourlyDifference(
+          store,
+          ["usgs/08474395", brazos.ground_m],
+          ["coops/8779749", await datum(store, "coops/8779749", "NAVD88")],
+        );
+        if (Math.abs(below + 0.68) > 0.1)
+          throw new Error(
+            `Brazos Santiago Pass reads ${below.toFixed(3)} m from NOAA's gauge in NAVD88, not 0.68 m below`,
+          );
+        // At 0.0 ft NAVD88, as USGS lists them, their levels are NAVD88 heights.
+        const byron = await datum(store, "usgs/11313315", "NAVD88");
+        for (const id of ["usgs/11312676", "usgs/11313405", "usgs/11313433"]) {
+          const above = await hourlyDifference(store, [id, 0], ["usgs/11313315", byron]);
+          if (above < 0.8 || above > 1.7)
+            throw new Error(
+              `${id} reads ${above.toFixed(3)} m above Old River near Byron, not 2.9 to 5.2 ft`,
+            );
+        }
+      },
+    },
   ],
-  "retired": []
-}
+  retired: [],
+} satisfies ErrataFile;
