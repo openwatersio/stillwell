@@ -13,6 +13,7 @@ import {
   exists,
   publishedSources,
   readStationList,
+  writeExtremes,
   writeObservations,
   writeRecent,
   writeStationList,
@@ -359,9 +360,9 @@ describe("refreshSource", () => {
 
   it("numbers a new epoch above files for a product the station no longer lists", async () => {
     await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
-    await writeObservations(
-      seriesPath(store, "predictions", "test", "a", 2026, 2),
-      [{ time: Date.parse(NOW), level: 1, flag: Flag.good }],
+    await writeExtremes(
+      seriesPath(store, "extremes", "test", "a", 2026, 2),
+      [{ time: Date.parse(NOW), level: 1, type: "high", flag: Flag.good }],
       "NAP",
     );
     const { stations } = await refreshSource(store, sourceOf([listed("a", { datum: "MSL" })]), {

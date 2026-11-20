@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import { Blocked, fetchText, HttpError, setTransport } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
-import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as ea from "../src/sources/ea/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
@@ -187,13 +186,6 @@ describe("rws", () => {
         (await get("hoekvanholland", ...range)).map((l) => l.level),
         [0.972, 1],
       );
-    // The astronomical tide is left as RWS serves it.
-    assert.deepEqual(
-      (await rws.levels("hoekvanholland", ...range, { process: "astronomisch" })).map(
-        (l) => l.level,
-      ),
-      [1, 1],
-    );
     // A gauge without an offset is served as RWS gives it, for its old-NAP epoch.
     assert.deepEqual(
       (await rws.levels("dordrecht", ...range)).map((l) => l.level),
@@ -533,14 +525,7 @@ describe("rws stations", () => {
     assert.deepEqual(
       stations.map((s) => [s.id, s.datum, s.products, s.country_code]),
       [
-        // RWS's astronomical tide but nothing measured: listed for its predictions alone.
-        ["rws/dukegat", "NAP", ["predictions", "predicted_extremes"], "NL"],
-        [
-          "rws/hoekvanholland",
-          "NAP",
-          ["levels", "extremes", "predictions", "predicted_extremes"],
-          "NL",
-        ],
+        ["rws/hoekvanholland", "NAP", ["levels", "extremes"], "NL"],
         ["rws/hoekvanholland.2", "NAP", ["levels"], "NL"],
         ["rws/k13a", "MSL", ["levels"], "NL"],
         ["rws/kralendijk", "NAP", ["levels"], "BQ"],
@@ -549,25 +534,16 @@ describe("rws stations", () => {
     // RWS's description says K13a is a platform, at sea; it says nothing of the others' water.
     assert.deepEqual(
       stations.map((s) => s.kind),
-      [null, null, null, "coastal", null],
+      [null, null, "coastal", null],
     );
     // Dutch NAP stations without an offset have their history before 2005 in
     // the old NAP; MSL and Bonaire's NAP never changed.
     assert.deepEqual(
       stations.map((s) => s.reference),
-      [rws.REVISED_NAP, null, rws.REVISED_NAP, null, null],
+      [null, rws.REVISED_NAP, null, null],
     );
-    // Only a station with measured levels is live.
-    assert.deepEqual(
-      stations.map((s) => [s.live, s.interval_s]),
-      [
-        [false, null],
-        [true, 600],
-        [true, 600],
-        [true, 600],
-        [true, 600],
-      ],
-    );
+    // A location with only RWS's astronomical tide, as Dukegat has, isn't listed.
+    assert.ok(stations.every((s) => s.live && s.interval_s === 600));
   });
 
   it("asks for the station's datum for every product", async () => {
@@ -580,8 +556,7 @@ describe("rws stations", () => {
     const station = { source_id: "k13a", datum: "MSL" } as never;
     const range = [new Date("2024-01-01T00:00:00Z"), new Date("2024-01-02T00:00:00Z")] as const;
     await rws.source.observations!(station, ...range);
-    await rws.source.predictions!(station, ...range);
-    assert.deepEqual(asked, ["MSL", "MSL"]);
+    assert.deepEqual(asked, ["MSL"]);
     // Extremes requests filter by grouping; the height channel must then be MSL.
     serve([
       [
@@ -1203,91 +1178,6 @@ describe("pegelonline kuestendaten", () => {
     const [listed] = await pegelonline.stations();
     assert.equal(listed!.history_since, "1999-11-01");
     assert.match(listed!.attribution, /PEGELONLINE; Hamburg Port Authority, .*kuestendaten\.de/);
-  });
-});
-
-describe("bsh", () => {
-  it("reads predicted extremes and skips years BSH hasn't published", async () => {
-    serve([[/deu2026&files=DE__506P2026/, fixture("DE__506P2026.txt")]]);
-    const extremes = await bsh.source.predictedExtremes!(
-      { source_id: "506P", datum: "PNP" } as never,
-      new Date("2026-01-01T00:00:00Z"),
-      new Date("2028-01-01T00:00:00Z"),
-    );
-    assert.ok(extremes.length > 100);
-    assert.deepEqual(
-      { type: extremes[0]!.type, flag: extremes[0]!.flag, transit: "transit" in extremes[0]! },
-      { type: "low", flag: Flag.good, transit: true },
-    );
-  });
-
-  it("reads no rows from a gauge BSH predicts only as times", async () => {
-    // 808P, Leer: times after Emden, with no heights, datum or unit.
-    serve([[/deu2026&files=DE__808P2026/, fixture("DE__808P2026.txt")]]);
-    const range = [new Date("2026-01-01T00:00:00Z"), new Date("2027-01-01T00:00:00Z")] as const;
-    assert.deepEqual(
-      await bsh.source.predictedExtremes!({ source_id: "808P", datum: "PNP" } as never, ...range),
-      [],
-    );
-    // A file cut short, or with a header BSH never used, fails rather than reading as none.
-    serve([[/deu2026&files=DE__808P2026/, "I_E#DE__808P2026#\n"]]);
-    await assert.rejects(
-      bsh.source.predictedExtremes!({ source_id: "808P", datum: "PNP" } as never, ...range),
-      /height unit is undefined/,
-    );
-    serve([
-      [/deu2026&files=DE__808P2026/, "I_E#DE__808P2026#\nC02#Datenumfang:#Zeiten : UNKNOWN#\n"],
-    ]);
-    await assert.rejects(
-      bsh.source.predictedExtremes!({ source_id: "808P", datum: "PNP" } as never, ...range),
-      /height unit is undefined/,
-    );
-  });
-
-  it("gives datum offsets from the station's own datum, skipping heights BSH leaves null", () => {
-    // 624A: SKN 1.56 m below NHN, gauge zero unknown.
-    assert.deepEqual(
-      bsh.offsets(
-        { "PNP (unter NHN)": null, "SKN (unter NHN)": -156, "SKN (ueber PNP)": null },
-        "SKN",
-      ),
-      { NHN: -1.56 },
-    );
-    // 726A: SKN 1.92 m below NHN, gauge zero 5.02 m below.
-    assert.deepEqual(bsh.offsets({ "PNP (unter NHN)": -502, "SKN (unter NHN)": -192 }, "SKN"), {
-      NHN: -1.92,
-      PNP: 3.1,
-    });
-    // A PNP gauge with SKN given above gauge zero.
-    assert.deepEqual(bsh.offsets({ "PNP (unter NHN)": -503, "SKN (ueber PNP)": 344 }, "PNP"), {
-      NHN: -5.03,
-      SKN: -3.44,
-    });
-  });
-
-  it("asks for no year before 1 August of the year before, when BSH's terms let it be published", async () => {
-    const asked: string[] = [];
-    setTransport(async (url) => {
-      asked.push(url);
-      return fixture("DE__506P2026.txt");
-    });
-    const year = new Date().getUTCFullYear() + 2;
-    const range = [new Date(Date.UTC(year, 0, 1)), new Date(Date.UTC(year + 1, 0, 1))] as const;
-    assert.deepEqual(
-      await bsh.source.predictions!({ source_id: "506P", datum: "PNP" } as never, ...range),
-      [],
-    );
-    assert.deepEqual(asked, []);
-    assert.equal(new Date(bsh.publishableFrom(2027)).toISOString(), "2026-07-31T22:00:00.000Z");
-  });
-
-  it("refuses a year whose file is in another datum", async () => {
-    serve([[/deu2026&files=DE__506P2026/, fixture("DE__506P2026.txt")]]);
-    const range = [new Date("2026-01-01T00:00:00Z"), new Date("2027-01-01T00:00:00Z")] as const;
-    await assert.rejects(
-      bsh.source.predictedExtremes!({ source_id: "506P", datum: "SKN" } as never, ...range),
-      /in PNP, not SKN/,
-    );
   });
 });
 

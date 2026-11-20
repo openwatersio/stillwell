@@ -12,6 +12,7 @@ import {
   readStationList,
   readJsonArray,
   writeJsonArray,
+  writeExtremes,
   writeObservations,
   writeRecent,
   writeStationBounds,
@@ -467,12 +468,12 @@ describe("publishStations with withheld stations", () => {
 describe("withhold", () => {
   const refused = (code: string) => code.startsWith("x");
 
-  async function file(code: string, product: "levels" | "predictions", year: number, epoch = 1) {
-    await writeObservations(
-      seriesPath(store, product, "test", code, year, epoch),
-      [{ time: Date.UTC(year, 0, 1), level: 1, flag: Flag.good }],
-      "ZERO",
-    );
+  async function file(code: string, product: "levels" | "extremes", year: number, epoch = 1) {
+    const path = seriesPath(store, product, "test", code, year, epoch);
+    const time = Date.UTC(year, 0, 1);
+    if (product === "levels")
+      await writeObservations(path, [{ time, level: 1, flag: Flag.good }], "ZERO");
+    else await writeExtremes(path, [{ time, level: 1, type: "high", flag: Flag.good }], "ZERO");
   }
 
   it("deletes exactly the withheld stations' directories, found through the list's history and the files", async () => {
@@ -482,7 +483,7 @@ describe("withhold", () => {
     await refreshSource(store, sourceOf(all), { now: "2026-11-20T00:00:00Z" });
     await file("x1", "levels", 2000);
     await file("x1", "levels", 2001, 2);
-    await file("x1", "predictions", 2000);
+    await file("x1", "extremes", 2000);
     await file("k", "levels", 2000);
     // An ID that only starts like a withheld one isn't another's directory.
     await file("kx1", "levels", 2000);
@@ -522,12 +523,10 @@ describe("withhold", () => {
     assert.deepEqual(
       removed[0],
       ["x1", "x1k", "x2"].flatMap((c) =>
-        ["obs", "extremes", "predictions", "predicted-extremes"].map(
-          (d) => `${store}/${d}/test/${c}/`,
-        ),
+        ["obs", "extremes"].map((d) => `${store}/${d}/test/${c}/`),
       ),
     );
-    for (const dir of ["obs/test/x1", "obs/test/x2", "predictions/test/x1"])
+    for (const dir of ["obs/test/x1", "obs/test/x2", "extremes/test/x1"])
       assert.equal(existsSync(join(store, dir)), false, dir);
     for (const dir of ["obs/test/k/2000.parquet", "obs/test/kx1/2000.parquet"])
       assert.equal(existsSync(join(store, dir)), true, dir);
@@ -585,7 +584,7 @@ describe("withhold", () => {
     assert.deepEqual(done.prefixes, dry.prefixes);
     assert.deepEqual(
       removed[0],
-      ["obs", "extremes", "predictions", "predicted-extremes"].map((d) => `${store}/${d}/test/d1/`),
+      ["obs", "extremes"].map((d) => `${store}/${d}/test/d1/`),
     );
     assert.equal(existsSync(join(store, "obs/test/d1")), false);
     assert.deepEqual(

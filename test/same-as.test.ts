@@ -805,7 +805,7 @@ describe("rank", () => {
 
   it("then one still reporting", () => {
     assert.equal(
-      best(station("bsh/1", { products: ["predictions"] }), station("pegelonline/1")),
+      best(station("rws/1", { products: ["extremes"] }), station("pegelonline/1")),
       "pegelonline/1",
     );
     // UHSLC's own version that ended in 2004 loses to the live series carrying a copy.

@@ -451,7 +451,7 @@ export type SeriesFiles<T> = ReturnType<typeof seriesFiles<T>>;
 
 /** The reader for a product's year files. */
 export function readerOf(product: Product) {
-  return product === "levels" || product === "predictions" ? readObservationFile : readExtremeFile;
+  return product === "levels" ? readObservationFile : readExtremeFile;
 }
 
 /**
@@ -475,29 +475,25 @@ export async function backfillYear(
   const year = from.getUTCFullYear();
   const path = files.path(year);
   const range = [from.getTime(), to.getTime()] as const;
-  if (product === "levels" || product === "predictions") {
+  if (product === "levels") {
+    if (!source.observations) return undefined;
     const series = files as SeriesFiles<Observation>;
-    const get = product === "levels" ? source.observations : source.predictions;
-    if (!get) return undefined;
-    const rows = await get(station, from, to);
+    const rows = await source.observations(station, from, to);
     // An empty fetch is an outage, a year the source no longer publishes, or a
     // datum it no longer serves; it never empties a file.
     if (!rows.length) return "empty";
     const { rows: stored, datums } = await series.get(year);
     await refuseOtherDatum(path, station, datums);
     // A stored level outside `SPAN_M` goes, as a fetch drops one.
-    const existing = product === "levels" ? stored.filter((r) => possible(r.level)) : stored;
-    const keepAll = product === "levels" && source.keepsStored;
-    let merged = mergeFetched(existing, rows, ...range, undefined, keepAll);
-    if (product === "levels")
-      merged = judgeFetched(
-        existing,
-        rows,
-        ...range,
-        qcFor(station),
-        [...(await series.get(year - 1)).rows, ...(await series.get(year + 1)).rows],
-        keepAll,
-      );
+    const existing = stored.filter((r) => possible(r.level));
+    const merged = judgeFetched(
+      existing,
+      rows,
+      ...range,
+      qcFor(station),
+      [...(await series.get(year - 1)).rows, ...(await series.get(year + 1)).rows],
+      source.keepsStored,
+    );
     if (!merged.length || sameRows(stored, merged)) return undefined;
     let stats: YearStats;
     try {
@@ -507,13 +503,12 @@ export async function backfillYear(
       throw error;
     }
     series.wrote(year, { rows: asWritten(merged), datums: [station.datum] });
-    if (product === "levels") written.set(path, stats);
+    written.set(path, stats);
     return merged.length;
   }
   const series = files as SeriesFiles<PublishedExtreme>;
-  const get = product === "extremes" ? source.extremes : source.predictedExtremes;
-  if (!get) return undefined;
-  const rows = await get(station, from, to);
+  if (!source.extremes) return undefined;
+  const rows = await source.extremes(station, from, to);
   if (!rows.length) return "empty";
   const { rows: existing, datums } = await series.get(year);
   await refuseOtherDatum(path, station, datums);

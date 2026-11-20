@@ -24,8 +24,6 @@ import type { Product } from "../schema.ts";
  *   recent/<source>/<YYYY-MM-DD>.parquet                one UTC day of every live station's values, for 30 days
  *   obs/<source>/<station>/<year>.parquet               observed levels
  *   extremes/<source>/<station>/<year>.parquet          the source's observed high and low waters
- *   predictions/<source>/<station>/<year>.parquet       the source's predicted curve
- *   predicted-extremes/<source>/<station>/<year>.parquet the source's predicted high and low waters
  *
  * `<station>` is the station's `source_id`, which `isUrlSafe` keeps to
  * characters a key and a URL both hold as they are. Each datum epoch has
@@ -36,8 +34,6 @@ import type { Product } from "../schema.ts";
 export const DATASET: Record<Product, string> = {
   levels: "obs",
   extremes: "extremes",
-  predictions: "predictions",
-  predicted_extremes: "predicted-extremes",
 };
 
 /** Every product a station can have files for. */

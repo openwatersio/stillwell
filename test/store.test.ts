@@ -100,18 +100,9 @@ describe("store files", () => {
     assert.deepEqual(await readDatums(join(root, "missing.parquet")), []);
   });
 
-  it("round-trips extremes with BSH's transit and event", async () => {
+  it("round-trips extremes", async () => {
     const path = join(root, "extremes.parquet");
-    const rows = [
-      {
-        time: T,
-        level: 3.1,
-        type: "high" as const,
-        flag: Flag.good,
-        transit: 26818,
-        event: 1 as const,
-      },
-    ];
+    const rows = [{ time: T, level: 3.1, type: "high" as const, flag: Flag.good }];
     await writeExtremes(path, rows, "PNP");
     assert.deepEqual(await readExtremes(path), rows);
     assert.deepEqual(await readDatums(path), ["PNP"]);
