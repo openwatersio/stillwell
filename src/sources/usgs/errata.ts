@@ -1,4 +1,5 @@
-import { impossibleDropped, type ErrataFile, type StoreReader } from "../../errata.ts";
+import { flaggedSpan, impossibleDropped, type ErrataFile, type StoreReader } from "../../errata.ts";
+import { Flag } from "../../schema.ts";
 import type { StoredStation } from "../../schema.ts";
 import { median } from "../../stats.ts";
 
@@ -75,6 +76,32 @@ export default {
         "November 2026. A scan of the range of levels in every year file of every source in the store (335,320 files) found 383 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span.",
       check: async (store, e) => {
         for (const id of e.stations!) await impossibleDropped(store, id, 2026);
+      },
+    },
+    {
+      id: "usgs-painted-rock-whole-feet",
+      stations: ["usgs/09519800"],
+      since: "2026-11-12",
+      until: "2026-11-14",
+      handling: "flagged",
+      error:
+        "USGS served 187 values of 926 to 990, all whole numbers, under the gage-height series of Gila River below Painted Rock Dam (09519800) from 2026-11-12 18:20 to 2026-11-13 11:20 UTC. They fall at 5-minute times between the gage's 15-minute readings of 9 to 10 ft, and read 282 to 302 m once taken as feet.",
+      response:
+        "QC flags the 187 `bad`, as levels hundreds of meters from the gage's median. The two days are flagged `suspect` whole, keeping USGS's own flag as `source_flag`, since the errata spans are whole days; readings near the bad ones carry the flag already. USGS now serves only the 15-minute readings for those days, so a refetch of 2026 replaces each month it covers, and the entry retires when its check fails because the values are gone.",
+      evidence:
+        "The store's 2026 file for the station and USGS's Water Data API, 2026-11-20. The store holds 187 levels of 282.2 to 301.8 m flagged `bad`, with USGS's Provisional flag as `source_flag`. The API serves 67 values in that window, every 15 minutes, 9.26 to 9.82 ft, and none of the 187. The discharge series (00060) reads 1,600 to 1,820 cfs from 18:00 to 19:45 on 2026-11-12, so the values aren't it. Of all 11,461 USGS stations with a 2026 file, read for 2026-11-12 18:00 to 2026-11-13 12:00, no other holds a level above 100 m flagged `bad` beside real ones, apart from 05051530's one repeated value, 399.5 m, which this entry doesn't cover.",
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        const rows = await store.levels(e.stations![0]!, e.since!, e.until!);
+        const wrong = rows.filter((o) => o.level > 100);
+        if (wrong.length !== 187)
+          throw new Error(
+            `the store holds ${wrong.length} 09519800 levels above 100 m, not the 187 described`,
+          );
+        if (wrong.some((o) => o.flag !== Flag.bad))
+          throw new Error("a 09519800 level above 100 m isn't flagged bad");
+        if (rows.length === wrong.length)
+          throw new Error("09519800 holds no ordinary reading in the span");
       },
     },
     {

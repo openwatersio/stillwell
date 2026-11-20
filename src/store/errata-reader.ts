@@ -56,15 +56,15 @@ export function errataReader(
       const [from, to] = [utcDay(since), utcDay(until)];
       if (!(from < to)) throw new Error(`${since} to ${until} isn't a span of UTC days`);
       // Each epoch's rows only within its span, as every reader goes by span: a split left rows in the earlier epoch's files until `ingest misplaced` moves them.
+      // A rejected epoch's files read as the epoch before it's, so they're read too, where that epoch has no row at the time.
       const epochs = listed.epochs.length
-        ? listed.epochs
-            .filter((e) => e.state !== "rejected")
-            .map((e) => ({
-              id: e.id,
-              since: e.since ? Date.parse(e.since) : -Infinity,
-              until: e.until ? Date.parse(e.until) : Infinity,
-            }))
-        : [{ id: 1, since: -Infinity, until: Infinity }];
+        ? listed.epochs.map((e) => ({
+            id: e.id,
+            rejected: e.state === "rejected",
+            since: e.since ? Date.parse(e.since) : -Infinity,
+            until: e.until ? Date.parse(e.until) : Infinity,
+          }))
+        : [{ id: 1, rejected: false, since: -Infinity, until: Infinity }];
       const out: Awaited<ReturnType<StoreReader["levels"]>> = [];
       for (const epoch of epochs) {
         const [lo, hi] = [Math.max(from, epoch.since), Math.min(to, epoch.until)];
@@ -90,7 +90,12 @@ export function errataReader(
           ))
             out.push({ ...o, epoch: epoch.id });
       }
-      return out.sort((a, b) => a.time - b.time);
+      const held = new Set(
+        out.filter((o) => !epochs.find((e) => e.id === o.epoch)!.rejected).map((o) => o.time),
+      );
+      return out
+        .filter((o) => !epochs.find((e) => e.id === o.epoch)!.rejected || !held.has(o.time))
+        .sort((a, b) => a.time - b.time);
     },
   };
   return reader;

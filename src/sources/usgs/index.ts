@@ -6,6 +6,7 @@ import {
   type Kind,
   type ListedStation,
   type Observation,
+  type Overrides,
   type Source,
   type SourceMetadata,
   type Station,
@@ -993,8 +994,58 @@ function checked(station: Station): string {
   return s.time_series_id;
 }
 
+/**
+ * Epochs the refresh of 2026-11-16 opened at gages whose zero didn't move.
+ * Each is rejected, so the readings between epoch 1's last `seen` and the
+ * epoch's start stay in epoch 1, and the series the station now fetches goes
+ * on into epoch 1's files. `seriesChanged` can't tell a re-keyed series, or
+ * a corrected altitude, from a moved zero, so these were decided from the
+ * readings (docs/stations.md, "Undoing an epoch").
+ */
+const overrides: Overrides = {
+  epochs: {
+    "usgs/08098295 2026-11-16T14:19:07Z": {
+      reject: true,
+      note: "USGS replaced series beb9a600… with cf10b3ee…, and the old ID is gone. The 2,290 timestamps from 2026-11-05 to 2026-11-16 that the store and the new series both hold agree to 0.1 mm.",
+    },
+    "usgs/08111056 2026-11-16T14:19:07Z": {
+      reject: true,
+      note: "USGS replaced series b4ba80eb… with cda30b54…, and the old ID is gone. The 1,629 timestamps from 2026-11-05 to 2026-11-16 that the store and the new series both hold agree to 0.1 mm.",
+    },
+    "usgs/08111070 2026-11-16T14:19:07Z": {
+      reject: true,
+      note: "USGS replaced series 3473a115… with 2c08b63f…, and the old ID is gone. The new series reads 6.1 mm (0.02 ft) lower than the store at 2,073 of the 2,166 timestamps from 2026-11-05 to 2026-11-16 that both hold, and the same 6.1 mm back to a day between 2026-06-01 and 2026-06-15, with the two equal before it, so USGS revised the series' values from then on, not its zero; the 93 values the store fetched under the new ID agree. A refetch of 2026 replaces the stored values with the revised ones.",
+    },
+    "usgs/08117857 2026-11-16T14:19:07Z": {
+      reject: true,
+      note: "USGS replaced series 0da938db… with 0421fe45…, and the old ID is gone. The 1,934 timestamps from 2026-11-05 to 2026-11-16 that the store and the new series both hold agree to 0.1 mm.",
+    },
+    "usgs/08117858 2026-11-16T14:19:07Z": {
+      reject: true,
+      note: "USGS replaced series ba4c3dbf… with 8239ab9a…, and the old ID is gone. The 1,965 timestamps from 2026-11-05 to 2026-11-16 that the store and the new series both hold agree to 0.1 mm.",
+    },
+    "usgs/09510200 2026-11-16T14:19:07Z": {
+      reject: true,
+      note: "The site has two primary gage-height series from 2007-10-01, 8b0c32f9… and 36860ca7…, which hold the same values: all 1,117 timestamps from 2026-11-05 to 2026-11-16 that the store and either series hold agree to 0.1 mm. The refresh moved the station from the first to the second.",
+    },
+    "usgs/09505800 2026-11-16T14:19:07Z": {
+      reject: true,
+      note: "USGS replaced series 7142c049… with f53bfd4e…, and the old ID is gone, and lists the gage datum against NAVD88 (1105.616 m) where it gave NGVD29 (1106.424 m). The 156 timestamps from 2026-11-10 to 2026-11-12 that the store and the new series both hold agree to 0.1 mm, and the new series carries no DIFFDATUM or DATUMCHANGE qualifier from 2026-10-01.",
+    },
+    "usgs/06207500 2026-11-16T14:19:07Z": {
+      reject: true,
+      note: "The series is the same (51ade2a1…) and USGS lists the gage datum against NAVD88 (1214.524 m) where it gave NGVD29 (1215.006 m). Its 4,509 values from 2026-10-01 to 2026-11-17 carry no DIFFDATUM or DATUMCHANGE qualifier, and the 1,115 timestamps from 2026-11-05 to 2026-11-16 that the store and USGS both hold agree to 0.1 mm.",
+    },
+    "usgs/09505400 2026-11-16T14:19:07Z": {
+      reject: true,
+      note: "The series is the same (359193d0…) and USGS lists the gage datum at 972.416 m above NAVD88 where it gave 972.312 m. Its 4,513 values from 2026-10-01 to 2026-11-17 carry no DIFFDATUM or DATUMCHANGE qualifier, and the 1,119 timestamps from 2026-11-05 to 2026-11-16 that the store and USGS both hold agree to 0.1 mm; a zero 0.104 m higher would step them by that much.",
+    },
+  },
+};
+
 export const source: Source = {
   metadata,
+  overrides,
   // USGS approves months to years later, a year a request at one every 4.8 seconds, too many for one run across
   // 11,000 stations, so each month takes a twelfth of them, by --shard, and each station comes round once a
   // year; the current year is left to compaction. A run that stops partway needs a rerun within the month.

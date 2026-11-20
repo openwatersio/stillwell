@@ -85,6 +85,55 @@ describe("errataReader", () => {
   });
 });
 
+describe("errataReader with a rejected epoch", () => {
+  it("reads its files as the epoch before it's, once for each time", async () => {
+    const store = mkdtempSync(join(tmpdir(), "stillwell-errata-"));
+    await writeStationList(stationListPath(store, "usgs"), [
+      {
+        id: "usgs/1",
+        source: "usgs",
+        source_id: "1",
+        datum: "STND",
+        products: ["levels"],
+        status: "active",
+        live: true,
+        interval_s: 900,
+        kind: "river",
+        commercial_use: true,
+        epochs: [
+          epoch(1, null, null),
+          { ...epoch(2, "2026-11-16T00:00:00Z", null), state: "rejected" },
+        ],
+      } as unknown as StoredStation,
+    ]);
+    const rows = (times: string[], level: number): Observation[] =>
+      times.map((t) => ({ time: at(t), level, flag: Flag.good }));
+    await writeObservations(
+      seriesPath(store, "levels", "usgs", "1", 2026, 1),
+      rows(["2026-11-16T01:00", "2026-11-16T02:00"], 1),
+      "STND",
+    );
+    await writeObservations(
+      seriesPath(store, "levels", "usgs", "1", 2026, 2),
+      rows(["2026-11-16T02:00", "2026-11-16T03:00"], 2),
+      "STND",
+    );
+    const read = await errataReader(() => store, store).levels(
+      "usgs/1",
+      "2026-11-16",
+      "2026-11-17",
+    );
+    assert.deepEqual(
+      read.map((o) => [new Date(o.time).toISOString().slice(11, 16), o.level, o.epoch]),
+      [
+        ["01:00", 1, 1],
+        ["02:00", 1, 1],
+        ["03:00", 2, 2],
+      ],
+    );
+  });
+});
+
 describe("flaggedSpan", () => {
   // Two levels on each day given, flagged as each day says.
   const reader = (days: Record<string, Partial<Observation>>): StoreReader => ({
