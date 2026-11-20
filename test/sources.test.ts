@@ -361,7 +361,7 @@ describe("rws", () => {
     );
     // The window runs from 23:00 UTC on 31 December 1999 up to, not including, 1 January 2005.
     const edge = (time: string) => {
-      serve([[/OphalenWaarnemingen/, answer([mean, [[time, 910]]], [nap, [[time, 911]]])]]);
+      serve([[/OphalenWaarnemingen/, answer([mean, [[time, 910]]])]]);
       return rws.levels(
         "dehaandrik.boven",
         new Date("1999-12-01T00:00:00Z"),
