@@ -297,8 +297,10 @@ interface Row {
 
 /**
  * Observed levels in meters above STND over [start, end): 6-minute values, a
- * calendar month per request, plus hourly heights for any part of the month
- * before the 6-minute record starts (everything before about 1996).
+ * calendar month per request. Before 1997, the verified hourly heights come
+ * with them. They replace a preliminary 6-minute value in their hour and fill
+ * every hour the 6-minute record lacks; a verified 6-minute value keeps its
+ * time against an hourly height.
  */
 export async function levels(
   id: string,
@@ -314,15 +316,14 @@ export async function levels(
   let hourlyRows: Row[] = [];
   for (const [from, to] of chunks(start, end, "month")) {
     if (!overlaps(window, from, to)) continue;
-    const sixMinute = await rowsOf("water_level", id, from, to);
-    const first = sixMinute.find((r) => r.v !== "" && Number.isFinite(Number(r.v)));
-    const firstSixMinute = first ? timeOf(first.t) : to.getTime();
-    // Hourly heights fill in only what the 6-minute record doesn't reach.
-    // Only before the 6-minute era: later, a month with no 6-minute values is
+    let sixMinute = await rowsOf("water_level", id, from, to);
+    // Before the 6-minute era's start, the verified hourly heights lead. Some
+    // stations' 6-minute record is all preliminary there, and its values can sit
+    // a meter off the verified ones. Later, a month with no 6-minute values is
     // an outage or a gap, and hourly heights would replace the store's 6-minute
     // values for that month.
     let hourly: Row[] = [];
-    if (from.getTime() < SIX_MINUTE_ERA && firstSixMinute > from.getTime()) {
+    if (from.getTime() < SIX_MINUTE_ERA) {
       if (hourlyYear !== from.getUTCFullYear()) {
         hourlyYear = from.getUTCFullYear();
         const until = new Date(
@@ -332,17 +333,25 @@ export async function levels(
         for (const [a, b] of within365([from, until]))
           hourlyRows.push(...(await rowsOf("hourly_height", id, a, b)));
       }
-      const until = Math.min(to.getTime(), firstSixMinute);
-      hourly = hourlyRows.filter((r) => timeOf(r.t) >= from.getTime() && timeOf(r.t) < until);
+      hourly = hourlyRows.filter(
+        (r) => timeOf(r.t) >= from.getTime() && timeOf(r.t) < to.getTime(),
+      );
+      // A preliminary 6-minute value gives way to a verified hourly height in
+      // its hour, and stays only where the hourly record has none.
+      const covered = new Set(
+        hourly.filter((r) => usable(r)).map((r) => Math.floor(timeOf(r.t) / HOUR_MS)),
+      );
+      sixMinute = sixMinute.filter(
+        (r) => r.q !== "p" || !covered.has(Math.floor(timeOf(r.t) / HOUR_MS)),
+      );
     }
     for (const [rows, isHourly] of [
-      [hourly, true],
       [sixMinute, false],
+      [hourly, true],
     ] as const)
       for (const r of rows) {
-        const level = Number(r.v);
-        if (r.v === "" || !Number.isFinite(level)) continue;
-        out.push({ time: timeOf(r.t), level, flag: flagOf(r, isHourly) });
+        if (!usable(r)) continue;
+        out.push({ time: timeOf(r.t), level: Number(r.v), flag: flagOf(r, isHourly) });
       }
   }
   return within(dedupe(out), start, end);
@@ -492,6 +501,10 @@ function isoOf(t: string): string {
   return match ? `${match[1]}T${match[2]}${match[3] ?? ":00"}Z` : t;
 }
 
+function usable(r: Row): boolean {
+  return r.v !== "" && Number.isFinite(Number(r.v));
+}
+
 function stamp(date: Date): string {
   const iso = date.toISOString();
   return `${iso.slice(0, 4)}${iso.slice(5, 7)}${iso.slice(8, 10)} ${iso.slice(11, 16)}`;
@@ -500,6 +513,7 @@ function stamp(date: Date): string {
 /** CO-OPS's 6-minute record starts between 1994 and 1996, depending on the station. */
 const SIX_MINUTE_ERA = Date.UTC(1997, 0, 1);
 const MINUTE_MS = 60_000;
+const HOUR_MS = 3_600_000;
 const DAY_MS = 86_400_000;
 
 /** [start, end) split at UTC calendar months or years. */
