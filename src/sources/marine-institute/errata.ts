@@ -113,18 +113,21 @@ export default {
     {
       id: "marine-institute-castletownbere-2026-offsets",
       stations: ["marine-institute/castletownbere-port"],
-      since: "2026-02-04",
-      until: "2026-04-26",
+      since: "2026-01-26",
+      until: "2026-04-27",
       handling: "flagged",
       error:
-        "The Marine Institute's Castletownbere levels step by up to 1.3 m on and off from 4 February to 25 April 2026.",
+        "The Marine Institute's Castletownbere levels read far too low, on and off, from 26 January to 26 April 2026: daily means from −4.22 to 0.07 m and levels down to −4.57 m, against daily means of −0.43 to 0.44 m on the other days of 2026.",
       response:
-        "4 February to 25 April 2026 is flagged `suspect` whole, keeping the source's own flag as `source_flag`, since the offsets come and go within it.",
+        "26 January to 26 April 2026 is flagged `suspect` whole, keeping the source's own flag as `source_flag`, since the low readings come and go within it. The fault starts at about 13:00 UTC on 26 January, so the day's earlier readings are flagged with it.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's CMEMS and Marine Institute copies of the gauge, which agree with the series to within 2 cm before and after: over the spans the series differs from them by up to 1.3 m.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal. In the store, CMEMS's copy of the gauge (`cmems/Castletownbere`) flags 1,295 values bad, from 13:00 UTC on 26 January to 08:00 UTC on 26 April 2026, while all 22,451 of the Marine Institute's values in the span carry its preliminary flag. The daily mean is −2.78 m on 10 February and −0.25 m on 28 April. The store holds nothing from 24 January 15:00 UTC to 26 January 08:00 UTC. GESLA's Marine Institute and CMEMS copies of the gauge (`gesla/castletownbere_port-cas-irl-mi_c` and `gesla/castletownbere-cas-irl-cmems`) hold the same low values.",
+      reported: null,
+      report: null,
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
+        await offset(store, id, "2026-02-10", "2026-04-28", -1);
         await offset(store, id, "2026-04-04", "2026-04-28", -1);
       },
     },
@@ -167,20 +170,42 @@ export default {
     {
       id: "marine-institute-malin-head-2026-offset",
       stations: ["marine-institute/malin-head-portmore-pier"],
-      since: "2026-08-12",
-      until: "2026-09-20",
+      since: "2026-08-10",
+      until: "2026-09-24",
       handling: "flagged",
       error:
-        "The Marine Institute's Malin Head (Portmore Pier) levels sit about 3.9 m low from 12 August to 9 September 2026 and about 1.2 m high from 10 to 19 September.",
+        "The Marine Institute's Malin Head (Portmore Pier) levels hold still for two hours on 10 August 2026 and stall again from about 11:30 UTC on 11 August. They then sit 1.9 to 4.1 m low from 12 August to 9 September, 1.0 to 1.7 m high from 10 to 19 September, and 0.6 to 1.0 m high from 20 to 23 September.",
       response:
-        "12 August to 19 September 2026 is flagged `suspect`, keeping the source's own flag as `source_flag`.",
+        "10 August to 23 September 2026 is flagged `suspect`, keeping the source's own flag as `source_flag`. Spans are whole days, so the readings before the first stall on 10 August and before the second on 11 August are flagged with them.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Buncrana (`marine-institute/buncranna`), 29 km away: the difference is −0.05 m before and −0.02 to −0.03 m after, −3.92 m from 12 August and +1.18 m from 10 September.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Buncrana (`marine-institute/buncranna`), 29 km away. On the 272 days of 2026 outside this span and erratum `marine-institute-malin-head-2026-may-offset`, the difference is −0.28 to +0.22 m. In the span it is −0.13 and −0.87 m on 10 and 11 August, −4.12 to −1.90 m from 12 August to 9 September, +0.97 to +1.66 m from 10 to 19 September, and +0.61 to +0.99 m from 20 to 23 September. On 24 and 25 September it is +0.11 and +0.13 m, inside the range of the other days, so those two are outside the span. On 10 August Malin Head reads −0.13 to −0.15 m from 13:30 to 15:30 UTC while Buncrana rises from 0.24 to 1.38 m, then jumps to 1.06 m. On 11 August it reads −1.30 m at 11:15 UTC and −1.08 m at 15:00 UTC, while Buncrana, after its low water of −1.48 m at 10:45 UTC, rises to 0.89 m.",
+      reported: null,
+      report: null,
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
         await offset(store, id, "2026-08-20", "2026-08-09", -3);
-        await offset(store, id, "2026-09-12", "2026-09-25", 0.8);
+        await offset(store, id, "2026-09-12", "2026-09-28", 0.8);
+      },
+    },
+    {
+      id: "marine-institute-malin-head-2026-may-offset",
+      stations: ["marine-institute/malin-head-portmore-pier"],
+      since: "2026-05-19",
+      until: "2026-05-25",
+      handling: "flagged",
+      error:
+        "The Marine Institute's Malin Head (Portmore Pier) levels stall from about 14:00 UTC on 19 May 2026 and sit 1.7 to 3.0 m low from 20 to 23 May, recovering in the afternoon of 24 May. QC flags 2 of the span's 1,725 values.",
+      response:
+        "19 to 24 May 2026 is flagged `suspect`, keeping the source's own flag as `source_flag`. Spans are whole days, so the readings before the stall on 19 May and after the recovery on 24 May are flagged with them.",
+      evidence:
+        "Found in November 2026 while checking erratum `marine-institute-malin-head-2026-offset` against Buncrana (`marine-institute/buncranna`), 29 km away. Malin Head's daily mean is 0.13 and 0.15 m above Buncrana's on 17 and 18 May, then −0.52, −1.71, −2.31, −2.70, −3.01 and −2.40 m on 19 to 24 May, and 0.18 m above on 25 May. On 19 May Malin Head reads −1.03 to −1.00 m from 14:00 to 15:30 UTC, while Buncrana rises from −1.48 m at 13:00 to 2.07 m at 19:00.",
+      reported: null,
+      report: null,
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        await offset(store, id, "2026-05-22", "2026-05-17", -1.5);
       },
     },
     {
