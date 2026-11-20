@@ -550,15 +550,16 @@ export function listYears(dir: string): Promise<Set<number>> {
 export type StationObservation = Observation & { station: string; epoch: number };
 
 /**
- * The recent window for a source: `station`, then the observation columns and
- * `epoch`, sorted by station and time.
+ * A recent file, such as one UTC day of a source's live values
+ * (`recentDayPath`): `station`, then the observation columns and `epoch`,
+ * sorted by station and time.
  */
 export async function writeRecent(
   path: string,
   batches: Iterable<StationObservation[]> | AsyncIterable<StationObservation[]>,
 ): Promise<void> {
-  // A batch of stations at a time: every live USGS station's 7 days is about
-  // 9 million values, too many to hold as objects at once.
+  // A batch of stations at a time: every live USGS station's day is over a
+  // million values, too many to hold as objects at once.
   const table = await serial(createTable);
   try {
     for await (const rows of batches) await serial(() => appendRows(table, rows, recentCells));
@@ -607,54 +608,70 @@ function observation(r: Record<string, unknown>): Observation {
   return o;
 }
 
-/**
- * Decode every value of a recent window without keeping any, so a file that
- * can't be read in full fails now. A missing file passes.
- */
-export async function checkRecent(path: string): Promise<void> {
-  await read(path, "SELECT sum(hash(r)) AS h", "h", "r");
+/** The stations recent files hold values for; none from a file that doesn't exist. */
+export async function recentStations(paths: string | string[]): Promise<string[]> {
+  const ids = new Set<string>();
+  for (const path of [paths].flat())
+    for (const r of await read(path, "SELECT DISTINCT station", "station"))
+      ids.add(String(r.station));
+  return [...ids].sort();
 }
 
-/** The stations a recent window holds values for; none when the file doesn't exist. */
-export async function recentStations(path: string): Promise<string[]> {
-  const rows = await read(path, "SELECT DISTINCT station", "station");
-  return rows.map((r) => String(r.station));
-}
-
-/** The highest epoch each station has rows for in a recent window; none for a file from before epochs. */
-export async function recentEpochs(path: string): Promise<Map<string, number>> {
-  let rows;
-  try {
-    rows = await read(
-      path,
-      "SELECT station, max(epoch) AS epoch",
-      "station",
-      "",
-      "GROUP BY station",
-    );
-  } catch (error) {
-    if (!/column "epoch"/i.test(String(error))) throw error;
-    return new Map();
+/** The highest epoch each station has rows for in recent files; none from a file from before epochs. */
+export async function recentEpochs(paths: string | string[]): Promise<Map<string, number>> {
+  const highest = new Map<string, number>();
+  for (const path of [paths].flat()) {
+    let rows;
+    try {
+      rows = await read(
+        path,
+        "SELECT station, max(epoch) AS epoch",
+        "station",
+        "",
+        "GROUP BY station",
+      );
+    } catch (error) {
+      if (!/column "epoch"/i.test(String(error))) throw error;
+      continue;
+    }
+    for (const r of rows) {
+      const station = String(r.station);
+      highest.set(station, Math.max(highest.get(station) ?? 0, Number(r.epoch)));
+    }
   }
-  return new Map(rows.map((r) => [String(r.station), Number(r.epoch)]));
+  return highest;
 }
 
-/** The recent window, or just the named stations' part of it. */
-export async function readRecent(path: string, stations?: string[]): Promise<StationObservation[]> {
+/**
+ * Recent files' rows, or just the named stations', sorted by station and
+ * time. A file that doesn't exist, such as a day with no values, has none.
+ */
+export async function readRecent(
+  paths: string | string[],
+  stations?: string[],
+): Promise<StationObservation[]> {
   if (stations?.length === 0) return [];
-  // The file is sorted by station, so the range lets DuckDB skip the row groups outside it.
+  // Each file is sorted by station, so the range lets DuckDB skip the row groups outside it.
   const where = stations
     ? `WHERE station BETWEEN ${quote(stations.reduce((a, b) => (a < b ? a : b)))} AND ${quote(stations.reduce((a, b) => (a > b ? a : b)))} AND station IN (${stations.map(quote).join(", ")})`
     : "";
+  const rows: StationObservation[] = [];
   // Every column, since older files lack some: one written before epochs has
   // no `epoch`, and every row in it is epoch 1; one written before
   // `source_flag` was kept has none.
-  const rows = await read(path, OBSERVATION_COLUMNS, "station, time", "", where);
-  return rows.map((r) => ({
-    station: String(r.station),
-    ...observation(r),
-    epoch: r.epoch == null ? 1 : Number(r.epoch),
-  }));
+  for (const path of [paths].flat())
+    for (const r of await read(path, OBSERVATION_COLUMNS, "station, time", "", where))
+      rows.push({
+        station: String(r.station),
+        ...observation(r),
+        epoch: r.epoch == null ? 1 : Number(r.epoch),
+      });
+  // Days are read oldest first, so only stations need to come together.
+  return Array.isArray(paths)
+    ? rows.sort((a, b) =>
+        a.station < b.station ? -1 : a.station > b.station ? 1 : a.time - b.time,
+      )
+    : rows;
 }
 
 /** `stations.parquet`: one row per series, sorted by ID, with its datum epochs. */
@@ -1003,6 +1020,22 @@ export async function writeJsonArray(path: string, rows: object[]): Promise<void
     "SELECT * FROM read_json(?, format = 'newline_delimited')",
     "FORMAT json, ARRAY true",
   );
+}
+
+/** A JSON value `writeJson` wrote, or null where there's none. */
+export async function readJson(path: string): Promise<unknown> {
+  if (!isRemote(path) && !existsSync(path)) return null;
+  return serial(async () => {
+    const db = await connection();
+    try {
+      const reader = await db.runAndReadAll(`SELECT content FROM read_text(${quote(path)})`);
+      const [row] = reader.getRowObjects();
+      return row ? (JSON.parse(String(row.content)) as unknown) : null;
+    } catch (error) {
+      if (isRemote(path) && isMissing(error)) return null;
+      throw error;
+    }
+  });
 }
 
 /**

@@ -18,7 +18,6 @@ const OPERATIONS = [
   ...files("docs/contributing", /\.md$/),
   "site/README.md",
   "scripts/monthly.sh",
-  ...files("server/deploy", /\.(md|sh|example|service)$/),
   ...files(".github/workflows", /\.yml$/),
 ];
 

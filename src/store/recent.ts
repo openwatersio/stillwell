@@ -16,7 +16,6 @@ import {
 import { mergeFetched, sameRows, upsert } from "./merge.ts";
 import { chunks } from "../chunks.ts";
 import {
-  checkRecent,
   readDatums,
   listFiles,
   foldObservationFile,
@@ -24,25 +23,24 @@ import {
   readStationBounds,
   readTimeBounds,
   type StationBounds,
-  recentStations,
   type YearStats,
-  writeRecent,
   writeStationBounds,
   type FileBounds,
   type StationObservation,
 } from "./parquet.ts";
 import {
   boundsPath,
-  recentPath,
+  recentDayPaths,
   seriesPath,
   sourceEpochDirs,
   sourceFirstEpochFiles,
 } from "./paths.ts";
 
 /**
- * The scheduled jobs: `updateRecent` merges a fetch into each source's
- * recent/<source>.parquet every hour, and `compactRecent` folds the days in it
- * into each station's year files once a day.
+ * Live values and compaction: `refreshStation` merges a fetch into a
+ * station's last days, as the poller does for each source's daily files
+ * (recent/<source>/<YYYY-MM-DD>.parquet), and `compactRecent` folds the days
+ * in those files into each station's year files once a day.
  */
 
 const HOUR_MS = 3_600_000;
@@ -113,142 +111,23 @@ interface RunOptions {
 }
 
 /**
- * Fetch [since, now) for every live station and merge it into the source's
- * recent window, keeping `keepDays` days. A value first seen in this run gets
- * `received` = `now`; one seen before keeps its first arrival. A station whose
- * fetch fails, or brings nothing, keeps what it had, so a source with a short
- * window of its own never loses values to an outage. A station fetched on its
- * own looks back at least two of its intervals, so a daily gauge that
- * publishes hours late still gets each value.
+ * One station's live window: its new window from `previous`, its rows from
+ * `keepFrom` on, and a fetch from `since`, or its answer in `swept`, a sweep
+ * of every station at once. Returns every row the window keeps for it, other
+ * epochs' included, and how many values arrived new, adding failures, stale
+ * and datum changes to `summary`. The poller (`src/realtime/poll.ts`) runs it
+ * for each station.
  *
- * Each row carries the datum epoch it belongs to. A station's rows from
- * before its current epoch stay as they are, for compaction to fold into
- * their own epoch's files, and fetching never reaches back before the current
- * epoch's start. A station whose new epoch is held isn't fetched,
- * but keeps what it had.
- *
- * A station is stale when its newest value is older than three of its
- * intervals, and at least `staleHours`.
- */
-export async function updateRecent({
-  source,
-  stations: all,
-  storeFor,
-  concurrency = 4,
-  since,
-  now,
-  keepDays = 7,
-  staleHours = 6,
-}: RunOptions & {
-  since: Date;
-  now: number;
-  keepDays?: number;
-  staleHours?: number;
-}): Promise<RunSummary> {
-  const id = source.metadata.id;
-  if (!source.observations && !source.recent) throw new Error(`${id} has no observations`);
-  const live = all.filter((s) => s.live && s.status === "active" && s.products.includes("levels"));
-  const stations = live.filter((s) => !isHeld(s.epochs));
-  const keepFrom = now - keepDays * DAY_MS;
-  // Restricted stations' recent values go to the private store, like their series.
-  const storeOf = (s: Station): string | undefined => {
-    try {
-      return recentPath(storeFor(s), id);
-    } catch {
-      return undefined;
-    }
-  };
-  const summary = emptySummary(`recent ${id}`, stations.length);
-  // A station whose store can't be named, such as a restricted one with no
-  // restricted store set, fails alone rather than stop the source's run.
-  const pathOf = new Map<string, string>();
-  for (const s of live)
-    try {
-      pathOf.set(s.id, recentPath(storeFor(s), id));
-    } catch (error) {
-      summary.failed.push(`${s.id}: ${message(error)}`);
-    }
-  const reporting = new Set<string>();
-
-  // Each file is read in batches after the sweep, so one that can't be read
-  // fails the run here, before the sweep spends a source's request budget.
-  const candidates = new Set([...pathOf.values(), ...all.flatMap((s) => storeOf(s) ?? [])]);
-  for (const path of candidates) await checkRecent(path);
-
-  // Listed stations a file holds that this run doesn't fetch, because they've
-  // stopped being live or active since, keep their rows until they age out, so
-  // compaction can still fold them. One whose license now sends it to the other
-  // store doesn't, so its rows never stay in the wrong one, and it starts empty
-  // in its new store rather than carry rows across. A station gone from the list
-  // has nowhere to be folded, so its rows go.
-  const listed = new Map(all.map((s) => [s.id, s]));
-  const carried = new Map<string, string[]>();
-  for (const path of candidates) {
-    const ids = (await recentStations(path)).filter((station) => {
-      if (pathOf.has(station)) return false;
-      const s = listed.get(station);
-      return s !== undefined && storeOf(s) === path;
-    });
-    if (ids.length) carried.set(path, ids);
-  }
-  const fetched = new Set(pathOf.values());
-  const paths = [...candidates].filter((path) => carried.has(path) || fetched.has(path));
-
-  // A source that can sweep every station at once does; a failed sweep fails
-  // every station, which keeps what each had.
-  let swept: Map<string, Observation[] | Error> | Error | undefined;
-  if (source.recent)
-    swept = await source
-      .recent(
-        stations.filter((s) => pathOf.has(s.id)),
-        since,
-        new Date(now),
-      )
-      .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
-
-  async function* batches(path: string): AsyncGenerator<StationObservation[]> {
-    for (const ids of chunks(carried.get(path) ?? [], BATCH))
-      yield (await readRecent(path, ids)).filter((r) => r.time >= keepFrom);
-    for (const batch of chunks(
-      live.filter((s) => pathOf.get(s.id) === path),
-      BATCH,
-    )) {
-      const ids = batch.map((s) => s.id);
-      const previous = Map.groupBy(await readRecent(path, ids), (r) => r.station);
-      const rows: StationObservation[] = [];
-      await pool(batch, concurrency, async (station) => {
-        const result = await refreshStation({
-          source,
-          station,
-          previous: previous.get(station.id) ?? [],
-          swept,
-          since: since.getTime(),
-          now,
-          keepFrom,
-          staleHours,
-          summary,
-        });
-        rows.push(...result.rows);
-        if (result.fresh) reporting.add(station.id);
-      });
-      if (swept instanceof Map) for (const id of ids) swept.delete(id);
-      yield rows;
-    }
-  }
-  for (const path of paths) {
-    await writeRecent(path, batches(path));
-    summary.files++;
-  }
-  summary.updated = reporting.size;
-  return summary;
-}
-
-/**
- * One station's part of `updateRecent`: its new window from `previous`, its
- * rows in the recent window, and a fetch or its answer in `swept`. Returns
- * every row the window keeps for it, other epochs' included, and how many
- * values arrived new, adding failures, stale and datum changes to `summary`.
- * The realtime poller (`src/realtime/poll.ts`) runs the same steps.
+ * A value first seen in this run gets `received` = `now`; one seen before
+ * keeps its first arrival. A station whose fetch fails, or brings nothing,
+ * keeps what it had, so a source with a short window of its own never loses
+ * values to an outage. A station fetched on its own looks back at least two
+ * of its intervals, so a daily gauge that publishes hours late still gets
+ * each value. Each row carries the datum epoch it belongs to: rows from
+ * before the station's current epoch stay as they are, fetching never reaches
+ * back before the current epoch's start, and a station whose new epoch is
+ * held isn't fetched but keeps what it had. A station is stale when its
+ * newest value is older than three of its intervals, and at least `staleHours`.
  */
 export async function refreshStation({
   source,
@@ -349,7 +228,8 @@ export async function refreshStation({
 }
 
 /**
- * Fold the recent window's values in [start, end) into each station's year
+ * Fold the values in [start, end) from the daily files of the days that range
+ * touches into each station's year
  * files, each row into its own datum epoch's, carrying `received`, as `upsert`
  * merges them. A year file is read, merged and written whole, so a failed run
  * leaves the file it had; one the fold doesn't change isn't written. Inactive
@@ -379,14 +259,17 @@ export async function compactRecent({
   // A station without levels has rows only from before its list dropped them,
   // and one of those whose store can't be named has none to fold there.
   const levels = (s: Station) => s.products.includes("levels");
-  const pathOf = new Map<string, string>();
+  const storeOf = new Map<string, string>();
   for (const s of all)
     try {
-      pathOf.set(s.id, recentPath(storeFor(s), id));
+      storeOf.set(s.id, storeFor(s));
     } catch (error) {
       if (levels(s)) summary.failed.push(`${s.id}: ${message(error)}`);
     }
-  const stations = all.filter((s) => pathOf.has(s.id));
+  const stations = all.filter((s) => storeOf.has(s.id));
+  // The daily files of the days [start, end) touches, oldest first; a day with no file has nothing to fold.
+  const firstDay = Math.floor(start / DAY_MS);
+  const days = Math.ceil(end / DAY_MS) - firstDay;
   summary.stations = stations.filter(levels).length + summary.failed.length;
   // The span of each year file this run folded, by `spanKey`, for the bounds.
   const spans = new Map<string, FileBounds | null>();
@@ -395,23 +278,23 @@ export async function compactRecent({
   // Each station's years folded from January 1, which compaction carries whole, by store.
   const carried = new Map<string, [string, number, number][]>();
 
-  for (const path of new Set(pathOf.values())) {
+  for (const store of new Set(storeOf.values())) {
+    const paths = days > 0 ? recentDayPaths(store, id, (firstDay + days - 1) * DAY_MS, days) : [];
     for (const batch of chunks(
-      stations.filter((s) => pathOf.get(s.id) === path),
+      stations.filter((s) => storeOf.get(s.id) === store),
       BATCH,
     )) {
       const window = Map.groupBy(
         (
           await time("read window", () =>
             readRecent(
-              path,
+              paths,
               batch.map((s) => s.id),
             ),
           )
         ).filter((r) => r.time >= start && r.time < end),
         (r) => r.station,
       );
-      const store = storeFor(batch[0]!);
       const folding = [...window.keys()];
       const written = new Map<string, YearStats>();
       // A batch that can't be marked still folds, since its rows age out of
@@ -439,7 +322,7 @@ export async function compactRecent({
             return;
           }
           let changed = false;
-          // A row goes to the epoch its time falls in, as the next hourly run
+          // A row goes to the epoch its time falls in, as the poller
           // would move it: a refresh can open an epoch whose start is in the
           // past after the window's rows were tagged. Rows at or after a held
           // epoch's start wait in the window for a decision.

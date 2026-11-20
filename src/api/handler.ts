@@ -1,6 +1,5 @@
-import type { ClickHouse } from "../realtime/clickhouse.ts";
 import { Flag } from "../schema.ts";
-import type { Catalog } from "./catalog.ts";
+import type { Catalog, CatalogStation } from "./catalog.ts";
 import {
   conversionFor,
   convertibleEpochs,
@@ -9,6 +8,8 @@ import {
   parseLevels,
   type ParamError,
   type StoredLevel,
+  TooManyValues,
+  usableFor,
 } from "./levels.ts";
 
 export interface ApiResponse {
@@ -19,16 +20,45 @@ export interface ApiResponse {
 
 const LEVELS = /^\/water-levels\/stations\/([^/]+)\/([^/]+)\/levels$/;
 
-/**
- * stillwell-api's routes over ClickHouse's `stillwell` database and the
- * catalog of public stations: `levels`, and `/health`.
- */
-export function apiHandler(deps: {
-  ch: ClickHouse;
-  catalog: () => Catalog | null;
-  now?: () => number;
-}): (method: string, url: string) => Promise<ApiResponse> {
+/** An epoch's span in ms, either end null when open. */
+export interface EpochSpan {
+  id: number;
+  since: number | null;
+  until: number | null;
+}
+
+/** Where `levels` reads its values: D1 and the year files (workers/api/store.ts). */
+export interface LevelsData {
+  /**
+   * The station's values from `from` to `to`, inclusive. With `sampling`, it
+   * may leave out any value that `stepSampler` wouldn't keep.
+   */
+  readLevels(
+    station: CatalogStation,
+    from: number,
+    to: number,
+    sampling?: { step: number; usable: (v: StoredLevel) => boolean },
+  ): Promise<StoredLevel[]>;
+  /**
+   * The time of the station's newest value that isn't bad and that the
+   * response could show: in one of `epochs`, within its span. A value in an
+   * epoch opened since the list was published, or one that doesn't convert,
+   * isn't shown, so it isn't counted either.
+   */
+  newest(station: string, epochs: EpochSpan[]): Promise<number | null>;
+  /** When the last pass that ended cleanly and asked for the station's interval group finished, or null. */
+  lastPass(source: string, group: number): Promise<number | null>;
+}
+
+/** The `levels` route over the catalog of public stations and `data`, and `/health`. */
+export function apiHandler(
+  deps: { data: LevelsData } & {
+    catalog: () => Catalog | null;
+    now?: () => number;
+  },
+): (method: string, url: string) => Promise<ApiResponse> {
   const now = deps.now ?? Date.now;
+  const data = deps.data;
   return async (method, url) => {
     if (method !== "GET" && method !== "HEAD") return json(405, { message: "Only GET is served" });
     const { pathname, searchParams } = new URL(url, "http://localhost");
@@ -55,8 +85,7 @@ export function apiHandler(deps: {
         message: `${id}'s terms bar commercial use, and the open API serves only stations whose terms allow it`,
       });
 
-    if (!station.polled)
-      return json(404, { message: `${id} has no recent levels: the server doesn't poll it` });
+    if (!station.levels) return json(404, { message: `${id} has no observed levels` });
 
     const at = now();
     const parsed = parseLevels(searchParams, at);
@@ -71,11 +100,20 @@ export function apiHandler(deps: {
     let updated: number | null;
     try {
       [values, asOf, updated] = await Promise.all([
-        readLevels(deps.ch, id, query.start - half, query.end + half),
-        newest(deps.ch, id, convertibleEpochs(station, conversion)),
-        lastPass(deps.ch, station.source, station.min_interval_s ?? 0),
+        data.readLevels(
+          station,
+          query.start - half,
+          query.end + half,
+          query.step
+            ? { step: query.step, usable: usableFor(station, conversion, query.includeBad) }
+            : undefined,
+        ),
+        data.newest(id, convertibleEpochs(station, conversion)),
+        data.lastPass(station.source, station.min_interval_s ?? 0),
       ]);
     } catch (error) {
+      if (error instanceof TooManyValues)
+        return invalid([{ path: "end", message: `${id}: ${error.message}` }]);
       console.error(`levels ${id}: ${(error as Error).message}`);
       return json(503, { message: "Levels are unavailable; try again shortly" });
     }
@@ -106,73 +144,4 @@ interface Row {
   level: number;
   flag: number;
   received_ms: string | null;
-}
-
-/** A station's values from `from` to `to`, inclusive. */
-async function readLevels(
-  ch: ClickHouse,
-  station: string,
-  from: number,
-  to: number,
-): Promise<StoredLevel[]> {
-  const rows = await ch.query<Row>(
-    `SELECT epoch, toUnixTimestamp64Milli(time) AS time_ms, level, flag,
-       toUnixTimestamp64Milli(received) AS received_ms
-     FROM observations FINAL
-     WHERE station = {station:String}
-       AND time >= fromUnixTimestamp64Milli({from:Int64}) AND time <= fromUnixTimestamp64Milli({to:Int64})
-     ORDER BY time
-     SETTINGS do_not_merge_across_partitions_select_final = 1, max_execution_time = 8`,
-    { station, from: Math.floor(from), to: Math.ceil(to) },
-  );
-  return rows.map((r) => ({
-    epoch: Number(r.epoch),
-    time: Number(r.time_ms),
-    level: r.level,
-    flag: r.flag,
-    received: r.received_ms === null ? null : Number(r.received_ms),
-  }));
-}
-
-/**
- * The time of the station's newest value that isn't bad and that the
- * response could show: in an epoch that converts as asked, within its span.
- * A value in an epoch opened since the list was published, or one that
- * doesn't convert, isn't shown, so it isn't counted either.
- */
-async function newest(
-  ch: ClickHouse,
-  station: string,
-  epochs: { id: number; since: number | null; until: number | null }[],
-): Promise<number | null> {
-  if (!epochs.length) return null;
-  // Each epoch's span as arrays in step with its id; an open end is the widest time there is.
-  const [row] = await ch.query<{ t: string | null }>(
-    `SELECT toUnixTimestamp64Milli(maxOrNull(time)) AS t
-     FROM observations FINAL
-     WHERE station = {station:String} AND flag != {bad:UInt8} AND epoch IN {ids:Array(UInt16)}
-       AND toUnixTimestamp64Milli(time) >= {since:Array(Int64)}[indexOf({ids:Array(UInt16)}, epoch)]
-       AND toUnixTimestamp64Milli(time) < {until:Array(Int64)}[indexOf({ids:Array(UInt16)}, epoch)]
-     SETTINGS do_not_merge_across_partitions_select_final = 1, max_execution_time = 8`,
-    {
-      station,
-      bad: Flag.bad,
-      ids: epochs.map((e) => e.id),
-      since: epochs.map((e) => e.since ?? Number.MIN_SAFE_INTEGER),
-      until: epochs.map((e) => e.until ?? Number.MAX_SAFE_INTEGER),
-    },
-  );
-  return row?.t == null ? null : Number(row.t);
-}
-
-/** When the last pass that ended cleanly and asked for the station's interval group finished, or null. */
-async function lastPass(ch: ClickHouse, source: string, group: number): Promise<number | null> {
-  const [row] = await ch.query<{ t: string | null }>(
-    `SELECT toUnixTimestamp64Milli(maxOrNull(finished)) AS t
-     FROM polls
-     WHERE source = {source:String} AND ok AND (empty(intervals) OR has(intervals, {group:UInt32}))
-     SETTINGS max_execution_time = 8`,
-    { source, group },
-  );
-  return row?.t == null ? null : Number(row.t);
 }

@@ -9,7 +9,7 @@ Hourly sea levels at Swedish gauges from SMHI's [Open Data Oceanographic Observa
 - **Datum:** RH2000, Sweden's national height system, named in each CSV's notes (`Höjdsystem: RH2000`). SMHI gives the whole record in RH2000, its 19th-century years included, so the series show land uplift and sea-level rise directly. `datums` is empty, and `archive` is `current`.
 - **Flags:** SMHI's G (checked and approved) is `good`. O (unchecked) and Y (roughly checked archive data, and each station's unchecked last two hours) are `preliminary`. SMHI documents no other codes, so any other is `suspect`. SMHI corrects its data every month and marks many values G within the hour, so a value from this calendar month or the last is at most `preliminary`. Much of the oldest data is O and stays `preliminary`: Kungsholmsfort's values from 1886 to 1919 are all O. A closed station whose values are all O, such as Landsort, never finalizes, and nothing marks it.
 - **QC start:** at about 30 stations, most of them the Swedish Maritime Administration's, the CSV's notes say data before 1 July 2019 isn't quality-controlled and automatic checks run from then on ("Data före 2019-07-01 är ej kvalitetskontrollerad"). The store keeps that date as `source_qc_start`. SMHI's own stations state no date, and most are O to the end of 2009 and G from 1 January 2010. Where the notes give no date, the store infers one from the flags, with `source_qc_start_inferred` true: the first G after the station's last run of a month or more of other flags, where that run ended over a year ago. It stays null where that start leaves less than a year of values to judge it by, where more than 5% of the values since aren't G, or where the station has no such run.
-- **Freshness:** SMHI adds each night's values to the archive and corrects it every month. Its latest values arrive in batches, at times more than an hour late, and the hourly refresh reads back 12 hours.
+- **Freshness:** SMHI adds each night's values to the archive and corrects it every month. Its latest values arrive in batches, at times more than an hour late, and the poller reads back 12 hours.
 
 ## Running ingest
 
@@ -22,7 +22,7 @@ Hourly sea levels at Swedish gauges from SMHI's [Open Data Oceanographic Observa
 
 ### Backfill
 
-From nothing, dispatch Monthly with `sources: smhi` first, since Ingest hourly and Compact daily fail for SMHI until its list is in the store. Then backfill through the Ingest workflow. `--with-inactive` takes the closed stations:
+From nothing, dispatch Monthly with `sources: smhi` first, since the poller and Compact daily fail for SMHI until its list is in the store. Then backfill through the Ingest workflow. `--with-inactive` takes the closed stations:
 
 ```bash
 node scripts/ingest.ts backfill smhi all 1886 2026 --skip-written --with-inactive
@@ -33,4 +33,4 @@ The past years are about 2,700 station-years but one archive download per statio
 
 ### Scheduled runs
 
-Ingest hourly reads each active station's `latest-day`. Monthly refreshes the list on the 2nd, and its refetch on the 9th (`backfill smhi preliminary`) reads each station again from its earliest preliminary value, which brings in SMHI's corrections. Each refetch downloads that station's whole archive.
+The poller reads each active station's `latest-day`. Monthly refreshes the list on the 2nd, and its refetch on the 9th (`backfill smhi preliminary`) reads each station again from its earliest preliminary value, which brings in SMHI's corrections. Each refetch downloads that station's whole archive.
