@@ -155,10 +155,6 @@ export function historyPath(
 }
 
 /** A source's whole recent window in one file, which only the box's poller (`src/realtime/poll.ts`) still reads, until it retires. */
-export function recentPath(root: string, source: string): string {
-  return `${root}/recent/${source}.parquet`;
-}
-
 /**
  * One UTC day of a source's live values, `day` as `YYYY-MM-DD`: the poller rewrites today's hourly and the 6 days
  * before nightly, and an R2 lifecycle rule deletes it after 30 days (docs/plans/cloudflare.md, The daily files).
