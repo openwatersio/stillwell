@@ -4,16 +4,15 @@ import serverList from "./server.json" with { type: "json" };
 
 /**
  * The scheduled jobs that run one job per source:
- * - `hourly`: hourly ingest, for sources that publish within hours.
  * - `compact`: nightly compaction, for every source with observed levels, and
- *   every hourly one, whose recent/ window it folds into year files.
+ *   every hourly one, whose daily files under recent/ it folds into year files.
  * - `lists`: the monthly station-list refresh, for every source.
  * - `refetch`: the monthly refetch, for sources whose values become final.
  *
  * Only sources that may be redistributed: the workflows write the public
  * store, and have no restricted one.
  */
-export const JOBS = ["hourly", "compact", "lists", "refetch"] as const;
+export const JOBS = ["compact", "lists", "refetch"] as const;
 export type Job = (typeof JOBS)[number];
 
 /**
@@ -41,8 +40,6 @@ export const SERVER_SOURCES: ReadonlySet<string> = new Set(PHASES.keys());
 export function runsJob(job: Job, source: Source): boolean {
   if (!source.metadata.license.redistribution) return false;
   switch (job) {
-    case "hourly":
-      return !!source.metadata.hourly;
     case "compact":
       return !!source.metadata.hourly || source.observations !== undefined;
     case "lists":

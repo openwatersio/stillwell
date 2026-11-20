@@ -40,7 +40,7 @@ analyze() {
 }
 
 # Every station's years that hold the last two months, requalified with the current rules and errata and judged
-# over the whole year, not the recent window's 7 days that compaction folds in. Compaction folds last month's
+# over the whole year, not the poller's 7 days that compaction folds in. Compaction folds last month's
 # final days again for a few nights after this, with the window's flags, so each month is judged whole by the
 # next month's run, December's by February's. Only a full refresh runs it. As a step of the list job, not a job
 # of its own, it puts no job in the source's lane to cancel one waiting there, such as a compaction. It takes

@@ -16,12 +16,6 @@ const SCHEDULES: Record<
   Job,
   { command: (id: string) => string[]; timeout: number; due: (now: Date) => string | null }
 > = {
-  // Ingest hourly's: from 12 minutes past each hour, its 12 hours catching up a late or missed run.
-  hourly: {
-    command: (id) => ["scripts/ingest.ts", "recent", id, "--hours", "12"],
-    timeout: 50,
-    due: (now) => (now.getUTCMinutes() >= 12 ? now.toISOString().slice(0, 13) : null),
-  },
   // Compact daily's: from 00:40 UTC, its 6 days catching up a late or missed night. Half its concurrency,
   // since sixteen full-year 1-minute files merging at once peaked near 2.5 GB of heap on a 16 GB runner,
   // and a job here gets a fifth of the box.
@@ -74,7 +68,7 @@ export function due(now: Date, phases: ReadonlyMap<string, string> = PHASES): Pl
   return out;
 }
 
-/** The list refresh a datum change asks for, at most once a day, as the hourly workflow's was. */
+/** The list refresh a datum change asks for, at most once a day. */
 export function refreshFor(id: string, now: Date): Planned {
   return {
     key: `refresh:${id}:${now.toISOString().slice(0, 10)}`,

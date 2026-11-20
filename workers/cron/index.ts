@@ -11,7 +11,6 @@ const REPO = "openwatersio/stillwell";
 
 // Keys match the crons in wrangler.jsonc.
 export const DISPATCHES: Record<string, { workflow: string; inputs?: Record<string, string> }> = {
-  "12 * * * *": { workflow: "ingest-hourly.yml" },
   "40 0 * * *": { workflow: "compact-daily.yml", inputs: { days: "6" } },
   "25 1 2 * *": { workflow: "monthly.yml" },
   "35 3 9 * *": { workflow: "monthly.yml", inputs: { refetch: "true" } },

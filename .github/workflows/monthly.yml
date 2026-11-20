@@ -7,16 +7,15 @@ name: Monthly
 # cross-station checks, and keep the scheduled workflows enabled. On the 9th,
 # refetch every station's values that were still
 # preliminary, from the earliest, so the ones the source has finalized since
-# replace them. Ingest hourly starts a refresh of one source, at
+# replace them. The poller starts a refresh of one source, at
 # most once a day, when that source reports a station in another datum.
 run-name: ${{ (inputs.refetch || github.event.schedule == '40 3 9 * *') && (inputs.sources && format('Refetch {0}', inputs.sources) || 'Refetch') || inputs.sources && format('Refresh {0}', inputs.sources) || 'Monthly' }}
 
 # Each job waits in its source's group. GitHub keeps one job waiting per
 # group and cancels it when a newer one arrives, so a job queued behind
-# anything that outlasts the hour, a manual backfill or a long refresh, is
-# cancelled by the next hourly run. Starting at 01:25 and 03:35, after that
-# hour's run and compaction, the groups are usually free; rerun a cancelled
-# job from Actions. The refetch runs on its own day for the same reason: queued
+# a manual backfill or a long refresh is cancelled by the next job that
+# waits there. Starting at 01:25 and 03:35, after that night's compaction,
+# the groups are usually free; rerun a cancelled job from Actions. The refetch runs on its own day for the same reason: queued
 # behind the refreshes, it would be cancelled.
 #
 # The Worker in workers/cron dispatches both at those times, since GitHub's
@@ -106,7 +105,7 @@ jobs:
 
   # Each list in its source's group, the one every job that writes the source's
   # files or list shares, so a refresh that opens a datum epoch never lands
-  # while a backfill, hourly, compaction or other refresh is writing that source.
+  # while a backfill, compaction or other refresh is writing that source.
   lists:
     needs: plan
     if: needs.plan.outputs.sources != '[]'
@@ -402,7 +401,7 @@ jobs:
       - run: |
           # Monthly first, since it enables the rest; one failure doesn't stop the others.
           failed=0
-          for workflow in monthly.yml ingest-hourly.yml compact-daily.yml bucket-check.yml canary.yml site.yml; do
+          for workflow in monthly.yml compact-daily.yml bucket-check.yml canary.yml site.yml; do
             if ! state=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow" --jq .state); then
               failed=1
             elif [ "$state" = disabled_manually ]; then

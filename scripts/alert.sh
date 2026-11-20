@@ -6,7 +6,7 @@
 #   scripts/alert.sh <job> [--single]
 #
 # Run from a workflow's alert job after its matrix, with `job` the matrix
-# job's name (`recent` or `compact`) and GH_TOKEN allowed to read Actions and
+# job's name (`compact`) and GH_TOKEN allowed to read Actions and
 # write issues. With `--single`, `job` is a job that isn't a matrix, such as
 # `publish`, which counts as a source of its own name. Without it, a job of
 # that bare name is the matrix skipped before it expanded, so it isn't one.
@@ -43,7 +43,7 @@ fi
 # Runs on main before this one, dispatched or scheduled, newest first, until
 # each source has one whose job started: up to 100 runs, for a source whose
 # jobs keep waiting behind a long backfill. A backup that skipped is one of
-# them, so that's between 2 and 4 days of hourly runs, or 50 to 100 nights.
+# them, so that's 50 to 100 nights.
 # A skipped backup's jobs count as none. Assigned first so a failed listing
 # fails the job.
 runs=$(gh api "repos/$repo/actions/workflows/$workflow/runs?branch=main&status=completed&per_page=100" \

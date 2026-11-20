@@ -1,20 +1,21 @@
 name: Compact daily
 
-# Fold the whole days in recent/<source>.parquet into each station's year file
-# under obs/ on R2. Each year file is read, merged and written whole, so a
+# Fold the whole days in the poller's daily files, recent/<source>/<YYYY-MM-DD>.parquet,
+# into each station's year file under obs/ on R2. Each year file is read, merged and written whole, so a
 # failed run leaves the file it had, and a rerun writes nothing new. Then it
 # writes each station's first and last level, and its earliest preliminary
 # value, to stations/bounds/<source>.parquet, and rebuilds stations.parquet,
 # sources.json, errata.json and datapackage.json from every source's list and bounds.
 on:
   schedule:
-    # Between hourly runs; the fold covers six days, so a late hourly run, or
-    # a missed compaction, is caught up the next night.
+    # After the poller's nightly rewrite of the last 6 days; the fold covers
+    # those six days, so values a source revised late, or a missed
+    # compaction, are caught up the next night.
     - cron: "45 0 * * *"
   workflow_dispatch:
     inputs:
       days:
-        description: "Whole UTC days to fold, ending yesterday (up to 6)"
+        description: "Whole UTC days to fold, ending yesterday (up to 30)"
         required: true
         default: "6"
 
@@ -80,8 +81,8 @@ jobs:
         # Every source with observed levels.
         source: ${{ fromJSON(needs.gate.outputs.sources) }}
     # The source's one group for every job that writes its files, manual
-    # Ingest runs included, so a compaction never reads recent/ while the hourly
-    # run replaces it, or rewrites a year file a backfill is writing.
+    # Ingest runs included, so a compaction never rewrites a year file a
+    # backfill is writing.
     concurrency:
       # A backup the gate skipped names a group of its own, so its skipped jobs
       # can't touch a job waiting in the source's.
@@ -104,8 +105,8 @@ jobs:
         env:
           SOURCE: ${{ matrix.source }}
       - run: npm ci
-      # Every whole day the window holds, not just yesterday, so late values,
-      # QC flags the window revised and missed runs still reach the year file.
+      # Every day the poller still rewrites, not just yesterday, so late values,
+      # QC flags it revised and missed runs still reach the year file.
       # It costs no extra writes: a station's days share one year file except
       # in the first week of January, and a file the fold doesn't change isn't
       # written.

@@ -2,7 +2,7 @@
  * Prints, as a JSON array, the sources a scheduled job runs for, from each
  * adapter's metadata, so the workflows' matrices never list them by hand.
  *
- *   node scripts/sources.ts <hourly|compact|lists|refetch> [source...]
+ *   node scripts/sources.ts <compact|lists|refetch> [source...]
  *
  * Given sources, it prints those of them the job runs for, and fails when
  * one isn't registered or none is left.

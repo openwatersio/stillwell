@@ -10,7 +10,6 @@ const ARITY: Record<string, number> = {
   matches: 0,
   backfill: 4,
   requalify: 4,
-  recent: 1,
   compact: 1,
   withhold: 1,
   drop: 1,
@@ -30,7 +29,7 @@ export const FLAGS = new Set(
     .map(([name]) => `--${name}`),
 );
 
-/** The longest a job may run, in minutes: under the 12 hours a source's next hourly `recent` catches up after waiting behind it. */
+/** The longest a job may run, in minutes. */
 export const MAX_TIMEOUT = 600;
 
 /** The command and its source: the words of ingest arguments that aren't an option or its value. */

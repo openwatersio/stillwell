@@ -28,7 +28,7 @@ export async function readFile(url: string, columns: string[]): Promise<Row[]> {
 }
 
 /**
- * One station's rows from a file sorted by station, such as recent/<source>.parquet: only the row groups
+ * One station's rows from a file sorted by station, such as a daily file under recent/: only the row groups
  * whose station statistics can hold it are read.
  */
 export async function readStation(url: string, station: string, columns: string[]): Promise<Row[]> {
@@ -36,7 +36,7 @@ export async function readStation(url: string, station: string, columns: string[
   try {
     file = await asyncBufferFromUrl({ url });
   } catch (error) {
-    // A source with no live stations yet has no recent file.
+    // A day with no values has no file.
     if (String(error).includes("404")) return [];
     throw error;
   }
