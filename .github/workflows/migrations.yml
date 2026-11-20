@@ -13,13 +13,13 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: "next, or retry or skip the migration named below"
+        description: "next; retry or skip the migration named below; or baseline, which begins the record with the migration named below, or none"
         required: true
         default: next
         type: choice
-        options: [next, retry, skip]
+        options: [next, retry, skip, baseline]
       migration:
-        description: "The migration to retry or skip"
+        description: "The migration to retry, skip or begin the record with"
         required: false
 
 # One run at a time, so two never take the same step, and runs wait in order, so a retry or skip dispatched while a
@@ -50,7 +50,7 @@ jobs:
           node-version-file: .mise.toml
           cache: npm
       - run: npm ci
-      - if: inputs.action == 'retry' || inputs.action == 'skip'
+      - if: inputs.action == 'retry' || inputs.action == 'skip' || inputs.action == 'baseline'
         run: node scripts/migrations.ts "$ACTION" "$MIGRATION"
         # The store's credentials reach only the steps that read or write it, not npm ci's install scripts.
         env:
