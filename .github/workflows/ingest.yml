@@ -29,19 +29,20 @@ jobs:
     permissions: {}
     outputs:
       name: ${{ steps.group.outputs.name }}
+      prune: ${{ steps.group.outputs.prune }}
     steps:
       - id: group
         run: |
           set -f
           # The command and sources are the words that aren't an option or
-          # its value; every ingest option takes a value but --accept-epochs, --accept-withheld, --accept-matches, --no-publish,
+          # its value; every ingest option takes a value but --accept-epochs, --accept-withheld, --accept-matches, --prune, --no-publish,
           # --refetch, --skip-written, --skip-unscreened, --with-inactive, --rebuild-bounds, --rebuild-years, --all, --requalify and --dry-run.
           words=()
           skip=
           for arg in $ARGS; do
             if [ -n "$skip" ]; then skip=; continue; fi
             case "$arg" in
-              --accept-epochs | --accept-withheld | --accept-matches | --no-publish | --refetch | --skip-written | --skip-unscreened | --with-inactive | --rebuild-bounds | --rebuild-years | --all | --requalify | --dry-run | --*=* | --) ;;
+              --accept-epochs | --accept-withheld | --accept-matches | --prune | --no-publish | --refetch | --skip-written | --skip-unscreened | --with-inactive | --rebuild-bounds | --rebuild-years | --all | --requalify | --dry-run | --*=* | --) ;;
               --*) skip=1 ;;
               *) words+=("$arg") ;;
             esac
@@ -58,6 +59,12 @@ jobs:
             *) group=store ;;
           esac
           echo "name=$group" >> "$GITHUB_OUTPUT"
+          # A station withheld or dropped leaves the link and match files too (the prune job);
+          # `drop --dry-run` deletes nothing, while `withhold` takes no --dry-run.
+          case "${words[0]:-} $ARGS" in
+            "drop "*--dry-run*) ;;
+            "withhold "* | "drop "*) echo "prune=true" >> "$GITHUB_OUTPUT" ;;
+          esac
         env:
           ARGS: ${{ inputs.args }}
 
@@ -105,3 +112,38 @@ jobs:
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
           CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
           CCO_REFERER: ${{ secrets.CCO_REFERER }}
+
+  # After a `withhold` or `drop`, `matches --prune` and `links --prune` take
+  # the stations' rows out of stations/matches.parquet and
+  # stations/links.parquet, measuring nothing, each in the group Monthly's job
+  # writes that file in, so neither rewrites a file a running job will write.
+  prune:
+    needs: [group, ingest]
+    if: needs.group.outputs.prune == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        command: [matches, links]
+    concurrency:
+      group: ${{ matrix.command }}
+      cancel-in-progress: false
+      queue: max
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: lake
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      - run: node scripts/ingest.ts "$COMMAND" --prune
+        env:
+          COMMAND: ${{ matrix.command }}
+          STILLWELL_STORE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}

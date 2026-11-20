@@ -11,12 +11,11 @@ name: Monthly
 # most once a day, when that source reports a station in another datum.
 run-name: ${{ (inputs.refetch || github.event.schedule == '40 3 9 * *') && (inputs.sources && format('Refetch {0}', inputs.sources) || 'Refetch') || inputs.sources && format('Refresh {0}', inputs.sources) || 'Monthly' }}
 
-# Each job waits in its source's group. GitHub keeps one job waiting per
-# group and cancels it when a newer one arrives, so a job queued behind
-# a manual backfill or a long refresh is cancelled by the next job that
-# waits there. Starting at 01:25 and 03:35, after that night's compaction,
-# the groups are usually free; rerun a cancelled job from Actions. The refetch runs on its own day for the same reason: queued
-# behind the refreshes, it would be cancelled.
+# Each job waits in its source's group, which sets `queue: max`, so a job
+# queued behind a manual backfill or a long refresh waits its turn rather
+# than being cancelled by the next. Starting at 01:25 and 03:35, after that
+# night's compaction, the groups are usually free. The refetch runs on its
+# own day so it doesn't wait behind the refreshes.
 #
 # The Worker in workers/cron dispatches both at those times, since GitHub's
 # schedule runs late or not at all. The schedule, five minutes later, is a
@@ -185,7 +184,8 @@ jobs:
   # once the file is written. It runs before links, which measures offsets
   # along the links publish makes. Only a full refresh runs it; a cancelled run
   # skips it, and publish uses last month's file. The matches group keeps a
-  # hand-run Ingest `matches` from writing the file at the same time.
+  # hand-run Ingest `matches`, or the prune after an Ingest `withhold` or
+  # `drop`, from writing the file at the same time.
   matches:
     needs: [plan, lists]
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' && !inputs.sources }}
@@ -224,8 +224,9 @@ jobs:
   # or a dropped GESLA record, and a failed read fails the job once the file is
   # written. Only
   # a full refresh runs it; a cancelled run skips it, and publish uses last
-  # month's file. The links group keeps a hand-run Ingest `links` from writing
-  # the file at the same time.
+  # month's file. The links group keeps a hand-run Ingest `links`, or the
+  # prune after an Ingest `withhold` or `drop`, from writing the file at the
+  # same time.
   links:
     needs: [plan, lists, matches]
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' && !inputs.sources }}

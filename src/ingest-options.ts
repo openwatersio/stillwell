@@ -7,6 +7,7 @@ export const INGEST_OPTIONS = {
   "accept-epochs": { type: "boolean", default: false },
   "accept-withheld": { type: "boolean", default: false },
   "accept-matches": { type: "boolean", default: false },
+  prune: { type: "boolean", default: false },
   "no-publish": { type: "boolean", default: false },
   first: { type: "string" },
   shard: { type: "string" },
