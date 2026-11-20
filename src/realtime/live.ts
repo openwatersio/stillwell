@@ -39,7 +39,12 @@ export function fromCell(station: string, c: LiveCell): StationObservation {
   };
 }
 
-/** Requests at most this many stations or values at once, to keep each request and its D1 statements small. */
+/**
+ * Reads at most this many stations at once: a week of a 1-minute station is about 10,000 values, which the Worker
+ * parses and writes again within its 128 MB.
+ */
+const READ = 20;
+/** Writes and removes at most this many values at once, and the store at most this many stations' lists. */
 const CHUNK = 2000;
 
 /**
@@ -51,6 +56,7 @@ export function liveStore(
   token = process.env.STILLWELL_LIVE_TOKEN ?? "",
 ): ObservationStore & {
   poll(row: PollRow): Promise<void>;
+  lastPass(source: string): Promise<number | null>;
   day(
     source: string,
     day: string,
@@ -76,9 +82,9 @@ export function liveStore(
   return {
     async read(stations, from) {
       const out: StationObservation[] = [];
-      for (let i = 0; i < stations.length; i += CHUNK) {
+      for (let i = 0; i < stations.length; i += READ) {
         const { rows } = await call<{ rows: [string, LiveCell[]][] }>("/read", {
-          stations: stations.slice(i, i + CHUNK),
+          stations: stations.slice(i, i + READ),
           from,
         });
         for (const [station, cells] of rows) for (const c of cells) out.push(fromCell(station, c));
@@ -105,6 +111,11 @@ export function liveStore(
     },
     async poll(row) {
       await call("/polls", row);
+    },
+    async lastPass(source) {
+      return (
+        await call<{ started: number | null }>(`/last-pass?source=${encodeURIComponent(source)}`)
+      ).started;
     },
     async day(source, day, after, limit) {
       const page = await call<{ rows: [string, LiveCell[]][]; next: string | null }>("/day", {

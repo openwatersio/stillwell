@@ -320,6 +320,35 @@ describe("the Worker", () => {
     assert.equal(body.status, "reporting");
   });
 
+  it("takes the hours before a partial D1 day's first value from the year files", async () => {
+    // The poller started at 18:00 on November 10, so D1 holds only that day's last hours.
+    const day = Date.parse("2026-11-10");
+    const rows = hourly("2026-11-10T18:00:00Z", "2026-11-10T23:00:00Z", 2).map((r) => [
+      2,
+      r.time,
+      r.level,
+      r.flag,
+      null,
+      null,
+    ]);
+    db.prepare("UPDATE live SET rows = ? WHERE station = 'coops/9447130' AND day = ?").run(
+      JSON.stringify(rows),
+      new Date(day).toISOString().slice(0, 10),
+    );
+    const body = await levels(
+      "start=2026-11-10T16:00:00Z&end=2026-11-10T19:00:00Z&step=1h&datum=station",
+    );
+    assert.deepEqual(
+      body.levels.map((l) => [l.time.slice(11, 13), l.level]),
+      [
+        ["16", 1],
+        ["17", 1],
+        ["18", 2],
+        ["19", 2],
+      ],
+    );
+  });
+
   it("reads a range across epochs from each epoch's file, and converts each", async () => {
     const range = "start=2026-10-31T22:00:00Z&end=2026-11-01T01:00:00Z&step=1h";
     // Epoch 1's 0.25 m is 0.75 m in epoch 2.

@@ -19,6 +19,7 @@ import { fileURLToPath } from "node:url";
 import { sources, sourceOf } from "../src/sources/index.ts";
 import type { Source } from "../src/schema.ts";
 import { recentDays } from "../src/store/paths.ts";
+import { liveStore } from "../src/realtime/live.ts";
 import { PassError, schedule, slots, type PassResult } from "../src/realtime/schedule.ts";
 
 const MINUTE_MS = 60_000;
@@ -51,6 +52,7 @@ process.stderr.write = ((chunk: string | Uint8Array, ...rest: never[]) => {
   recent.splice(0, recent.length - 300);
   return write(chunk, ...rest);
 }) as typeof process.stderr.write;
+const live = liveStore(process.env.STILLWELL_LIVE ?? "");
 const health = process.env.PORT
   ? createServer((request, response) => {
       if (request.url === "/log") response.writeHead(200).end(recent.join("\n"));
@@ -85,11 +87,16 @@ health?.close();
 async function exports(): Promise<void> {
   // After the first passes, so a start doesn't export an empty today.
   await sleep(10 * MINUTE_MS);
-  for (let first = true; !stopping; first = false) {
+  // The UTC day of the last run that rewrote the 7 days: a run that starts late, past midnight's hour, still does.
+  let rewrote = "";
+  while (!stopping) {
     const now = Date.now();
-    const days =
-      first || new Date(now).getUTCHours() === 0 ? recentDays(now, 7) : recentDays(now, 1);
-    for (const { metadata } of chosen) if (!stopping) await exportSource(metadata.id, days);
+    const today = recentDays(now, 1)[0]!;
+    const days = rewrote === today ? [today] : recentDays(now, 7);
+    let ok = true;
+    for (const { metadata } of chosen)
+      if (!stopping) ok = (await exportSource(metadata.id, days)) && ok;
+    if (ok && days.length > 1) rewrote = today;
     const next =
       Math.ceil((Date.now() - EXPORT_MINUTE * MINUTE_MS) / HOUR_MS) * HOUR_MS +
       EXPORT_MINUTE * MINUTE_MS;
@@ -97,11 +104,11 @@ async function exports(): Promise<void> {
   }
 }
 
-/** Run server/export.ts for one source, in a pass slot so it shares the passes' memory budget. */
-async function exportSource(id: string, days: string[]): Promise<void> {
+/** Run server/export.ts for one source, in a pass slot so it shares the passes' memory budget; whether it succeeded. */
+async function exportSource(id: string, days: string[]): Promise<boolean> {
   await passSlots.acquire();
   try {
-    await new Promise<void>((resolve) => {
+    return await new Promise<boolean>((resolve) => {
       const child = spawn(process.execPath, [EXPORT, id, days.join(",")], {
         stdio: ["ignore", "inherit", "pipe"],
       });
@@ -112,7 +119,7 @@ async function exportSource(id: string, days: string[]): Promise<void> {
         clearTimeout(timer);
         running.delete(child);
         if (code !== 0) console.error(`${id}: export ended with ${code}`);
-        resolve();
+        resolve(code === 0);
       });
     });
   } finally {
@@ -123,6 +130,15 @@ async function exportSource(id: string, days: string[]): Promise<void> {
 /** Poll one source until the process stops (`schedule`). */
 async function run(source: Source): Promise<void> {
   const id = source.metadata.id;
+  // A source polled hourly by agreement, as CCO is, waits for the hour since its last pass, so a restart doesn't
+  // read every site again within it.
+  if (source.metadata.poller === "hourly") {
+    const last = await live.lastPass(id).catch(() => null);
+    if (last !== null && Date.now() - last < HOUR_MS) {
+      console.error(`${id}: waits until an hour after its last pass`);
+      await sleep(last + HOUR_MS - Date.now());
+    }
+  }
   await schedule({
     pass: async (due, seeding) => {
       return pass(id, due, seeding);

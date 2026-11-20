@@ -194,7 +194,7 @@ function dayNumber(time: number): number {
   return Math.floor(time / DAY);
 }
 
-/** `levels`' values from D1's `live` for the last 8 days, and the year files on R2 for any day D1 doesn't hold. */
+/** `levels`' values from D1's `live` for the last 8 days, and the year files on R2 for any time D1 doesn't hold. */
 export function storeData(db: D1, bucket: Bucket, now: () => number = Date.now): LevelsData {
   return {
     async readLevels(station, from, to, sampling) {
@@ -216,16 +216,24 @@ export function storeData(db: D1, bucket: Bucket, now: () => number = Date.now):
                 .all<{ day: string; rows: string }>()
             ).results
           : [];
-      const held = new Set(live.map((r) => dayNumber(Date.parse(r.day))));
-      for (const { rows } of live)
-        for (const [epoch, time, level, flag, , received] of JSON.parse(rows) as LiveValue[])
+      // Each day D1 holds, from its first value on: before that, as on the day the poller started or came back from an
+      // outage longer than its lookback, the year files have it.
+      const heldFrom = new Map<number, number>();
+      for (const { day, rows } of live) {
+        const values = JSON.parse(rows) as LiveValue[];
+        if (values.length) heldFrom.set(dayNumber(Date.parse(day)), values[0]![1]);
+        for (const [epoch, time, level, flag, , received] of values)
           if (time >= from && time <= to) add({ epoch, time, level, flag, received });
-      // Only the days D1 doesn't hold, so it wins where both have a day.
-      const missing = (t: number) => !held.has(dayNumber(t));
+      }
+      // Only the times D1 doesn't hold, so it wins where both have a time.
+      const missing = (t: number) => {
+        const since = heldFrom.get(dayNumber(t));
+        return since === undefined || t < since;
+      };
       let firstMissing: number | undefined;
       let lastMissing: number | undefined;
       for (let day = dayNumber(from) * DAY; day <= to; day += DAY)
-        if (missing(day)) [firstMissing, lastMissing] = [firstMissing ?? day, day];
+        if (missing(Math.max(day, from))) [firstMissing, lastMissing] = [firstMissing ?? day, day];
       if (firstMissing !== undefined) {
         const range = [Math.max(from, firstMissing), Math.min(to, lastMissing! + DAY - 1)] as const;
         await readYears(bucket, station, ...range, missing, add);

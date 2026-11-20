@@ -168,7 +168,7 @@ jobs:
       - if: steps.result.outputs.result == 'failure'
         run: |
           node scripts/migrations.ts fail "$ID" "$STEP" "step $STEP failed in $RUN"
-          gh issue create --repo "$GITHUB_REPOSITORY" --title "Migration $ID failed" --body "Step $STEP of \`src/migrations/$ID.ts\` failed in [this run]($RUN), and every migration after it waits. Fix the cause, then run the Migrations workflow with \`retry\` and \`$ID\`, or with \`skip\` if the remaining steps can't or needn't run."
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "Migration $ID failed" --body "Step $STEP of \`src/migrations/$ID.ts\` failed in [this run]($RUN), and every migration after it waits. Fix the cause, then run the Migrations workflow with \`retry\` and \`$ID\`, or with \`skip\` if the remaining steps can't or needn't run. A run waiting for the workflow's group is replaced by the next one to queue, so check that the dispatch ran, and dispatch it again if it was cancelled."
         env:
           ID: ${{ needs.plan.outputs.id }}
           STEP: ${{ needs.plan.outputs.step }}

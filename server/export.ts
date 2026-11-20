@@ -14,8 +14,8 @@ import { liveStore } from "../src/realtime/live.ts";
 import { writeRecent, type StationObservation } from "../src/store/parquet.ts";
 import { recentDayPath } from "../src/store/paths.ts";
 
-/** Stations a page holds: a 1-minute station's day is 1,440 values. */
-const PAGE = 500;
+/** Stations a page holds: a 1-minute station's day is 1,440 values, which the Worker parses within its 128 MB. */
+const PAGE = 50;
 
 const [source, days] = process.argv.slice(2);
 if (!source || !days) throw new Error("usage: export.ts <source> <YYYY-MM-DD,...>");

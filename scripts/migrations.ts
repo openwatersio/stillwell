@@ -58,10 +58,9 @@ const need = (r: Record | null): Record => {
 switch (command) {
   case "next": {
     if (!record) {
-      console.error(
-        `no record at ${path}, so no migration runs until one begins it with \`baseline\``,
-      );
-      output({ id: "" });
+      const stopped = `no record at ${path}, so no migration runs until \`node scripts/migrations.ts baseline <id|none>\` begins it`;
+      console.error(stopped);
+      output({ id: "", stopped });
       break;
     }
     const found = next(migrations, record);

@@ -6,6 +6,7 @@ import {
   day,
   handleStore,
   insertPoll,
+  lastPass,
   prune,
   read,
   remove,
@@ -135,8 +136,10 @@ describe("the live store", () => {
         blocked: false,
         datum_changed: false,
       });
+    assert.equal(await lastPass(db, "ea"), null);
     await pass(T);
     await pass(T - 40 * DAY);
+    assert.equal(await lastPass(db, "ea"), T - 1000);
     await write(db, [
       ["ea/1", cell(T, 1)],
       ["ea/1", cell(T - 9 * DAY, 1)],

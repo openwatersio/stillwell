@@ -63,8 +63,13 @@ try {
     finished: Date.now(),
     // An hourly-polled source asks every station each pass, as a pass over all of them does.
     intervals: due && source.metadata.poller !== "hourly" ? [...due] : [],
-    // Clean when it ran to the end and the source answered for some station it asked.
-    ok: process.exitCode !== 1 && (!summary.stations || summary.failed.length < summary.stations),
+    // Clean when it ran to the end, wasn't blocked, and some station it asked had something: one that asked none,
+    // as with no list, or whose every station failed or went stale, is an outage or a broken adapter.
+    ok:
+      process.exitCode !== 1 &&
+      !summary.blocked &&
+      summary.stations > 0 &&
+      summary.failed.length + summary.stale.length < summary.stations,
     stations: summary.stations,
     updated: summary.updated,
     values: summary.values,

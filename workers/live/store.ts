@@ -41,6 +41,8 @@ export async function handleStore(request: Request, env: StoreEnv): Promise<Resp
       await env.STORE.put(key, request.body);
       return json({ ok: true });
     }
+    if (request.method === "GET" && url.pathname === "/last-pass")
+      return json({ started: await lastPass(env.LIVE, url.searchParams.get("source") ?? "") });
     if (request.method === "GET" && url.pathname === "/stations")
       return json({ stations: await stations(env.LIVE, url.searchParams.get("source") ?? "") });
     if (request.method !== "POST") return json({ error: "not found" }, 404);
@@ -208,6 +210,15 @@ export async function stations(db: LiveDb, source: string): Promise<string[]> {
     .bind(...range(source))
     .all<{ station: string }>();
   return results.map((r) => r.station);
+}
+
+/** When the source's last recorded pass started, or null with none. */
+export async function lastPass(db: LiveDb, source: string): Promise<number | null> {
+  const { results } = await db
+    .prepare("SELECT max(started) AS started FROM polls WHERE source = ?")
+    .bind(source)
+    .all<{ started: number | null }>();
+  return results[0]?.started ?? null;
 }
 
 export async function insertPoll(db: LiveDb, row: PollRow): Promise<void> {
