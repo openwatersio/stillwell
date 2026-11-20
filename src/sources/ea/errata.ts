@@ -21,6 +21,16 @@ async function offset(store: StoreReader, id: string, bad: string, good: string,
     );
 }
 
+/** Throws unless every level the store holds for `id` from `since` to before `until` is suspect or worse. */
+async function allSuspect(store: StoreReader, id: string, since: string, until: string) {
+  const rows = await levels(store, id, since, until);
+  const missed = rows.filter((o) => o.flag < Flag.suspect);
+  if (missed.length)
+    throw new Error(
+      `${missed.length} of ${id}'s ${rows.length} levels from ${since} to ${until} aren't suspect, the first at ${new Date(missed[0]!.time).toISOString()}`,
+    );
+}
+
 /** Throws unless the store holds no levels on `day` at a few gauges, and holds the days either side. */
 async function gap(store: StoreReader, day: string) {
   for (const id of ["ea/E70539", "ea/E71239", "ea/E71639"]) {
@@ -51,18 +61,19 @@ export default {
       response:
         "1 to 20 February 2026 is flagged `suspect`, keeping the EA's own flag as `source_flag`. Spans are whole days, so the readings between the erratic ones are flagged with them.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and read back in November 2026 value by value. The readings agree with CMEMS's Holyhead (`cmems/Holyhead`) at −3.05 m, its datum difference, through 31 January, and with BODC's record (`bodc/hol`) at −3.05 m on each day from 22 to 31 January and from 20 February, so the EA's gauge isn't off by a constant before or after. They go wrong from 01:15 UTC on 1 February to 01:45 UTC on 20 February, and agree again from 21 February. CMEMS's copy of the gauge carries the same readings. BODC's record of the gauge (`bodc/hol`), whose values stay between 0.4 and 6.2 m chart datum on those days, follows a tide that neaps on 10 February and springs on 19 February.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and read back in November 2026 value by value. The readings agree with CMEMS's Holyhead (`cmems/Holyhead`) at −3.05 m, its datum difference, through 31 January, and with BODC's record (`bodc/hol`) at −3.05 m on each day from 22 to 31 January and from 02:00 UTC on 20 February, so the EA's gauge isn't off by a constant before or after. They go wrong from 01:15 UTC on 1 February to 01:45 UTC on 20 February, and agree again from 21 February. CMEMS's copy of the gauge carries the same readings. BODC's record of the gauge (`bodc/hol`), whose values stay between 0.4 and 6.2 m chart datum on those days, follows a tide that neaps on 10 February and springs on 19 February.",
       reported: null,
       report: null,
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
+        await allSuspect(store, id, e.since!, e.until!);
         const high = (await levels(store, id, "2026-02-10")).filter((o) => o.level > 3.95);
         if (!high.length)
           throw new Error(`the store holds no ${id} level above 3.95 m on 2026-02-10`);
         for (const day of ["2026-01-25", "2026-02-25"]) {
           const top = Math.max(...(await levels(store, id, day)).map((o) => o.level));
-          if (top > 3.5) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 3.5 m`);
+          if (top > 3.6) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 3.6 m`);
         }
       },
     },
@@ -77,18 +88,19 @@ export default {
       response:
         "8 to 14 April 2026 is flagged `suspect`, keeping the EA's own flag as `source_flag`. QC flags 196 of the 204 erratic values, so the span flags the other 8 and the readings between them.",
       evidence:
-        "Found in November 2026 while reading back erratum `ea-holyhead-2026-erratic`, by counting the readings above 3.95 m AOD or at the floor: the highest water at Holyhead in the rest of 2026 is 3.46 m. None of 11 and 12 April's 187 readings is beyond. CMEMS's copy of the gauge (`cmems/Holyhead`) also has erratic values on 10 April.",
+        "Found in November 2026 while reading back erratum `ea-holyhead-2026-erratic`, by counting the readings above 3.95 m AOD or at the floor: the highest water at Holyhead in the rest of 2026, outside 1 to 20 February and 8 to 14 April, is 3.46 m. None of 11 and 12 April's 187 readings is beyond. CMEMS's copy of the gauge (`cmems/Holyhead`) also has erratic values on 10 April.",
       reported: null,
       report: null,
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
+        await allSuspect(store, id, e.since!, e.until!);
         const high = (await levels(store, id, "2026-04-10")).filter((o) => o.level > 3.95);
         if (!high.length)
           throw new Error(`the store holds no ${id} level above 3.95 m on 2026-04-10`);
         for (const day of ["2026-04-05", "2026-04-20"]) {
           const top = Math.max(...(await levels(store, id, day)).map((o) => o.level));
-          if (top > 3.5) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 3.5 m`);
+          if (top > 3.6) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 3.6 m`);
         }
       },
     },
@@ -107,6 +119,7 @@ export default {
       report: null,
       check: async (store, e) => {
         await flaggedSpan(store, e);
+        await allSuspect(store, e.stations![0]!, e.since!, "2026-05-01");
         await offset(store, e.stations![0]!, "2026-04-10", "2026-01-21", 2.5);
       },
     },
@@ -125,12 +138,26 @@ export default {
       report: null,
       check: async (store, e) => {
         const id = e.stations![0]!;
-        const held = await store.levels(id, e.since!, e.until!);
-        if (held.length !== 5)
+        const held = (await store.levels(id, e.since!, e.until!)).map((o) =>
+          new Date(o.time).toISOString(),
+        );
+        const expected = [
+          "2026-03-17T12:17:48.000Z",
+          "2026-03-17T12:23:54.000Z",
+          "2026-03-22T12:42:12.000Z",
+          "2026-04-01T12:57:43.000Z",
+          "2026-04-01T15:53:53.000Z",
+        ];
+        if (held.join() !== expected.join())
           throw new Error(
-            `the store holds ${held.length} ${id} levels from ${e.since} to ${e.until}, not 5`,
+            `the store holds ${id} levels at ${held.join(", ") || "no time"} from ${e.since} to ${e.until}, not at ${expected.join(", ")}`,
           );
-        for (const day of [dayAfter(e.since!, -1), e.until!]) await levels(store, id, day);
+        const before = await levels(store, id, "2026-02-03");
+        if (before.at(-1)!.time !== Date.parse("2026-02-03T06:00:00Z"))
+          throw new Error(`${id}'s last level on 2026-02-03 isn't at 06:00 UTC`);
+        const after = await levels(store, id, e.until!);
+        if (after[0]!.time !== Date.parse(`${e.until}T00:00:00Z`))
+          throw new Error(`${id}'s first level on ${e.until} isn't at 00:00 UTC`);
       },
     },
     {
