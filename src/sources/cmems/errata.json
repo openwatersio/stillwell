@@ -74,9 +74,33 @@
       "since": "2026-10-26",
       "until": "2026-10-30",
       "handling": "flagged",
-      "error": "CMEMS's copy of the WSV's Wangerooge West gauge reads −7.45 m from 25 to 29 October 2026, as PEGELONLINE's −2.40 m (erratum `pegelonline-wangerooge-west-2026-dropout`). CMEMS flags most of these values, not all.",
-      "response": "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. CMEMS flags the −7.45 m values of 25 October itself.",
-      "evidence": "Found with erratum `pegelonline-wangerooge-west-2026-dropout`, November 2026: of 2,564 values below −4 m, CMEMS flags 2,465 and QC 98, and one, at 12:00 UTC on 27 October, is left unflagged."
+      "error": "CMEMS's copy of the WSV's Wangerooge West gauge reads −7.45 m from 20:30 UTC on 25 October 2026 to 13:40 UTC on 29 October, as PEGELONLINE's −2.40 m (erratum `pegelonline-wangerooge-west-2026-dropout`). CMEMS flags 293 of the 363 values below −4 m probably bad and leaves the other 70 unflagged, with its preliminary flag. The store holds no value on 28 October.",
+      "response": "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. QC flags the 20 unflagged −7.45 m values of 25 October, and the span flags the 50 of 26 and 27 October.",
+      "evidence": "Found with erratum `pegelonline-wangerooge-west-2026-dropout`, November 2026. The store's 2026 file for the gauge has 363 values below −4 m, none before 20:30 UTC on 25 October and none after 13:40 UTC on 29 October: 20 on 25 October, 116 on 26, 144 on 27 and 83 on 29. CMEMS flags 90 of the 26th's, 120 of the 27th's and all of the 29th's, and none of the 25th's. The 20 on 25 October are from 20:30 to 23:50 UTC, the 26 on 26 October from 00:00 to 16:10, and the 24 on 27 October from 12:00 to 15:50. The file holds no value on 28 October, which the store's hourly and monthly reads haven't filled, while PEGELONLINE's has 1,440, all −2.40 or −2.41 m."
+    },
+    {
+      "id": "cmems-holyhead-2026-erratic",
+      "stations": ["cmems/Holyhead"],
+      "since": "2026-02-03",
+      "until": "2026-02-21",
+      "handling": "flagged",
+      "error": "CMEMS's copy of the Holyhead gauge carries the erratic readings of the EA's record of it from 3 to 20 February 2026: 86 of the 430 values it holds read above 7 m, up to 12.05 m, where the highest water in the rest of 2026, outside 1 to 20 February and 8 to 14 April, is 6.51 m. CMEMS flags none of them.",
+      "response": "3 to 20 February 2026 is flagged `suspect`, keeping the source flag as `source_flag`. QC flags 14 of the 86 values above 7 m, so the span flags the rest and the readings between them.",
+      "evidence": "Found in November 2026 while reading back the EA's Holyhead record (`ea/E70539`), whose readings from 1 to 20 February are erratic, between the −3.05 m floor and 8.94 m above Ordnance Datum, 3.46 m being the highest water in the rest of 2026. CMEMS's values agree with the EA's at −3.05 m, its datum difference, through 31 January and from 21 February. The store holds no CMEMS value on 1 February and 9 on 2 February, all within the tide. BODC's record of the gauge (`bodc/hol`) stays between 0.4 and 6.2 m on those days.",
+      "reported": null,
+      "report": null
+    },
+    {
+      "id": "cmems-holyhead-2026-april-erratic",
+      "stations": ["cmems/Holyhead"],
+      "since": "2026-04-10",
+      "until": "2026-04-11",
+      "handling": "flagged",
+      "error": "CMEMS's copy of the Holyhead gauge reads 7.88, 10.37, 8.82 and 9.81 m at 14:00, 15:00, 16:00 and 19:00 UTC on 10 April 2026, above 6.51 m, the highest water in the rest of 2026 outside 1 to 20 February and 8 to 14 April. CMEMS flags none of them.",
+      "response": "10 April 2026 is flagged `suspect`, keeping the source flag as `source_flag`. QC flags the 9.81 m value, so the span flags the other three and the day's other readings.",
+      "evidence": "Found in November 2026 while reading back the EA's Holyhead record (`ea/E70539`), which is erratic from 8 to 14 April. The store holds 10 CMEMS values on 10 April, from 14:00 to 23:00 UTC.",
+      "reported": null,
+      "report": null
     },
     {
       "id": "cmems-fill-values",
