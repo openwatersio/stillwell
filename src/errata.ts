@@ -112,7 +112,9 @@ export const dayAfter = (day: string, n: number) =>
  * day just outside it has more than half its levels flagged above a source
  * flag that was good. Inside the span `source_flag` isn't required, since a
  * value stored before it was kept and already suspect has none; outside, such
- * a value doesn't count. `stations` defaults to every station the entry lists.
+ * a value doesn't count. A day with no levels, such as one in a gap or a
+ * dropped span, isn't judged, and a station with none on all three fails.
+ * `stations` defaults to every station the entry lists.
  */
 export async function flaggedSpan(
   store: StoreReader,
