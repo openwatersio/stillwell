@@ -18,23 +18,23 @@ Tide levels every 10 minutes from the gauges of the National Network of Regional
 
 ## Running ingest
 
-- **Key:** every request needs a key tied to a domain. Ours is for `https://stillwell.openwaters.io/`, and the API answers 403 unless the request's `Referer` is that domain or a subdomain. The adapter sends the key as `X-API-Key` and the domain as `Referer`, from `CCO_API_KEY` and `CCO_REFERER`, and refuses to run without both. The server's jobs read them from `/etc/stillwell.env`. The workflows pass the repository secrets of the same names, for the canary and for a move back to Actions.
-- **Limits:** the observatory asks for one request at a time, caching, and no request more often than the data is recorded, and may limit or switch off a key without notice. It publishes no rate. The adapter sends one request at a time, however many stations a run reads, each starting a second after the last. A timeout or a 5xx is sent again, up to four times in all. The poller doesn't ask CCO (`poller: "recent"`), so the hourly job's read is the one request per site an hour that Stillwell told the observatory to expect.
+- **Key:** every request needs a key tied to a domain. Ours is for `https://stillwell.openwaters.io/`, and the API answers 403 unless the request's `Referer` is that domain or a subdomain. The adapter sends the key as `X-API-Key` and the domain as `Referer`, from `CCO_API_KEY` and `CCO_REFERER`, and refuses to run without both. The poller reads them from the live Worker's secrets ([workers/live](../../../workers/live/README.md)), and the workflows from the repository secrets of the same names.
+- **Limits:** the observatory asks for one request at a time, caching, and no request more often than the data is recorded, and may limit or switch off a key without notice. It publishes no rate. The adapter sends one request at a time, however many stations a run reads, each starting a second after the last. A timeout or a 5xx is sent again, up to four times in all. The poller asks each site once an hour (`poller: "hourly"`), the one request per site an hour that Stillwell told the observatory to expect.
 - **Requests:** `GET /observations/tides/latest.geojson` lists every site with its latest reading. `GET /observations/tides/<YYYYMMDDhhmmss>.geojson?sensor=<id>&duration=<hours>` answers with every reading from `duration` hours before the time up to it, both ends included, newest first. A request covers up to 168 hours for all sites or 8,760 for one. The adapter asks a year at a time, from the end back, each request starting one reading inside the last. A year of one site is about 50,000 readings and takes from seconds to several minutes, so a request of more than a day waits up to 15 minutes. Values and flags arrive as text, such as `"3.88300"`, and times as `YYYYMMDD#hhmmss`.
 
 ### Backfill
 
-A backfill is a job on [the server's queue](../../../docs/plans/jobs.md#the-queue), queued on the box. On a store with no CCO list, `stillwell-jobs enqueue stations cco --no-publish` runs first. The years before 2009 run by name, and Brighton's and Lymington's first years start the day after their first reading (erratum `cco-empty-window-answers`). A full backfill is about 11 million rows and takes about an hour:
+A backfill is an Ingest run, started from Actions. On a store with no CCO list, dispatch Monthly with `sources: cco` first. The years before 2009 run by name, and Brighton's and Lymington's first years start the day after their first reading (erratum `cco-empty-window-answers`). A full backfill is about 11 million rows and takes about an hour:
 
 ```bash
-stillwell-jobs enqueue backfill cco 86,89,90,92,93,95,111 2005 2009 --skip-written --concurrency 1
-stillwell-jobs enqueue backfill cco 88 2006-02-12 2009 --skip-written --concurrency 1
-stillwell-jobs enqueue backfill cco 87 2009-02-13 2010 --skip-written --concurrency 1
-stillwell-jobs enqueue backfill cco all 2009 2027 --skip-written --with-inactive --concurrency 1
+node scripts/ingest.ts backfill cco 86,89,90,92,93,95,111 2005 2009 --skip-written --concurrency 1
+node scripts/ingest.ts backfill cco 88 2006-02-12 2009 --skip-written --concurrency 1
+node scripts/ingest.ts backfill cco 87 2009-02-13 2010 --skip-written --concurrency 1
+node scripts/ingest.ts backfill cco all 2009 2027 --skip-written --with-inactive --concurrency 1
 ```
 
-Most years hold preliminary readings, so they count as unfinished, and `--skip-written` keeps a run that stops partway from starting over. After the last run, `stillwell-jobs enqueue compact cco --rebuild-bounds` updates the store's bounds, and Compact daily's publish picks them up that night.
+Most years hold preliminary readings, so they count as unfinished, and `--skip-written` keeps a run that stops partway from starting over. After the last run, `compact cco --rebuild-bounds` updates the store's bounds, and Compact daily's publish picks them up that night.
 
 ### Scheduled runs
 
-CCO is on the server's job queue ([src/sources/server.json](../server.json)), which runs its hourly, nightly and monthly jobs at Actions' times. Monthly refreshes the list on the 2nd. Its refetch on the 9th runs `schedule.refetch`, which `node scripts/schedule.ts refetch cco` prints: every active station from 12 months back to this month, with `--refetch`, since a month's flags arrive within weeks. To bring in flags on older years, run the backfills again without `--skip-written`.
+CCO's nightly and monthly jobs run in Actions like every other source's, and the poller reads it hourly. Monthly refreshes the list on the 2nd. Its refetch on the 9th runs `schedule.refetch`, which `node scripts/schedule.ts refetch cco` prints: every active station from 12 months back to this month, with `--refetch`, since a month's flags arrive within weeks. To bring in flags on older years, run the backfills again without `--skip-written`.
