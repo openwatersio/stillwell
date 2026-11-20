@@ -51,11 +51,11 @@ Each value also has a `source_flag`: the source's own judgment on the same 0 to 
 
 When the two differ, Stillwell marked the value worse than its source did. A value the source verified still shows as verified in `source_flag`. Read `flag` to skip what shouldn't be used, and read `source_flag` to see what the source itself said.
 
-In the last week of PEGELONLINE, every value is preliminary from the source, and Stillwell's checks marked some suspect or bad:
+In yesterday's PEGELONLINE values, every value is preliminary from the source, and Stillwell's checks marked some suspect or bad:
 
 <QueryResult
   sql={`SELECT source_flag, flag, count(*) AS "values", count(DISTINCT station) AS stations
-FROM 'https://stillwell.openwaters.io/recent/pegelonline.parquet'
+FROM read_parquet('https://stillwell.openwaters.io/recent/pegelonline/' || strftime(current_date - 1, '%Y-%m-%d') || '.parquet')
 GROUP BY ALL ORDER BY ALL`}
 />
 

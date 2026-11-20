@@ -276,7 +276,7 @@ const STATION_COLUMNS: Column[] = [
     name: "live",
     type: "BOOLEAN",
     description:
-      "Whether the station's latest values are fetched as they come in. Its last 7 days are in `recent/`, which is rewritten every hour.",
+      "Whether the station's latest values are fetched as they come in. Its values are in `recent/`, one file per UTC day, with today's rewritten every hour.",
   },
   {
     name: "min_interval_s",
@@ -698,11 +698,11 @@ export const FILES = {
     sort: ["id"],
   },
   recent: {
-    path: "recent/<source>.parquet",
-    example: "recent/rws.parquet",
+    path: "recent/<source>/<YYYY-MM-DD>.parquet",
+    example: "recent/rws/2026-11-19.parquet",
     title: "Recent levels",
     description:
-      "The last 7 days of observed levels from a source's live stations, refreshed hourly.",
+      "One UTC day of observed levels from a source's live stations, by `time`. Today's file is rewritten hourly and the 6 days before it each night, so a day's file is final once it's 6 days old, and each file is deleted after 30 days.",
     columns: [
       {
         name: "station",

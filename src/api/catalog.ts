@@ -1,6 +1,3 @@
-import { USER_AGENT } from "../http.ts";
-import type { ClickHouse } from "../realtime/clickhouse.ts";
-
 /** What the levels API needs of a station from `stations.parquet`. */
 export interface CatalogStation {
   id: string;
@@ -15,8 +12,8 @@ export interface CatalogStation {
   datums_attribution: string[];
   tide_station: string | null;
   min_interval_s: number | null;
-  /** Whether the server polls the station for levels: live, active and with levels, as the poller picks them. */
-  polled: boolean;
+  /** Whether the station has observed levels, in `products`. */
+  levels: boolean;
   /** How often the station records a value, in seconds. */
   interval_s: number | null;
   /** The current epoch: the last one open. */
@@ -35,32 +32,6 @@ export interface CatalogEpoch {
 }
 
 export type Catalog = Map<string, CatalogStation>;
-
-/**
- * The public stations and their offsets, from `stations.parquet` and
- * `stations/offsets.parquet` in `store`, read by ClickHouse, which keeps the
- * reading out of the API's own memory.
- */
-export async function loadCatalog(ch: ClickHouse, store: string): Promise<Catalog> {
-  const read = (file: string, columns: string) =>
-    ch.query<Record<string, unknown>>(
-      `SELECT ${columns} FROM url({url:String}, Parquet, headers('User-Agent' = {ua:String})) SETTINGS date_time_output_format = 'iso'`,
-      { url: `${store}/${file}`, ua: USER_AGENT },
-    );
-  const [stations, offsets] = await Promise.all([
-    read(
-      "stations.parquet",
-      `id, source, name, datum, chart_datum, frame, commercial_use, attribution, datums_attribution,
-       tide_station, min_interval_s, interval_s, live, status, products, epochs.id AS epoch_ids, epochs.since AS since, epochs.until AS until,
-       epochs.to_current AS to_current, epochs.state AS state`,
-    ),
-    read("stations/offsets.parquet", "station, epoch, datum, offset_m"),
-  ]);
-  // An empty file is a failed read or a broken publish; the last list keeps serving.
-  if (!stations.length) throw new Error(`no stations in ${store}/stations.parquet`);
-  if (!offsets.length) throw new Error(`no offsets in ${store}/stations/offsets.parquet`);
-  return buildCatalog(stations, offsets);
-}
 
 /**
  * The catalog of `stations.parquet`'s rows, with each epoch's `id`, `since`,
@@ -95,10 +66,7 @@ export function buildCatalog(
       tide_station: (s.tide_station as string | null) ?? null,
       min_interval_s: (s.min_interval_s as number | null) ?? null,
       interval_s: (s.interval_s as number | null) ?? null,
-      polled:
-        s.live === true &&
-        s.status === "active" &&
-        ((s.products as string[] | null) ?? []).includes("levels"),
+      levels: ((s.products as string[] | null) ?? []).includes("levels"),
       epoch: open < 0 ? null : ids[open]!,
       // A held epoch waits on a decision, so its values aren't part of the series in any datum.
       epochs: new Map(

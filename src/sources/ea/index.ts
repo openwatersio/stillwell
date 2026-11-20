@@ -103,7 +103,7 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
   );
   const tidal = items.flatMap((s) => {
     // Only the series the archive's day files are read for, so backfill and
-    // hourly ingest read the same one.
+    // the poller read the same one.
     const measure = [s.measures ?? []]
       .flat()
       // The mAOD series first, where a station has both.
