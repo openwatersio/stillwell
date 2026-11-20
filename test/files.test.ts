@@ -182,14 +182,6 @@ describe("published file definitions", () => {
         ],
         "NAP",
       ),
-    predictions: (path) =>
-      writeObservations(path, [{ time: T, level: 1, flag: Flag.preliminary }], "SKN"),
-    "predicted-extremes": (path) =>
-      writeExtremes(
-        path,
-        [{ time: T, level: 1, type: "high", flag: Flag.good, transit: 100, event: 1 }],
-        "SKN",
-      ),
   };
 
   for (const [name, write] of Object.entries(writers) as [FileName, typeof writers.obs][]) {

@@ -203,8 +203,7 @@ const STATION_COLUMNS: Column[] = [
   {
     name: "products",
     type: "VARCHAR[]",
-    description:
-      "Which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.",
+    description: "Which of `levels` and `extremes` the station has.",
   },
   {
     name: "first",
@@ -371,7 +370,7 @@ const SOURCE_FLAG: Column = {
   nullable: true,
   optional: true,
   description:
-    "The source's own flag on the same scale, before the store's quality checks; null in predictions and some older values, and missing from some older files. Where an older value's `source_flag` is null and its `flag` is better than suspect, the `flag` is the source's; a suspect or bad one may be the store's own quality check.",
+    "The source's own flag on the same scale, before the store's quality checks; null in some older values, and missing from some older files. Where an older value's `source_flag` is null and its `flag` is better than suspect, the `flag` is the source's; a suspect or bad one may be the store's own quality check.",
 };
 
 const RECEIVED: Column = {
@@ -740,50 +739,6 @@ export const FILES = {
     columns: [...EXTREME_COLUMNS("observed"), DATUM],
     sort: ["time"],
   },
-  predictions: {
-    path: `predictions/${SERIES_PATH}`,
-    example: "predictions/rws/hoekvanholland/2024.parquet",
-    title: "Predicted levels",
-    description: `The source's predicted curve for one UTC year. ${SERIES_NOTE}`,
-    columns: [
-      TIME,
-      LEVEL("predicted level"),
-      FLAG,
-      SOURCE_FLAG,
-      {
-        ...RECEIVED,
-        description:
-          "Always null: predictions are fetched in bulk, never as they come in; missing from some older files.",
-      },
-      DATUM,
-    ],
-    sort: ["time"],
-  },
-  "predicted-extremes": {
-    path: `predicted-extremes/${SERIES_PATH}`,
-    example: "predicted-extremes/bsh/506P/2026.parquet",
-    title: "Predicted extremes",
-    description: `The source's predicted high and low waters for one UTC year. ${SERIES_NOTE}`,
-    columns: [
-      ...EXTREME_COLUMNS("predicted"),
-      {
-        name: "transit",
-        type: "INTEGER",
-        optional: true,
-        description:
-          "BSH's number for the lunar transit the high or low water follows; only in BSH's files.",
-      },
-      {
-        name: "event",
-        type: "UTINYINT",
-        optional: true,
-        description:
-          "Which one it is after that transit: 1 high water after the upper transit, 2 low water after it, 3 high water after the lower, 4 low water after it; only in BSH's files.",
-      },
-      DATUM,
-    ],
-    sort: ["time"],
-  },
 } satisfies Record<string, ParquetFile>;
 
 export type FileName = keyof typeof FILES;
@@ -1077,7 +1032,7 @@ export function dataPackage(): object {
     name: "stillwell",
     title: "Stillwell",
     description:
-      "Observed and predicted water levels from tide and river gauges, from each source's own service.",
+      "Observed water levels from tide and river gauges, from each source's own service.",
     homepage: "https://github.com/openwatersio/stillwell",
     resources: [
       ...Object.entries(FILES).map(([name, f]) => ({

@@ -1278,8 +1278,8 @@ describe("compactRecent", () => {
   it("folds a station whose list dropped levels, and doesn't count it stale", async () => {
     const root = store();
     const [dropped, gone] = [
-      station("dropped", { products: ["predictions"] }),
-      station("gone", { products: ["predictions"] }),
+      station("dropped", { products: ["extremes"] }),
+      station("gone", { products: ["extremes"] }),
     ];
     await writeDays(root, [
       [{ ...at(start + HOUR, 1, start + HOUR), station: dropped.id, epoch: 1 }],

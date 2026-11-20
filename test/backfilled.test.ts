@@ -237,7 +237,7 @@ describe("backfillStatus", () => {
         station("test/g"),
         // With no open epoch it has no span, and is left out rather than failing the source.
         station("test/h", false, [epoch(1, "A", null, "2020-01-01T00:00:00Z")]),
-        { ...station("test/d"), products: ["predictions" as const] },
+        { ...station("test/d"), products: ["extremes" as const] },
       ],
       NOW,
     );

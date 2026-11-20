@@ -16,8 +16,7 @@ import {
  * Rijkswaterstaat Waterwebservices (DDAPI 2.0). Data is CC0 unless a component
  * says otherwise: https://rijkswaterstaatdata.nl/waterdata/
  *
- * Observed levels (`meting`) and the astronomical tide (`astronomisch`) are 10-minute
- * series in integer centimeters. Extremes come as two channels on the same
+ * Observed levels (`meting`) are 10-minute series in integer centimeters. Extremes come as two channels on the same
  * timestamps: GETETTPE gives the type (`EXTREME_TYPES`), WATHTE the height.
  */
 const BASE = "https://ddapi20-waterwebservices.rijkswaterstaat.nl";
@@ -58,9 +57,7 @@ const CHUNK_MS = 365 * 86_400_000;
  * the factor up to 2005 minus the one from 2005 on. Each converted series
  * matches PSMSL's RLR series within a few millimeters in every year from 1990
  * to 2006. Delfzijl's doesn't: RWS has corrected its archive for subsidence
- * since, by 5 to 40 mm. The astronomical tide is left as served: converting it
- * would step its mean level by 4 to 5 cm at 2005, where it steps by 1 to 2 cm
- * as served.
+ * since, by 5 to 40 mm.
  *
  * Every other Dutch NAP station lists `REVISED_NAP` as its reference, so its
  * values before 2005 go to an epoch of their own, in the old NAP, which
@@ -90,8 +87,8 @@ const NAP_REVISED = Date.UTC(2005, 0, 1);
 export const REVISED_NAP = { id: "NAP 2005", since: "2005-01-01" };
 
 /** Centimeters to add to a value before 2005 to put it on today's NAP. */
-function revision(location: string, datum: string, process: ProcessType): number {
-  if (datum !== "NAP" || process !== "meting") return 0;
+function revision(location: string, datum: string): number {
+  if (datum !== "NAP") return 0;
   return NAP_2005[location] ?? 0;
 }
 
@@ -99,13 +96,8 @@ function revision(location: string, datum: string, process: ProcessType): number
 const onRevisedNap = (value: number, time: number, cm: number) =>
   Math.round((time < NAP_REVISED ? value + cm : value) * 10) / 1000;
 
-export type ProcessType = "meting" | "astronomisch" | "verwachting";
-
-/** Groupings that carry extremes, keyed by process type. */
-const EXTREME_GROUPING: Partial<Record<ProcessType, string>> = {
-  meting: "GETETM2",
-  astronomisch: "GETETBRKD2",
-};
+/** The grouping that carries observed extremes. */
+const EXTREME_GROUPING = "GETETM2";
 
 interface Measurement {
   Tijdstip: string;
@@ -164,8 +156,7 @@ interface Catalog {
 
 /**
  * Locations with a measured water-level series against NAP, or against MSL
- * where that's all a location measures (the offshore platforms), and those
- * with only RWS's astronomical tide, listed for their predictions.
+ * where that's all a location measures (the offshore platforms).
  */
 export async function stations(): Promise<ListedStation[]> {
   const catalog = await throughOutage(() =>
@@ -196,10 +187,8 @@ export async function stations(): Promise<ListedStation[]> {
     ) {
       productsOf.set(m.AquoMetadata_MessageID, ["levels"]);
       datumOf.set(m.AquoMetadata_MessageID, m.Hoedanigheid.Code);
-    } else if (grouping === EXTREME_GROUPING.meting)
+    } else if (grouping === EXTREME_GROUPING)
       productsOf.set(m.AquoMetadata_MessageID, ["extremes"]);
-    else if (grouping === EXTREME_GROUPING.astronomisch)
-      productsOf.set(m.AquoMetadata_MessageID, ["predictions", "predicted_extremes"]);
   }
   const products = new Map<number, Set<Product>>();
   const datums = new Map<number, Set<string>>();
@@ -217,15 +206,9 @@ export async function stations(): Promise<ListedStation[]> {
     products.set(link.Locatie_MessageID, set);
   }
   return linkTwins(
-    // A location with only RWS's astronomical tide, such as Knock and Dukegat, is listed for its predictions.
-    catalog.LocatieLijst.filter((l) => {
-      const set = products.get(l.Locatie_MessageID);
-      return set?.has("levels") || set?.has("predictions");
-    })
+    catalog.LocatieLijst.filter((l) => products.get(l.Locatie_MessageID)?.has("levels"))
       .map((l): Station => {
         const available = products.get(l.Locatie_MessageID)!;
-        const measured = available.has("levels");
-        // The astronomical groupings are against NAP even where a location measures against MSL.
         const datum = DATUMS.find((d) => datums.get(l.Locatie_MessageID)?.has(d)) ?? "NAP";
         return {
           ...stationDefaults(metadata),
@@ -241,7 +224,7 @@ export async function stations(): Promise<ListedStation[]> {
           // names each location's water: Meetnet Noordzee's `gebied` covers 77 sea sites
           // under codes of its own.
           kind: /platform/i.test(l.Omschrijving ?? "") ? "coastal" : null,
-          interval_s: measured ? 600 : null,
+          interval_s: 600,
           datum,
           datums: {},
           products: productsFor(available, datum),
@@ -250,7 +233,7 @@ export async function stations(): Promise<ListedStation[]> {
           tide_station: null,
           same_as: [],
           status: "active",
-          live: measured,
+          live: true,
           min_interval_s: 300,
           source_url: `https://waterinfo.rws.nl/publiek/waterhoogte/${encodeURIComponent(l.Code)}/details`,
         };
@@ -288,8 +271,7 @@ function linkTwins(stations: Station[]): Station[] {
 }
 
 /**
- * The groupings RWS publishes extremes and the astronomical tide under are
- * against NAP, even at the offshore platforms whose levels are only against
+ * The grouping RWS publishes extremes under is against NAP, even at the offshore platforms whose levels are only against
  * MSL. A station's files are all in its one datum, so an MSL station lists
  * levels only.
  */
@@ -300,10 +282,9 @@ function productsFor(available: Set<Product>, datum: string): Product[] {
 /** Preferred first: NAP on land and in estuaries, MSL offshore. */
 const DATUMS = ["NAP", "MSL"];
 
-const ORDER: Product[] = ["levels", "extremes", "predictions", "predicted_extremes"];
+const ORDER: Product[] = ["levels", "extremes"];
 
 export interface LevelsOptions {
-  process?: ProcessType;
   datum?: string;
   /** Skip the response cache. Use for ranges that include the present. */
   fresh?: boolean;
@@ -314,14 +295,14 @@ export async function levels(
   location: string,
   start: Date,
   end: Date,
-  { process = "meting", datum = "NAP", fresh }: LevelsOptions = {},
+  { datum = "NAP", fresh }: LevelsOptions = {},
 ): Promise<Observation[]> {
   const samples: Observation[] = [];
-  const cm = revision(location, datum, process);
+  const cm = revision(location, datum);
   for (const [from, to] of chunks(start, end)) {
     const series = await request(
       location,
-      { Grootheid: { Code: "WATHTE" }, Hoedanigheid: { Code: datum }, ProcesType: process },
+      { Grootheid: { Code: "WATHTE" }, Hoedanigheid: { Code: datum }, ProcesType: "meting" },
       from,
       to,
       fresh,
@@ -338,7 +319,7 @@ export async function levels(
         // RWS marks missing values with large sentinels (e.g. 999999999).
         if (value === undefined || Math.abs(value) > 10_000) continue;
         const time = Date.parse(m.Tijdstip);
-        samples.push({ time, level: onRevisedNap(value, time, cm), flag: flagOf(m, process) });
+        samples.push({ time, level: onRevisedNap(value, time, cm), flag: flagOf(m) });
       }
     }
   }
@@ -362,16 +343,14 @@ export async function extremes(
   location: string,
   start: Date,
   end: Date,
-  { process = "meting", datum = "NAP", fresh }: LevelsOptions = {},
+  { datum = "NAP", fresh }: LevelsOptions = {},
 ): Promise<PublishedExtreme[]> {
-  const grouping = EXTREME_GROUPING[process];
-  if (!grouping) throw new Error(`RWS publishes no extremes for ${process}`);
   const result: PublishedExtreme[] = [];
-  const cm = revision(location, datum, process);
+  const cm = revision(location, datum);
   for (const [from, to] of chunks(start, end)) {
     const series = await request(
       location,
-      { Groepering: { Code: grouping }, ProcesType: process },
+      { Groepering: { Code: EXTREME_GROUPING }, ProcesType: "meting" },
       from,
       to,
       fresh,
@@ -432,7 +411,7 @@ export async function extremes(
         time,
         level: onRevisedNap(value, time, cm),
         type,
-        flag: flagOf(m, process),
+        flag: flagOf(m),
       });
     }
   }
@@ -444,8 +423,7 @@ export async function extremes(
  * Quality code `00` is a normal value. What `25` means isn't documented where
  * we've looked, so it and any other code count as suspect until it is.
  */
-function flagOf(m: Measurement, process: ProcessType): Flag {
-  if (process === "astronomisch") return Flag.good;
+function flagOf(m: Measurement): Flag {
   const status = m.WaarnemingMetadata.Statuswaarde;
   const code = m.WaarnemingMetadata.Kwaliteitswaardecode;
   const flag = status === "Gecontroleerd" || status === "Definitief" ? Flag.good : Flag.preliminary;
@@ -656,14 +634,6 @@ export const source: Source = {
   // Every product asks for the station's datum, so a file never mixes two.
   extremes: (s, start, end) =>
     extremes(s.source_id, start, end, { datum: s.datum, fresh: fresh(end) }),
-  predictions: (s, start, end) =>
-    levels(s.source_id, start, end, { process: "astronomisch", datum: s.datum, fresh: fresh(end) }),
-  predictedExtremes: (s, start, end) =>
-    extremes(s.source_id, start, end, {
-      process: "astronomisch",
-      datum: s.datum,
-      fresh: fresh(end),
-    }),
   overrides: {
     // Listed in NAP from RWS's NAP forecasts, though they measure against MSL.
     restarts: {

@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import * as harmonic from "../src/harmonic.ts";
-import { compareExtremes } from "../src/metrics.ts";
 import type { Sample } from "../src/types.ts";
 
 describe("harmonic", () => {
@@ -52,24 +51,5 @@ describe("phaseLag", () => {
     assert.ok(Math.abs(harmonic.phaseLag(year(0), reference)!) < 0.05);
     assert.ok(Math.abs(harmonic.phaseLag(year(-1), reference)! + 1) < 0.05);
     assert.ok(Math.abs(Math.abs(harmonic.phaseLag(year(12), reference)!) - 12) < 0.2);
-  });
-});
-
-describe("compareExtremes", () => {
-  it("matches one to one within the window and by type", () => {
-    const reference = [
-      { time: 0, level: 1, type: "high" as const },
-      { time: 6 * 3_600_000, level: -1, type: "low" as const },
-    ];
-    const predicted = [
-      { time: 10 * 60_000, level: 1.1, type: "high" as const },
-      { time: 20 * 60_000, level: 1.2, type: "high" as const },
-      { time: 6 * 3_600_000 - 5 * 60_000, level: -0.9, type: "low" as const },
-    ];
-    const c = compareExtremes(predicted, reference);
-    assert.equal(c.matched, 2);
-    assert.equal(c.high.time.bias, 10);
-    assert.equal(c.low.time.bias, -5);
-    assert.ok(Math.abs(c.height.rms - 0.1) < 1e-9);
   });
 });

@@ -1,4 +1,4 @@
-import type { Extreme, Sample, TransitExtreme } from "./types.ts";
+import type { Extreme, Sample } from "./types.ts";
 
 /**
  * Quality flags, ordered from best to worst so that combining two flags is
@@ -28,13 +28,13 @@ export interface Observation extends Sample {
   received?: number;
 }
 
-/** A high or low water a source publishes, observed or predicted. */
-export type PublishedExtreme = (Extreme | TransitExtreme) & { flag: Flag };
+/** A high or low water a source publishes. */
+export type PublishedExtreme = Extreme & { flag: Flag };
 
 export type Kind = "coastal" | "estuary" | "lake" | "river";
 
 /** What a station has in the store. */
-export type Product = "levels" | "extremes" | "predictions" | "predicted_extremes";
+export type Product = "levels" | "extremes";
 
 export interface Station {
   /** `<source>/<source_id>`, e.g. `rws/hoekvanholland`. */
@@ -376,10 +376,6 @@ export interface Source {
   ): Promise<[number, number][]>;
   /** High and low waters the source selects from its observations. */
   extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;
-  /** The source's own predicted curve over [start, end). */
-  predictions?(station: Station, start: Date, end: Date): Promise<Observation[]>;
-  /** The source's own predicted high and low waters over [start, end). */
-  predictedExtremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;
   /**
    * The `backfill` runs the source's monthly jobs make, each the arguments
    * after `backfill <source>`, given the day the job runs (scripts/schedule.ts).

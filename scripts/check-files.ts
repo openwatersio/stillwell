@@ -47,8 +47,7 @@ async function check(path: string, file: ParquetFile, optional = false): Promise
 
 for (const f of [FILES.stations, FILES.offsets, FILES.links]) await check(f.path, f);
 await check(FILES.matches.path, FILES.matches, true);
-for (const f of [FILES.extremes, FILES.predictions, FILES["predicted-extremes"]])
-  await check(f.example, f);
+await check(FILES.extremes.example, FILES.extremes);
 for (const source of sources) {
   await check(`stations/${source}.parquet`, FILES.lists);
   await check(`stations/analysis/${source}.parquet`, FILES.analysis, true);

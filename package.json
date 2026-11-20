@@ -1,6 +1,6 @@
 {
   "name": "stillwell",
-  "description": "Observed and predicted water levels from tide and river gauges, as Parquet",
+  "description": "Observed water levels from tide and river gauges, as Parquet",
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
@@ -16,8 +16,6 @@
     "ticon:inventory": "node scripts/ticon-inventory.ts",
     "errata": "node scripts/errata.ts",
     "errata:check": "node scripts/errata-check.ts",
-    "evaluate:bsh": "node scripts/evaluate-bsh.ts",
-    "evaluate:rws": "node scripts/evaluate-rws.ts",
     "clock-check": "node scripts/clock-check.ts",
     "cross-check": "node scripts/cross-check.ts",
     "uhslc:contributors": "node scripts/uhslc-contributors.ts",

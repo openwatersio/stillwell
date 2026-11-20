@@ -12,7 +12,6 @@ import {
   type PublishedExtreme,
   type Station,
 } from "../schema.ts";
-import type { EventIndex } from "../types.ts";
 import type { OffsetRow } from "../datums.ts";
 import { FILES, IN_LIST_EXTRA, columnTypes, type Column, type ParquetFile } from "./files.ts";
 import { USER_AGENT } from "../http.ts";
@@ -256,8 +255,6 @@ function appendObservations(table: string, rows: Observation[]): Promise<void> {
     null,
     null,
     null,
-    null,
-    null,
     r.source_flag ?? null,
   ]);
 }
@@ -416,32 +413,21 @@ export async function readObservationFile(
 }
 
 /**
- * Extremes: `time`, `level_m`, `type`, `flag`, plus `transit` and `event` when
- * the source gives them, and `datum` as for observations.
+ * Extremes: `time`, `level_m`, `type`, `flag`, and `datum` as for observations.
  */
 export async function writeExtremes(
   path: string,
   rows: PublishedExtreme[],
   datum: string,
 ): Promise<void> {
-  // Only BSH gives `transit` and `event`; other sources' files have observed extremes' columns.
-  const transit = rows.some((r) => "transit" in r);
-  await copyRows(
-    path,
-    rows,
-    FILES[transit ? "predicted-extremes" : "extremes"].columns,
-    datum,
-    (r) => [
-      r.time,
-      r.level,
-      r.flag,
-      null,
-      r.type,
-      null,
-      "transit" in r ? r.transit : null,
-      "event" in r ? r.event : null,
-    ],
-  );
+  await copyRows(path, rows, FILES.extremes.columns, datum, (r) => [
+    r.time,
+    r.level,
+    r.flag,
+    null,
+    r.type,
+    null,
+  ]);
 }
 
 export async function readExtremes(path: string): Promise<PublishedExtreme[]> {
@@ -454,17 +440,12 @@ export async function readExtremeFile(
 ): Promise<{ rows: PublishedExtreme[]; datums: string[] }> {
   const rows = await read(path, "SELECT epoch_ms(time) AS time, * EXCLUDE (time)");
   const datums = [...new Set(rows.map((r) => String(r.datum)))];
-  const extremes = rows.map((r) => {
-    const e = {
-      time: Number(r.time),
-      level: level(r.level_m),
-      type: r.type as "high" | "low",
-      flag: r.flag as Flag,
-    };
-    return r.transit === undefined || r.transit === null
-      ? e
-      : { ...e, transit: Number(r.transit), event: Number(r.event) as EventIndex };
-  });
+  const extremes = rows.map((r) => ({
+    time: Number(r.time),
+    level: level(r.level_m),
+    type: r.type as "high" | "low",
+    flag: r.flag as Flag,
+  }));
   return { rows: extremes, datums };
 }
 
@@ -576,8 +557,6 @@ const recentCells = (r: StationObservation): Cell[] => [
   r.received ?? null,
   null,
   r.station,
-  null,
-  null,
   r.epoch,
   r.source_flag ?? null,
 ];
@@ -1135,7 +1114,7 @@ type Cell = number | string | null;
 
 /**
  * Append rows to a scratch table with columns (time_ms, level_m, flag,
- * received_ms, type, station, transit, event, epoch, source_flag) and copy the
+ * received_ms, type, station, epoch, source_flag) and copy the
  * named columns out.
  */
 function copyRows<T>(
@@ -1170,7 +1149,7 @@ async function createTable(): Promise<string> {
   const db = await connection();
   const table = `rows_${Math.random().toString(36).slice(2)}`;
   await db.run(
-    `CREATE TABLE ${table} (time_ms DOUBLE, level_m FLOAT, flag UTINYINT, received_ms DOUBLE, type VARCHAR, station VARCHAR, transit INTEGER, event UTINYINT, epoch INTEGER, source_flag UTINYINT)`,
+    `CREATE TABLE ${table} (time_ms DOUBLE, level_m FLOAT, flag UTINYINT, received_ms DOUBLE, type VARCHAR, station VARCHAR, epoch INTEGER, source_flag UTINYINT)`,
   );
   return table;
 }
@@ -1179,26 +1158,14 @@ async function appendRows<T>(table: string, rows: T[], cells: (row: T) => Cell[]
   const db = await connection();
   const appender = await db.createAppender(table);
   for (const row of rows) {
-    const [
-      time,
-      level,
-      flag,
-      received,
-      type,
-      station,
-      transit,
-      event,
-      epoch = null,
-      sourceFlag = null,
-    ] = cells(row);
+    const [time, level, flag, received, type, station, epoch = null, sourceFlag = null] =
+      cells(row);
     appender.appendDouble(time as number);
     appender.appendFloat(level as number);
     appender.appendUTinyInt(flag as number);
     received === null ? appender.appendNull() : appender.appendDouble(received as number);
     type === null ? appender.appendNull() : appender.appendVarchar(type as string);
     station === null ? appender.appendNull() : appender.appendVarchar(station as string);
-    transit === null ? appender.appendNull() : appender.appendInteger(transit as number);
-    event === null ? appender.appendNull() : appender.appendUTinyInt(event as number);
     epoch === null ? appender.appendNull() : appender.appendInteger(epoch as number);
     sourceFlag === null ? appender.appendNull() : appender.appendUTinyInt(sourceFlag as number);
     appender.endRow();
