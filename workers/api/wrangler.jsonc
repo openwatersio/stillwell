@@ -9,7 +9,11 @@
   "preview_urls": false,
   // The poller's last 8 days (workers/live/schema.sql).
   "d1_databases": [
-    { "binding": "LIVE", "database_name": "stillwell-live", "database_id": "TODO-live-db" },
+    {
+      "binding": "LIVE",
+      "database_name": "stillwell-live",
+      "database_id": "5a6967f3-67b7-4522-b393-a08282aac76a",
+    },
   ],
   // The store.
   "r2_buckets": [{ "binding": "STORE", "bucket_name": "water-levels" }],
