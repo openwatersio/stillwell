@@ -511,6 +511,33 @@ describe("rws", () => {
     );
   });
 
+  it("reads RWS's numeric types 1 and 2, and fails on the table's other codes", async () => {
+    const times = [1, 2, 3].map((n) => `2027-01-01T0${n}:00:00+01:00`);
+    const range = [new Date("2026-12-31T00:00:00Z"), new Date("2027-01-02T00:00:00Z")] as const;
+    const get = (codes: string[]) => {
+      serve([
+        [
+          /OphalenWaarnemingen/,
+          answer(
+            [typeChannel, codes.map((c, i) => [times[i]!, c] as [string, string])],
+            [nap, codes.map((_, i) => [times[i]!, [170, -169, -160][i]!] as [string, number])],
+          ),
+        ],
+      ]);
+      return rws.extremes("pogum", ...range, { process: "astronomisch" });
+    };
+    assert.deepEqual(
+      (await get(["1", "2", "1"])).map((e) => [e.type, e.level]),
+      [
+        ["high", 1.7],
+        ["low", -1.69],
+        ["high", -1.6],
+      ],
+    );
+    for (const code of ["3", "4", "5"])
+      await assert.rejects(get(["1", "2", code]), new RegExp(`unknown extreme type ${code}`));
+  });
+
   it("fails on an extreme type it doesn't know rather than drop it", async () => {
     const time = "2024-01-01T02:00:00+01:00";
     serve([
