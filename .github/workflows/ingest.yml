@@ -1,8 +1,8 @@
 name: Ingest
 
 # Run any ingest command against the R2 store by hand, e.g.
-# `backfill rws hoekvanholland 2024 2025`. Ingest hourly and Compact daily run
-# `recent` and `compact` on a schedule.
+# `backfill rws hoekvanholland 2024 2025`. Compact daily runs `compact` on a
+# schedule.
 run-name: Ingest ${{ inputs.args }}
 on:
   workflow_dispatch:
@@ -50,7 +50,7 @@ jobs:
             # links reads levels and writes only its own file, in the group Monthly's job takes.
             links) group=links ;;
             matches) group=matches ;;
-            backfill | recent | compact | requalify | withhold | drop | misplaced | years | analyze) [ -n "${words[1]:-}" ] && group="store-${words[1]}" || group=store ;;
+            backfill | compact | requalify | withhold | drop | misplaced | years | analyze) [ -n "${words[1]:-}" ] && group="store-${words[1]}" || group=store ;;
             stations)
               echo "::error::Refresh station lists with the Monthly workflow, which runs each source in its own group and then publishes"
               exit 1

@@ -73,7 +73,7 @@ describe("commands", () => {
       for (const phase of ["server", "returning"] as const) {
         phases.set("ea", phase);
         sources.add("ea");
-        for (const job of ["hourly", "compact", "lists"] as const)
+        for (const job of ["compact", "lists"] as const)
           assert.ok(!sourcesFor(job).includes("ea"), `${phase} ${job}`);
         assert.equal(serverRuns("store-ea"), phase === "server", phase);
       }
@@ -203,18 +203,10 @@ describe("schedule", () => {
   const at = (iso: string) => due(new Date(iso), phases).map((p) => p.key);
 
   it("queues a server source's runs as Actions schedules them, keyed by their period", () => {
-    // EA is hourly, has observations and finalizes nothing.
+    // EA has observations and finalizes nothing.
     assert.deepEqual(at("2026-11-16T05:11:00Z"), ["compact:ea:2026-11-16"]);
-    assert.deepEqual(at("2026-11-16T05:12:00Z"), [
-      "hourly:ea:2026-11-16T05",
-      "compact:ea:2026-11-16",
-    ]);
-    assert.deepEqual(at("2026-11-16T00:39:00Z"), ["hourly:ea:2026-11-16T00"]);
-    assert.deepEqual(at("2026-11-02T01:30:00Z"), [
-      "hourly:ea:2026-11-02T01",
-      "compact:ea:2026-11-02",
-      "lists:ea:2026-11",
-    ]);
+    assert.deepEqual(at("2026-11-16T00:39:00Z"), []);
+    assert.deepEqual(at("2026-11-02T01:30:00Z"), ["compact:ea:2026-11-02", "lists:ea:2026-11"]);
     // Three days on, a source that moved since waits for next month's.
     assert.ok(!at("2026-11-05T01:30:00Z").includes("lists:ea:2026-11"));
   });
@@ -242,10 +234,10 @@ describe("actions", () => {
     // A re-run of one from before run-name names its arguments nowhere.
     assert.deepEqual(writing("ingest.yml", { id: 1, display_title: "Ingest" }, []), [ALL]);
     assert.deepEqual(
-      writing("ingest-hourly.yml", { id: 1, display_title: "Ingest hourly" }, [
+      writing("compact-daily.yml", { id: 1, display_title: "Compact daily" }, [
         job("gate", "completed"),
-        job("recent (ea)"),
-        job("recent (bom)", "completed"),
+        job("compact (ea)"),
+        job("compact (bom)", "completed"),
       ]),
       ["ea"],
     );
@@ -277,7 +269,6 @@ describe("job service", () => {
 describe("workflows", () => {
   it("runs the ownership guard before every job that writes one source does anything", () => {
     for (const [file, job] of [
-      ["ingest-hourly.yml", "recent"],
       ["compact-daily.yml", "compact"],
       ["monthly.yml", "lists"],
       ["monthly.yml", "refetch"],
@@ -402,7 +393,7 @@ describe("queue", () => {
     const a = enqueue(db, long("backfill ea all 2020 2027"))!;
     const b = enqueue(db, long("backfill bom all 2020 2027"))!;
     enqueue(db, long("backfill rws all 2020 2027"));
-    const d = enqueue(db, job("recent smhi --hours 12"))!;
+    const d = enqueue(db, job("compact smhi --days 6"))!;
     assert.deepEqual(
       startable(db, 3, () => true, 2).map((j) => j.id),
       [d.id, a.id, b.id],
@@ -417,22 +408,22 @@ describe("queue", () => {
     markStarted(db, 1, "/opt/r1");
     markStarted(db, 2, "/opt/r1");
     enqueue(db, long("requalify rws all 2020 2027"));
-    const hourly = enqueue(db, job("recent rws --hours 12"))!;
+    const short = enqueue(db, job("compact rws --days 6"))!;
     assert.deepEqual(
       startable(db, 3, () => true, 2).map((j) => j.id),
-      [hourly.id],
+      [short.id],
     );
   });
 
-  it("starts a lane's hourly run before a row of long jobs queued ahead of it", () => {
+  it("starts a lane's short job before a row of long jobs queued ahead of it", () => {
     const db = openQueue(":memory:");
     const long = (args: string) => ({ ...job(args), timeout: 360 });
     enqueue(db, long("backfill usgs all 2026 2027 --shard 2/3"));
     enqueue(db, long("backfill usgs all 2026 2027 --shard 3/3"));
-    const hourly = enqueue(db, job("recent usgs --hours 12"))!;
+    const short = enqueue(db, job("compact usgs --days 6"))!;
     assert.deepEqual(
       startable(db, 3, () => true, 2).map((j) => j.id),
-      [hourly.id],
+      [short.id],
     );
   });
 

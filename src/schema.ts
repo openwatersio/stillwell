@@ -101,7 +101,7 @@ export interface Station {
   /** The IDs of the errata, from `src/sources/<source>/errata.json`, that affect the station. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
-  /** Whether ingest asks for this station's current values: the hourly job and the realtime poller. */
+  /** Whether ingest asks for this station's current values: the poller. */
   live: boolean;
   /**
    * Where the source's quality checks of this station's values start, as a
@@ -273,7 +273,7 @@ export interface SourceMetadata {
    */
   archive?: "current" | "previous";
   /**
-   * Whether the source publishes values within hours, so hourly ingest polls
+   * Whether the source publishes values within hours, so the poller polls
    * its live stations into recent/. A source that delivers later, as UHSLC's
    * monthly fast-delivery files do, is left to backfill and the refetch.
    */
@@ -355,7 +355,7 @@ export interface Source {
   /**
    * Whether backfill keeps every level the store holds, replacing only those
    * at times it fetched, not each month it fetched: for a source that never
-   * withdraws a value, and whose archive can lack what hourly ingest kept,
+   * withdraws a value, and whose archive can lack what the poller kept,
    * such as a whole day or a late reading.
    */
   keepsStored?: boolean;

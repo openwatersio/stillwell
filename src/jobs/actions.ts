@@ -5,7 +5,6 @@ export const ALL = "*";
 
 /** The workflows that write one source per job, and the names of those jobs, `<name> (<source>)`. */
 const WORKFLOWS: Record<string, string[]> = {
-  "ingest-hourly.yml": ["recent"],
   "compact-daily.yml": ["compact"],
   "monthly.yml": ["lists", "refetch"],
 };

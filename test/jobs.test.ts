@@ -13,21 +13,6 @@ import { stationListPath } from "../src/store/paths.ts";
 
 describe("sourcesFor", () => {
   it("picks each job's sources from the adapters' metadata", () => {
-    assert.deepEqual(sourcesFor("hourly"), [
-      "cdec",
-      "coops",
-      "dmi",
-      "ea",
-      "kartverket",
-      "pegelonline",
-      "refmar",
-      "rws",
-      "sfwmd",
-      "smhi",
-      "unam",
-      "usace",
-      "usgs",
-    ]);
     assert.deepEqual(sourcesFor("compact"), [
       "bodc",
       "bom",
@@ -88,10 +73,9 @@ describe("sourcesFor", () => {
   });
 
   it("polls hourly only sources that can fetch observed levels", () => {
-    for (const id of sourcesFor("hourly")) {
-      const source = sources[id]!;
-      assert.ok(source.observations || source.recent, `${id} is hourly with nothing to fetch`);
-    }
+    for (const [id, source] of Object.entries(sources))
+      if (source.metadata.hourly)
+        assert.ok(source.observations || source.recent, `${id} is hourly with nothing to fetch`);
   });
 
   it("schedules only sources that may be redistributed, and compacts every hourly one", () => {
@@ -109,7 +93,7 @@ describe("sourcesFor", () => {
     });
     try {
       sources.zz = fake(false, { observations: base.observations });
-      for (const job of ["hourly", "compact", "lists", "refetch"] as const)
+      for (const job of ["compact", "lists", "refetch"] as const)
         assert.ok(!sourcesFor(job).includes("zz"), job);
       // A source whose only fetch is a sweep of recent values is still folded.
       sources.zz = fake(true, { recent: base.recent });
@@ -130,7 +114,7 @@ describe("scripts/sources.ts", () => {
     execFileSync(process.execPath, ["scripts/sources.ts", ...args], { encoding: "utf8" });
 
   it("prints a job's sources as a JSON array for a workflow matrix", () => {
-    assert.deepEqual(JSON.parse(run("hourly")), sourcesFor("hourly"));
+    assert.deepEqual(JSON.parse(run("compact")), sourcesFor("compact"));
     assert.deepEqual(JSON.parse(run("refetch", "coops", "pegelonline")), ["coops"]);
   });
 
@@ -173,10 +157,7 @@ describe("scripts/sources.ts imports", () => {
 describe("scheduled jobs for a source with no list yet", () => {
   it("skip it, saying the Monthly workflow starts its list", () => {
     const root = mkdtempSync(join(tmpdir(), "stillwell-jobs-"));
-    for (const args of [
-      ["recent", "coops"],
-      ["compact", "coops"],
-    ]) {
+    for (const args of [["compact", "coops"]]) {
       const out = execFileSync(process.execPath, ["scripts/ingest.ts", ...args], {
         encoding: "utf8",
         env: {
@@ -203,7 +184,7 @@ describe("Monthly workflow", () => {
     const step = jobs.lists!.steps.find((s) => s.run?.includes("monthly.sh requalify-recent"));
     assert.ok(step, "the lists job requalifies");
     assert.equal(jobs.lists!.concurrency?.group, "store-${{ matrix.source }}");
-    // A dispatched refresh of named sources, such as Ingest hourly's on a datum change, skips it.
+    // A dispatched refresh of named sources, such as the poller's on a datum change, skips it.
     assert.equal(
       step.if,
       "${{ !cancelled() && steps.owns.outcome == 'success' && !inputs.sources }}",

@@ -20,7 +20,8 @@ import {
 } from "../src/store/parquet.ts";
 import {
   boundsPath,
-  recentPath,
+  recentDayPath,
+  recentDays,
   seriesPath,
   sourcesPath,
   errataPath,
@@ -121,6 +122,9 @@ after(() => {
 
 const NOW = "2026-11-05T00:00:00Z";
 const LATER = "2026-12-05T00:00:00Z";
+
+/** Today's daily file, which a refresh reads as it runs. */
+const todayFile = (root: string) => recentDayPath(root, "test", recentDays(Date.now(), 1)[0]!);
 
 describe("refreshSource", () => {
   let store: string;
@@ -225,8 +229,8 @@ describe("refreshSource", () => {
     );
   });
 
-  it("refuses to start a list over a recent window the store already has", async () => {
-    await writeRecent(recentPath(store, "test"), [
+  it("refuses to start a list over a daily file the store already has", async () => {
+    await writeRecent(todayFile(store), [
       [{ station: "test/a", time: Date.parse(NOW), level: 1, flag: Flag.good, epoch: 1 }],
     ]);
     await assert.rejects(
@@ -369,10 +373,10 @@ describe("refreshSource", () => {
     );
   });
 
-  it("numbers a new epoch above an epoch only the recent window still has", async () => {
+  it("numbers a new epoch above an epoch only a daily file still has", async () => {
     await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
     // Rows from an epoch 2 that a restored list no longer knows about.
-    await writeRecent(recentPath(store, "test"), [
+    await writeRecent(todayFile(store), [
       [{ station: "test/a", time: Date.parse(NOW), level: 1, flag: Flag.good, epoch: 2 }],
     ]);
     const { stations } = await refreshSource(store, sourceOf([listed("a", { datum: "MSL" })]), {
@@ -733,7 +737,7 @@ describe("startedListOf", () => {
   });
 
   it("fails for a store with the source's series but no list or history", async () => {
-    await writeRecent(recentPath(store, "test"), []);
+    await writeRecent(todayFile(store), []);
     await assert.rejects(startedListOf(store, sourceOf([])), /test series but no list or history/);
   });
 
@@ -754,9 +758,9 @@ describe("startedListOf", () => {
       );
       await writeStations(stationsPath(store), []);
       assert.equal(await startedListOf(http, sourceOf([])), null);
-      await writeRecent(recentPath(store, "test"), []);
+      await writeRecent(todayFile(store), []);
       await assert.rejects(startedListOf(http, sourceOf([])), /test series but no list/);
-      await rm(recentPath(store, "test"));
+      await rm(todayFile(store));
       await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
       await publishStations(store, [sourceOf([])], ["test"], []);
       assert.equal((await startedListOf(http, sourceOf([])))!.length, 1);

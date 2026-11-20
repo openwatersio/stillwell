@@ -177,7 +177,7 @@ export async function stations(previous: Station[] = []): Promise<DmiStation[]> 
       handedOver === null ? undefined : new Date(handedOver - DAY_MS).toISOString().slice(0, 10),
     ].filter((d): d is string => !!d);
     const recordEnd = ends.sort()[0] ?? null;
-    // A handover the stored list doesn't end at yet: hourly ingest may have stored
+    // A handover the stored list doesn't end at yet: the poller may have stored
     // the new owner's values since, which have to be deleted by hand. A station
     // the store has never listed has no values to delete but still counts toward
     // the floor; one stored inactive with no end isn't read hourly, so neither.
