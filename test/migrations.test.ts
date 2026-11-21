@@ -69,6 +69,26 @@ describe("migration problems", () => {
     assert.match(one({ ingest: "drop gesla --dry-run" })[0], /--dry-run/);
   });
 
+  it("refuses a withhold or drop with no prune of both files after it", () => {
+    const prunes: Migration["steps"] = [{ ingest: "matches --prune" }, { ingest: "links --prune" }];
+    assert.deepEqual(problems(steps({ ingest: "withhold ea" }, ...prunes)), []);
+    assert.deepEqual(problems(steps({ ingest: "drop gesla" }, ...prunes.toReversed())), []);
+    assert.deepEqual(problems(steps({ ingest: "compact ea" })), []);
+    assert.deepEqual(one({ ingest: "withhold ea" }), [
+      "withhold ea: follow it with a `matches --prune` step",
+      "withhold ea: follow it with a `links --prune` step",
+    ]);
+    assert.deepEqual(problems(steps(...prunes, { ingest: "drop gesla" })).length, 2);
+    assert.deepEqual(
+      problems(steps({ ingest: "withhold ea" }, { ingest: "matches" }, prunes[1]!)),
+      ["withhold ea: follow it with a `matches --prune` step"],
+    );
+    assert.deepEqual(
+      problems(steps({ ingest: "withhold ea" }, ...prunes, { ingest: "drop gesla" }, prunes[0]!)),
+      ["drop gesla: follow it with a `links --prune` step"],
+    );
+  });
+
   it("refuses a budget that can end a requalify before it's done", () => {
     assert.deepEqual(one({ ingest: "requalify ea all 2020 2027" }), []);
     assert.match(one({ ingest: "requalify ea all 2020 2027 --budget 0" })[0], /--budget/);

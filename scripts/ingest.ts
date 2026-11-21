@@ -3,8 +3,8 @@
  *
  *   node scripts/ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish]
  *   node scripts/ingest.ts publish
- *   node scripts/ingest.ts links [--concurrency 4]
- *   node scripts/ingest.ts matches [--concurrency 4] [--accept-matches]
+ *   node scripts/ingest.ts links [--concurrency 4] [--prune]
+ *   node scripts/ingest.ts matches [--concurrency 4] [--accept-matches] [--prune]
  *   node scripts/ingest.ts backfill <source> <station,...|all|preliminary> <start> <end>
  *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written] [--skip-unscreened]
  *       [--with-inactive]
@@ -127,6 +127,7 @@ import {
   setConnections,
   publishedSources,
   readJsonArray,
+  readStationList,
   writeJsonArray,
   type YearStats,
 } from "../src/store/parquet.ts";
@@ -141,9 +142,11 @@ import {
 } from "../src/store/analysis.ts";
 import {
   boundsPath,
+  linksPath,
   matchesPath,
   requalifyLeftPath,
   seriesDir,
+  stationListPath,
   stationsPath,
   yearsPath,
   RECENT_DAYS,
@@ -169,9 +172,8 @@ import type {
   Station,
 } from "../src/schema.ts";
 import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
-import { dropFiles, removePrefixes, withhold, withheldReason } from "../src/withhold.ts";
+import { DROPS, dropFiles, removePrefixes, withhold, withheldReason } from "../src/withhold.ts";
 import { misplaced } from "../src/store/misplaced.ts";
-import { deletesFiles } from "../src/sources/gesla/dropped.ts";
 import { storeFor, storeOfSource } from "../src/store/stores.ts";
 import { measureLinks, readLinks, writeLinks } from "../src/links.ts";
 import {
@@ -196,8 +198,47 @@ const shown = (id: string) => {
   return !source || withheldReason(source, id) === null;
 };
 
-/** The records whose files `drop` deletes, by source. */
-const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFiles };
+/**
+ * With `--prune`, `links` and `matches` only take out the rows `withoutGone`
+ * does, measuring nothing, so the Ingest workflow can drop a withheld or
+ * dropped station's rows in minutes after a `withhold` or `drop`. A file with
+ * no such row isn't written.
+ */
+async function prune<T>(
+  path: string,
+  stored: number,
+  kept: T[],
+  write: (rows: T[]) => Promise<void>,
+): Promise<void> {
+  if (kept.length < stored) await write(kept);
+  console.log(
+    `${path}: ${stored - kept.length} rows naming a withheld or dropped station taken out, ${kept.length} kept`,
+  );
+}
+
+/**
+ * The stations `--prune` tells gone rows by, from each source's list as
+ * stored: `withoutGone` reads only their IDs, so it needs no levels, bounds or
+ * matches. A dropped record is known only through its source's list, so a
+ * source `drop` covers with no list fails the run, leaving `file` unchanged.
+ */
+async function listedStations(
+  store: string,
+  held: Source[],
+  file: string,
+): Promise<StoredStation[] | null> {
+  const stations: StoredStation[] = [];
+  for (const source of held) {
+    const list = await readStationList(stationListPath(store, source.metadata.id));
+    if (list) stations.push(...list);
+    else if (source.metadata.id in DROPS) {
+      console.error(`${store}: no list for ${source.metadata.id}; ${file} unchanged`);
+      process.exitCode = 1;
+      return null;
+    }
+  }
+  return stations;
+}
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -217,12 +258,21 @@ switch (command) {
     setConnections(positive("concurrency"));
     for (const store of new Set(Object.values(sources).flatMap(storesOf))) {
       const held = Object.values(sources).filter((s) => storesOf(s).includes(store));
+      if (values.prune) {
+        const listed = await listedStations(store, held, "links");
+        if (!listed) continue;
+        const stored = await readLinks(store);
+        const kept = withoutGone(stored, listed, shown);
+        await prune(linksPath(store), stored.length, kept, (rows) => writeLinks(store, rows));
+        continue;
+      }
       const stations = await stationsToMeasure(store, held);
+      const previous = withoutGone(await readLinks(store), stations, shown);
       const { rows, failed } = await measureLinks(
         store,
         stations,
         positive("concurrency"),
-        withoutGone(await readLinks(store), stations, shown),
+        previous,
       );
       await writeLinks(store, rows);
       // Written first, so the pairs that were read are kept; a failed read keeps its pair's last row.
@@ -234,6 +284,14 @@ switch (command) {
     setConnections(positive("concurrency"));
     for (const store of new Set(Object.values(sources).flatMap(storesOf))) {
       const held = Object.values(sources).filter((s) => storesOf(s).includes(store));
+      if (values.prune) {
+        const listed = await listedStations(store, held, "matches");
+        if (!listed) continue;
+        const stored = await readMatches(store);
+        const kept = withoutGone(stored, listed, shown);
+        await prune(matchesPath(store), stored.length, kept, (rows) => writeMatches(store, rows));
+        continue;
+      }
       const stations = await stationsToMeasure(store, held);
       // A missing list or years file leaves no stations; last month's file stays.
       if (!stations.length) {
@@ -1206,7 +1264,7 @@ async function withholdStations(sourceId: string): Promise<void> {
   ];
   if (ids.length)
     lines.push(
-      `Refresh ${sourceId}'s list with the Monthly workflow (sources: ${sourceId}) to drop them from it and publish stations.parquet, and Ingest \`matches --concurrency 16\` (timeout 300) and \`links --concurrency 8\` to drop their rows from those files.`,
+      `Refresh ${sourceId}'s list with the Monthly workflow (sources: ${sourceId}) to drop them from it and publish stations.parquet. In the Ingest workflow, this withhold's prune jobs run \`matches --prune\` and \`links --prune\`, which take their rows out of stations/matches.parquet and stations/links.parquet, as a migration's prune steps do after it; after a withhold run anywhere else, dispatch Ingest with each.`,
     );
   for (const line of lines) console.log(line);
   const file = process.env.GITHUB_STEP_SUMMARY;
@@ -1227,7 +1285,7 @@ async function dropStations(sourceId: string): Promise<void> {
   ];
   if (ids.length && !dryRun)
     lines.push(
-      `Run \`compact ${sourceId} --rebuild-bounds\` and \`publish\` so the bounds and stations.parquet drop them, and Ingest \`matches --concurrency 16\` (timeout 300) and \`links --concurrency 8\` so their files do.`,
+      `Run \`compact ${sourceId} --rebuild-bounds\` and \`publish\` so the bounds and stations.parquet drop them. In the Ingest workflow, this drop's prune jobs run \`matches --prune\` and \`links --prune\`, which take their rows out of stations/matches.parquet and stations/links.parquet, as a migration's prune steps do after it; after a drop run anywhere else, dispatch Ingest with each.`,
     );
   for (const line of lines) console.log(line);
   const file = process.env.GITHUB_STEP_SUMMARY;
@@ -1286,7 +1344,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | matches [--concurrency N] [--accept-matches] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] [--prune] | matches [--concurrency N] [--accept-matches] [--prune] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }

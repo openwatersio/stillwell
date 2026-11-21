@@ -70,7 +70,25 @@ export function problems(migration: Migration): string[] {
     )
       out.push(`${step.ingest}: pass a --budget of at least the timeout, ${timeout}`);
   }
+  out.push(...unpruned(migration.steps ?? []));
   return out;
+}
+
+/**
+ * A `withhold` or `drop` leaves its stations' rows in stations/matches.parquet and stations/links.parquet until a
+ * `matches --prune` and a `links --prune` after it take them out, as the Ingest workflow's prune jobs do.
+ */
+function unpruned(steps: Step[]): string[] {
+  const ingest = steps.map((s) => ("ingest" in s ? argsOf(s) : []));
+  const last = ingest.findLastIndex((args) => ["withhold", "drop"].includes(words(args)[0]!));
+  if (last < 0) return [];
+  const after = ingest.slice(last + 1);
+  return ["matches", "links"]
+    .filter((c) => !after.some((args) => words(args)[0] === c && args.includes("--prune")))
+    .map(
+      (c) =>
+        `${(steps[last] as { ingest: string }).ingest}: follow it with a \`${c} --prune\` step`,
+    );
 }
 
 /** Every migration in src/migrations/, by ID (its file name), sorted. */
