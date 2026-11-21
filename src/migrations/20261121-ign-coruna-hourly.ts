@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { errata } from "../sources/index.ts";
 import { errataReader } from "../store/errata-reader.ts";
 import { Flag } from "../schema.ts";
@@ -17,6 +18,34 @@ const LAST_YEAR = 2023;
 const YEARS = Array.from({ length: LAST_YEAR - FIRST_YEAR + 1 }, (_, i) => FIRST_YEAR + i);
 /** Every observation in the 24 admitted files, from the recorded inputs the change was validated on. */
 const OBSERVATIONS = 209_544;
+
+/** Each year's MD5 (first 16 hex digits) of its `time,level` rows, from the 24 files whose SHA-256 receipts are in docs/results/ign-coruna-2026-11-18/input-files.csv. */
+const DIGESTS: Record<number, string> = {
+  "2000": "a35a42726ad6fb64",
+  "2001": "f7823793dbe76708",
+  "2002": "39b967f4621dcdc2",
+  "2003": "20be03606ad7bee7",
+  "2004": "e056dbbc397c2401",
+  "2005": "beabeb0608c3e016",
+  "2006": "7c10ddda983e6f6b",
+  "2007": "2e0b76eda0118cab",
+  "2008": "53e9684086c01bb0",
+  "2009": "859f96ee8bd2446b",
+  "2010": "6b1b5b92cafb0617",
+  "2011": "258f66e3ac607aab",
+  "2012": "9b648c5e2670264e",
+  "2013": "0693e5677ced2c74",
+  "2014": "55333374fd68badc",
+  "2015": "654acd45da2f48cf",
+  "2016": "4e9f7f57e7921e1f",
+  "2017": "063e5f0e9d171596",
+  "2018": "338905f827d5f713",
+  "2019": "8462a189077e6b68",
+  "2020": "d01259d5b9a9e0ed",
+  "2021": "60471d90f72e4783",
+  "2022": "1143d5e7d4a6e08e",
+  "2023": "de27b7dd06791787",
+};
 
 const ID = "ign/ACOR1";
 
@@ -53,16 +82,41 @@ export default {
     // One station and 24 yearly files, a request every 350 ms, so one run holds the whole range.
     { ingest: "backfill ign all 2000 2025 --with-inactive --refetch" },
     { ingest: "compact ign --rebuild-bounds" },
-    { ingest: "publish" },
-    { ingest: `requalify ign ACOR1 ${FIRST_YEAR} 2025` },
     {
       check:
-        "ign/ACOR1 has 24 year files, 2000 to 2023, each with only its own year's hours, every quality flag at least suspect and every source flag good",
+        "ign/ACOR1 has 24 year files, 2000 to 2023, whose every time and level is the validated one, each time in its own year, every quality flag at least suspect and every source flag good",
       async verify(store) {
         const years = await listYears(seriesDir(store, "levels", "ign", "ACOR1"));
         const held = [...years].sort((a, b) => a - b);
         if (held.join() !== YEARS.join())
           throw new Error(`${ID} has year files for ${held.join(", ") || "no year"}`);
+        let total = 0;
+        for (const [year, observations] of await readAll(store)) {
+          if (!observations.length) throw new Error(`${ID} ${year}: no levels`);
+          total += observations.length;
+          const digest = createHash("md5");
+          for (const o of observations) {
+            const at = new Date(o.time).toISOString();
+            if (new Date(o.time).getUTCFullYear() !== year)
+              throw new Error(`${ID} ${year}: a level at ${at}`);
+            if (o.flag < Flag.suspect) throw new Error(`${ID} ${year}: flag ${o.flag} at ${at}`);
+            if (o.source_flag !== Flag.good)
+              throw new Error(`${ID} ${year}: source flag ${o.source_flag} at ${at}`);
+            digest.update(`${o.time},${o.level}\n`);
+          }
+          if (digest.digest("hex").slice(0, 16) !== DIGESTS[year])
+            throw new Error(`${ID} ${year}: the levels differ from the validated ones`);
+        }
+        if (total !== OBSERVATIONS)
+          throw new Error(`${ID} holds ${total} levels, not the ${OBSERVATIONS} validated`);
+      },
+    },
+    { ingest: "publish" },
+    { ingest: `requalify ign ACOR1 ${FIRST_YEAR} 2025` },
+    {
+      check:
+        "IGN's years file holds the 24 year files of ign/ACOR1, and requalifying kept every quality flag at least suspect",
+      async verify(store) {
         const rows = await readRows(yearsPath(store, "ign"));
         const files = rows.filter((r) => r.year !== null);
         if (files.length !== rows.length)
@@ -71,24 +125,9 @@ export default {
           throw new Error(
             `IGN's years file holds ${files.length} files, not ${YEARS.length} of ${ID}`,
           );
-
-        let total = 0;
-        for (const [year, observations] of await readAll(store)) {
-          if (!observations.length) throw new Error(`${ID} ${year}: no levels`);
-          total += observations.length;
-          for (const o of observations) {
-            if (new Date(o.time).getUTCFullYear() !== year)
-              throw new Error(`${ID} ${year}: a level at ${new Date(o.time).toISOString()}`);
-            if (o.flag < Flag.suspect)
-              throw new Error(`${ID} ${year}: flag ${o.flag} at ${new Date(o.time).toISOString()}`);
-            if (o.source_flag !== Flag.good)
-              throw new Error(
-                `${ID} ${year}: source flag ${o.source_flag} at ${new Date(o.time).toISOString()}`,
-              );
-          }
-        }
-        if (total !== OBSERVATIONS)
-          throw new Error(`${ID} holds ${total} levels, not the ${OBSERVATIONS} validated`);
+        for (const [year, observations] of await readAll(store))
+          if (observations.some((o) => o.flag < Flag.suspect))
+            throw new Error(`${ID} ${year}: a level below suspect after requalifying`);
       },
     },
     {

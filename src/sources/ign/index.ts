@@ -385,6 +385,23 @@ export async function levels(
   return out.filter((o) => o.time >= from && o.time < to).sort((a, b) => a.time - b.time);
 }
 
+/**
+ * The admitted files hold exactly their header and one row per hour, with a terminal midnight at most. The candidate
+ * parser tolerates repeated rows, blank lines and impossible-date markers, which would vanish before the grid is counted.
+ */
+function admittedShape(body: string, year: number): void {
+  const [header = "", ...rows] = body.trim().split(/\r?\n/);
+  if (!/^\d+ \S+ \d+ ACOR1 .*\bDatos horarios en mm respecto JM\b/.test(header))
+    throw new Error(`IGN ACOR1 ${year}: header names another station, product or unit`);
+  const hours = (Date.UTC(year + 1, 0, 1) - Date.UTC(year, 0, 1)) / 3_600_000;
+  // The one extra row allowed is the next year's first midnight.
+  const closing = rows.length === hours + 1 && rows.at(-1)!.startsWith(`01/01/${year + 1} 00:00`);
+  if (rows.some((row) => !row.trim()) || (rows.length !== hours && !closing))
+    throw new Error(
+      `IGN ACOR1 ${year}: incomplete or off-hour hourly grid, ${rows.length} rows for ${hours} hours`,
+    );
+}
+
 /** The admitted hourly archive; other products and periods remain research-only. */
 export async function corunaHourly(start: Date, end: Date, datum = "JM"): Promise<Observation[]> {
   if (datum !== "JM") throw new Error(`IGN ACOR1: expected datum JM, got ${datum}`);
@@ -404,7 +421,9 @@ export async function corunaHourly(start: Date, end: Date, datum = "JM"): Promis
     const nextYear = Date.UTC(year + 1, 0, 1);
     if (Date.UTC(year, 0, 1) >= to || nextYear <= from) continue;
     const file = `200031_horarios_${year}_JM.txt`;
-    const rows = parse(await text(path + file), {
+    const body = await text(path + file);
+    admittedShape(body, year);
+    const rows = parse(body, {
       year,
       gauge: "ACOR1",
       raw: false,
@@ -413,6 +432,9 @@ export async function corunaHourly(start: Date, end: Date, datum = "JM"): Promis
       sign: 1,
       offset: 0,
     }).filter((row) => row.time < nextYear);
+    for (const row of rows)
+      if (!row.withdrawn && !Number.isFinite(row.level))
+        throw new Error(`IGN ACOR1 ${year}: a level that is not a finite number`);
     // A changed/truncated annual grid is not an admitted file: erratum `ign-coruna-hourly-grid`.
     const first = Date.UTC(year, 0, 1);
     if (

@@ -226,6 +226,26 @@ describe("IGN", () => {
     }
   });
 
+  it("refuses an admitted file whose header names another station, product or unit, or whose rows repeat, blank out or overflow", async () => {
+    const complete = hourlyYear(2000);
+    const [header, first] = complete.split("\n");
+    for (const body of [
+      complete.replace("031 ACOR1", "999 ACOR1-0701"),
+      complete.replace("Datos horarios", "Datos minutales"),
+      complete.replace("en mm", "en m (original export in mm)"),
+      complete.replace(`${first}\n`, `${first}\n${first}\n`),
+      complete.replace(`${first}\n`, `${first}\n\n`),
+      complete.replace(first!, `01/01/2000 00:00 ${"9".repeat(320)}`),
+    ]) {
+      serve({ "ACOR1/procesados/horarios/200031_horarios_2000_JM.txt": body });
+      await assert.rejects(
+        () => ign.corunaHourly(new Date("2000-01-01Z"), new Date("2000-01-02Z")),
+        /header names|hourly grid|finite/,
+      );
+    }
+    assert.match(header!, /ACOR1/);
+  });
+
   it("treats Coruña hourly -9999 as an unusable aggregate without inventing a level", async () => {
     serve({
       "ACOR1/procesados/horarios/200031_horarios_2000_JM.txt": hourlyYear(2000).replace(

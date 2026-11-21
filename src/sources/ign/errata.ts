@@ -192,9 +192,20 @@ export default {
       evidence:
         "The 24 downloaded Coruña hourly exports all have complete regular own-year grids: 210384 hours before unusable aggregate markers are removed. Receipt hashes and complete local checks are in docs/results/ign-coruna-2026-11-18/. Tests reproduce truncation, an interior missing row and a half-hour timestamp.",
       check: async (store) => {
-        const years = new Set((await held(store)).map((o) => new Date(o.time).getUTCFullYear()));
-        for (let year = 2000; year < 2024; year++)
-          if (!years.has(year)) throw new Error(`ign/ACOR1 holds no levels in ${year}`);
+        // Only unusable aggregates are missing from a complete grid (840 in all), so a year well under its hours was cut short.
+        const counts = new Map<number, number>();
+        for (const o of await held(store)) {
+          if (o.time % 3_600_000)
+            throw new Error(`ign/ACOR1 holds a level off the hour at ${o.time}`);
+          const year = new Date(o.time).getUTCFullYear();
+          counts.set(year, (counts.get(year) ?? 0) + 1);
+        }
+        for (let year = 2000; year < 2024; year++) {
+          const hours = (Date.UTC(year + 1, 0, 1) - Date.UTC(year, 0, 1)) / 3_600_000;
+          const held = counts.get(year) ?? 0;
+          if (held < hours * 0.9 || held > hours)
+            throw new Error(`ign/ACOR1 holds ${held} levels in ${year}, of ${hours} hours`);
+        }
       },
     },
   ],

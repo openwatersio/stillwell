@@ -17,8 +17,6 @@ Hourly sea levels from tide gauges worldwide, read from the University of Hawaii
 - **Reissues:** UHSLC can reissue a version's values in place. A year that holds only RQ values isn't read again once it has ended, so such a reissue doesn't reach the store on its own.
 - **Unscanned versions:** the withheld rule works from the last scan of the documentation files, so a refusing contributor's record under a station number the scan hasn't read, such as a new gauge, is listed until the next scan.
 
-IGN is a separate originator: only verified IDs or explicit links join its records to UHSLC copies. Same-port Coruña records are not matched to IGN by proximity or tidal agreement.
-
 ## Running ingest
 
 - **Contributor scan:** `node scripts/uhslc-contributors.ts` reads every documentation file again (about 720, a second apart) and rewrites [`contributors.ts`](contributors.ts) and the table in [contributors.md](contributors.md). Run it (`npm run uhslc:contributors`) after each UHSLC release. A rescan that would lose a refusal, because UHSLC reworded the notice or dropped the version that carried it, fails rather than list the station again, unless `--allow-lost-refusal` says the loss was checked. [Withheld stations](../../../docs/contributing/sources.md#withheld-stations) has how withheld stations leave the store.
