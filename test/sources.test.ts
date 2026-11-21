@@ -3781,27 +3781,6 @@ describe("usgs", () => {
     asked.length = 0;
     await fetch(2020, 2021);
     assert.deepEqual(asked, []);
-    // A series listed with no dates has no values; one from a list without the field is asked for.
-    const undated = (series_begin?: null) =>
-      usgs.source.observations!(
-        { ...(station as object), series_begin, series_end: series_begin } as never,
-        new Date(Date.UTC(2007, 0)),
-        new Date(Date.UTC(2009, 0)),
-      );
-    await undated(null);
-    assert.deepEqual(asked, []);
-    await undated(undefined);
-    assert.equal(asked.length, 2);
-    // A live series, whose end is left null, and one with an end, are asked for.
-    for (const fields of [{ live: true }, { series_end: "2008-06-01T00:00:00+00:00" }]) {
-      asked.length = 0;
-      await usgs.source.observations!(
-        { ...(station as object), series_begin: null, series_end: null, ...fields } as never,
-        new Date(Date.UTC(2007, 0)),
-        new Date(Date.UTC(2009, 0)),
-      );
-      assert.equal(asked.length, 2);
-    }
   });
 
   it("refuses an empty answer that isn't a feature collection, since an empty year is recorded", async () => {
@@ -3818,8 +3797,9 @@ describe("usgs", () => {
       "{}",
       JSON.stringify({ type: "FeatureCollection", features: [] }),
       JSON.stringify({ features: [], numberReturned: 0 }),
-      // A page cut short of the count it gives.
+      // A page cut short of the count it gives, or with none.
       JSON.stringify({ type: "FeatureCollection", features: [value], numberReturned: 2 }),
+      JSON.stringify({ type: "FeatureCollection", features: [value] }),
     ]) {
       setTransport(async () => body);
       await assert.rejects(year(), /USGS continuous: not a feature collection/);

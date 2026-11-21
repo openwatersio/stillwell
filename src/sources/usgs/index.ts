@@ -625,16 +625,9 @@ function toStation(
   };
 }
 
-/**
- * The part of [start, end) the station's series covers, or null when it covers
- * none of it. A series that isn't live and that `time-series-metadata` lists
- * with neither begin nor end has no values in `continuous`, so it covers
- * nothing. `undefined`, from a list written before the fields, isn't known and
- * covers everything, and so does a live series, whose end is left null.
- */
+/** The part of [start, end) the station's series covers, or null when it covers none of it. */
 export function within(station: Station, start: Date, end: Date): [Date, Date] | null {
   const s = station as Station & Partial<UsgsStation>;
-  if (!s.live && s.series_begin === null && s.series_end === null) return null;
   const from = s.series_begin
     ? Math.max(start.getTime(), Date.parse(s.series_begin))
     : start.getTime();
@@ -905,13 +898,13 @@ async function* featurePages<T>(
   while (url) {
     const page: Collection<T> = await request<Collection<T>>(url, options);
     // An empty answer means no values (`skip_empty`) only as a whole feature collection: USGS
-    // sends `type` and `numberReturned: 0` with one from `continuous`, `time-series-metadata`
-    // and `monitoring-locations` alike. A page whose count disagrees with its features was cut short.
-    const count = page?.numberReturned;
+    // sends `type` and `numberReturned` with every page from `continuous`, `time-series-metadata`
+    // and `monitoring-locations`, 0 with an empty one. A page whose count is missing or disagrees
+    // with its features was cut short.
     if (
       page?.type !== "FeatureCollection" ||
       !Array.isArray(page.features) ||
-      (page.features.length ? count !== undefined && count !== page.features.length : count !== 0)
+      page.numberReturned !== page.features.length
     )
       throw new Error(`USGS ${collection}: not a feature collection`);
     yield page.features;

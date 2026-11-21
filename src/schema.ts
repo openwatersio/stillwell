@@ -301,7 +301,8 @@ export interface SourceMetadata {
   /**
    * Whether a `--skip-written` backfill records a year with no file that came back empty and skips
    * it for 30 days (`src/empty-years.ts`), though the adapter can't show the empty answer wasn't an
-   * outage, so publish still counts the year missing. `empty_means_none` implies it.
+   * outage, so publish still counts such a year inside a station's record missing. `empty_means_none`
+   * implies it.
    */
   skip_empty?: boolean;
   /**

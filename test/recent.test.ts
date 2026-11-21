@@ -393,6 +393,7 @@ describe("refreshStation", () => {
           v("b-00065", NOW - HOUR, "3.00"),
           v("someone-else", NOW - HOUR, "1.00"),
         ],
+        numberReturned: 4,
         links: [],
       });
     });
