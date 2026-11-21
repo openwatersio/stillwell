@@ -1,5 +1,6 @@
 import { firstOfMonth, REFETCH_YEARS, yearOf } from "../schedule.ts";
 import { getJson, type RequestOptions } from "../../http.ts";
+import { overrides } from "./overrides.ts";
 import {
   Flag,
   stationDefaults,
@@ -1009,6 +1010,7 @@ export const source: Source = {
       ],
     ],
   },
+  overrides,
   stations,
   seriesChanged,
   observations: async (s: Station, start, end) => {

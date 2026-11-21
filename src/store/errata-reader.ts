@@ -57,15 +57,15 @@ export function errataReader(
       if (!(from < to)) throw new Error(`${since} to ${until} isn't a span of UTC days`);
       // Each epoch's rows only within its span, as every reader goes by span: a split left rows in the earlier epoch's files until `ingest misplaced` moves them.
       const epochs = listed.epochs.length
-        ? listed.epochs
-            .filter((e) => e.state !== "rejected")
-            .map((e) => ({
-              id: e.id,
-              since: e.since ? Date.parse(e.since) : -Infinity,
-              until: e.until ? Date.parse(e.until) : Infinity,
-            }))
-        : [{ id: 1, since: -Infinity, until: Infinity }];
-      const out: Awaited<ReturnType<StoreReader["levels"]>> = [];
+        ? listed.epochs.map((e) => ({
+            id: e.id,
+            rejected: e.state === "rejected",
+            since: e.since ? Date.parse(e.since) : -Infinity,
+            until: e.until ? Date.parse(e.until) : Infinity,
+          }))
+        : [{ id: 1, rejected: false, since: -Infinity, until: Infinity }];
+      // A rejected epoch's files are read as the epoch before it, so a time in both goes to the one that isn't rejected.
+      const byTime = new Map<number, Awaited<ReturnType<StoreReader["levels"]>>[number]>();
       for (const epoch of epochs) {
         const [lo, hi] = [Math.max(from, epoch.since), Math.min(to, epoch.until)];
         if (lo >= hi) continue;
@@ -87,10 +87,12 @@ export function errataReader(
               lo,
               hi,
             ),
-          ))
-            out.push({ ...o, epoch: epoch.id });
+          )) {
+            if (epoch.rejected && byTime.has(o.time)) continue;
+            byTime.set(o.time, { ...o, epoch: epoch.id });
+          }
       }
-      return out.sort((a, b) => a.time - b.time);
+      return [...byTime.values()].sort((a, b) => a.time - b.time);
     },
   };
   return reader;

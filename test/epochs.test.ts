@@ -418,6 +418,92 @@ describe("nextEpochs, with decisions", () => {
     assert.equal(epochs[0]!.until, "2027-04-16T00:00:00Z");
   });
 
+  it("starts the epoch at the instant a decision gives, so the epoch before holds until then", () => {
+    const opened = nextEpochs([epoch()], { datum: "NN", datums: {} }, options({ now })).epochs;
+    const key = epochKey("x/1", now);
+    const decisions = { [key]: { since: "2027-05-20T04:30:00Z", note: "the series restarted" } };
+    const { epochs } = nextEpochs(opened, { datum: "NN", datums: {} }, options({ decisions }));
+    assert.deepEqual(
+      epochs.map((e) => [e.since, e.until]),
+      [
+        [null, "2027-05-20T04:30:00Z"],
+        ["2027-05-20T04:30:00Z", null],
+      ],
+    );
+    // The key names the start the decision replaces, so a later refresh leaves the new start alone.
+    const again = nextEpochs(epochs, { datum: "NN", datums: {} }, options({ decisions }));
+    assert.deepEqual(
+      again.epochs.map((e) => [e.since, e.until]),
+      epochs.map((e) => [e.since, e.until]),
+    );
+  });
+
+  it("moves the reference's date with the start it dates, which backfill reads", () => {
+    const epochs = [
+      epoch({ since: "2026-03-01T00:00:00Z", until: "2027-03-10T00:00:00Z", state: "closed" }),
+      epoch({
+        id: 2,
+        since: "2027-03-10T00:00:00Z",
+        reference_since: "2027-03-10T00:00:00Z",
+        datum: "NN",
+      }),
+    ];
+    const decisions = {
+      [epochKey("x/1", "2027-03-10T00:00:00Z")]: { since: "2027-03-01T00:00:00Z", note: "" },
+    };
+    const next = nextEpochs(epochs, { datum: "NN", datums: {} }, options({ decisions })).epochs;
+    assert.deepEqual(
+      [next[1]!.since, next[1]!.reference_since, next[0]!.until],
+      ["2027-03-01T00:00:00Z", "2027-03-01T00:00:00Z", "2027-03-01T00:00:00Z"],
+    );
+  });
+
+  it("refuses a since that can't apply, naming why", () => {
+    const opened = nextEpochs(
+      [epoch({ since: "2026-03-01T00:00:00Z" })],
+      { datum: "NN", datums: {} },
+      options({ now }),
+    ).epochs;
+    const key = epochKey("x/1", now);
+    const refuses = (decision: object, message: RegExp) =>
+      assert.throws(
+        () =>
+          nextEpochs(
+            opened,
+            { datum: "NN", datums: {} },
+            options({ decisions: { [key]: { note: "", ...decision } } }),
+          ),
+        message,
+      );
+    refuses({ since: "" }, /isn't an instant/);
+    refuses({ since: "2027-05-20" }, /isn't an instant/);
+    refuses({ since: "2027-02-30T00:00:00Z" }, /isn't an instant/);
+    refuses({ since: "2026-03-01T00:00:00Z" }, /isn't after the epoch before/);
+    refuses({ since: "2027-06-01T00:00:00Z" }, /isn't before the epoch's own start/);
+    refuses({ since: "2027-05-20T00:00:00Z", to_current: 0.5 }, /stands alone/);
+    refuses({ since: "2027-05-20T00:00:00Z", until: "2027-05-18" }, /stands alone/);
+  });
+
+  it("refuses a since on a held epoch", () => {
+    const held = nextEpochs(
+      [epoch({ since: "2027-03-01T00:00:00Z" })],
+      { datum: "NN", datums: {} },
+      options({ now }),
+    ).epochs;
+    assert.equal(held[1]!.state, "held");
+    assert.throws(
+      () =>
+        nextEpochs(
+          held,
+          { datum: "NN", datums: {} },
+          options({
+            decisions: { [epochKey("x/1", now)]: { since: "2027-05-20T00:00:00Z", note: "" } },
+          }),
+        ),
+      /needs an open or closed epoch/,
+    );
+  });
+
   it("takes a fixed adapter and the rejection of its wrong epoch in one refresh", () => {
     const wrong = nextEpochs([epoch()], { datum: "NN", datums: {} }, options({ now })).epochs;
     const key = epochKey("x/1", now);
@@ -727,5 +813,25 @@ describe("an archive in the reference of its time", () => {
         [4, "2005-01-01T00:00:00Z", null, "open", 0],
       ],
     );
+  });
+});
+
+describe("USGS's epoch decisions", () => {
+  it("name exactly the ten gages of the 2026-11-16 refresh, by the start it opened their second epoch at", async () => {
+    const { overrides } = await import("../src/sources/usgs/overrides.ts");
+    const keys = Object.keys(overrides.epochs!);
+    assert.deepEqual(keys.map((k) => k.split(" ")[0]).sort(), [
+      "usgs/06207500",
+      "usgs/07263883",
+      "usgs/08098295",
+      "usgs/08111056",
+      "usgs/08111070",
+      "usgs/08117857",
+      "usgs/08117858",
+      "usgs/09505400",
+      "usgs/09505800",
+      "usgs/09510200",
+    ]);
+    assert.ok(keys.every((k) => k.endsWith(" 2026-11-16T14:19:07Z")));
   });
 });
