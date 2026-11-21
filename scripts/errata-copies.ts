@@ -6,7 +6,8 @@
  * is a copy that carries the error (src/errata-copies.ts). A span longer than
  * 150 days is read over 5 pieces of 30 days spread over it, an open end taken
  * at the original record's own, and every piece must agree. Each row says how
- * many of the span's days it compared. A copy belongs in the erratum's `stations`; a record with values
+ * many of the span's days it read, and how many of those had values to
+ * compare. A copy belongs in the erratum's `stations`; a record with values
  * of its own doesn't. Reads only the store, STILLWELL_STORE, prints a Markdown
  * table, and exits 1 when any pair couldn't be read.
  *
@@ -104,9 +105,9 @@ const cm = (m: number) => (Number.isFinite(m) ? (m * 100).toFixed(1) : "");
 
 let failed = 0;
 console.log(
-  "| Erratum | Original | Record | Span days compared | Inside | Unmatched | Outside | Offset cm | Shift cm | RMS cm | Verdict | Record's own errata |",
+  "| Erratum | Original | Record | Span days read | Days with values | Inside | Unmatched | Outside | Offset cm | Shift cm | RMS cm | Verdict | Record's own errata |",
 );
-console.log("| --- | --- | --- | --- | --: | --: | --: | --: | --: | --: | --- | --- |");
+console.log("| --- | --- | --- | --- | --: | --: | --: | --: | --: | --: | --: | --- | --- |");
 for (const e of chosen) {
   for (const original of e.stations!.filter((s) => s.startsWith(`${e.source}/`))) {
     // Listed copies too, so one that stops matching shows.
@@ -119,20 +120,24 @@ for (const e of chosen) {
     let base, w;
     try {
       w = windows(e, original);
-      base = await read(original, w.reads);
+      // A day more either side, so the original's hourly mean at a piece's edge is whole.
+      base = await read(
+        original,
+        w.reads.map(([a, b]): [number, number] => [a - DAY_MS, b + DAY_MS]),
+      );
     } catch (error) {
       failed++;
-      console.log(`| ${e.id} | ${original} | | | | | | | | | ${(error as Error).message} | |`);
+      console.log(`| ${e.id} | ${original} | | | | | | | | | | ${(error as Error).message} | |`);
       continue;
     }
     for (const other of others) {
       let row: string;
       try {
         const c = compare(base, await read(other, w.reads), w.lo, w.hi, w.pieces);
-        row = `${c.inside} | ${c.unmatched} | ${c.outside} | ${cm(c.offset_m)} | ${cm(c.shift_m)} | ${cm(c.rms_m)} | ${c.verdict}`;
+        row = `${c.days} | ${c.inside} | ${c.unmatched} | ${c.outside} | ${cm(c.offset_m)} | ${cm(c.shift_m)} | ${cm(c.rms_m)} | ${c.verdict}`;
       } catch (error) {
         failed++;
-        row = ` | | | | | | ${(error as Error).message}`;
+        row = ` | | | | | | | ${(error as Error).message}`;
       }
       console.log(
         `| ${e.id} | ${original} | ${other}${listed.includes(other) ? " (listed)" : ""} | ${w.label} | ${row} | ${ownErrata(e, other)} |`,

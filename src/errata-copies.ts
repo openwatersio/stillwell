@@ -12,7 +12,7 @@ const HALF_HOUR_MS = 1_800_000;
 export const COPY_M = 0.01;
 /** Meters: a record this far from the original holds values of its own. */
 export const OWN_M = 0.03;
-/** The fewest shared values inside a piece of the span, and outside the span, that judge a pair. */
+/** The fewest shared values inside a piece of the span, and outside the span, that judge a pair; a piece with fewer can't, by its shift alone, make it the record's own. */
 export const MIN_INSIDE = 6;
 export const MIN_OUTSIDE = 24;
 /** The share of the copy's values inside the span that may have no value of the original near them. */
@@ -26,6 +26,8 @@ export interface Comparison {
   /** Values compared inside the span and outside it. */
   inside: number;
   outside: number;
+  /** UTC days inside the span with a value compared. */
+  days: number;
   /** The copy's values inside the span with no value of the original within half an hour. */
   unmatched: number;
   /** The difference's median outside the span, which lines the two datums up; inside it where there's none outside. */
@@ -56,6 +58,10 @@ export function compare(
   to: number,
   pieces: [number, number][] = [[from, to]],
 ): Comparison {
+  // Sorted, one value a time, since reads of nearby pieces can overlap.
+  original = [
+    ...new Map([...original].sort((a, b) => a.time - b.time).map((o) => [o.time, o])).values(),
+  ];
   const at = new Map(original.map((o) => [o.time, o.level]));
   const times = original.map((o) => o.time);
   const near = (time: number) => {
@@ -88,20 +94,26 @@ export function compare(
     const rms = Math.sqrt(
       inside.reduce((s, x) => s + (x.d - offset) ** 2, 0) / (inside.length || 1),
     );
-    // The piece furthest off, of those with enough values to judge.
+    // The piece furthest off, of those with enough values to judge; a thinner one's shift
+    // can make the pair unclear, not its own, so a short stretch that differs can't hide
+    // behind the rest. Its values still count in the RMS.
     let shift = NaN;
+    let thin = 0;
     for (const [a, b] of pieces) {
       const ds = inside.filter((x) => x.time >= a && x.time < b).map((x) => x.d);
-      if (ds.length < MIN_INSIDE) continue;
+      if (!ds.length) continue;
       const s = median(ds) - offset;
-      if (!(Math.abs(s) <= Math.abs(shift))) shift = s;
+      if (ds.length < MIN_INSIDE) thin = Math.max(thin, Math.abs(s));
+      else if (!(Math.abs(s) <= Math.abs(shift))) shift = s;
     }
     return {
       inside: inside.length,
+      days: new Set(inside.map((x) => Math.floor(x.time / 86_400_000))).size,
       outside: outside.length,
       offset_m: offset,
       shift_m: shift,
       rms_m: rms,
+      thin,
       control,
     };
   };
@@ -109,7 +121,7 @@ export function compare(
   const best =
     fits.filter((f) => f.inside >= MIN_INSIDE).sort((a, b) => a.rms_m - b.rms_m)[0] ??
     fits.sort((a, b) => b.inside - a.inside)[0]!;
-  const { control, ...rest } = best;
+  const { control, thin, ...rest } = best;
   const out = { ...rest, unmatched };
   const verdict: Verdict =
     out.inside < MIN_INSIDE || Number.isNaN(out.shift_m)
@@ -120,7 +132,7 @@ export function compare(
         ? "own"
         : !control
           ? "no control"
-          : out.rms_m < COPY_M && Math.abs(out.shift_m) < COPY_M
+          : out.rms_m < COPY_M && Math.abs(out.shift_m) < COPY_M && thin < COPY_M
             ? "copy"
             : "unclear";
   return { ...out, verdict };

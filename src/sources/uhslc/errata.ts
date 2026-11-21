@@ -251,7 +251,7 @@ export default {
       response:
         "23 July to 31 December 2007 is flagged `suspect`, keeping each record's own flag as `source_flag`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide's timing at Göteborg ran about 65 minutes early in those windows. Against SMHI's own record of the gauge (`smhi/2109`), UHSLC's values differ by 3.6 to 4.3 cm RMS a month, and by 0.0 cm once shifted 60 minutes; before 23 July and after 31 December they match unshifted. GESLA's copies (`gesla/goteborgorsh-819-swe-uhslc_fd` and `gesla/goteborgorsh-819a-swe-uhslc_rq`) equal UHSLC's on every day of 2007, and GESLA rates them usable. GESLA's CMEMS record of the gauge differs from UHSLC's by the same amount over the span, as SMHI's does, so it's on the right clock.",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide's timing at Göteborg ran about 65 minutes early in those windows. Against SMHI's own record of the gauge (`smhi/2109`), UHSLC's values differ by 3.6 to 4.3 cm RMS a month, and by 0.0 cm once shifted 60 minutes; before 23 July and after 31 December they match unshifted. GESLA's copies of UHSLC's fast-delivery and research-quality records (`gesla/goteborgorsh-819-swe-uhslc_fd` and `gesla/goteborgorsh-819a-swe-uhslc_rq`) hold the same values at all 3,600 times each shares with UHSLC's, on 150 of the 150 days read in five 30-day pieces spread over the span's 162, and GESLA rates them usable. GESLA's CMEMS record of the gauge differs from UHSLC's by the same amount over the span, as SMHI's does, so it's on the right clock.",
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
@@ -277,7 +277,7 @@ export default {
       response:
         "February to June 2011 is flagged `suspect`, keeping each record's own flag as `source_flag`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide's timing at Göteborg ran about 62 minutes early. Against SMHI's own record (`smhi/2109`) the values differ by 3.5 to 4.8 cm RMS a month, and by 0.0 to 0.2 cm once shifted 60 minutes; January and July onward match unshifted. GESLA's copies (`gesla/goteborgorsh-819-swe-uhslc_fd` and `gesla/goteborgorsh-819a-swe-uhslc_rq`) equal UHSLC's on every day of 2011. GESLA's CMEMS record of the gauge differs from UHSLC's by the same amount over the span, as SMHI's does, so it's on the right clock.",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide's timing at Göteborg ran about 62 minutes early. Against SMHI's own record (`smhi/2109`) the values differ by 3.5 to 4.8 cm RMS a month, and by 0.0 to 0.2 cm once shifted 60 minutes; January and July onward match unshifted. GESLA's copies of UHSLC's fast-delivery and research-quality records (`gesla/goteborgorsh-819-swe-uhslc_fd` and `gesla/goteborgorsh-819a-swe-uhslc_rq`) hold the same values at all 3,600 times each shares with UHSLC's, on all 150 days of the span. GESLA's CMEMS record of the gauge differs from UHSLC's by the same amount over the span, as SMHI's does, so it's on the right clock.",
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
@@ -299,7 +299,7 @@ export default {
       response:
         "29 February to 31 March 2024 is flagged `suspect`, keeping each record's own flag as `source_flag`. These are fast-delivery values; check the span again when UHSLC's research-quality release replaces them.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026. Against PEGELONLINE's Cuxhaven Steubenhöft (`pegelonline/5990020`) and GESLA's BfG and CMEMS records of the gauge, which agree with each other, UHSLC's March 2024 differs by 56 cm RMS, and still by 38 cm at its best lag of about 45 minutes; April to June and September to December 2024 match to within 0.4 cm. No other gauge in the German Bight matches the month (best r 0.94). GESLA's copy of the fast-delivery record (`gesla/cuxhaven-825-deu-uhslc_fd`) equals UHSLC's over the span.",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026. Against PEGELONLINE's Cuxhaven Steubenhöft (`pegelonline/5990020`) and GESLA's BfG and CMEMS records of the gauge, which agree with each other, UHSLC's March 2024 differs by 56 cm RMS, and still by 38 cm at its best lag of about 45 minutes; April to June and September to December 2024 match to within 0.4 cm. No other gauge in the German Bight matches the month (best r 0.94). GESLA's copy of UHSLC's fast-delivery record (`gesla/cuxhaven-825-deu-uhslc_fd`) holds the same values at all 768 times the two share, on all 32 days of the span.",
       // Months that match PEGELONLINE's gauge do so to under a centimeter.
       check: async (store, e) => {
         const id = e.stations![0]!;
@@ -327,7 +327,7 @@ export default {
       response:
         "July and August 2024 are flagged `suspect`, keeping each record's own flag as `source_flag`. These are fast-delivery values; check the span again when UHSLC's research-quality release replaces them.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026. Against PEGELONLINE's Cuxhaven Steubenhöft (`pegelonline/5990020`) and GESLA's BfG and CMEMS records, UHSLC's July and August 2024 differ by 52 and 54 cm RMS, and still by 26 and 34 cm at their best lag of about 50 minutes; the tide-timing check puts them about 45 minutes late in the semidiurnal band and 60 in the diurnal. No other gauge in the German Bight matches (best r 0.94). GESLA's copy of the fast-delivery record (`gesla/cuxhaven-825-deu-uhslc_fd`) equals UHSLC's over the span.",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026. Against PEGELONLINE's Cuxhaven Steubenhöft (`pegelonline/5990020`) and GESLA's BfG and CMEMS records, UHSLC's July and August 2024 differ by 52 and 54 cm RMS, and still by 26 and 34 cm at their best lag of about 50 minutes; the tide-timing check puts them about 45 minutes late in the semidiurnal band and 60 in the diurnal. No other gauge in the German Bight matches (best r 0.94). GESLA's copy of UHSLC's fast-delivery record (`gesla/cuxhaven-825-deu-uhslc_fd`) holds the same values at all 1,488 times the two share, on all 62 days of the span.",
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
@@ -412,7 +412,7 @@ export default {
       response:
         "Values before 21 April 2012 are flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's copies of UHSLC's fast-delivery and research-quality records: the series equals the fast-delivery copy before the date and the research-quality copy after it, and the fast-delivery copy sits 1.03 m from the series after it. `npm run errata:copies` found the copy `gesla/inhambane-900a-moz-uhslc_rq` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over 150 of its 295 days, in 5 pieces spread over it, from the original record's first value (November 2026), so it carries the error too.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's copies of UHSLC's fast-delivery and research-quality records: the series equals the fast-delivery copy before the date and the research-quality copy (`gesla/inhambane-900a-moz-uhslc_rq`) after it, and the fast-delivery copy sits 1.03 m from the series after it. The research-quality copy holds the series' values before the date too, at all 2,042 times the two share, on 143 of the 150 days read in five 30-day pieces spread from the record's start to the date, 295 days in all.",
       check: async (store, e) => {
         const id = e.stations![0]!;
         // The record holds nothing from 15 April 2012 11:00 to the span's end.

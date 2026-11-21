@@ -398,7 +398,7 @@ export default {
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Neither sensor is known to be right, so neither is read as a replacement.",
       evidence:
-        "The 2021 to 2024 sensor 40 and 41 files, monthly medians, November 2026; the README's gauge history and calibration. `npm run errata:copies` found the copy `gesla/korotiti_bay-gbit-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over 150 of its 1,137 days, in 5 pieces spread over it (November 2026), so it carries the error too.",
+        "The 2021 to 2024 sensor 40 and 41 files, monthly medians, November 2026; the README's gauge history and calibration. GESLA's copy (`gesla/korotiti_bay-gbit-nzl-ttw`) holds the same values at all 2,795 times the two share, on 119 of the 150 days read in five 30-day pieces spread over the span's 1,137.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const s = await store.station("linz/GBIT");
@@ -535,7 +535,7 @@ export default {
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own. Sensor 41's median level is 5.61 m, against sensor 40's 5.36 m in the 60 days before and 5.03 m after.",
       evidence:
-        "The sensor 40 and 41 files for the years, November 2026. `npm run errata:copies` found the copy `gesla/auckland-auct-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
+        "The sensor 40 and 41 files for the years, November 2026. GESLA's copy (`gesla/auckland-auct-nzl-ttw`) holds the same values at all 1,152 times the two share, on all 48 days of the span.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
@@ -549,7 +549,7 @@ export default {
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own.",
       evidence:
-        "The sensor 40 and 41 files for the years, November 2026. `npm run errata:copies` found the copy `gesla/boat_cove-rbct-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
+        "The sensor 40 and 41 files for the years, November 2026. GESLA's copy (`gesla/boat_cove-rbct-nzl-ttw`) holds the same values at all 2,842 times the two share, on all 119 days of the span.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
@@ -589,7 +589,7 @@ export default {
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own. Sensor 41's median level is 3.07 m, against sensor 40's 2.70 m in the 60 days before and 2.76 m after.",
       evidence:
-        "The sensor 40 and 41 files for the years, November 2026. `npm run errata:copies` found the copy `gesla/napier-napt-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
+        "The sensor 40 and 41 files for the years, November 2026. GESLA's copy (`gesla/napier-napt-nzl-ttw`) holds the same values at all 109 times the two share, on all 8 days of the span.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
@@ -1023,7 +1023,7 @@ export default {
       response:
         "The days of the three shifts, 17 to 19 January, are flagged `suspect`, keeping the source's own flag as `source_flag`. No epoch opens, since no step shows.",
       evidence:
-        "Scott Base's and Cape Roberts' hourly levels, the medians of the differences either side, November 2026; the README's gauge history. `npm run errata:copies` found the copy `gesla/scott_base_antarctica-scot-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
+        "Scott Base's and Cape Roberts' hourly levels, the medians of the differences either side, November 2026; the README's gauge history. GESLA's copy (`gesla/scott_base_antarctica-scot-nzl-ttw`) holds the same values at all 72 times the two share, on all 3 days of the span.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         await noEpochBetween(store, "linz/SCOT", "2019-01-06", "2019-02-01");
@@ -1084,7 +1084,7 @@ export default {
         "Scott Base's README marks its levels from 8 February to 17 March 2021 unreliable, after a drift of TG0, and lists six shifts of TG0 from 17 February to 16 March. The levels still follow a tide, and against Cape Roberts' the difference moves from 5.403 m over the 4 weeks before to 5.583 m over the span, with a standard deviation of 0.103 m against 0.065 m, and by 0.2 to 0.3 m over days.",
       response: "The span is flagged `suspect`, keeping the source's own flag as `source_flag`.",
       evidence:
-        "Scott Base's and Cape Roberts' hourly levels, November 2026; the README's gauge history. `npm run errata:copies` found the copy `gesla/scott_base_antarctica-scot-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
+        "Scott Base's and Cape Roberts' hourly levels, November 2026; the README's gauge history. GESLA's copy (`gesla/scott_base_antarctica-scot-nzl-ttw`) holds the same values at all 906 times the two share, on all 38 days of the span.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
