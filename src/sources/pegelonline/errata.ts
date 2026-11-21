@@ -2,6 +2,7 @@ import { dayAfter, flaggedSpan, impossibleDropped, type ErrataFile } from "../..
 import {
   differences,
   held,
+  flaggedByQc,
   kept,
   lagMinutes,
   levels,
@@ -334,14 +335,15 @@ export default {
       error:
         "PEGELONLINE gives Este Inneres Sperrwerk BP 3.20 m at 08:10 UTC on 3 June 2025, after 6.51 and 6.40 m at 08:08 and 08:09, followed by a gap.",
       response:
-        "The value is kept as served. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark about 1,400 good one-minute values suspect.",
+        "The values are kept as served, with the flags QC gives them in the store's 2025 file, checked on 20 November 2026: the spike rule flags 6.40 m at 08:09, which sits between 6.51 and 3.20 m, and the residual-jump rule flags 3.20 m at 08:10. The 6.51 m at 08:08 stays unflagged. Errata spans are whole days, so flagging the three minutes here would mark about 1,400 good one-minute values suspect.",
       evidence:
         "In PEGELONLINE's raw-data download for the gauge, as the store holds it, checked in November 2026: 6.51 m at 08:08 UTC, 6.40 m at 08:09, 3.20 m at 08:10, then a gap. The gauge also jumps for a minute or two to fixed values such as 5.19, 4.99 and 4.19 m dozens of times a year, which the store's spike test mostly catches.",
       check: async (store, e) => {
         const [station, day] = [e.stations![0]!, e.since!];
         const values = await levels(store, station, day);
-        kept(values, station, `${day}T08:09Z`, 6.4);
-        kept(values, station, `${day}T08:10Z`, 3.2);
+        kept(values, station, `${day}T08:08Z`, 6.51);
+        flaggedByQc(values, station, `${day}T08:09Z`, 6.4);
+        flaggedByQc(values, station, `${day}T08:10Z`, 3.2);
       },
     },
     {
@@ -353,7 +355,7 @@ export default {
       error:
         "PEGELONLINE gives Eichhorst OP and Eichhorst UP 0 cm at 03:30 UTC on 10 November 2026, then nothing until 05:15, between steady levels of 389 and 107 cm.",
       response:
-        "The values are kept as served. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark the rest of the day suspect too.",
+        "The values are kept as served. In the values the store holds, checked on 20 November 2026, no rule in its QC flags the 0 cm values. Both stations are judged not tidal, so the residual-jump rule is off for them, and the spike rule judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap. It flags the level at 03:15 UTC before each zero (389 and 107 cm) as suspect. Errata spans are whole days, so flagging the zeros here would mark the rest of the day suspect too.",
       evidence:
         "PEGELONLINE's REST API (`/stations/693320/W/measurements.json` and the same for 693330), checked on 11 November 2026, returns 389 and 107 cm at 04:00 and 04:15 CET, 0.0 at 04:30 CET, and nothing until 06:15 CET. The store holds the same values.",
       check: async (store, e) => {
@@ -361,6 +363,7 @@ export default {
         for (const station of e.stations!) {
           const values = await levels(store, station, day);
           kept(values, station, `${day}T03:30Z`, 0);
+          flaggedByQc(values, station, `${day}T03:15Z`, station.endsWith("320") ? 3.89 : 1.07);
           const [from, to] = [Date.parse(`${day}T03:30Z`), Date.parse(`${day}T05:15Z`)];
           if (values.some((o) => o.time > from && o.time < to))
             throw new Error(`${station} holds values between 03:30 and 05:15 on ${day}`);
