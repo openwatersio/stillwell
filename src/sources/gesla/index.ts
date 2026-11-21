@@ -485,7 +485,7 @@ function uhslcTerms(file: string): {
 /** `yyyy/mm/dd hh:mm:ss` as an ISO instant, or null. */
 function isoOf(text: string): string | null {
   if (!/^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}$/.test(text.trim())) return null;
-  const t = timeOf(text.trim());
+  const t = labelTime(text.trim(), 0);
   return Number.isFinite(t) ? new Date(t).toISOString() : null;
 }
 
@@ -498,6 +498,41 @@ function timeOf(s: string, at = 0): number {
     +s.slice(at + 14, at + 16),
     +s.slice(at + 17, at + 19),
   );
+}
+
+const DIGITS = [0, 1, 2, 3, 5, 6, 8, 9, 11, 12, 14, 15, 17, 18];
+
+/**
+ * The label `yyyy/mm/dd hh:mm:ss` at `at` as an instant, or NaN where it isn't
+ * a real date and time. `Date.UTC` rolls 2021/02/30 over to 2 March, so a label
+ * is turned back into its fields rather than trusted.
+ */
+function labelTime(s: string, at: number): number {
+  for (const i of DIGITS) {
+    const c = s.charCodeAt(at + i);
+    if (!(c >= 48 && c <= 57)) return NaN;
+  }
+  if (
+    s.charCodeAt(at + 4) !== 47 ||
+    s.charCodeAt(at + 7) !== 47 ||
+    s.charCodeAt(at + 10) !== 32 ||
+    s.charCodeAt(at + 13) !== 58 ||
+    s.charCodeAt(at + 16) !== 58
+  )
+    return NaN;
+  // The label ends at its 19th character; a character other than a space or tab after it is another shape.
+  const next = s.charCodeAt(at + 19);
+  if (!Number.isNaN(next) && next !== 32 && next !== 9) return NaN;
+  const t = timeOf(s, at);
+  const d = new Date(t);
+  return d.getUTCFullYear() === +s.slice(at, at + 4) &&
+    d.getUTCMonth() === +s.slice(at + 5, at + 7) - 1 &&
+    d.getUTCDate() === +s.slice(at + 8, at + 10) &&
+    d.getUTCHours() === +s.slice(at + 11, at + 13) &&
+    d.getUTCMinutes() === +s.slice(at + 14, at + 16) &&
+    d.getUTCSeconds() === +s.slice(at + 17, at + 19)
+    ? t
+    : NaN;
 }
 
 /** `time` with its day and month swapped, when its day is 12 or less. */
@@ -560,6 +595,12 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
     let end = text.indexOf("\n", at);
     if (end < 0) end = text.length;
     if (text.charCodeAt(at) !== 35 /* # */ && end - at > 20) {
+      // A label that isn't a real date and time (2021/02/30) fails the file, on a line with no value too: Date.UTC would roll it over to another day.
+      const time = labelTime(text, at);
+      if (Number.isNaN(time))
+        throw new Error(
+          `GESLA's ${file} has a line whose label isn't a real date: ${text.slice(at, end).trim().slice(0, 60)}`,
+        );
       const fields = text
         .slice(at + 20, end)
         .trim()
@@ -570,7 +611,6 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
       // missing (erratum `gesla-fill-values`).
       if (qc >= 0 && qc <= 4 && fields[0] !== nul && possible(level)) {
         const flag = QC_FLAGS[qc]!;
-        const time = timeOf(text, at);
         const more = clock?.extra && time >= clock.extra.since && time < clock.extra.until;
         times[n] =
           time < since || time >= until
@@ -859,8 +899,13 @@ function record(station: Pick<GeslaStation, "source_id" | "kind" | "file">): Pro
     recent.set(station.source_id, got);
   } else {
     const file = station.file ?? station.source_id;
-    got = readRecord(file).then((text) => parse(text, file, station.kind));
-    got.catch(() => recent.delete(station.source_id));
+    // A failed read is asked for again; a record that fails to parse fails the same way each time, so its failure stays.
+    got = readRecord(file)
+      .catch((error: unknown) => {
+        recent.delete(station.source_id);
+        throw error;
+      })
+      .then((text) => parse(text, file, station.kind));
     recent.set(station.source_id, got);
     if (recent.size > KEEP) recent.delete(recent.keys().next().value!);
   }

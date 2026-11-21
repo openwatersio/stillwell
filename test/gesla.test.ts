@@ -686,6 +686,66 @@ describe("gesla parse", () => {
   });
 });
 
+describe("gesla parse labels", () => {
+  const file = (line: string) =>
+    `# NULL VALUE -99.9999\n2021/02/28 23:00:00   1.0000 1 1\n${line}\n`;
+
+  it("fails the file on a label that isn't a real date or time, which Date.UTC would roll over", () => {
+    for (const label of [
+      "2021/02/30 00:00:00",
+      "2021/13/01 00:00:00",
+      "2021/04/31 00:00:00",
+      "2021/03/01 24:00:00",
+      "2021/03/01 00:60:00",
+      "2021/03/01 00:00:60",
+      "2021/03/0a 00:00:00",
+      "2021-03-01 00:00:00",
+      "2019/02/29 00:00:00",
+      "2021/03/01 00:00:009",
+    ])
+      assert.throws(
+        () => gesla.parse(file(`${label}   2.0000 1 1`), "x", null),
+        /label isn't a real date/,
+        label,
+      );
+  });
+
+  it("fails the file on a bad label of a line that carries no value", () => {
+    assert.throws(
+      () => gesla.parse(file("2021/02/30 00:00:00 -99.9999 5 0"), "x", null),
+      /label isn't a real date/,
+    );
+  });
+
+  it("reads leap days and real labels", () => {
+    const r = gesla.parse(
+      file("2020/02/29 00:00:00  10.0000 1 1\n2021/03/01 00:00:00  11.0000 1 1"),
+      "x",
+      null,
+    );
+    assert.deepEqual(
+      [...r.times].map((t, i) => [iso(t), r.levels[i]]),
+      [
+        ["2020-02-29T00:00:00.000Z", 10],
+        ["2021-02-28T23:00:00.000Z", 1],
+        ["2021-03-01T00:00:00.000Z", 11],
+      ],
+    );
+  });
+
+  it("fails a Queensland file on a label that isn't a real date, before the day and month swap", () => {
+    assert.throws(
+      () =>
+        gesla.parse(
+          file("2020/02/30 00:00:00   1.0000 1 1"),
+          "cape_ferguson-h033007a-aus-bom",
+          null,
+        ),
+      /label isn't a real date/,
+    );
+  });
+});
+
 describe("gesla clocks", () => {
   const lines = (times: string[]) =>
     ["# NULL VALUE -99.9999", ...times.map((t) => `${t}   1.0000 0 1`), ""].join("\n");
