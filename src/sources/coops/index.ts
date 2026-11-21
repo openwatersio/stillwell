@@ -384,11 +384,11 @@ export async function extremes(
   for (const [from, to] of [...chunks(start, end, "year")].flatMap(within365)) {
     if (!overlaps(window, from, to)) continue;
     for (const r of await rowsOf("high_low", id, from, to)) {
-      const level = Number(r.v);
-      if (r.v === "" || !Number.isFinite(level) || !r.ty) continue;
+      // A level outside the store's span or a time that isn't a real date is left out, as in `levels`.
+      if (!usable(r) || !r.ty) continue;
       out.push({
         time: timeOf(r.t),
-        level,
+        level: Number(r.v),
         type: r.ty.trim().startsWith("H") ? "high" : "low",
         flag: flagOf(r),
       });
@@ -516,9 +516,11 @@ function isoOf(t: string): string {
   return match ? `${match[1]}T${match[2]}${match[3] ?? ":00"}Z` : t;
 }
 
-/** A row with a level within `SPAN_M` and a time that is a real date, which `Date.parse` would roll over. */
+/** A row with a level within `SPAN_M` and a time that is a real date, which `Date.parse` would roll over; for 6-minute values, hourly heights and high and low waters. */
 function usable(r: Row): boolean {
   if (typeof r.v !== "string" || r.v.trim() === "" || !possible(Number(r.v))) return false;
+  // The whole text is a time: the match takes a valid prefix of `12:00junk` otherwise.
+  if (!/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?$/.test(r.t.trim())) return false;
   const time = timeOf(r.t);
   return (
     Number.isFinite(time) && new Date(time).toISOString().slice(0, 16) === isoOf(r.t).slice(0, 16)
