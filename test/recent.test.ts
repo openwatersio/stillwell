@@ -393,6 +393,7 @@ describe("refreshStation", () => {
           v("b-00065", NOW - HOUR, "3.00"),
           v("someone-else", NOW - HOUR, "1.00"),
         ],
+        numberReturned: 4,
         links: [],
       });
     });
@@ -431,7 +432,7 @@ describe("refreshStation", () => {
   it("keeps every station's window when USGS's sweep fails", async () => {
     usgs.pacing.requestMs = 0;
     setTransport(async () =>
-      JSON.stringify({ type: "FeatureCollection", features: [], links: [] }),
+      JSON.stringify({ type: "FeatureCollection", features: [], numberReturned: 0, links: [] }),
     );
     const a = station("a", {
       id: "usgs/a",

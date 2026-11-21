@@ -3998,6 +3998,29 @@ describe("usgs", () => {
     assert.deepEqual(asked, []);
   });
 
+  it("refuses an empty answer that isn't a feature collection, since an empty year is recorded", async () => {
+    // Skipped for a campaign, but not trusted by publish.
+    assert.equal(usgs.metadata.skip_empty, true);
+    assert.equal(usgs.metadata.empty_means_none, undefined);
+    const year = () => usgs.levels("x", new Date(Date.UTC(2020, 0)), new Date(Date.UTC(2021, 0)));
+    setTransport(async () => collection([]));
+    assert.deepEqual(await year(), []);
+    const value = {
+      properties: { time: "2020-06-01T00:00:00+00:00", value: "1", approval_status: "Approved" },
+    };
+    for (const body of [
+      "{}",
+      JSON.stringify({ type: "FeatureCollection", features: [] }),
+      JSON.stringify({ features: [], numberReturned: 0 }),
+      // A page cut short of the count it gives, or with none.
+      JSON.stringify({ type: "FeatureCollection", features: [value], numberReturned: 2 }),
+      JSON.stringify({ type: "FeatureCollection", features: [value] }),
+    ]) {
+      setTransport(async () => body);
+      await assert.rejects(year(), /USGS continuous: not a feature collection/);
+    }
+  });
+
   it("caches a page only when every value on it is approved", () => {
     const page = (statuses: (string | null)[]) =>
       JSON.stringify(

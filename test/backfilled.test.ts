@@ -260,6 +260,24 @@ describe("backfillStatus", () => {
     );
   });
 
+  it("leaves a source's empty years in its record missing unless its empty answer is sure", async () => {
+    const store = mkdtempSync(join(tmpdir(), "stillwell-backfilled-"));
+    await writeYears(store, "test", [row("test/k", 1990), row("test/k", 1992)]);
+    await writeBackfilled(store, "test", new Map([["test/k", new Map([[1, [[1986, 2027]]]])]]));
+    const judged = async (metadata: object) =>
+      (
+        await backfillStatus(
+          store,
+          { metadata: { ...source().metadata, ...metadata } } as ReturnType<typeof source>,
+          [station("test/k")],
+          NOW,
+        )
+      )?.missing.get("test/k");
+    // One that only skips them in a campaign keeps the gap inside the record.
+    assert.deepEqual(await judged({ skip_empty: true }), [1991]);
+    assert.deepEqual(await judged({ empty_means_none: true }), []);
+  });
+
   it("takes an empty answer as sure from a source that says so", async () => {
     const store = mkdtempSync(join(tmpdir(), "stillwell-backfilled-"));
     await writeYears(store, "test", [row("test/x", 2000)]);

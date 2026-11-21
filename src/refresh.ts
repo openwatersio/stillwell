@@ -421,6 +421,7 @@ const INGEST_ONLY = new Set([
   "archive",
   "hourly",
   "empty_means_none",
+  "skip_empty",
   "poller",
   "chart_datum",
   "datum_aliases",

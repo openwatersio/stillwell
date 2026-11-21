@@ -39,6 +39,11 @@ export const metadata: SourceMetadata = {
   // Provisional values are approved months to years later.
   hourly: true,
   finalizes: true,
+  // The API answers a failure with an error status, 500 in its OpenAPI description, which
+  // `fetchText` throws on, and `featurePages` refuses an empty answer that isn't a feature
+  // collection. Nothing shows an outage never answers with an empty one, so publish still
+  // counts such a year missing.
+  skip_empty: true,
 };
 
 /** The gage's own zero, which gage height (00065) is measured from. */
@@ -340,7 +345,9 @@ interface ApiLocation {
 }
 
 interface Collection<T> {
+  type?: string;
   features: { id?: string; properties: T; geometry: { coordinates: number[] } | null }[];
+  numberReturned?: number;
   links?: { rel: string; href: string }[];
 }
 
@@ -890,6 +897,16 @@ async function* featurePages<T>(
   let url: string | undefined = `${API}/collections/${collection}/items?${query}`;
   while (url) {
     const page: Collection<T> = await request<Collection<T>>(url, options);
+    // An empty answer means no values (`skip_empty`) only as a whole feature collection: USGS
+    // sends `type` and `numberReturned` with every page from `continuous`, `time-series-metadata`
+    // and `monitoring-locations`, 0 with an empty one. A page whose count is missing or disagrees
+    // with its features was cut short.
+    if (
+      page?.type !== "FeatureCollection" ||
+      !Array.isArray(page.features) ||
+      page.numberReturned !== page.features.length
+    )
+      throw new Error(`USGS ${collection}: not a feature collection`);
     yield page.features;
     url = page.links?.find((l) => l.rel === "next")?.href;
     // The key goes with every request, so only ever to the API itself.
