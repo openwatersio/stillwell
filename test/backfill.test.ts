@@ -40,7 +40,7 @@ import {
   stationListPath,
 } from "../src/store/paths.ts";
 import { writeYears } from "../src/store/years.ts";
-import { readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
+import { keepsEmptyYears, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import { readBackfilled } from "../src/backfilled.ts";
 import {
   Flag,
@@ -749,6 +749,15 @@ describe("backfill script", () => {
     assert.equal(run.status, 0, run.stderr);
     assert.doesNotMatch(run.stderr, /^fetch /m);
     assert.equal((await readStationBounds(path)).get("coops/7")?.preliminary, late);
+  });
+
+  it("keeps a record for a source whose empty answer is sure, or that skips empty years anyway", () => {
+    assert.deepEqual(
+      [{}, { empty_means_none: true }, { skip_empty: true }, { empty_means_none: false }].map(
+        keepsEmptyYears,
+      ),
+      [false, true, true, false],
+    );
   });
 
   it("with --skip-written, skips a year it found empty, for 30 days", async () => {
