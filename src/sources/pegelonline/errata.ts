@@ -114,16 +114,21 @@ export default {
     },
     {
       id: "pegelonline-helgoland-suedhafen-2013-clock",
-      stations: ["pegelonline/9510075"],
+      stations: [
+        "pegelonline/9510075",
+        "gesla/helgolandsdhafen-9510075-deu-wsv",
+        "cmems/HelgolandTG",
+        "gesla/helgolandtg-hel-deu-cmems",
+      ],
       since: "2013-05-29",
       until: "2013-07-25",
       handling: "flagged",
       error:
-        "PEGELONLINE's Helgoland Südhafen levels run about 19 minutes late on 29 and 30 May and from 17 June to 24 July 2013.",
+        "PEGELONLINE's Helgoland Südhafen levels run about 19 minutes late on 29 and 30 May and from 17 June to 24 July 2013. GESLA's WSV record of the gauge carries the same values.",
       response:
-        "29 May to 24 July 2013 is flagged `suspect`, keeping the source flag as `source_flag`.",
+        "29 May to 24 July 2013 is flagged `suspect`, keeping each record's own flag as `source_flag`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide-timing check put the semidiurnal tide 19 minutes and the diurnal 13 minutes late from mid-June to mid-July, against about 3 minutes of scatter. Against Helgoland Binnenhafen (`pegelonline/9510070`), 0.5 km away, the daily RMS rises from about 2 cm to 8 to 14 cm on those days. GESLA's WSV copy carries it too (erratum `gesla-helgoland-suedhafen-2013-clock`).",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide-timing check put the semidiurnal tide 19 minutes and the diurnal 13 minutes late from mid-June to mid-July, against about 3 minutes of scatter. Against Helgoland Binnenhafen (`pegelonline/9510070`), 0.5 km away, the daily RMS rises from about 2 cm to 8 to 14 cm on those days. GESLA's WSV record of the gauge (`gesla/helgolandsdhafen-9510075-deu-wsv`) equals the means of PEGELONLINE's minute values over the same hours to 0.0 cm RMS from April to August 2013, so it carries the same clock error. `npm run errata:copies` found the copies `cmems/HelgolandTG` and `gesla/helgolandtg-hel-deu-cmems` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so they carry the error too.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const lag = await lagMinutes(store, e.stations![0]!, "9510070", "2013-07-01");
@@ -135,16 +140,16 @@ export default {
     },
     {
       id: "pegelonline-bake-z-2004-offset",
-      stations: ["pegelonline/9510066"],
+      stations: ["pegelonline/9510066", "gesla/bakez-9510066-deu-wsv"],
       since: "2004-11-11",
       until: "2005-03-08",
       handling: "flagged",
       error:
-        "PEGELONLINE's Bake Z levels sit 0.5 to 1 m high from 11 November 2004 to 7 March 2005, apart from a few days in December.",
+        "PEGELONLINE's Bake Z levels sit 0.5 to 1 m high from 11 November 2004 to 7 March 2005, apart from a few days in December. GESLA's WSV record of the gauge carries the same values.",
       response:
-        "11 November 2004 to 7 March 2005 is flagged `suspect`, keeping the source flag as `source_flag`.",
+        "11 November 2004 to 7 March 2005 is flagged `suspect`, keeping each record's own flag as `source_flag`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: a step of −95 cm on 7 March 2005 against all four neighboring gauges. Daily means against Scharhörn (`pegelonline/9510060`) are about +5 cm before and after, and +48 to +64 cm over the span. GESLA's WSV copy carries it too (erratum `gesla-bake-z-2004-offset`).",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: a step of −95 cm on 7 March 2005 against all four neighboring gauges. Daily means against Scharhörn (`pegelonline/9510060`) are about +5 cm before and after, and +48 to +64 cm over the span. GESLA's WSV record of the gauge (`gesla/bakez-9510066-deu-wsv`), hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm at the median over 93 days, with a few days apart.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const since = e.since!;
@@ -160,15 +165,19 @@ export default {
     },
     {
       id: "pegelonline-helgoland-binnenhafen-2000-offset",
-      stations: ["pegelonline/9510070"],
+      stations: [
+        "pegelonline/9510070",
+        "gesla/helgolandbinnenhafen-9510070-deu-wsv",
+        "cmems/HelgolandBinnenhafenTG",
+      ],
       until: "2000-11-01",
       handling: "flagged",
       error:
-        "PEGELONLINE's Helgoland Binnenhafen levels before 1 November 2000 sit about 25 cm lower than the gauge's later ones against its neighbors, with no change of gauge zero recorded.",
+        "PEGELONLINE's Helgoland Binnenhafen levels before 1 November 2000 sit about 25 cm lower than the gauge's later ones against its neighbors, with no change of gauge zero recorded. GESLA's WSV record of the gauge carries the same values.",
       response:
-        "Values before 1 November 2000 are flagged `suspect`, keeping the source flag as `source_flag`.",
+        "Values before 1 November 2000 are flagged `suspect`, keeping each record's own flag as `source_flag`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: a step of +27 cm on 29 October 2000 against three neighboring gauges. Against Bake A (`pegelonline/9510063`) the yearly median difference is −25 cm in 2000 and between −13 and +2 cm in every later year; against Bake Z it is −17 cm in 2000 and −1 to +2 cm in 2001 to 2004. Helgoland Südhafen sits as low as Binnenhafen until its own step (erratum `pegelonline-helgoland-suedhafen-2001-offset`). The gauge's zero has one date, 2019-11-01. Daily means against Südhafen move from about +4 cm to +30 cm between 30 October and 1 November 2000. GESLA's WSV copy carries it too (erratum `gesla-helgoland-binnenhafen-2000-offset`).",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: a step of +27 cm on 29 October 2000 against three neighboring gauges. Against Bake A (`pegelonline/9510063`) the yearly median difference is −25 cm in 2000 and between −13 and +2 cm in every later year; against Bake Z it is −17 cm in 2000 and −1 to +2 cm in 2001 to 2004. Helgoland Südhafen sits as low as Binnenhafen until its own step (erratum `pegelonline-helgoland-suedhafen-2001-offset`). The gauge's zero has one date, 2019-11-01. Daily means against Südhafen move from about +4 cm to +30 cm between 30 October and 1 November 2000. GESLA's WSV record of the gauge (`gesla/helgolandbinnenhafen-9510070-deu-wsv`), hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm at the median, 0.2 cm standard deviation, over 305 days. `npm run errata:copies` found the copy `cmems/HelgolandBinnenhafenTG` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over 150 of its 305 days, in 5 pieces spread over it, from the original record's first value (November 2026), so it carries the error too.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const until = e.until!;
@@ -184,15 +193,20 @@ export default {
     },
     {
       id: "pegelonline-helgoland-suedhafen-2001-offset",
-      stations: ["pegelonline/9510075"],
+      stations: [
+        "pegelonline/9510075",
+        "gesla/helgolandsdhafen-9510075-deu-wsv",
+        "cmems/HelgolandTG",
+        "gesla/helgolandtg-hel-deu-cmems",
+      ],
       until: "2004-01-01",
       handling: "flagged",
       error:
-        "PEGELONLINE's Helgoland Südhafen levels before 2004 sit about 29 cm lower than the gauge's later ones against its neighbors, and May and November 2001 are a further 75 cm low and 47 cm high.",
+        "PEGELONLINE's Helgoland Südhafen levels before 2004 sit about 29 cm lower than the gauge's later ones against its neighbors, and May and November 2001 are a further 75 cm low and 47 cm high. GESLA's WSV record of the gauge carries the same values.",
       response:
-        "Values before 2004 are flagged `suspect`, keeping the source's own flag as `source_flag`: the step falls in the 2002 and 2003 outage, so the few values left from then are flagged too.",
+        "Values before 2004 are flagged `suspect`, keeping each record's own flag as `source_flag`: the step falls in the 2002 and 2003 outage, so the few values left from then are flagged too.",
       evidence:
-        "Against Bake A (`pegelonline/9510063`) the yearly median difference is −29 cm in 2000 and 2001 and between −13 and +1 cm from 2004 on. Against Helgoland Binnenhafen, 0.5 km away, it is −4 cm until November 2000, when Binnenhafen steps (erratum `pegelonline-helgoland-binnenhafen-2000-offset`), then −30 cm through 2001, and the two agree again from 2004. The step falls in 2002 and 2003, when almost every value is flagged. Monthly differences against Bake A are −105 cm in May 2001 and +19 cm in November 2001. Found while checking the Binnenhafen erratum; the cross-station check's 120-day limit skipped the span because of the gap. GESLA's WSV copy carries it too (erratum `gesla-helgoland-suedhafen-2001-offset`).",
+        "Against Bake A (`pegelonline/9510063`) the yearly median difference is −29 cm in 2000 and 2001 and between −13 and +1 cm from 2004 on. Against Helgoland Binnenhafen, 0.5 km away, it is −4 cm until November 2000, when Binnenhafen steps (erratum `pegelonline-helgoland-binnenhafen-2000-offset`), then −30 cm through 2001, and the two agree again from 2004. The step falls in 2002 and 2003, when almost every value is flagged. Monthly differences against Bake A are −105 cm in May 2001 and +19 cm in November 2001. Found while checking the Binnenhafen erratum; the cross-station check's 120-day limit skipped the span because of the gap. GESLA's WSV record of the gauge (`gesla/helgolandsdhafen-9510075-deu-wsv`), hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm at the median over 407 days. `npm run errata:copies` found the copies `cmems/HelgolandTG` and `gesla/helgolandtg-hel-deu-cmems` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over 150 of its 1,461 days, in 5 pieces spread over it, from the original record's first value (November 2026), so they carry the error too.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const d = await offset(store, e.stations![0]!, "9510070", "2001-08-01", "2001-08-08");
@@ -204,16 +218,16 @@ export default {
     },
     {
       id: "pegelonline-mittelgrund-2012-offset",
-      stations: ["pegelonline/9510132"],
+      stations: ["pegelonline/9510132", "gesla/mittelgrund-9510132-deu-wsv"],
       since: "2012-10-10",
       until: "2012-11-20",
       handling: "flagged",
       error:
-        "PEGELONLINE's Mittelgrund levels sit about 13 cm lower than usual against Cuxhaven from 10 October to 19 November 2012.",
+        "PEGELONLINE's Mittelgrund levels sit about 13 cm lower than usual against Cuxhaven from 10 October to 19 November 2012. GESLA's WSV record of the gauge carries the same values.",
       response:
-        "10 October to 19 November 2012 is flagged `suspect`, keeping the source flag as `source_flag`.",
+        "10 October to 19 November 2012 is flagged `suspect`, keeping each record's own flag as `source_flag`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: steps of −19 cm on 10 October and +17 cm on 20 November 2012 against two of three neighboring gauges. The monthly median difference against Cuxhaven Steubenhöft (`pegelonline/5990020`) is −25 cm in October 2012 against −11 to −14 cm in the months around it. GESLA's WSV copy carries it too (erratum `gesla-mittelgrund-2012-offset`).",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: steps of −19 cm on 10 October and +17 cm on 20 November 2012 against two of three neighboring gauges. The monthly median difference against Cuxhaven Steubenhöft (`pegelonline/5990020`) is −25 cm in October 2012 against −11 to −14 cm in the months around it. GESLA's WSV record of the gauge (`gesla/mittelgrund-9510132-deu-wsv`), hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm over 41 days.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const since = e.since!;
@@ -229,16 +243,16 @@ export default {
     },
     {
       id: "pegelonline-borkum-suedstrand-2014-offset",
-      stations: ["pegelonline/9340030"],
+      stations: ["pegelonline/9340030", "gesla/borkumsdstrand-9340030-deu-wsv"],
       since: "2014-12-05",
       until: "2015-03-12",
       handling: "flagged",
       error:
-        "PEGELONLINE's Borkum Südstrand levels sit about 11 cm higher than usual against Borkum Fischerbalje from 5 December 2014 to 11 March 2015.",
+        "PEGELONLINE's Borkum Südstrand levels sit about 11 cm higher than usual against Borkum Fischerbalje from 5 December 2014 to 11 March 2015. GESLA's WSV record of the gauge carries the same values.",
       response:
-        "5 December 2014 to 11 March 2015 is flagged `suspect`, keeping the source flag as `source_flag`.",
+        "5 December 2014 to 11 March 2015 is flagged `suspect`, keeping each record's own flag as `source_flag`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: a step of −11 cm on 14 March 2015 against both neighboring gauges with values then. The monthly median difference against Borkum Fischerbalje (`pegelonline/9340020`), 2 km away, is −8 to −11 cm in every month of 2014 and 2015 except December 2014 to February 2015, at +1.5 to +2.5 cm. Daily means against Fischerbalje are back near usual from 12 March 2015. The step check compares 30-day medians, so its dates are a few days off; the span follows the daily means. GESLA's WSV copy carries it too (erratum `gesla-borkum-suedstrand-2014-offset`).",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: a step of −11 cm on 14 March 2015 against both neighboring gauges with values then. The monthly median difference against Borkum Fischerbalje (`pegelonline/9340020`), 2 km away, is −8 to −11 cm in every month of 2014 and 2015 except December 2014 to February 2015, at +1.5 to +2.5 cm. Daily means against Fischerbalje are back near usual from 12 March 2015. The step check compares 30-day medians, so its dates are a few days off; the span follows the daily means. GESLA's WSV record of the gauge (`gesla/borkumsdstrand-9340030-deu-wsv`), hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm over 97 days.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const since = e.since!;
@@ -254,7 +268,7 @@ export default {
     },
     {
       id: "pegelonline-schillig-2006-offset",
-      stations: ["pegelonline/9430030"],
+      stations: ["pegelonline/9430030", "gesla/schillig-9430030-deu-wsv"],
       since: "2006-08-01",
       until: "2006-09-07",
       handling: "flagged",
@@ -263,7 +277,7 @@ export default {
       response:
         "1 August to 6 September 2006 is flagged `suspect`, keeping the source flag as `source_flag`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: a step of +9 cm on 28 July 2006 against two of three neighboring gauges. Monthly median differences against Wilhelmshaven Alter Vorhafen (`pegelonline/9440020`) are −4 to −6 cm from January to July 2006 and about −3 cm from October to December, and +4 cm in August; daily means over the span are +7 to +11 cm. Daily means first sit high on 1 August. The step check compares 30-day medians, so its dates are a few days off; the span follows the daily means.",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: a step of +9 cm on 28 July 2006 against two of three neighboring gauges. Monthly median differences against Wilhelmshaven Alter Vorhafen (`pegelonline/9440020`) are −4 to −6 cm from January to July 2006 and about −3 cm from October to December, and +4 cm in August; daily means over the span are +7 to +11 cm. Daily means first sit high on 1 August. The step check compares 30-day medians, so its dates are a few days off; the span follows the daily means. `npm run errata:copies` found the copy `gesla/schillig-9430030-deu-wsv` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const since = e.since!;
@@ -303,7 +317,7 @@ export default {
     },
     {
       id: "pegelonline-bake-z-2002-offset",
-      stations: ["pegelonline/9510066"],
+      stations: ["pegelonline/9510066", "gesla/bakez-9510066-deu-wsv"],
       since: "2002-09-30",
       until: "2002-10-22",
       handling: "flagged",
@@ -312,7 +326,7 @@ export default {
       response:
         "30 September to 21 October 2002 is flagged `suspect`, keeping the source's own flag as `source_flag`. The store's QC already flags about two thirds of it.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Bake A (`pegelonline/9510063`) and Scharhörn (`pegelonline/9510060`): the differences are 0.03 to 0.08 m before and after, +0.83 m from 30 September and +2.37 m from 18 October.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Bake A (`pegelonline/9510063`) and Scharhörn (`pegelonline/9510060`): the differences are 0.03 to 0.08 m before and after, +0.83 m from 30 September and +2.37 m from 18 October. `npm run errata:copies` found the copy `gesla/bakez-9510066-deu-wsv` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const since = e.since!;

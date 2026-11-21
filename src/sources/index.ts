@@ -116,7 +116,7 @@ export const errataFiles: Record<string, ErrataFile> = {
 };
 
 /** Every source's errata, and what's wrong with any, which `publish` and the tests fail on. */
-export const { errata, problems: errataProblems } = readErrata(errataFiles);
+export const { errata, problems: errataProblems } = readErrata(errataFiles, Object.keys(adapters));
 
 /**
  * `source` with every observed level it fetches outside `SPAN_M` left out, since no

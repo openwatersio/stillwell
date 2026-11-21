@@ -46,7 +46,7 @@ for (const [id, { metadata }] of Object.entries(sources)) {
       [
         `### ${e.id}`,
         e.error,
-        `Stations: ${e.stations === null ? "every station" : e.stations.join(", ") || "none listed"}${span(e.since, e.until) ? `; values ${span(e.since, e.until)}` : ""}.`,
+        `Stations: ${e.stations === null ? "every station" : e.stations.filter((s) => s.startsWith(`${id}/`)).join(", ") || "none listed"}${span(e.since, e.until) ? `; values ${span(e.since, e.until)}` : ""}.`,
         e.evidence ?? "",
         `What we do meanwhile: ${e.response}`,
       ]

@@ -150,7 +150,7 @@ export default {
     },
     {
       id: "cmems-holyhead-2026-erratic",
-      stations: ["cmems/Holyhead"],
+      stations: ["cmems/Holyhead", "gesla/holyhead-hol-gbr-cmems"],
       since: "2026-02-03",
       until: "2026-02-21",
       handling: "flagged",
@@ -159,7 +159,7 @@ export default {
       response:
         "3 to 20 February 2026 is flagged `suspect`, keeping the source flag as `source_flag`. QC flags 14 of the 86 values above 7 m, so the span flags the rest and the readings between them.",
       evidence:
-        "Found in November 2026 while reading back the EA's Holyhead record (`ea/E70539`), whose readings from 1 to 20 February are erratic, between the −3.05 m floor and 8.94 m above Ordnance Datum, 3.46 m being the highest water in the rest of 2026. CMEMS's values agree with the EA's at −3.05 m, its datum difference, through 31 January and from 21 February. The store holds no CMEMS value on 1 February and 9 on 2 February, all within the tide. BODC's record of the gauge (`bodc/hol`) stays between 0.4 and 6.2 m on those days.",
+        "Found in November 2026 while reading back the EA's Holyhead record (`ea/E70539`), whose readings from 1 to 20 February are erratic, between the −3.05 m floor and 8.94 m above Ordnance Datum, 3.46 m being the highest water in the rest of 2026. CMEMS's values agree with the EA's at −3.05 m, its datum difference, through 31 January and from 21 February. The store holds no CMEMS value on 1 February and 9 on 2 February, all within the tide. BODC's record of the gauge (`bodc/hol`) stays between 0.4 and 6.2 m on those days. `npm run errata:copies` found the copy `gesla/holyhead-hol-gbr-cmems` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
       reported: null,
       report: null,
       check: async (store, e) => {
@@ -182,7 +182,7 @@ export default {
     },
     {
       id: "cmems-holyhead-2026-april-erratic",
-      stations: ["cmems/Holyhead"],
+      stations: ["cmems/Holyhead", "gesla/holyhead-hol-gbr-cmems"],
       since: "2026-04-10",
       until: "2026-04-11",
       handling: "flagged",
@@ -191,7 +191,7 @@ export default {
       response:
         "10 April 2026 is flagged `suspect`, keeping the source flag as `source_flag`. QC flags the 9.81 m value, so the span flags the other three and the day's other readings.",
       evidence:
-        "Found in November 2026 while reading back the EA's Holyhead record (`ea/E70539`), which is erratic from 8 to 14 April. The store holds 10 CMEMS values on 10 April, from 14:00 to 23:00 UTC, and no value from 8 to 14 April outside 0.3 to 6.5 m on any other day.",
+        "Found in November 2026 while reading back the EA's Holyhead record (`ea/E70539`), which is erratic from 8 to 14 April. The store holds 10 CMEMS values on 10 April, from 14:00 to 23:00 UTC, and no value from 8 to 14 April outside 0.3 to 6.5 m on any other day. `npm run errata:copies` found the copy `gesla/holyhead-hol-gbr-cmems` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over its day (November 2026), so it carries the error too.",
       reported: null,
       report: null,
       check: async (store, e) => {
@@ -294,6 +294,44 @@ export default {
           if (next - off <= 0.2)
             throw new Error(
               `${id} rises ${(next - off).toFixed(2)} m from 02:00 to 02:10 on 27 July 2026, not over 0.2 m`,
+            );
+        }
+      },
+    },
+    {
+      id: "cmems-buesum-spikes",
+      stations: ["cmems/BuesumTG", "gesla/buesumtg-bue-deu-cmems"],
+      since: "2024-02-25",
+      until: "2025-05-05",
+      handling: "flagged",
+      error:
+        "CMEMS's Büsum record has spikes of up to 3 m and repeated values from February 2024 to early May 2025 that PEGELONLINE's record of the gauge doesn't have. GESLA's copy of the CMEMS record carries the same values.",
+      response:
+        "25 February 2024 to 4 May 2025 is flagged `suspect`, keeping each record's own flag as `source_flag`.",
+      evidence:
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026, in GESLA's copy. The copy equals PEGELONLINE's Büsum (`pegelonline/9510095`) to 0.0 cm through January 2024. From 25 February 2024 it differs by 3 cm RMS on most days, from values held for several 10-minute steps, and by 34 to 101 cm on 25 February, 18 March, 22 April and 1 to 3 August 2024, from spikes of up to 3 m. From 5 May 2025 to the record's end in May 2026 it matches PEGELONLINE's again, within 2 cm RMS every day. `npm run errata:copies` found CMEMS's own record (`cmems/BuesumTG`) equal to the copy inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over 150 of its 435 days, in 5 pieces spread over it (November 2026).",
+      check: (store, e) => flaggedSpan(store, e),
+    },
+    {
+      id: "cmems-kilrush-2025-01-09-offset",
+      stations: ["cmems/KilrushLough", "gesla/kilrushlough-kil-irl-cmems"],
+      since: "2025-01-09",
+      until: "2025-01-10",
+      handling: "flagged",
+      error:
+        "CMEMS's hourly Kilrush Lough record holds 4 values about 6 m low, from 02:00 to 05:00 UTC on 9 January 2025, unflagged, from the drop the Marine Institute's own record has. GESLA's copy of the CMEMS record carries the same values, with GESLA's good flag.",
+      response:
+        "9 January 2025 is flagged `suspect`, keeping each record's own flag as `source_flag`. Errata spans are whole days, so the day's other values are flagged too.",
+      evidence:
+        "In the store, checked in November 2026: GESLA's copy of the CMEMS record (`gesla/kilrushlough-kil-irl-cmems`) has 4 values below −3 m, down to −5.95 m, from 02:00 to 05:00 with flag good, against daily medians of 0.13 m on 8 January and 0.07 m on 10 January. `npm run errata:copies` found CMEMS's own record (`cmems/KilrushLough`) equal to the copy on that day to 0.0 cm RMS, with their datums lined up on the 7 days either side (November 2026). The drop is the one in erratum `marine-institute-kilrush-2025-01-09-offset`; CMEMS's hourly values aren't a copy of the Marine Institute's value for value, so the entry is CMEMS's own.",
+      // The drop is kept, flagged, in each record.
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        for (const id of e.stations!) {
+          const low = (await levels(store, id, e.since!)).filter((o) => o.level < -3);
+          if (low.length !== 4)
+            throw new Error(
+              `the store holds ${low.length} ${id} levels below −3 m on ${e.since}, not 4`,
             );
         }
       },

@@ -389,7 +389,7 @@ export default {
     },
     {
       id: "linz-korotiti-bay-sensors",
-      stations: ["linz/GBIT"],
+      stations: ["linz/GBIT", "gesla/korotiti_bay-gbit-nzl-ttw"],
       since: "2021-08-01",
       until: "2024-09-11",
       handling: "flagged",
@@ -398,7 +398,7 @@ export default {
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Neither sensor is known to be right, so neither is read as a replacement.",
       evidence:
-        "The 2021 to 2024 sensor 40 and 41 files, monthly medians, November 2026; the README's gauge history and calibration.",
+        "The 2021 to 2024 sensor 40 and 41 files, monthly medians, November 2026; the README's gauge history and calibration. `npm run errata:copies` found the copy `gesla/korotiti_bay-gbit-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over 150 of its 1,137 days, in 5 pieces spread over it (November 2026), so it carries the error too.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const s = await store.station("linz/GBIT");
@@ -526,7 +526,7 @@ export default {
     },
     {
       id: "linz-devonport-sensor-fault-2012",
-      stations: ["linz/AUCT"],
+      stations: ["linz/AUCT", "gesla/auckland-auct-nzl-ttw"],
       since: "2012-07-11",
       until: "2012-08-28",
       handling: "flagged",
@@ -534,12 +534,13 @@ export default {
         "Sensor 40 at Devonport is erratic from 11 July to 27 August 2012: its daily medians run from 1.2 to 5.1 m and its daily ranges up to 5.8 m, while sensor 41's medians are 5.4 to 6.0 m with ranges of 1.8 to 3.0 m. The README lists sensors replaced on 28 August.",
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own. Sensor 41's median level is 5.61 m, against sensor 40's 5.36 m in the 60 days before and 5.03 m after.",
-      evidence: "The sensor 40 and 41 files for the years, November 2026.",
+      evidence:
+        "The sensor 40 and 41 files for the years, November 2026. `npm run errata:copies` found the copy `gesla/auckland-auct-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
       id: "linz-boat-cove-sensor-fault-2013",
-      stations: ["linz/RBCT"],
+      stations: ["linz/RBCT", "gesla/boat_cove-rbct-nzl-ttw"],
       since: "2013-07-16",
       until: "2013-11-12",
       handling: "flagged",
@@ -547,7 +548,8 @@ export default {
         "Sensor 40 at Boat Cove is erratic from 16 July to 11 November 2013: its daily medians run from 2.8 to 4.9 m and its daily ranges up to 11.7 m, and it is stuck on some days. Sensor 41's own range is 0.0 to 5.5 m, so it is stuck or erratic on some days too.",
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own.",
-      evidence: "The sensor 40 and 41 files for the years, November 2026.",
+      evidence:
+        "The sensor 40 and 41 files for the years, November 2026. `npm run errata:copies` found the copy `gesla/boat_cove-rbct-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
@@ -578,7 +580,7 @@ export default {
     },
     {
       id: "linz-napier-sensor-fault-2010-12",
-      stations: ["linz/NAPT"],
+      stations: ["linz/NAPT", "gesla/napier-napt-nzl-ttw"],
       since: "2010-12-07",
       until: "2010-12-15",
       handling: "flagged",
@@ -586,7 +588,8 @@ export default {
         "Sensor 40 at Napier is erratic from 7 to 14 December 2010: its daily medians run from 2.7 to 27.9 m and its daily ranges up to 30 m, while sensor 41's medians are 3.0 to 3.1 m. The README lists sensors replaced on 15 December.",
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own. Sensor 41's median level is 3.07 m, against sensor 40's 2.70 m in the 60 days before and 2.76 m after.",
-      evidence: "The sensor 40 and 41 files for the years, November 2026.",
+      evidence:
+        "The sensor 40 and 41 files for the years, November 2026. `npm run errata:copies` found the copy `gesla/napier-napt-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
@@ -1011,7 +1014,7 @@ export default {
     },
     {
       id: "linz-scott-base-steps-2019-01",
-      stations: ["linz/SCOT"],
+      stations: ["linz/SCOT", "gesla/scott_base_antarctica-scot-nzl-ttw"],
       since: "2019-01-17",
       until: "2019-01-20",
       handling: "flagged",
@@ -1020,7 +1023,7 @@ export default {
       response:
         "The days of the three shifts, 17 to 19 January, are flagged `suspect`, keeping the source's own flag as `source_flag`. No epoch opens, since no step shows.",
       evidence:
-        "Scott Base's and Cape Roberts' hourly levels, the medians of the differences either side, November 2026; the README's gauge history.",
+        "Scott Base's and Cape Roberts' hourly levels, the medians of the differences either side, November 2026; the README's gauge history. `npm run errata:copies` found the copy `gesla/scott_base_antarctica-scot-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         await noEpochBetween(store, "linz/SCOT", "2019-01-06", "2019-02-01");
@@ -1073,7 +1076,7 @@ export default {
     },
     {
       id: "linz-scott-base-unreliable-2021",
-      stations: ["linz/SCOT"],
+      stations: ["linz/SCOT", "gesla/scott_base_antarctica-scot-nzl-ttw"],
       since: "2021-02-07",
       until: "2021-03-17",
       handling: "flagged",
@@ -1081,7 +1084,7 @@ export default {
         "Scott Base's README marks its levels from 8 February to 17 March 2021 unreliable, after a drift of TG0, and lists six shifts of TG0 from 17 February to 16 March. The levels still follow a tide, and against Cape Roberts' the difference moves from 5.403 m over the 4 weeks before to 5.583 m over the span, with a standard deviation of 0.103 m against 0.065 m, and by 0.2 to 0.3 m over days.",
       response: "The span is flagged `suspect`, keeping the source's own flag as `source_flag`.",
       evidence:
-        "Scott Base's and Cape Roberts' hourly levels, November 2026; the README's gauge history.",
+        "Scott Base's and Cape Roberts' hourly levels, November 2026; the README's gauge history. `npm run errata:copies` found the copy `gesla/scott_base_antarctica-scot-nzl-ttw` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
