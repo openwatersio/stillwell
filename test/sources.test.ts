@@ -1921,6 +1921,21 @@ describe("coops", () => {
       );
     });
 
+    it("asks nothing after a station's removed date before 2001", async () => {
+      const asked = serveInventory(
+        inventory(["1960-01-01 00:00", "1975-12-31 23:00", "Verified Hourly Height Water Level"]),
+      );
+      await coops.levels("9990021", ...span("1975-10-01Z", "1976-06-01Z"), {
+        established: "1950-01-01T00:00:00Z",
+        removed: "1975-12-31T00:00:00Z",
+      });
+      assert.ok(asked.includes("water_level 197512"), asked.join());
+      assert.ok(
+        asked.every((q) => !/ 1976/.test(q)),
+        asked.join(),
+      );
+    });
+
     it("asks every month of a station's dates from 2001 on, whatever the inventory lists", async () => {
       const asked = serveInventory(inventory(verified("2005-01-04 11:00", "2005-02-16 13:54")));
       await coops.levels("9990002", ...span("2004-11-01Z", "2005-04-01Z"), old);

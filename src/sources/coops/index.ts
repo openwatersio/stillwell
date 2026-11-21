@@ -460,11 +460,14 @@ type Covers = (from: Date, to: Date) => boolean;
 const everything: Covers = () => true;
 
 /**
- * CO-OPS's preliminary 6-minute archive starts here. Preliminary values are
- * served for months the data inventory lists no period for: of the 14,872
- * station-years the store held on 2026-11-21 at stations whose inventory lists
- * parameters, 10 at 8 stations fall outside every period the inventory lists
- * for 6-minute or hourly values, all of them in 2001 or later.
+ * From here a backfill asks for every month of a station's dates. The data
+ * inventory leaves out preliminary 6-minute values CO-OPS serves: of the
+ * 16,312 station-years the store held on 2026-11-21 at the stations whose
+ * inventory lists parameters, 10 at 8 stations fall outside
+ * every period the inventory lists for 6-minute or hourly values, and every one
+ * is in 2001 or later. Before 2001 the omission seen (Chuuk, November 1994)
+ * lies after the station's first listed period. 2001 is where the evidence
+ * stops, not where CO-OPS's preliminary archive starts.
  */
 const PRELIMINARY_ERA = Date.UTC(2001, 0, 1);
 
@@ -496,7 +499,10 @@ async function operated(
     first === null
       ? inWindow
       : (from, to) =>
-          (from.getTime() < PRELIMINARY_ERA && to.getTime() > first) ||
+          // Before 2001 the station's removed date still ends the months asked.
+          (from.getTime() < PRELIMINARY_ERA &&
+            to.getTime() > first &&
+            from.getTime() <= window[1]) ||
           (to.getTime() > PRELIMINARY_ERA && inWindow(from, to));
   if (!station.live) return covers;
   // Whatever the inventory says, a live station has values in its last month.
@@ -512,7 +518,13 @@ async function operated(
 async function inventoryStart(id: string): Promise<number | null> {
   let first = inventories.get(id);
   if (!first) {
-    if (inventoryFailures >= INVENTORY_FAILURES) return null;
+    if (inventoryFailures >= INVENTORY_FAILURES) {
+      if (inventoryFailures++ === INVENTORY_FAILURES)
+        console.warn(
+          `CO-OPS inventory failed ${INVENTORY_FAILURES} times in a row; using station dates`,
+        );
+      return null;
+    }
     // Counted where the request is made, so callers sharing it count it once.
     first = inventoryOf(id).then(
       (found) => {
