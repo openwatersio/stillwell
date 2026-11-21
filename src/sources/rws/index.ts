@@ -358,6 +358,13 @@ const EXTREME_TYPES: Record<string, "high" | "low"> = {
   "laagwater 2": "low",
 };
 
+/**
+ * Numeric codes of RWS's type table, as the astronomical extremes of Dukegat, Knock and Pogum give
+ * them, and only those: observed and forecast extremes still fail on one. The table's other codes
+ * (3 to 5) fail the request too.
+ */
+const CODED_TYPES: Record<string, "high" | "low"> = { "1": "high", "2": "low" };
+
 /** High and low waters at `location` over [start, end), as RWS selects them. */
 export async function extremes(
   location: string,
@@ -426,7 +433,8 @@ export async function extremes(
       const value = m.Meetwaarde.Waarde_Numeriek;
       if (value === undefined || Math.abs(value) > 10_000) continue;
       if (kind === undefined || kind === "topagger") continue;
-      const type = EXTREME_TYPES[kind];
+      const type =
+        EXTREME_TYPES[kind] ?? (process === "astronomisch" ? CODED_TYPES[kind] : undefined);
       // A type RWS adds would otherwise vanish, as the agger's lows once did.
       if (!type) throw new Error(`RWS ${location}: unknown extreme type ${kind}`);
       result.push({
