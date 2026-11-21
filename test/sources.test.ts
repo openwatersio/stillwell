@@ -3798,7 +3798,7 @@ describe("usgs", () => {
     );
     assert.ok(
       await usgs.stations([
-        stored("usgs/02130700", { series_begin: "2001-01-01T00:00:00+00:00" }),
+        stored("usgs/02130700", { series_end: "2001-01-01T00:00:00+00:00" }),
       ] as never),
     );
     // A site with no dated series isn't listed.

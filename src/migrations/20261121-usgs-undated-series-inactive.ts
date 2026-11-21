@@ -15,7 +15,9 @@ export default {
         const list = (await readStationList(stationListPath(store, "usgs"))) ?? [];
         const years = await readYears(store, "usgs");
         if (!years) throw new Error("the store has no years file for USGS");
-        const held = new Set([...years.values()].filter((y) => y.year !== null).map((y) => y.id));
+        const held = new Set(
+          [...years.values()].filter((y) => y.year !== null && (y.hours ?? 0) > 0).map((y) => y.id),
+        );
         const dropped = list.filter((s) => {
           const x = s as unknown as { series_begin?: string | null; series_end?: string | null };
           return s.status === "inactive" && !s.live && !x.series_begin && !x.series_end;

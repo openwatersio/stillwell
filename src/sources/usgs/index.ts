@@ -447,7 +447,9 @@ export async function stations(previous: Station[] = []): Promise<UsgsStation[]>
   // A reply that lost its dates would retire stations that had them, live ones included.
   const active = (id: string) => known.get(id)?.status === "active";
   const lost = dropped.filter(
-    (id) => active(id) && (known.get(id)?.live || known.get(id)?.series_begin),
+    (id) =>
+      active(id) &&
+      (known.get(id)?.live || known.get(id)?.series_begin || known.get(id)?.series_end),
   );
   if (lost.length > 10 || dropped.some((id) => active(id) && known.get(id)?.live))
     throw new Error(
