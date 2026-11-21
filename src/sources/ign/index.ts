@@ -397,6 +397,11 @@ function admittedShape(body: string, year: number): void {
   const hours = (Date.UTC(year + 1, 0, 1) - Date.UTC(year, 0, 1)) / 3_600_000;
   // The one extra row allowed is the next year's first midnight.
   const closing = rows.length === hours + 1 && rows.at(-1)!.startsWith(`01/01/${year + 1} 00:00`);
+  // The files hold `DD/MM/YYYY HH:00 <integer mm>` and nothing else on a row, a marker `---` for a missing hour included.
+  if (rows.some((row) => !/^\d{2}\/\d{2}\/\d{4} \d{2}:00 (-?\d+|---)$/.test(row)))
+    throw new Error(
+      `IGN ACOR1 ${year}: incomplete or off-hour hourly grid, a row not in the published shape`,
+    );
   if (rows.some((row) => !row.trim()) || (rows.length !== hours && !closing))
     throw new Error(
       `IGN ACOR1 ${year}: incomplete or off-hour hourly grid, ${rows.length} rows for ${hours} hours`,

@@ -139,9 +139,9 @@ export default {
       error:
         "IGN hasn't confirmed the time convention of its historical hourly labels. Its server README says reviewed processing corrects temporal phase, and neither it nor IGN's 17 November reply names UTC.",
       response:
-        "The labels are stored as UTC, with no shift, and the values keep the flags QC and IGN's reviewed source flag give them. The record agrees with other originators' records of the gauge in every year, so it is kept; a change in that agreement shows in this entry's check.",
+        "The labels are stored as UTC, with no shift, and the values keep the flags QC and IGN's reviewed source flag give them. The record agrees with other originators' records of the gauge in every year, so it is kept. The check fits 2020's levels to the CMEMS copy's, which are IGN's own, so it shows a break in the stored levels or their stamps, not an error IGN made in both.",
       evidence:
-        "Each of the 24 years, 2000 to 2023, was cross-correlated with the TICON constants of IEO's Coruña gauge 0.7 km away, UHSLC's La Coruña and CMEMS's Coruna2TG, at lags of up to 3 hours: best lag 0 minutes in 57 of the 72 fits and ±10 minutes in the rest, K1 phase −9 to +16 minutes, zero-lag correlation 0.987 to 0.995. A whole-hour or seasonal shift would show as a lag of an hour or more. IEO's gauge is the independent reference: the CMEMS copy may be IGN's own data, and UHSLC's may come from IEO. See docs/results/ign-coruna-clock-check-2026-11-21.md.",
+        "Each of the 24 years, 2000 to 2023, was cross-correlated with the TICON constants of IEO's Coruña gauge 0.7 km away, UHSLC's La Coruña and CMEMS's Coruna2TG, at lags of up to 3 hours: best lag 0 minutes in 57 of the 72 fits and ±10 minutes in the rest, K1 phase −9 to +16 minutes, zero-lag correlation 0.987 to 0.995. A whole-hour or seasonal shift would show as a lag of an hour or more. IEO's gauge is the independent reference: CMEMS's record is named ‘A Coruña ACOR1 TG tide gauge’ after IGN's code, so it is IGN's data, and UHSLC's may come from IEO. See docs/results/ign-coruna-clock-check-2026-11-21.md.",
       check: async (store) => {
         await listed(store);
         // The CMEMS copy of the gauge, hourly from November 2019: its levels fit IGN's at zero lag, not an hour either way.
@@ -172,7 +172,7 @@ export default {
           return correlation(a, b);
         };
         const [early, now, late] = [await fit(-60), await fit(0), await fit(60)];
-        if (now < 0.98 || now - Math.max(early, late) < 0.05)
+        if (!Number.isFinite(now) || now < 0.98 || now - Math.max(early, late) < 0.05)
           throw new Error(
             `ign/ACOR1 fits the CMEMS copy at r ${now.toFixed(3)}, against ${early.toFixed(3)} an hour early and ${late.toFixed(3)} an hour late`,
           );

@@ -107,7 +107,7 @@ describe("IGN", () => {
     assert.deepEqual(station.same_as, []);
   });
 
-  it("admits only checked hourly years and flags every published clock", async () => {
+  it("admits only checked hourly years, stored as IGN reviewed them", async () => {
     const files = [
       "200031_horarios_1999_JM.txt",
       "200031_horarios_2024_JM.txt",

@@ -6,9 +6,9 @@ Each year of `ign/ACOR1`, 2000 to 2023, cross-correlated with the harmonic predi
 | --- | --- | --: | --: | --: | --: |
 | `coruna-coru-esp-ieo` | IEO's Coruña gauge, 0.7 km from IGN's | 19 | 4 | 1 | +4.0 min |
 | `la_coruna-830-esp-uhslc_fd` | UHSLC's La Coruña (fast delivery) | 19 | 4 | 1 | +3.6 min |
-| `coruna2tg-cor-esp-cmems` | CMEMS's Coruna2TG, which may be IGN's own data | 19 | 2 | 3 | +0.1 min |
+| `coruna2tg-cor-esp-cmems` | CMEMS's Coruna2TG, named for IGN's ACOR1 | 19 | 2 | 3 | +0.1 min |
 
-The independent reference is IEO's gauge. UHSLC's record may come from IEO, and the CMEMS copy may come from IGN, so agreement with those two doesn't add independent evidence.
+The independent reference is IEO's gauge. UHSLC's record may come from IEO, and CMEMS's record is named "A Coruña ACOR1 TG tide gauge" after IGN's code, so it is IGN's own data and its agreement isn't independent evidence.
 
 Comparing hourly levels directly with the store's copy of the CMEMS record from November 2019 to 2023 (32,879 hours in both): r 0.9979 at zero lag, 0.878 with IGN an hour late and 0.871 an hour early. The copy sits 4.981 m above IGN's levels, near IGN's 4.998 m NMMA offset, with a standard deviation of 5.9 cm in the difference. The copy is hourly, so it can't resolve less than an hour.
 
@@ -90,3 +90,7 @@ Comparing hourly levels directly with the store's copy of the CMEMS record from 
 | 2023 | `coruna2tg-cor-esp-cmems` | 8,712 | 0.991 | 0 min | 0.991 | -2 min |
 
 Each fit uses a whole year, so a change within a year would show only as a lower zero-lag correlation than a steady clock gives. The correlations are 0.987 to 0.995 in every year. IGN hasn't confirmed its clock convention, so the source's README and the `ign-coruna-clock` erratum say so.
+
+## Stored flags
+
+A local backfill of all 24 years through the registered adapter, then a requalify, stores 209,544 levels: 209,543 good and 1 suspect, with IGN's reviewed source flag 0 on every one.
