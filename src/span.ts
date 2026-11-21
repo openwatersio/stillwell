@@ -8,6 +8,7 @@
  * the window's own median is the placeholder. A scan of every year file in
  * November 2026 found no real level above 1,817 m, at USGS's Lyman Lake.
  * The store leaves out a level outside it: every fetch of levels drops one,
+ * and CO-OPS's fetch of high and low waters drops one,
  * as do backfill, compaction and requalify from the stored rows they write.
  */
 export const SPAN_M = [-500, 9000] as const;

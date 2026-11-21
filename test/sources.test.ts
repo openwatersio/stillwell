@@ -1970,6 +1970,34 @@ describe("coops", () => {
     );
   });
 
+  it("ignores high and low waters with no level, an impossible level or an impossible date", async () => {
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=high_low/,
+        JSON.stringify({
+          data: [
+            { t: "2010-02-27 06:00", v: "2.1", ty: "H", f: "0,0" },
+            { t: "2010-02-30 12:00", v: "1.9", ty: "L", f: "0,0" },
+            { t: "2010-02-28 00:00", v: "99999", ty: "H", f: "0,0" },
+            { t: "2010-02-28 06:00", v: " ", ty: "L", f: "0,0" },
+            { t: "2010-02-28 12:00", v: null, ty: "H", f: "0,0" },
+            { t: "2010-02-28 12:00junk", v: "1.9", ty: "L", f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const extremes = await coops.extremes(
+      "9455920",
+      new Date("2010-01-01Z"),
+      new Date("2011-01-01Z"),
+    );
+    assert.deepEqual(
+      extremes.map((e) => [new Date(e.time).toISOString().slice(0, 16), e.level, e.type]),
+      [["2010-02-27T06:00", 2.1, "high"]],
+    );
+  });
+
   it("ignores hourly rows with no level, an impossible level or an impossible date", async () => {
     serve([
       [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
