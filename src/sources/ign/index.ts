@@ -390,7 +390,8 @@ export async function levels(
  * parser tolerates repeated rows, blank lines and impossible-date markers, which would vanish before the grid is counted.
  */
 function admittedShape(body: string, year: number): void {
-  const [header = "", ...rows] = body.trim().split(/\r?\n/);
+  // Only the last line terminator is optional; trimming whitespace would hide blank rows.
+  const [header = "", ...rows] = body.replace(/\r?\n$/, "").split(/\r?\n/);
   if (!/^\d+ \S+ \d+ ACOR1 .*\bDatos horarios en mm respecto JM\b/.test(header))
     throw new Error(`IGN ACOR1 ${year}: header names another station, product or unit`);
   const hours = (Date.UTC(year + 1, 0, 1) - Date.UTC(year, 0, 1)) / 3_600_000;

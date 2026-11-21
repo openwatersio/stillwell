@@ -246,6 +246,24 @@ describe("IGN", () => {
     assert.match(header!, /ACOR1/);
   });
 
+  it("accepts one line terminator but refuses leading or trailing blank rows", async () => {
+    const complete = hourlyYear(2000);
+    const request = () => ign.corunaHourly(new Date("2000-01-01Z"), new Date("2000-01-02Z"));
+    for (const body of [complete, `${complete}\n`, complete.replaceAll("\n", "\r\n") + "\r\n"]) {
+      serve({ "ACOR1/procesados/horarios/200031_horarios_2000_JM.txt": body });
+      assert.equal((await request()).length, 24);
+    }
+    for (const body of [
+      `\n${complete}`,
+      `${complete}\n\n`,
+      `${complete}\n \t\n`,
+      complete.replaceAll("\n", "\r\n") + "\r\n\r\n",
+    ]) {
+      serve({ "ACOR1/procesados/horarios/200031_horarios_2000_JM.txt": body });
+      await assert.rejects(request, /header names|hourly grid/);
+    }
+  });
+
   it("treats Coruña hourly -9999 as an unusable aggregate without inventing a level", async () => {
     serve({
       "ACOR1/procesados/horarios/200031_horarios_2000_JM.txt": hourlyYear(2000).replace(
