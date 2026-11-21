@@ -1,3 +1,4 @@
+import { yearOf } from "../schedule.ts";
 import { getJson, HttpError } from "../../http.ts";
 import {
   Flag,
@@ -11,7 +12,9 @@ import {
 /**
  * BODC's processed, quality-controlled 15-minute levels from the UK National
  * Tide Gauge Network, from its ERDDAP, in meters above Admiralty Chart Datum.
- * See README.md.
+ * See README.md. BODC's processed data page has the whole record, from 1915,
+ * but only to a registered, logged-in user, as are its near-real-time files,
+ * and it sells the last month's; ERDDAP's datasets are open and start in 2022.
  */
 const ERDDAP = "https://erddap.bodc.ac.uk/erddap/tabledap";
 
@@ -19,6 +22,10 @@ export const metadata: SourceMetadata = {
   id: "bodc",
   name: "British Oceanographic Data Centre, UK National Tide Gauge Network",
   url: "https://www.bodc.ac.uk/data/hosted_data_systems/sea_level/uk_tide_gauge_network/",
+  // Each dataset's `license` attribute, which BODC confirmed in writing for the
+  // network's processed data (ticket BODCREQ-11479, on openwatersio/stillwell#80),
+  // allowing republishing under CC BY 4.0. BODC's site-wide copyright page is
+  // stricter, but its processed data page names no licence.
   license: {
     id: "OGL-UK-3.0",
     name: "Open Government Licence v3.0",
@@ -26,16 +33,20 @@ export const metadata: SourceMetadata = {
     commercial_use: true,
     redistribution: true,
   },
+  // The Environment Agency is each dataset's `creator_name`.
   attribution:
     "British Oceanographic Data Centre, as part of the function of the National Tidal and Sea Level Facility; Environment Agency",
+  // BODC's published enquiries address. The datasets also name tgi@noc.ac.uk as
+  // publisher and the EA's enquiries address as creator.
   contact: { email: "enquiries@bodc.ac.uk" },
-  terms:
-    "Open Government Licence v3.0, as each dataset's ERDDAP metadata says and BODC confirmed in writing (ticket BODCREQ-11479, 9 November 2026), which allows republishing under CC BY 4.0. Credit BODC, as part of the National Tidal and Sea Level Facility, and the Environment Agency, which owns the network.",
+  chart_datum: "CD",
+  // Admiralty Chart Datum.
+  datum_aliases: { CD: "ACD" },
   // BODC processes each month weeks to months after it ends.
   hourly: false,
   // BODC sends no preliminary values, but it adds months late, fills gaps and
   // reflags months it has published, so the monthly refetch reads the last
-  // three years again (scripts/monthly.sh).
+  // three years again (`schedule`).
   finalizes: true,
 };
 
@@ -45,9 +56,11 @@ const DATUM = "CD";
 /**
  * Chart datum's height relative to ordnance datum (Newlyn, or the local one
  * where the network uses it), in meters, by BODC's port code, from NTSLF's
- * table (https://ntslf.org/tides/datum). The EA's mAOD readings agree to the
- * centimeter where they overlap; README.md lists where they differ. Harwich and
- * Portbury aren't in the table.
+ * table (https://ntslf.org/tides/datum). The EA's mAOD readings less BODC's
+ * agree to the centimeter where they overlap in unflagged months, except at
+ * Kinlochbervie (-2.44), Lerwick (-1.24) and Cromer (-2.77 to -2.81). Harwich
+ * and Portbury aren't in the table; the EA's Harwich readings are 2.05 m below
+ * BODC's.
  */
 const CD_TO_OD: Record<string, number> = {
   ABE: -2.25,
@@ -98,8 +111,8 @@ const COUNTRY: Record<string, string> = { JER: "JE", IOM: "IM" };
 /**
  * The channel BODC's processed series is. Each dataset holds every sensor's
  * channel and marks none as the main one; this one matches GESLA's copy of
- * BODC's processed files value for value at every gauge both have, except
- * those in `CHANNELS`.
+ * BODC's processed files within 1.5 mm at nearly every shared time, at every
+ * gauge checked. `CHANNELS` names the exceptions.
  */
 const LEVEL = "ASLVBG02";
 
@@ -306,6 +319,11 @@ export function reset(): void {
 
 export const source: Source = {
   metadata,
+  // Months arrive late and in batches, and BODC fills gaps and reflags months it has published, and nothing
+  // else fetches them, so every station's last three years are read again, finished ones included.
+  schedule: {
+    refetch: (today) => [["all", `${yearOf(today) - 2}`, `${yearOf(today) + 1}`, "--refetch"]],
+  },
   stations,
   observations: (s, start, end) => levels(s.source_id, start, end, s.datum),
 };

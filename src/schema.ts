@@ -100,10 +100,10 @@ export interface Station {
    * `stations.parquet` is built, never by an adapter.
    */
   preferred?: string;
-  /** The IDs of the errata, from `src/sources/<source>/errata.json`, that affect the station. Set as `stations.parquet` is built. */
+  /** The IDs of the errata, from `src/sources/<source>/errata.ts`, that affect the station. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
-  /** Whether ingest asks for this station's current values: the hourly job and the realtime poller. */
+  /** Whether ingest asks for this station's current values: the poller. */
   live: boolean;
   /**
    * Where the source's quality checks of this station's values start, as a
@@ -206,6 +206,12 @@ export interface EpochDecision {
 export interface EpochSplit {
   /** YYYY-MM-DD: the first local day on the new zero. */
   since: string;
+  /**
+   * YYYY-MM-DD: a day a store's list may already hold this split's epoch at.
+   * That epoch moves to `since`, earlier, and the one before it ends there.
+   * Where no epoch starts at that day, it does nothing.
+   */
+  from?: string;
   note: string;
 }
 
@@ -260,7 +266,10 @@ export interface SourceMetadata {
    * address, since `sources.json` publishes it.
    */
   contact: { email: string; url?: string } | { email?: string; url: string };
-  /** Anything a user of the data should know about the terms. */
+  /**
+   * Conditions of use beyond the license and credit. The changes Stillwell
+   * makes to every source are stated in the `sources.json` schema.
+   */
   terms?: string;
   /**
    * `current` when the source serves past values measured from each station's
@@ -272,7 +281,7 @@ export interface SourceMetadata {
    */
   archive?: "current" | "previous";
   /**
-   * Whether the source publishes values within hours, so hourly ingest polls
+   * Whether the source publishes values within hours, so the poller polls
    * its live stations into recent/. A source that delivers later, as UHSLC's
    * monthly fast-delivery files do, is left to backfill and the refetch.
    */
@@ -292,11 +301,34 @@ export interface SourceMetadata {
    */
   empty_means_none?: boolean;
   /**
+   * Whether a `--skip-written` backfill records a year with no file that came back empty and skips
+   * it for 30 days (`src/empty-years.ts`), though the adapter can't show the empty answer wasn't an
+   * outage, so publish still counts such a year inside a station's record missing. `empty_means_none`
+   * implies it.
+   */
+  skip_empty?: boolean;
+  /**
    * The range of the source's local UTC offsets in hours, such as [-6, -4] for
    * US Central and Eastern time, so a date it gives can be turned into the
    * instants its day surely starts after and ends before. Defaults to [0, 0].
    */
   utc_offsets?: [number, number];
+  /**
+   * `hourly` when the poller asks each station once an hour whatever its
+   * interval, for a source whose terms allow one read of each site an hour.
+   */
+  poller?: "hourly";
+  /**
+   * The chart datum the source's own offsets give, for a station
+   * slackwater-database has no record of (src/datums.ts).
+   */
+  chart_datum?: string;
+  /**
+   * The source's datum names that are another name for a reference, such as
+   * `{ CD: "ACD" }` where its chart datum is Admiralty Chart Datum, so an
+   * offset can be carried through it to another series of the gauge.
+   */
+  datum_aliases?: Record<string, string>;
 }
 
 /**
@@ -313,8 +345,9 @@ export interface Source {
   stations(previous?: Station[]): Promise<ListedStation[]>;
   /**
    * Why a station, by its `source_id`, is withheld from the store, or null.
-   * Withheld means its owner refused republication, its identity changed, or
-   * the evidence does not support publishing it: the adapter never lists
+   * Withheld means its owner refused republication, the station has a new
+   * ID, its values aren't water levels, or the evidence does not support
+   * publishing it: the adapter never lists
    * or fetches it, a refresh drops it from the store's list and the bounds and
    * recent window, publishing leaves it out, and `ingest withhold` deletes its
    * files (src/withhold.ts).
@@ -340,13 +373,13 @@ export interface Source {
   /**
    * Whether backfill keeps every level the store holds, replacing only those
    * at times it fetched, not each month it fetched: for an archive that can
-   * omit what hourly ingest kept, such as a whole day or a late reading.
+   * omit what the poller kept, such as a whole day or a late reading.
    * Explicit withdrawals still invalidate a row.
    */
   keepsStored?: boolean;
   /**
    * Spans of a station's values that the store's own errata flag `suspect`,
-   * beyond the spans its `errata.json` names, which the registry adds, worked
+   * beyond the spans its `errata.ts` names, which the registry adds, worked
    * out from the source's levels and flags alone, so requalify flags
    * them again without fetching. `record` reads the values of one epoch that
    * the caller holds, a year at a time, which can be only part of it, such as
@@ -365,6 +398,18 @@ export interface Source {
   predictions?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   /** The source's own predicted high and low waters over [start, end). */
   predictedExtremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;
+  /**
+   * The `backfill` runs the source's monthly jobs make, each the arguments
+   * after `backfill <source>`, given the day the job runs (scripts/schedule.ts).
+   * `lists` runs after the list refresh; none by default. `refetch` replaces
+   * the default refetch, `preliminary` from January `REFETCH_YEARS` back to this
+   * month, for a source with new or final values the default refetch doesn't
+   * reach.
+   */
+  schedule?: {
+    lists?(today: Date): string[][] | Promise<string[][]>;
+    refetch?(today: Date): string[][] | Promise<string[][]>;
+  };
 }
 
 /** Fields every station from a source shares. */
@@ -382,7 +427,7 @@ export function stationDefaults(
 /**
  * A source's `suspect` can't judge the part of a record the caller holds, as
  * GESLA's datum-jump check can't where the store holds only part of a record.
- * `spans` are the ones it can still give, the source's `errata.json` spans,
+ * `spans` are the ones it can still give, the source's `errata.ts` spans,
  * which the registry adds. Requalify keeps the record's stored flags and adds
  * these, and analysis judges with them, each with a warning; the recent window
  * keeps its stored flags.

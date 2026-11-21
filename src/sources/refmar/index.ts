@@ -1,3 +1,4 @@
+import { firstOfMonth, REFETCH_YEARS, yearOf } from "../schedule.ts";
 import { getJson } from "../../http.ts";
 import {
   Flag,
@@ -21,6 +22,13 @@ export const metadata: SourceMetadata = {
   id: "refmar",
   name: "REFMAR (Shom)",
   url: "https://refmar.shom.fr/",
+  // SHOM publishes both networks' datasets on data.gouv.fr under this licence, as their ISO
+  // metadata in SHOM's catalogue and Sextant also say:
+  // https://www.data.gouv.fr/datasets/reseaux-de-reference-des-observations-maregraphiques-refmar-maregraphes-ronim
+  // https://www.data.gouv.fr/datasets/reseaux-de-reference-des-observations-maregraphiques-refmar-maregraphes-partenaires
+  // refmar.shom.fr's "Politique de diffusion" still carries the REFMAR® production system's
+  // older terms (registration, no redistribution). They predate SHOM's move of REFMAR's
+  // downloads to data.shom.fr under the open licence, which governs the data served there.
   license: {
     id: "etalab-2.0",
     name: "Licence Ouverte / Open Licence 2.0 (Etalab)",
@@ -29,7 +37,9 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "REFMAR, Shom (doi:10.17183/REFMAR)",
+  // https://refmar.shom.fr/politique-d-acces-aux-donnees asks users to report questionable observations here.
   contact: { email: "refmar@shom.fr", url: "https://refmar.shom.fr/contact" },
+  chart_datum: "ZH",
   // Raw values arrive within minutes, from the 1-minute series.
   hourly: true,
   // SHOM validates raw values weeks to months later.
@@ -85,7 +95,7 @@ const DATUMS: Record<string, string> = {
 /**
  * The earliest year asked for at a gauge SHOM gives no first observation for:
  * five years before the first 1 June with values, from a probe of 1 June every
- * five years since 1960 (November 2026). The rest, whose first values the
+ * five years since 1960. The rest, whose first values the
  * probe found from 2015 on or not at all, are asked for from 2010.
  */
 // prettier-ignore
@@ -398,6 +408,18 @@ function nextMonth(t: number): number {
 
 export const source: Source = {
   metadata,
+  // Partner gauges often have only raw values, so a station with none validated is skipped but in January,
+  // as USACE's are.
+  schedule: {
+    refetch: (today) => [
+      [
+        "preliminary",
+        `${yearOf(today) - REFETCH_YEARS}`,
+        firstOfMonth(today),
+        ...(today.getUTCMonth() ? ["--skip-unscreened"] : []),
+      ],
+    ],
+  },
   stations,
   observations: async (s: Station, start, end) => {
     // A hidden gauge is listed without levels, so ingest never asks; this guards direct callers.
@@ -432,8 +454,9 @@ export const source: Source = {
       ],
       "refmar/495": [
         {
-          since: "2020-03-06",
-          note: "Values read 1.35 m higher from this day, as the zero moved down, against UHSLC's record of the gauge (erratum `refmar-hiva-oa-uhslc-2020-datum`).",
+          since: "2020-03-05",
+          from: "2020-03-06",
+          note: "Values read 1.35 m higher from this day, as the zero moved down, against UHSLC's record of the gauge. The record resumes on the new zero at 23:00 UTC that day, after a gap since 2017 (erratum `refmar-hiva-oa-uhslc-2020-datum`).",
         },
       ],
       "refmar/6438": [
@@ -448,10 +471,6 @@ export const source: Source = {
       ],
     },
     epochs: {
-      "refmar/495 2020-03-06T00:00:00Z": {
-        until: "2020-03-04",
-        note: "The record resumes on the new zero at 23:00 UTC on 5 March 2020, after a gap since 2017, so the epoch before holds through the 4th and ends at the start of the 5th, and that hour belongs to neither epoch (erratum `refmar-hiva-oa-uhslc-2020-datum`).",
-      },
       "refmar/495 start": {
         to_current: 1.35,
         note: "REFMAR sits 0.24 m above UHSLC's record of the gauge (uhslc/017) every year from 2010 to 2015 and 1.59 m above it from 2020; UHSLC's has no step. REFMAR's yearly medians from 1977 to 2017 stay within 0.68 to 0.91 m, so the years before UHSLC's record are on the same zero.",

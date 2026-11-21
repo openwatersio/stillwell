@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import { readRows, readYearStats, writeObservations, writeRecent } from "../src/store/parquet.ts";
-import { recentPath, seriesPath, yearsPath } from "../src/store/paths.ts";
+import { recentDayPath, seriesPath, yearsPath } from "../src/store/paths.ts";
 import { compactRecent } from "../src/store/recent.ts";
 import {
   commitYears,
@@ -362,7 +362,7 @@ describe("the source's years", () => {
       epochs: [{ id: 1, datum: "NAP", since: null, until: null, state: "open" }],
     } as unknown as StoredStation;
     const start = Date.UTC(2026, 10, 4);
-    await writeRecent(recentPath(root, "test"), [
+    await writeRecent(recentDayPath(root, "test", "2026-11-04"), [
       [{ time: start + HOUR, level: 1, flag: Flag.good, station: a.id, epoch: 1 }],
     ]);
     const summary = await compactRecent({

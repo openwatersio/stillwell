@@ -91,11 +91,28 @@ const first = list.reduce<Date | undefined>(
       <td>{s.attribution}</td>
     </tr>
     <tr>
-      <th>Checks its values</th>
+      <th>Finalizes preliminary data</th>
+      <td>{s.finalizes ? "yes" : "no"}</td>
+    </tr>
+    <tr>
+      <th>Changes in the store</th>
       <td>
-        {s.finalizes
-          ? "yes: preliminary values are checked later"
-          : "no: its preliminary values stay preliminary"}
+        <a href={sitePath("/docs/reference/sources/#column-terms")}>the same for every source</a>,
+        plus what{" "}
+        {about && (
+          <>
+            <a href="#about">How Stillwell reads it</a> and{" "}
+          </>
+        )}
+        the <a href="#errata">errata</a> below describe
+      </td>
+    </tr>
+    <tr>
+      <th>Report errors to</th>
+      <td>
+        {s.contact?.email && <a href={`mailto:${s.contact.email}`}>{s.contact.email}</a>}
+        {s.contact?.email && s.contact?.url && " or "}
+        {s.contact?.url && <a href={s.contact.url}>contact page</a>}
       </td>
     </tr>
   </table>
@@ -147,17 +164,22 @@ const first = list.reduce<Date | undefined>(
 
 <script>
   import { latest } from "../../lib/read";
-  import { recentUrl } from "../../lib/paths";
+  import { recentUrls } from "../../lib/paths";
 
-  // The newest value in recent/, from the file's footer alone.
+  // The newest value in the newest daily file under recent/, from the file's footer alone.
+  async function newest(source: string) {
+    for (const url of recentUrls(source).reverse()) {
+      const t = await latest(url).catch(() => undefined);
+      if (t) return t;
+    }
+  }
+
   for (const el of document.querySelectorAll<HTMLElement>("[data-latest]"))
-    latest(recentUrl(el.dataset.latest!))
-      .catch(() => undefined)
-      .then((t) => {
-        el.textContent = t
-          ? `The newest value is from ${t.toISOString().slice(0, 16).replace("T", " ")} UTC.`
-          : "";
-      });
+    newest(el.dataset.latest!).then((t) => {
+      el.textContent = t
+        ? `The newest value is from ${t.toISOString().slice(0, 16).replace("T", " ")} UTC.`
+        : "";
+    });
 
   // The station list loads as JSON and shows 100 matches at a time, so a source with 14,000 stations stays a small page.
   const table = document.querySelector<HTMLTableElement>("[data-stations]");

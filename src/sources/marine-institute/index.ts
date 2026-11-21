@@ -19,6 +19,7 @@ export const metadata: SourceMetadata = {
   id: "marine-institute",
   name: "Marine Institute, Irish National Tide Gauge Network",
   url: "https://erddap.marine.ie/erddap/tabledap/IrishNationalTideGaugeNetwork.html",
+  // The dataset's `license` attribute and its catalogue record, http://data.marine.ie/geonetwork/srv/eng/catalog.search#/metadata/ie.marine.data:dataset.2774.
   license: {
     id: "CC-BY-4.0",
     name: "Creative Commons Attribution 4.0 International",
@@ -26,10 +27,13 @@ export const metadata: SourceMetadata = {
     commercial_use: true,
     redistribution: true,
   },
+  // The catalogue record names no credit line; the Marine Institute is the dataset's institution and publisher.
   attribution: "Marine Institute",
+  // The publisher address in the ERDDAP dataset's metadata, https://erddap.marine.ie/erddap/info/IrishNationalTideGaugeNetwork/index.html, which also names a person.
   contact: { email: "data_requests@marine.ie" },
   terms:
-    "CC BY 4.0: credit the Marine Institute, link to the license and say if the data was changed. The Marine Institute accepts no responsibility for errors, omissions or misleading information in the data, or for loss or damage from its use. Changes in the store: quality flags added and missing values dropped.",
+    "The Marine Institute accepts no responsibility for errors, omissions or misleading information in the data, or for loss or damage from its use. Some gauges sit in harbors run by others, and the dataset serves them all under the same license.",
+  chart_datum: "LAT",
   // Values reach ERDDAP 10 to 30 minutes after they're measured.
   hourly: true,
   // The institute checks values later, turning QC flag 0 into 1.

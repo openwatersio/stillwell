@@ -3,12 +3,11 @@
  *
  *   node scripts/ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish]
  *   node scripts/ingest.ts publish
- *   node scripts/ingest.ts links [--concurrency 4]
- *   node scripts/ingest.ts matches [--concurrency 4] [--accept-matches]
+ *   node scripts/ingest.ts links [--concurrency 4] [--prune]
+ *   node scripts/ingest.ts matches [--concurrency 4] [--accept-matches] [--prune]
  *   node scripts/ingest.ts backfill <source> <station,...|all|preliminary> <start> <end>
  *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written] [--skip-unscreened]
  *       [--with-inactive]
- *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
  *   node scripts/ingest.ts compact <source> [--days 1] [--rebuild-bounds]
  *   node scripts/ingest.ts requalify <source> <station,...|all> <start> <end> [--shard <i>/<n>]
  *       [--budget <minutes>]
@@ -42,19 +41,18 @@
  * cutoff. After fetching a station's levels, backfill reads its earliest
  * preliminary value again into stations/bounds/<source>.parquet.
  * Skipping looks only at the files of the epoch a year is written to, so a
- * new epoch starts its years over. `recent` fetches the last hours for every live station and merges them into
- * recent/<source>.parquet. `compact` folds
- * the last `--days` whole UTC days of that window into each station's year
+ * new epoch starts its years over. `compact` folds the last `--days` whole UTC
+ * days of the poller's daily files, recent/<source>/<YYYY-MM-DD>.parquet, into each station's year
  * files, each row into its datum epoch's, then writes each station's first and
  * last level to stations/bounds/<source>.parquet (`updateBounds` in
  * src/store/recent.ts); `--rebuild-bounds` reads every station's again rather
- * than keep the ones it knows. Both print a summary, and add it to
+ * than keep the ones it knows. It prints a summary, and adds it to
  * the workflow run's page. `requalify` works the flags of stations' observed
  * levels out again over the years [start, end) from the store alone (src/store/requalify.ts),
  * so a QC rule change reaches stored values without fetching them again;
  * with `--budget` it starts stations only for that many minutes.
  * `withhold` deletes the files of a source's withheld stations, whose owner
- * refused republication, and their rows in its bounds, years and recent window
+ * refused republication, and their rows in its bounds, years and daily files
  * (src/withhold.ts); the source's next refresh drops them from its list.
  * `misplaced` drops the rows in a datum epoch's files from outside its span that
  * the epoch holding their time already has, as an epoch opened with a start in
@@ -69,7 +67,7 @@
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
- * and `recent` write the current epoch, never before its start, and skip a
+ * writes the current epoch, never before its start, and skips a
  * station whose new epoch is held for a decision. For a source with `archive:
  * "previous"`, backfill writes each closed epoch's span to its files too. `backfill all` skips inactive
  * stations unless given `--with-inactive`; naming one still works, adapters refuse values in any datum but
@@ -99,7 +97,7 @@ import {
   years,
   yearsToFetch,
 } from "../src/backfill.ts";
-import { emptyKey, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
+import { emptyKey, keepsEmptyYears, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import {
   mergeBackfilled,
   readBackfilled,
@@ -118,7 +116,6 @@ import {
   poolUntil,
   qcFor,
   REFETCH_YEARS,
-  updateRecent,
   writePreliminary,
   type RunSummary,
 } from "../src/store/recent.ts";
@@ -130,6 +127,7 @@ import {
   setConnections,
   publishedSources,
   readJsonArray,
+  readStationList,
   writeJsonArray,
   type YearStats,
 } from "../src/store/parquet.ts";
@@ -144,11 +142,14 @@ import {
 } from "../src/store/analysis.ts";
 import {
   boundsPath,
+  linksPath,
   matchesPath,
   requalifyLeftPath,
   seriesDir,
+  stationListPath,
   stationsPath,
   yearsPath,
+  RECENT_DAYS,
 } from "../src/store/paths.ts";
 import {
   describeReport,
@@ -171,9 +172,8 @@ import type {
   Station,
 } from "../src/schema.ts";
 import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
-import { dropFiles, removePrefixes, withhold, withheldReason } from "../src/withhold.ts";
+import { DROPS, dropFiles, removePrefixes, withhold, withheldReason } from "../src/withhold.ts";
 import { misplaced } from "../src/store/misplaced.ts";
-import { deletesFiles } from "../src/sources/gesla/dropped.ts";
 import { storeFor, storeOfSource } from "../src/store/stores.ts";
 import { measureLinks, readLinks, writeLinks } from "../src/links.ts";
 import {
@@ -183,6 +183,7 @@ import {
   sameByData,
   shiftedByData,
   tooManyStopped,
+  withoutGone,
   writeMatches,
   type DataMatch,
 } from "../src/matches.ts";
@@ -191,8 +192,53 @@ import { INGEST_OPTIONS } from "../src/ingest-options.ts";
 
 useDiskCache();
 
-/** The records whose files `drop` deletes, by source. */
-const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFiles };
+/** Whether a station isn't withheld, so its rows in the monthly files stay (`withoutGone`). */
+const shown = (id: string) => {
+  const source = sources[id.split("/")[0]!];
+  return !source || withheldReason(source, id) === null;
+};
+
+/**
+ * With `--prune`, `links` and `matches` only take out the rows `withoutGone`
+ * does, measuring nothing, so the Ingest workflow can drop a withheld or
+ * dropped station's rows in minutes after a `withhold` or `drop`. A file with
+ * no such row isn't written.
+ */
+async function prune<T>(
+  path: string,
+  stored: number,
+  kept: T[],
+  write: (rows: T[]) => Promise<void>,
+): Promise<void> {
+  if (kept.length < stored) await write(kept);
+  console.log(
+    `${path}: ${stored - kept.length} rows naming a withheld or dropped station taken out, ${kept.length} kept`,
+  );
+}
+
+/**
+ * The stations `--prune` tells gone rows by, from each source's list as
+ * stored: `withoutGone` reads only their IDs, so it needs no levels, bounds or
+ * matches. A dropped record is known only through its source's list, so a
+ * source `drop` covers with no list fails the run, leaving `file` unchanged.
+ */
+async function listedStations(
+  store: string,
+  held: Source[],
+  file: string,
+): Promise<StoredStation[] | null> {
+  const stations: StoredStation[] = [];
+  for (const source of held) {
+    const list = await readStationList(stationListPath(store, source.metadata.id));
+    if (list) stations.push(...list);
+    else if (source.metadata.id in DROPS) {
+      console.error(`${store}: no list for ${source.metadata.id}; ${file} unchanged`);
+      process.exitCode = 1;
+      return null;
+    }
+  }
+  return stations;
+}
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -212,11 +258,21 @@ switch (command) {
     setConnections(positive("concurrency"));
     for (const store of new Set(Object.values(sources).flatMap(storesOf))) {
       const held = Object.values(sources).filter((s) => storesOf(s).includes(store));
+      if (values.prune) {
+        const listed = await listedStations(store, held, "links");
+        if (!listed) continue;
+        const stored = await readLinks(store);
+        const kept = withoutGone(stored, listed, shown);
+        await prune(linksPath(store), stored.length, kept, (rows) => writeLinks(store, rows));
+        continue;
+      }
+      const stations = await stationsToMeasure(store, held);
+      const previous = withoutGone(await readLinks(store), stations, shown);
       const { rows, failed } = await measureLinks(
         store,
-        await stationsToMeasure(store, held),
+        stations,
         positive("concurrency"),
-        await readLinks(store),
+        previous,
       );
       await writeLinks(store, rows);
       // Written first, so the pairs that were read are kept; a failed read keeps its pair's last row.
@@ -228,6 +284,14 @@ switch (command) {
     setConnections(positive("concurrency"));
     for (const store of new Set(Object.values(sources).flatMap(storesOf))) {
       const held = Object.values(sources).filter((s) => storesOf(s).includes(store));
+      if (values.prune) {
+        const listed = await listedStations(store, held, "matches");
+        if (!listed) continue;
+        const stored = await readMatches(store);
+        const kept = withoutGone(stored, listed, shown);
+        await prune(matchesPath(store), stored.length, kept, (rows) => writeMatches(store, rows));
+        continue;
+      }
       const stations = await stationsToMeasure(store, held);
       // A missing list or years file leaves no stations; last month's file stays.
       if (!stations.length) {
@@ -235,12 +299,8 @@ switch (command) {
         process.exitCode = 1;
         continue;
       }
-      // A withheld station's row goes, as its levels do.
-      const shown = (id: string) => {
-        const source = sources[id.split("/")[0]!];
-        return !source || withheldReason(source, id) === null;
-      };
-      const previous = (await readMatches(store)).filter((m) => shown(m.a) && shown(m.b));
+      // Before the stopped-agreeing guard, so a withheld or dropped station's rows don't count as stopped.
+      const previous = withoutGone(await readMatches(store), stations, shown);
       const { rows, failed, pairs } = await compareStations(
         store,
         stations,
@@ -284,12 +344,6 @@ switch (command) {
     const [source, ids, start, end] = args;
     if (!source || !ids || !start || !end) usage();
     await backfill(source, ids, parseDate(start), parseDate(end));
-    break;
-  }
-  case "recent": {
-    const [source] = args;
-    if (!source) usage();
-    await recent(source);
     break;
   }
   case "requalify": {
@@ -520,6 +574,12 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   // Each worker writes its stations' years; on one connection they'd wait on each other's uploads.
   setConnections(positive("concurrency"));
   const list = await listOf(store, source);
+  // A refresh never stores an empty list, so this is a broken file or every station withheld, and a run would
+  // pass having read nothing.
+  if (!list.length)
+    throw new Error(
+      `${sourceId}: no station to backfill: the store's list is empty or all withheld`,
+    );
   // `preliminary` takes each station from its earliest preliminary value, active or not.
   let ranges: Map<string, [Date, Date]> | undefined;
   // Stations listed past the cutoff with nothing after it to fetch, whose value is cleared.
@@ -603,10 +663,10 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   };
   let skipped = 0;
   // Years a skip-written campaign found empty lately, skipped rather than asked again.
-  // Only a source whose empty answer means no data, not an outage, keeps a
-  // record. One that can't be read is neither used nor written over this run.
+  // Only a source that says so keeps a record (`keepsEmptyYears`). One that
+  // can't be read is neither used nor written over this run.
   const empty =
-    mode === "written" && source.metadata.empty_means_none
+    mode === "written" && keepsEmptyYears(source.metadata)
       ? await readEmptyYears(store, sourceId, now).catch((error: Error) => {
           console.error(
             `${sourceId}: asking for every year, recording none; the empty-years record: ${error.message}`,
@@ -913,47 +973,17 @@ async function notStarted(sourceId: string): Promise<void> {
   if (page) await appendFile(page, `${note}\n`);
 }
 
-async function recent(sourceId: string): Promise<void> {
-  const now = Date.now();
-  const source = sourceOf(sourceId);
-  const stations = await startedListOf(storeOfSource(source.metadata), source);
-  if (!stations) return await notStarted(sourceId);
-  const summary = await reporting(`recent ${sourceId}`, async () => {
-    const [hours, keepDays] = [positive("hours"), positive("keep-days")];
-    return updateRecent({
-      source,
-      stations,
-      storeFor,
-      concurrency: positive("concurrency"),
-      since: new Date(now - hours * 3_600_000),
-      now,
-      keepDays,
-    });
-  });
-  // A source now reporting a station in another datum needs a station refresh,
-  // which the Ingest hourly workflow starts.
-  const output = process.env.GITHUB_OUTPUT;
-  if (output && summary.datumChanged) await appendFile(output, "datum_changed=true\n");
-  // Some stations failing or going quiet is ordinary; all of them is an outage,
-  // or a broken adapter, even one that answers "no data" without an error.
-  // A source that blocked this client needs a person, however many stations got through.
-  if (
-    summary.blocked ||
-    (summary.stations && summary.failed.length + summary.stale.length >= summary.stations)
-  )
-    process.exitCode = 1;
-}
-
 async function compact(sourceId: string, days: number): Promise<void> {
   let live = 0;
   const source = sourceOf(sourceId);
   const started = await startedListOf(storeOfSource(source.metadata), source);
   if (!started) return await notStarted(sourceId);
   const summary = await reporting(`compact ${sourceId}`, async () => {
-    // The window keeps 7 days back from its last hourly run, which is partway
-    // into the seventh day, so 6 is the most whole days it holds.
-    if (!Number.isInteger(days) || days < 1 || days > 6)
-      throw new Error("--days must be a whole number from 1 to 6, the whole days the window holds");
+    // An R2 lifecycle rule deletes a daily file after RECENT_DAYS.
+    if (!Number.isInteger(days) || days < 1 || days > RECENT_DAYS)
+      throw new Error(
+        `--days must be a whole number from 1 to ${RECENT_DAYS}, the days the daily files are kept`,
+      );
     const concurrency = positive("concurrency");
     setConnections(concurrency);
     const stations = started;
@@ -972,7 +1002,7 @@ async function compact(sourceId: string, days: number): Promise<void> {
     });
   });
   // A failed fold left its year file as it was; a person should look. Every
-  // live station silent means recent/ is missing, empty or not being updated.
+  // live station silent means the daily files are missing, empty or not being written.
   if (summary.failed.length || (live && summary.stale.length >= live)) process.exitCode = 1;
 }
 
@@ -1000,10 +1030,7 @@ async function reporting(title: string, run: () => Promise<RunSummary>): Promise
 }
 
 /** A command-line option that must be a whole number of at least 1. */
-function positive(
-  name: "concurrency" | "hours" | "keep-days" | "budget",
-  fallback?: string,
-): number {
+function positive(name: "concurrency" | "budget", fallback?: string): number {
   const value = Number(values[name] ?? fallback);
   if (!Number.isInteger(value) || value < 1)
     throw new Error(`--${name} must be a whole number of at least 1`);
@@ -1180,7 +1207,7 @@ async function analyzeSource(sourceId: string): Promise<void> {
   const waiting = pending(analysis)
     .filter((id) => listed.has(id))
     .sort((a, b) => Number(differs(b)) - Number(differs(a)));
-  // A station starts only within the budget, so the source's hourly runs and compaction aren't held off for long.
+  // A station starts only within the budget, so the source's compaction isn't held off for long.
   const until = Date.now() + positive("budget", "120") * 60_000;
   // Finished stations are marked as others finish, at most every 5 minutes, and after each batch,
   // since a batch of 1-minute series can run for hours.
@@ -1237,7 +1264,7 @@ async function withholdStations(sourceId: string): Promise<void> {
   ];
   if (ids.length)
     lines.push(
-      `Refresh ${sourceId}'s list with the Monthly workflow (sources: ${sourceId}) to drop them from it and publish stations.parquet.`,
+      `Refresh ${sourceId}'s list with the Monthly workflow (sources: ${sourceId}) to drop them from it and publish stations.parquet. In the Ingest workflow, this withhold's prune jobs run \`matches --prune\` and \`links --prune\`, which take their rows out of stations/matches.parquet and stations/links.parquet, as a migration's prune steps do after it; after a withhold run anywhere else, dispatch Ingest with each.`,
     );
   for (const line of lines) console.log(line);
   const file = process.env.GITHUB_STEP_SUMMARY;
@@ -1258,7 +1285,7 @@ async function dropStations(sourceId: string): Promise<void> {
   ];
   if (ids.length && !dryRun)
     lines.push(
-      `Run \`compact ${sourceId} --rebuild-bounds\` and \`publish\` so the bounds and stations.parquet drop them.`,
+      `Run \`compact ${sourceId} --rebuild-bounds\` and \`publish\` so the bounds and stations.parquet drop them. In the Ingest workflow, this drop's prune jobs run \`matches --prune\` and \`links --prune\`, which take their rows out of stations/matches.parquet and stations/links.parquet, as a migration's prune steps do after it; after a drop run anywhere else, dispatch Ingest with each.`,
     );
   for (const line of lines) console.log(line);
   const file = process.env.GITHUB_STEP_SUMMARY;
@@ -1317,7 +1344,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | matches [--concurrency N] [--accept-matches] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] [--prune] | matches [--concurrency N] [--accept-matches] [--prune] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }

@@ -78,7 +78,7 @@ describe("firstEpochs", () => {
     );
   });
 
-  it("ends Hiva Oa's first epoch at the start of 5 March 2020 under REFMAR's own overrides", () => {
+  it("starts Hiva Oa's second epoch on 5 March 2020 under REFMAR's own overrides", () => {
     const epochs = firstEpochs(
       { datum: "ZI", datums: {}, reference: null },
       options({
@@ -91,7 +91,7 @@ describe("firstEpochs", () => {
       epochs.map((e) => [e.since, e.until, e.to_current]),
       [
         [null, "2020-03-05T00:00:00Z", 1.35],
-        ["2020-03-06T00:00:00Z", null, 0],
+        ["2020-03-05T00:00:00Z", null, 0],
       ],
     );
   });
@@ -475,6 +475,75 @@ describe("nextEpochs, with splits", () => {
     );
     assert.equal(again.event, null);
     assert.equal(again.epochs.length, 2);
+  });
+
+  it("moves the epoch a list holds at a split's `from` day to the split's earlier day, once", () => {
+    const decisions = { [epochKey("x/1", null)]: { to_current: 1.35, note: "measured" } };
+    const made = nextEpochs(
+      [epoch()],
+      { datum: "PNP", datums: {} },
+      options({ splits: split("2020-03-06"), decisions }),
+    ).epochs;
+    const moved = { "x/1": [{ since: "2020-03-05", from: "2020-03-06", note: "the zero moved" }] };
+    const next = nextEpochs(
+      made,
+      { datum: "PNP", datums: {} },
+      options({ splits: moved, decisions }),
+    );
+    assert.equal(next.event, "opened");
+    assert.match(next.reason!, /moved .*2020-03-05/);
+    assert.deepEqual(
+      next.epochs.map((e) => [e.id, e.since, e.until, e.state, e.to_current]),
+      [
+        [1, null, "2020-03-05T00:00:00Z", "closed", 1.35],
+        [2, "2020-03-05T00:00:00Z", null, "open", 0],
+      ],
+    );
+    // Once moved, a refresh changes nothing.
+    const again = nextEpochs(
+      next.epochs,
+      { datum: "PNP", datums: {} },
+      options({ splits: moved, decisions }),
+    );
+    assert.equal(again.event, null);
+    assert.deepEqual(again.epochs, next.epochs);
+    // A store with no epoch at `from`, or a first list, gets the split's own day.
+    const fresh = firstEpochs(
+      { datum: "PNP", datums: {}, reference: null },
+      options({ station: "x/1", splits: moved, decisions }),
+    );
+    assert.deepEqual(
+      fresh.map((e) => [e.since, e.until]),
+      [
+        [null, "2020-03-05T00:00:00Z"],
+        ["2020-03-05T00:00:00Z", null],
+      ],
+    );
+  });
+
+  it("moves Hiva Oa's stored epoch under REFMAR's own overrides, keeping the earlier end", () => {
+    const stored = [
+      { ...epoch(), until: "2020-03-05T00:00:00Z", state: "closed" as const, to_current: 1.35 },
+      { ...epoch(), id: 2, since: "2020-03-06T00:00:00Z", until: null },
+    ];
+    const next = nextEpochs(
+      stored,
+      { datum: "PNP", datums: {} },
+      options({
+        station: "refmar/495",
+        splits: refmar.overrides!.splits,
+        decisions: refmar.overrides!.epochs!,
+      }),
+    );
+    assert.equal(next.event, "opened");
+    assert.deepEqual(
+      next.epochs.map((e) => [e.id, e.since, e.until, e.to_current]),
+      [
+        [1, null, "2020-03-05T00:00:00Z", 1.35],
+        [2, "2020-03-05T00:00:00Z", null, 0],
+      ],
+    );
+    assert.equal(next.decide?.id, 1);
   });
 
   it("splits at several days in one refresh, leaving the middle unconverted without a decision", () => {

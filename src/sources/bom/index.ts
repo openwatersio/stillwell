@@ -1,3 +1,4 @@
+import { yearOf } from "../schedule.ts";
 import { gunzipSync } from "node:zlib";
 import { FtpError } from "../../ftp.ts";
 import { getText } from "../../http.ts";
@@ -36,7 +37,7 @@ export const metadata: SourceMetadata = {
     name: "Bureau of Meteorology conditions of use for tide information",
     url: BOM_CONDITIONS,
     // As UHSLC's copies of these gauges are (`NOTICES.bom`): BOM's reply
-    // (CAS-151567-N3L2D4) allows use under its conditions, and the store reads
+    // (CAS-151567-N3L2D4, issue #80) allows use under its conditions, and the store reads
     // that as covering commercial use. A copy can't carry looser terms than
     // the original, so a change to one is a change to both.
     commercial_use: NOTICES.bom!.commercial_use,
@@ -45,7 +46,7 @@ export const metadata: SourceMetadata = {
   attribution: NOTICES.bom!.credit!,
   // The page that publishes the Centre's contact details; BOM's site is closed to scripted requests, so no mailbox is recorded.
   contact: { url: "https://www.bom.gov.au/oceanography/projects/ntc/ntc.shtml" },
-  terms: `${NOTICES.bom!.terms} "${DISCLAIMER}" Where a product modifies the data: "${MODIFIED_DISCLAIMER}" Changes in the store: levels from millimeters to meters, the tide gauge zero named ${DATUM}, and quality flags added.`,
+  terms: `${NOTICES.bom!.terms} "${DISCLAIMER}" Where a product modifies the data: "${MODIFIED_DISCLAIMER}"`,
   // The files are rebuilt about monthly, and weeks behind.
   hourly: false,
   // The last years' values are preliminary until BOM has rebuilt their archives.
@@ -715,6 +716,12 @@ async function pace(): Promise<void> {
 
 export const source: Source = {
   metadata,
+  // The archives are rebuilt about monthly, and a finished year's again in the new year's first weeks, and
+  // nothing else brings new values, so every active gauge is read again from the year before last, past the
+  // year of its last value, which the default would stop at.
+  schedule: {
+    refetch: (today) => [["all", `${yearOf(today) - 2}`, `${yearOf(today) + 1}`, "--refetch"]],
+  },
   stations,
   observations: (s, start, end) => levels(s.source_id, start, end, s),
 };

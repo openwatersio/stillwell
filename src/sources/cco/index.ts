@@ -1,3 +1,4 @@
+import { firstOfMonth } from "../schedule.ts";
 import { getText } from "../../http.ts";
 import {
   Flag,
@@ -26,6 +27,7 @@ export const metadata: SourceMetadata = {
   id: "cco",
   name: "Channel Coastal Observatory, National Network of Regional Coastal Monitoring Programmes",
   url: "https://www.coastalmonitoring.org/ccoresources/api/",
+  // The API page (`url`) names and links the license.
   license: {
     id: "OGL-UK-3.0",
     name: "Open Government Licence v3.0",
@@ -35,11 +37,17 @@ export const metadata: SourceMetadata = {
   },
   attribution:
     "Real time data are from the National Network of Regional Coastal Monitoring Programmes, made freely available under the terms of the Open Government Licence v3.0. Data are not quality-controlled in real time.",
+  // The contact the API page (`url`) gives.
   contact: { url: "https://www.coastalmonitoring.org/contact_us", email: "cco@channelcoast.org" },
   terms:
-    "Open Government Licence v3.0. Real-time data are not quality-controlled; the observatory checks each month in arrears.",
+    "The API page asks for the credit, and the note that data are not quality-controlled in real time, on pages and other outputs that use the data.",
+  chart_datum: "CD",
+  // The Admiralty Tide Tables' offset added to Ordnance Datum levels (tide QC manual, 2.4).
+  datum_aliases: { CD: "ACD" },
   // The API has each reading within 10 minutes.
   hourly: true,
+  // The key is for one read of each site an hour (README.md).
+  poller: "hourly",
   // Readings carry no flag until the monthly check, which can flag them.
   finalizes: true,
   // An outage is an error, so a year with no readings has none.
@@ -287,6 +295,11 @@ function flagOf(code: unknown): Flag {
 
 export const source: Source = {
   metadata,
+  // A month's flags arrive within weeks, and reading from the earliest preliminary reading would read the
+  // archive from 2005, so every active station is read again from 12 months back (README.md).
+  schedule: {
+    refetch: (today) => [["all", firstOfMonth(today, -12), firstOfMonth(today), "--refetch"]],
+  },
   stations,
   observations: (s: Station, start, end) => levels(s.source_id, start, end),
 };

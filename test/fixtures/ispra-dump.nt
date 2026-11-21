@@ -1,0 +1,38 @@
+<https://w3id.org/italia/env/ld/rmn/media/00105_an15_hydrometriclevel_201401> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/ancona_hydrometric_201401.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_an15_hydrometriclevel_201402> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/ancona_hydrometric_201402.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_an15_hydrometriclevel_201403> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/ancona_hydrometric_201403.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_it45_hydrometriclevel_201401> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/isole-tremiti_hydrometric_201401.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_it45_hydrometriclevel_201402> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/isole-tremiti_hydrometric_201402.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_it45_hydrometriclevel_201403> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/isole-tremiti_hydrometric_201403.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_la38_hydrometriclevel_201401> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/la-spezia_hydrometric_201401.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_la38_hydrometriclevel_201402> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/la-spezia_hydrometric_201402.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_la38_hydrometriclevel_201403> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/la-spezia_hydrometric_201403.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_na23_hydrometriclevel_201312> <http://www.w3.org/2000/01/rdf-schema#label> "CSV media for RMN09-Napoli, HydrometricLevel type, 2013-12 period"@en .
+<https://w3id.org/italia/env/ld/rmn/media/00105_na23_hydrometriclevel_201312> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/napoli_hydrometric_201312.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_na23_hydrometriclevel_201401> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/napoli_hydrometric_201401.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_na23_hydrometriclevel_201402> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/napoli_hydrometric_201402.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_na23_hydrometriclevel_201403> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/napoli_hydrometric_201403.csv> .
+<https://w3id.org/italia/env/ld/rmn/media/00105_na23_hydrometriclevel_201405> <http://www.w3.org/2000/01/rdf-schema#label> "CSV media for RMN09-Napoli, HydrometricLevel type, 2014-05 period"@en .
+<https://w3id.org/italia/env/ld/rmn/media/00105_na23_hydrometriclevel_201405> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/napoli_hydrometric_201405.csv> .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_an15_hydrometriclevel_201401> <http://www.w3.org/2000/01/rdf-schema#label> "Ancona - Water Level, January 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_an15_hydrometriclevel_201402> <http://www.w3.org/2000/01/rdf-schema#label> "Ancona - Water Level, February 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_an15_hydrometriclevel_201403> <http://www.w3.org/2000/01/rdf-schema#label> "Ancona - Water Level, March 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_it45_hydrometriclevel_201401> <http://www.w3.org/2000/01/rdf-schema#label> "Isole Tremiti - Water Level, January 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_it45_hydrometriclevel_201402> <http://www.w3.org/2000/01/rdf-schema#label> "Isole Tremiti - Water Level, February 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_it45_hydrometriclevel_201403> <http://www.w3.org/2000/01/rdf-schema#label> "Isole Tremiti - Water Level, March 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_la38_hydrometriclevel_201401> <http://www.w3.org/2000/01/rdf-schema#label> "La Spezia - Water Level, January 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_la38_hydrometriclevel_201402> <http://www.w3.org/2000/01/rdf-schema#label> "La Spezia - Water Level, February 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_la38_hydrometriclevel_201403> <http://www.w3.org/2000/01/rdf-schema#label> "La Spezia - Water Level, March 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_na23_hydrometriclevel_201312> <http://www.w3.org/2000/01/rdf-schema#label> "Napoli - Water Level, Dicember 2013"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_na23_hydrometriclevel_201401> <http://www.w3.org/2000/01/rdf-schema#label> "Napoli - Water Level, January 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_na23_hydrometriclevel_201402> <http://www.w3.org/2000/01/rdf-schema#label> "Napoli - Water Level, February 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_na23_hydrometriclevel_201403> <http://www.w3.org/2000/01/rdf-schema#label> "Napoli - Water Level, March 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/observationseries/00105_na23_hydrometriclevel_201405> <http://www.w3.org/2000/01/rdf-schema#label> "Napoli - Water Level, May 2014"@en .
+<https://w3id.org/italia/env/ld/rmn/platform/00105_an15_09> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "43.62477"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://w3id.org/italia/env/ld/rmn/platform/00105_an15_09> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.50652"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://w3id.org/italia/env/ld/rmn/platform/00105_it45_09> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "42.11888"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://w3id.org/italia/env/ld/rmn/platform/00105_it45_09> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "15.50157"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://w3id.org/italia/env/ld/rmn/platform/00105_la38_09> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "44.09661"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://w3id.org/italia/env/ld/rmn/platform/00105_la38_09> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "9.85764"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://w3id.org/italia/env/ld/rmn/platform/00105_na23_09> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "40.84141"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://w3id.org/italia/env/ld/rmn/platform/00105_na23_09> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "14.26919"^^<http://www.w3.org/2001/XMLSchema#decimal> .

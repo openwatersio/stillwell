@@ -29,14 +29,15 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Norwegian Mapping Authority, Hydrographic Service",
+  terms: "Kartverket asks users not to poll its API excessively.",
+  // The tide and water-level data page (`license.url`) names both for feedback.
   contact: {
     email: "kundesenter@kartverket.no",
     url: "https://kartverket.no/en/about-kartverket/contact-us/contact-form",
   },
-  terms:
-    "Licensed under CC BY 4.0. The Norwegian Mapping Authority, Hydrographic Service must be credited. Kartverket asks users not to poll the API excessively. Kartverket doesn't mark which values it has quality-controlled, so values from the last year are treated as preliminary. Changes in the store: levels converted from centimeters to meters, and quality flags added.",
   // The API serves a station's whole record against its current chart datum.
   archive: "current",
+  chart_datum: "CD",
   // Values arrive 10 to 20 minutes after they're measured.
   hourly: true,
   // Values count as final once they're a year old, so the refetch reads them again until then.
@@ -160,10 +161,10 @@ const asked = new Map<string, Promise<Record<string, number> | null>>();
 
 /**
  * Throws `DatumChanged` with `seriesChanged`'s reason as the reference, so
- * Ingest hourly starts a refresh, which opens or holds the epoch, and a
+ * The poller starts a refresh, which opens or holds the epoch, and a
  * rejected change matches its epoch and asks for none. Offsets that can't be
  * read refuse a backfill, which writes the store's years, but only warn for
- * `strict` false, so an outage of `stationlevels` doesn't stop hourly ingest.
+ * `strict` false, so an outage of `stationlevels` doesn't stop the poller.
  */
 async function checkChartDatum(
   code: string,

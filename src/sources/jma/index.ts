@@ -1,3 +1,4 @@
+import { firstOfMonth, REFETCH_YEARS, yearOf } from "../schedule.ts";
 import { getText, HttpError } from "../../http.ts";
 import {
   Flag,
@@ -21,6 +22,7 @@ export const metadata: SourceMetadata = {
   id: "jma",
   name: "Japan Meteorological Agency (JMA)",
   url: `${SITE}/db/tide/genbo/index.php`,
+  // No tide page carries a rights notice of its own, so the site-wide license applies.
   license: {
     id: "PDL-1.0",
     name: "Public Data License (Version 1.0)",
@@ -29,12 +31,14 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Japan Meteorological Agency",
+  // JMA's website feedback form (気象庁ホームページに関するご意見・ご感想), in Japanese, linked from
+  // https://www.jma.go.jp/jma/kishou/info/coment.html. JMA publishes no mailbox.
   contact: { url: "https://ds.data.jma.go.jp/homepage.php/index.php" },
   terms:
-    "JMA's website content is under the Public Data License 1.0, compatible with CC BY 4.0, commercial use included. Credit the source as 出典：気象庁ホームページ (Source: Japan Meteorological Agency website) with the page's URL, and say the data was edited. Changes in the store: times converted from JST to UTC, levels from centimeters to meters, and quality flags added; the current and previous month's provisional values are marked preliminary.",
+    "Content under the Public Data License 1.0 may be used under CC BY 4.0 instead. Credit the source as 出典：気象庁ホームページ (Source: Japan Meteorological Agency website) with the page's URL, and say the data was edited.",
   // The historical files are shifted to each station's current observation datum.
   archive: "current",
-  // Provisional values appear around noon the next day, too late for hourly ingest.
+  // Provisional values appear around noon the next day, too late for the poller.
   hourly: false,
   // Provisional values are replaced by final ones around the 20th of the next month.
   finalizes: true,
@@ -428,6 +432,14 @@ async function pace(): Promise<void> {
 
 export const source: Source = {
   metadata,
+  // JMA isn't hourly, so the refetch also brings its new values: every open station from two months back,
+  // whose final file is out by now, to this month's provisional one, then the default refetch.
+  schedule: {
+    refetch: (today) => [
+      ["all", firstOfMonth(today, -2), firstOfMonth(today, 1)],
+      ["preliminary", `${yearOf(today) - REFETCH_YEARS}`, firstOfMonth(today)],
+    ],
+  },
   stations,
   observations: (s, start, end) => levels(s.source_id, start, end, s as JmaStation),
 };

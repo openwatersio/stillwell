@@ -1,3 +1,4 @@
+import { firstOfMonth, REFETCH_YEARS, yearOf } from "../schedule.ts";
 import { getJson, getText } from "../../http.ts";
 import {
   Flag,
@@ -22,6 +23,7 @@ export const metadata: SourceMetadata = {
   id: "linz",
   name: "Toitū Te Whenua Land Information New Zealand (LINZ), tsunami gauge network",
   url: "https://www.linz.govt.nz/products-services/data/types-linz-data/sea-level-data/sea-level-data-downloads",
+  // The download page (`url`) licenses every gauge it lists under CC BY 3.0 NZ; the files and READMEs carry no license.
   license: {
     id: "CC-BY-3.0-NZ",
     name: "Creative Commons Attribution 3.0 New Zealand",
@@ -30,15 +32,14 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Land Information New Zealand",
+  // Both are published on https://www.linz.govt.nz/contact-us.
   contact: {
     email: "customersupport@linz.govt.nz",
     url: "https://www.linz.govt.nz/contact-us",
   },
-  terms:
-    "Licensed under CC BY 3.0 NZ. Land Information New Zealand must be credited. LINZ does not quality-control the data and warns that the sensors drift, so it advises caution for long-term analysis. Changes in the store: rows LINZ marks missing or bad, or sets to a sensor-off value, are left out; over spans where sensor 40 is stuck, erratic or missing, sensor 41's levels stand in, or nothing is read where both are stuck; Napier's levels before a step in 2008 are converted to the later zero by the API; datum steps are converted by what UHSLC's records measure at Wellington, Port Chalmers, Tauranga and Gisborne, and those gauges' minutes between a step and the next day are left out; Cape Roberts' and Scott Base's times are converted to UTC and Scott Base's levels from millimeters to meters, and their rows that aren't levels, repeat or disagree, and the spans where a gauge read no sea level, are left out; and quality flags are added. The source's errata list each span and step.",
   // Each gauge's whole record is served against its own zero, as it was measured.
   archive: "previous",
-  // Daily files appear 6 to 12 days after their day, in batches, so hourly ingest would find nothing.
+  // Daily files appear 6 to 12 days after their day, in batches, so the poller would find nothing.
   hourly: false,
   // A year's file replaces its daily files and marks as missing the sensor-off values they hold.
   finalizes: true,
@@ -46,11 +47,16 @@ export const metadata: SourceMetadata = {
 
 /** The datum LINZ's levels are measured from: each sensor's own tide gauge zero (TG0). */
 const DATUM = "ZERO";
-/** The sensor whose files the store reads. Sensor 41 sits on a zero of its own, and the two drift apart by 0.3 to 1.5 m at some gauges (README). */
+/**
+ * The sensor whose files the store reads, so a series stays on one zero. Sensor 41
+ * sits on a zero of its own, and the two move apart by 0.3 to 1.5 m, with a yearly
+ * cycle, at Lottin Point, Kaikoura, Korotiti Bay, Fishing Rock, Boat Cove and
+ * Napier; neither holds better against UHSLC's Wellington (erratum `linz-wellington-drift`).
+ */
 const SENSOR = "40";
 /**
  * Cape Roberts and Scott Base, LINZ's two Antarctic gauges, have only sensor
- * `00` files, in formats that change from year to year (README).
+ * `00` files, in formats that change from year to year (erratum `linz-antarctic-formats`).
  */
 const ANTARCTIC = new Set(["ROBT", "SCOT"]);
 const sensorOf = (code: string): string => (ANTARCTIC.has(code) ? "00" : SENSOR);
@@ -383,6 +389,7 @@ async function listing(code: string, sensor: string, year: number): Promise<stri
     { fresh: true, pace },
   );
   if (!Array.isArray(files)) throw new Error(`LINZ ${code} ${year}: no file list`);
+  // A listing can hold a file with an empty name, as Scott Base's last year's does.
   return files.map((f) => f.name).filter(Boolean);
 }
 
@@ -390,6 +397,7 @@ async function listing(code: string, sensor: string, year: number): Promise<stri
  * The label days `[from, to)` a file's name covers: `<code>_<sensor>_<year><day of year>.zip`
  * is one day, `<code>_<sensor>_<year>_<first month>-<last month>.zip` (Scott Base's
  * `SCOT_00_2026_01-03.zip`) is those months, and any other file, such as the year's, is null.
+ * The Antarctic READMEs' `ROBT_yyyyddd.zip`, without the sensor, isn't what LINZ serves.
  */
 function fileSpan(
   name: string,
@@ -724,6 +732,19 @@ const overrides: Overrides = {
 
 export const source: Source = {
   metadata,
+  // LINZ isn't hourly: its daily files appear 6 to 12 days late, so the refetch brings its new values. Every
+  // open station is read from two months back to the end of this month, since the preliminary run stops at the
+  // year of a station's last value and skips one with no preliminary value, which leaves out a new year's first
+  // days and a new gauge. Cape Roberts has only year's files, issued early in the next year, which nothing else
+  // leads to. The preliminary run then reads each station from its earliest preliminary value, which brings in
+  // the year's file that replaces a year's daily files.
+  schedule: {
+    refetch: (today) => [
+      ["all", firstOfMonth(today, -2), firstOfMonth(today, 1)],
+      ["ROBT", `${yearOf(today) - 1}`, `${yearOf(today)}`, "--refetch"],
+      ["preliminary", `${yearOf(today) - REFETCH_YEARS}`, firstOfMonth(today, 1)],
+    ],
+  },
   overrides,
   stations,
   observations: (s, start, end) => levels(s.source_id, start, end, s as Partial<LinzStation>),

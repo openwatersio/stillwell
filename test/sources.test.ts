@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it } from "node:test";
-import { Blocked, fetchText, HttpError, setTransport } from "../src/http.ts";
+import {
+  Blocked,
+  fetchText,
+  HttpError,
+  setTransport as setHttpTransport,
+  type Transport,
+} from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
@@ -11,6 +17,7 @@ import * as kuestendaten from "../src/sources/pegelonline/kuestendaten.ts";
 import { sources } from "../src/sources/index.ts";
 import * as refmar from "../src/sources/refmar/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
+import rwsErrata from "../src/sources/rws/errata.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
 import { CONTRIBUTORS } from "../src/sources/uhslc/contributors.ts";
 import {
@@ -27,6 +34,21 @@ import { describedDatums, isoDate } from "../src/sources/usace/described.ts";
 import { ZERO_SINCE } from "../src/sources/usace/zeros.ts";
 import * as usgs from "../src/sources/usgs/index.ts";
 
+/**
+ * CO-OPS's data inventory answers with no station here, as it does for a
+ * station it doesn't know, so a test's own requests are the ones it counts;
+ * tests of the inventory itself serve it with `setHttpTransport`.
+ */
+function setTransport(next: Transport): void {
+  setHttpTransport((url, options) =>
+    url.includes("/datainventory/")
+      ? Promise.resolve(
+          "<soapenv:Fault><faultstring>No meta data available</faultstring></soapenv:Fault>",
+        )
+      : next(url, options),
+  );
+}
+
 const fixture = (name: string) =>
   readFileSync(new URL(`fixtures/${name}`, import.meta.url), "utf8");
 
@@ -39,9 +61,90 @@ function serve(routes: [RegExp, string | (() => string)][]): void {
   });
 }
 
-afterEach(() => setTransport(fetchText));
+afterEach(() => setHttpTransport(fetchText));
 
 describe("rws", () => {
+  it("waits out an outage's 404, then stops the run as blocked for every later request", async () => {
+    const range = [new Date("2023-01-01T00:00:00Z"), new Date("2024-01-01T00:00:00Z")] as const;
+    const { waits } = rws.outage;
+    const gone = () =>
+      new HttpError(
+        "POST /OphalenWaarnemingen returned 404 (retry after 120 s)",
+        "404 page not found",
+      );
+    rws.outage.waits = [0, 0];
+    rws.outage.blocked = undefined;
+    try {
+      let calls = 0;
+      setTransport(async () => {
+        if (++calls < 3) throw gone();
+        return "";
+      });
+      assert.deepEqual(await rws.levels("hoekvanholland", ...range), []);
+      assert.equal(calls, 3);
+      calls = 0;
+      setTransport(async () => {
+        calls++;
+        throw gone();
+      });
+      await assert.rejects(rws.levels("hoekvanholland", ...range), Blocked);
+      assert.equal(calls, 3);
+      // The block is shared: other requests, and the catalog, fail without asking.
+      await assert.rejects(rws.extremes("dordrecht", ...range), Blocked);
+      await assert.rejects(rws.stations(), Blocked);
+      const day = new Date(+range[1] - 86_400_000);
+      await assert.rejects(rws.levels("hoekvanholland", day, range[1]), Blocked);
+      assert.equal(calls, 3);
+    } finally {
+      rws.outage.waits = waits;
+      rws.outage.blocked = undefined;
+    }
+  });
+
+  it("fails an outage's 404 at once for a read of a few days", async () => {
+    const { waits } = rws.outage;
+    rws.outage.blocked = undefined;
+    let calls = 0;
+    setTransport(async () => {
+      calls++;
+      throw new HttpError("POST /OphalenWaarnemingen returned 404", "404 page not found");
+    });
+    const day = new Date("2024-01-01T00:00:00Z");
+    await assert.rejects(
+      rws.levels("hoekvanholland", day, new Date(+day + 6 * 86_400_000)),
+      HttpError,
+    );
+    assert.equal(calls, 1);
+    // Seven days exactly is still a short read; a millisecond more waits.
+    const week = new Date(+day + 7 * 86_400_000);
+    rws.outage.waits = [0];
+    try {
+      await assert.rejects(rws.levels("hoekvanholland", day, week), HttpError);
+      assert.equal(calls, 2);
+      await assert.rejects(rws.levels("hoekvanholland", day, new Date(+week + 1)), Blocked);
+    } finally {
+      rws.outage.waits = waits;
+      rws.outage.blocked = undefined;
+    }
+  });
+
+  it("fails a 404 that isn't the outage's, and any other error, at once", async () => {
+    rws.outage.blocked = undefined;
+    let calls = 0;
+    const range = [new Date("2023-01-01T00:00:00Z"), new Date("2024-01-01T00:00:00Z")] as const;
+    for (const error of [
+      new HttpError("POST /OphalenWaarnemingen returned 404", '{"Foutmelding":"x"}'),
+      new HttpError("POST /OphalenWaarnemingen returned 500", "404 page not found"),
+    ]) {
+      setTransport(async () => {
+        calls++;
+        throw error;
+      });
+      await assert.rejects(rws.levels("hoekvanholland", ...range), HttpError);
+    }
+    assert.equal(calls, 2);
+  });
+
   it("reads levels in meters with flags from RWS's status and quality codes", async () => {
     serve([[/OphalenWaarnemingen/, fixture("rws-observations.json")]]);
     const levels = await rws.levels(
@@ -239,6 +342,86 @@ describe("rws", () => {
       rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" }),
       /extremes are in NAP, not MSL/,
     );
+    // Hourly means are all some weirs have: read as levels there, and after any reading at a time.
+    const mean = { ...nap, WaardeBewerkingsMethode: { Code: "GEMH" } };
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [
+            mean,
+            [
+              [times[0]!, 910],
+              [times[1]!, 912],
+            ],
+          ],
+          [nap, [[times[0]!, 911]]],
+        ),
+      ],
+    ]);
+    const years = [new Date("2002-01-01T00:00:00Z"), new Date("2003-01-01T00:00:00Z")] as const;
+    const at = (time: string) => time.replace("2023", "2002");
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [
+            mean,
+            [
+              [at(times[0]!), 910],
+              [at(times[1]!), 912],
+            ],
+          ],
+          [nap, [[at(times[0]!), 911]]],
+        ),
+      ],
+    ]);
+    assert.deepEqual(
+      (await rws.levels("dehaandrik.boven", ...years)).map((l) => l.level),
+      [9.11, 9.12],
+    );
+    // The window runs from 23:00 UTC on 31 December 1999 up to, not including, 1 January 2005.
+    const edge = (time: string, value = 910) => {
+      serve([[/OphalenWaarnemingen/, answer([mean, [[time, value]]])]]);
+      return rws.levels(
+        "dehaandrik.boven",
+        new Date("1999-12-01T00:00:00Z"),
+        new Date("2005-02-01T00:00:00Z"),
+      );
+    };
+    // A series of only missing-value sentinels inside the window holds no value, and isn't a failure.
+    assert.deepEqual(await edge("2002-01-01T00:00:00+01:00", 999_999_999), []);
+    assert.deepEqual(
+      (await edge("2000-01-01T00:00:00+01:00")).map((l) => l.level),
+      [9.1],
+    );
+    // A read's end is inclusive, so the mean at 2005-01-01T00:00Z is part of a read of 2004.
+    assert.deepEqual(
+      (await edge("2005-01-01T00:00:00+00:00")).map((l) => l.level),
+      [9.1],
+    );
+    await assert.rejects(edge("2005-01-01T00:01:00+00:00"), /unknown WaardeBewerkingsMethode GEMH/);
+    await assert.rejects(edge("1999-12-31T22:59:00+00:00"), /unknown WaardeBewerkingsMethode GEMH/);
+    await assert.rejects(
+      edge("2002-01-01T00:00:00+01:00", 999_999_999).then(() =>
+        edge("2023-06-01T00:00:00+00:00", 999_999_999),
+      ),
+      /unknown WaardeBewerkingsMethode GEMH/,
+    );
+    // Anywhere else, for the astronomical tide, and at other times, an hourly mean fails rather than vanish.
+    for (const [location, options] of [
+      ["goeree.lichteiland", { datum: "MSL" }],
+      ["dehaandrik.boven", { process: "astronomisch" as const }],
+    ] as const)
+      await assert.rejects(
+        rws.levels(location, ...years, options),
+        /unknown WaardeBewerkingsMethode GEMH/,
+      );
+    serve([[/OphalenWaarnemingen/, answer([mean, [[times[0]!, 910]]], [nap, [[times[0]!, 911]]])]]);
+    await assert.rejects(
+      rws.levels("dehaandrik.boven", ...range),
+      /unknown WaardeBewerkingsMethode GEMH/,
+    );
     // A way of deriving values the adapter doesn't know fails rather than vanish.
     serve([
       [
@@ -430,6 +613,36 @@ describe("rws", () => {
     );
   });
 
+  it("reads RWS's numeric types 1 and 2, and fails on the table's other codes", async () => {
+    const times = [1, 2, 3].map((n) => `2027-01-01T0${n}:00:00+01:00`);
+    const range = [new Date("2026-12-31T00:00:00Z"), new Date("2027-01-02T00:00:00Z")] as const;
+    const get = (codes: string[]) => {
+      serve([
+        [
+          /OphalenWaarnemingen/,
+          answer(
+            [typeChannel, codes.map((c, i) => [times[i]!, c] as [string, string])],
+            [nap, codes.map((_, i) => [times[i]!, [170, -169, -160][i]!] as [string, number])],
+          ),
+        ],
+      ]);
+      return rws.extremes("pogum", ...range, { process: "astronomisch" });
+    };
+    assert.deepEqual(
+      (await get(["1", "2", "1"])).map((e) => [e.type, e.level]),
+      [
+        ["high", 1.7],
+        ["low", -1.69],
+        ["high", -1.6],
+      ],
+    );
+    for (const code of ["3", "4", "5"])
+      await assert.rejects(get(["1", "2", code]), new RegExp(`unknown extreme type ${code}`));
+    // Only the astronomical tide's extremes use the codes.
+    await get(["1", "2", "1"]);
+    await assert.rejects(rws.extremes("pogum", ...range), /unknown extreme type 1/);
+  });
+
   it("fails on an extreme type it doesn't know rather than drop it", async () => {
     const time = "2024-01-01T02:00:00+01:00";
     serve([
@@ -439,6 +652,16 @@ describe("rws", () => {
     await assert.rejects(
       rws.extremes("hoekvanholland", ...range),
       /unknown extreme type hoogwater 1/,
+    );
+  });
+});
+
+describe("rws hourly means", () => {
+  it("are read at the weirs the erratum lists", () => {
+    const entry = rwsErrata.errata.find((e) => e.id === "rws-hourly-means-weirs")!;
+    assert.deepEqual(
+      [...rws.HOURLY_MEANS].map((code) => `rws/${code}`).sort(),
+      [...entry.stations].sort(),
     );
   });
 });
@@ -1500,6 +1723,33 @@ describe("coops", () => {
     });
   });
 
+  it("leaves the GPS buoy out of the list without asking for its datums", async () => {
+    const buoy = station({ id: "9414796", name: "GPS Buoy, San Francisco Bay" });
+    serve([
+      [/type=historicwl/, JSON.stringify({ stations: [station({}), buoy] })],
+      [/type=waterlevels/, JSON.stringify({ stations: [station({}), buoy] })],
+      [/9447130\/datums/, JSON.stringify({ datums: null, LAT: null })],
+    ]);
+    assert.deepEqual(
+      (await coops.stations()).map((s) => s.id),
+      ["coops/9447130"],
+    );
+  });
+
+  it("refuses to fetch the withheld GPS buoy", async () => {
+    assert.match(coops.withheld("9414796")!, /GPS buoy/);
+    assert.equal(coops.withheld("9447130"), null);
+    await assert.rejects(
+      async () =>
+        coops.source.observations!(
+          { source_id: "9414796", datum: "STND" } as Station,
+          new Date("2000-01-01T00:00:00Z"),
+          new Date("2000-02-01T00:00:00Z"),
+        ),
+      /9414796 is withheld/,
+    );
+  });
+
   it("refuses a historical list under half the stored one", async () => {
     serve([
       [/type=historicwl/, JSON.stringify({ stations: [station({})] })],
@@ -1625,6 +1875,200 @@ describe("coops", () => {
     assert.deepEqual([levels, asked.length], [[], 1]);
   });
 
+  describe("data inventory", () => {
+    beforeEach(() => coops.resetPacing());
+
+    const inventory = (...periods: [string, string, string][]) =>
+      `<?xml version="1.0"?><soapenv:Envelope><DataInventory><station ID="1" name="x"><metadata/>${periods
+        .map(([first, last, name]) => `<parameter first="${first}" last="${last}" name="${name}"/>`)
+        .join("")}</station></DataInventory></soapenv:Envelope>`;
+    const fault =
+      "<soapenv:Fault><faultstring>No meta data available</faultstring></soapenv:Fault>";
+    const serveInventory = (xml: string) => {
+      const asked: string[] = [];
+      setHttpTransport(async (url) => {
+        if (url.includes("/datainventory/")) return xml;
+        const q = new URL(url).searchParams;
+        asked.push(`${q.get("product")} ${q.get("begin_date")?.slice(0, 6)}`);
+        return JSON.stringify({ error: { message: "No data was found." } });
+      });
+      return asked;
+    };
+    const span = (a: string, b: string) => [new Date(a), new Date(b)] as const;
+    const old = { established: "1950-01-01T00:00:00Z", removed: null };
+    const verified = (first: string, last: string): [string, string, string] => [
+      first,
+      last,
+      "Verified 6-Minute Water Level",
+    ];
+
+    it("starts at the first period of a level product, filling the gaps after it", async () => {
+      const asked = serveInventory(
+        inventory(
+          verified("1999-03-04 11:00", "1999-03-31 23:54"),
+          verified("1999-06-01 00:00", "1999-06-30 23:54"),
+          ["1999-05-01 00:00", "1999-05-31 23:00", "Verified Hourly Height Water Level"],
+          ["1979-05-01 00:00", "1979-05-31 23:54", "Verified Monthly Mean Water Level"],
+        ),
+      );
+      assert.deepEqual(
+        await coops.levels("9990001", ...span("1998-01-01Z", "1999-08-01Z"), old),
+        [],
+      );
+      assert.deepEqual(
+        asked,
+        [3, 4, 5, 6, 7].map((m) => `water_level 1999${String(m).padStart(2, "0")}`),
+      );
+    });
+
+    it("asks nothing after a station's removed date before 2001", async () => {
+      const asked = serveInventory(
+        inventory(["1960-01-01 00:00", "1975-12-31 23:00", "Verified Hourly Height Water Level"]),
+      );
+      await coops.levels("9990021", ...span("1975-10-01Z", "1976-06-01Z"), {
+        established: "1950-01-01T00:00:00Z",
+        removed: "1975-12-31T00:00:00Z",
+      });
+      assert.ok(asked.includes("water_level 197512"), asked.join());
+      assert.ok(
+        asked.every((q) => !/ 1976/.test(q)),
+        asked.join(),
+      );
+    });
+
+    it("asks every month of a station's dates from 2001 on, whatever the inventory lists", async () => {
+      const asked = serveInventory(inventory(verified("2005-01-04 11:00", "2005-02-16 13:54")));
+      await coops.levels("9990002", ...span("2004-11-01Z", "2005-04-01Z"), old);
+      assert.deepEqual(
+        asked,
+        ["200411", "200412", "200501", "200502", "200503"].map((m) => `water_level ${m}`),
+      );
+      asked.length = 0;
+      await coops.extremes("9990002", ...span("1999-01-01Z", "2003-01-01Z"), old);
+      assert.deepEqual(asked, ["high_low 200101", "high_low 200201"]);
+    });
+
+    it("asks nothing before 2001 of a station listing no level, and its dates after", async () => {
+      const asked = serveInventory(
+        inventory(
+          ["1990-01-01 00:00", "1990-12-31 00:00", "Verified Monthly Mean Water Level"],
+          ["2010-01-01 00:00", "2012-01-01 00:00", "Wind"],
+        ),
+      );
+      await coops.levels("9990003", ...span("2000-11-01Z", "2001-03-01Z"), old);
+      assert.deepEqual(asked, ["water_level 200101", "water_level 200102"]);
+    });
+
+    it("asks a month before 1997 for its 6-minute and hourly values together", async () => {
+      const asked = serveInventory(
+        inventory(verified("1994-11-01 00:00", "1994-11-30 23:54"), [
+          "1994-10-01 00:00",
+          "1994-12-31 23:00",
+          "Verified Hourly Height Water Level",
+        ]),
+      );
+      await coops.levels("9990004", ...span("1994-09-01Z", "1994-12-01Z"), old);
+      assert.deepEqual(asked, ["water_level 199410", "hourly_height 199410", "water_level 199411"]);
+    });
+
+    it("falls back to the station's dates when the inventory doesn't know it", async () => {
+      const asked = serveInventory(fault);
+      await coops.levels("9990006", ...span("2010-01-01Z", "2010-03-01Z"), {
+        established: "2010-02-01T00:00:00Z",
+        removed: null,
+      });
+      assert.deepEqual(asked, ["water_level 201002"]);
+    });
+
+    it("asks a live station's last month without the inventory", async () => {
+      let inventoried = 0;
+      setHttpTransport(async (url) => {
+        if (url.includes("/datainventory/")) inventoried++;
+        return JSON.stringify({ data: [] });
+      });
+      const now = new Date();
+      await coops.levels("9990007", new Date(now.getTime() - 3 * 86_400_000), now, { live: true });
+      assert.equal(inventoried, 0);
+    });
+
+    it("asks a live station's recent months whatever the inventory says", async () => {
+      const month = new Date();
+      month.setUTCDate(1);
+      month.setUTCHours(0, 0, 0, 0);
+      const asked = serveInventory(inventory(verified("2001-01-01 00:00", "2001-01-31 23:54")));
+      await coops.levels(
+        "9990016",
+        new Date("1999-12-01Z"),
+        new Date(month.getTime() + 86_400_000),
+        {
+          live: true,
+          established: "2001-01-01T00:00:00Z",
+          removed: null,
+        },
+      );
+      assert.equal(asked[0], "water_level 200101");
+      assert.equal(asked.at(-1), `water_level ${month.toISOString().slice(0, 7).replace("-", "")}`);
+    });
+
+    it("reads attributes in any order and a parameter of any name", async () => {
+      const asked = serveInventory(
+        `<DataInventory><station ID="1"><parameter name="Verified 6-Minute Water Level" type="v" last="1999-02-16 13:54" first="1999-01-04 11:00"/><parameter first="1990-01-04 11:00" last="1999-02-16 13:54" name="Wind"/></station></DataInventory>`,
+      );
+      await coops.levels("9990009", ...span("1998-12-01Z", "1999-04-01Z"), old);
+      assert.deepEqual(asked, ["water_level 199901", "water_level 199902", "water_level 199903"]);
+    });
+
+    it("uses the station's dates when the inventory is cut off, lists no parameters or names a water level it doesn't know", async () => {
+      for (const [id, body] of [
+        [
+          "9990010",
+          `<DataInventory><station ID="1"><parameter first="2005-01-01 00:00" last="2005-01-31 00:00" name="Verified 6-Minute Water Level"/>`,
+        ],
+        ["9990011", `<DataInventory><station ID="1"></station></DataInventory>`],
+        [
+          "9990019",
+          `<DataInventory><station ID="1"><parameter first="2005-01-01 00:00" last="2005-01-31 00:00" name="Water Level, 6-Minute"/></station></DataInventory>`,
+        ],
+      ] as const) {
+        const asked = serveInventory(body);
+        await coops.levels(id, ...span("1999-01-01Z", "1999-03-01Z"), {
+          established: "1999-02-01T00:00:00Z",
+          removed: null,
+        });
+        assert.deepEqual(asked, ["water_level 199902"]);
+      }
+    });
+
+    it("asks the inventory again after a failure, and stops after three in a row", async () => {
+      let inventoried = 0;
+      setHttpTransport(async (url) => {
+        if (url.includes("/datainventory/")) {
+          inventoried++;
+          throw new Error(`GET ${url} returned 500`);
+        }
+        return JSON.stringify({ data: [] });
+      });
+      const station = { established: "2005-01-01T00:00:00Z", removed: null };
+      for (const id of ["9990012", "9990012", "9990013", "9990014", "9990015"])
+        await coops.levels(id, ...span("2005-01-01Z", "2005-02-01Z"), station);
+      assert.equal(inventoried, 3);
+    });
+
+    it("fails on a date that rolls over, one it can't read, or a period that ends before it starts", async () => {
+      for (const [id, first, last] of [
+        ["9990017", "2005-02-31 00:00", "2005-03-05 00:00"],
+        ["9990018", "2005-02-28 00:00", "2005-02-01 00:00"],
+        ["9990020", "soon", "later"],
+      ] as const) {
+        serveInventory(inventory(verified(first, last)));
+        await assert.rejects(
+          coops.levels(id, ...span("1999-02-01Z", "1999-03-01Z"), old),
+          /unreadable date|ends before/,
+        );
+      }
+    });
+  });
+
   it("asks for a year's hourly heights at once, in halves in a leap year", async () => {
     const asked: string[] = [];
     const day = (d: Date) => d.toISOString().slice(0, 10);
@@ -1656,12 +2100,12 @@ describe("coops", () => {
       new Date("1953-01-01Z"),
       span,
     );
-    // October's hourly height gives way to its 6-minute value; every other month keeps its own.
+    // October's verified 6-minute value joins its hourly height; every other month has only its own.
     assert.deepEqual(
       [asked, leap.map((l) => l.level)],
       [
         ["19520101 00:00-19520630 23:59", "19520701 00:00-19521231 23:59"],
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 6, 11, 12],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 6, 10, 11, 12],
       ],
     );
     asked.length = 0;
@@ -1675,6 +2119,195 @@ describe("coops", () => {
     assert.deepEqual(
       [asked, plain.map((l) => l.level)],
       [["19510501 00:00-19510731 23:59"], [5, 6, 7]],
+    );
+  });
+
+  it("prefers verified hourly heights to preliminary 6-minute values before 1997", async () => {
+    // Anchorage 1996: every 6-minute value is preliminary and sits well off the verified hours.
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({
+          data: [
+            { t: "1996-03-01 00:00", v: "10.119", f: "0,0,0,0", q: "p" },
+            { t: "1996-03-01 00:06", v: "10.18", f: "0,0,0,0", q: "p" },
+            { t: "1996-03-01 01:00", v: "10.0", f: "0,0,0,0", q: "p" },
+            // The hourly record has nothing for 02:00, so its preliminary value stays.
+            { t: "1996-03-01 02:00", v: "10.4", f: "0,0,0,0", q: "p" },
+            { t: "1996-03-01 02:06", v: "", f: "1,1,1,1", q: "p" },
+            // A verified 6-minute value keeps its time against the hourly height.
+            { t: "1996-03-01 03:00", v: "10.5", f: "0,0,0,0", q: "v" },
+          ],
+        }),
+      ],
+      [
+        /product=hourly_height/,
+        JSON.stringify({
+          data: [
+            { t: "1996-03-01 00:00", v: "9.103", f: "0,0" },
+            { t: "1996-03-01 01:00", v: "9.473", f: "0,0" },
+            { t: "1996-03-01 02:00", v: "", f: "0,0" },
+            { t: "1996-03-01 03:00", v: "9.6", f: "0,0" },
+            { t: "1996-03-01 04:00", v: "9.7", f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const levels = await coops.levels("9455920", new Date("1996-03-01Z"), new Date("1996-04-01Z"));
+    assert.deepEqual(
+      levels.map((r) => [new Date(r.time).toISOString().slice(11, 16), r.level, r.flag]),
+      [
+        ["00:00", 9.103, Flag.good],
+        ["01:00", 9.473, Flag.good],
+        ["02:00", 10.4, Flag.preliminary],
+        ["03:00", 10.5, Flag.good],
+        ["04:00", 9.7, Flag.good],
+      ],
+    );
+  });
+
+  it("keeps preliminary 6-minute values in hours the hourly record doesn't reach before 1997", async () => {
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({
+          data: [{ t: "1996-03-01 00:06", v: "10.18", f: "0,0,0,0", q: "p" }],
+        }),
+      ],
+      [/product=hourly_height/, JSON.stringify({ error: { message: "No data was found." } })],
+    ]);
+    const levels = await coops.levels("9468756", new Date("1996-03-01Z"), new Date("1996-04-01Z"));
+    assert.deepEqual(
+      levels.map((r) => [r.level, r.flag]),
+      [[10.18, Flag.preliminary]],
+    );
+  });
+
+  it("ignores high and low waters with no level, an impossible level or an impossible date", async () => {
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=high_low/,
+        JSON.stringify({
+          data: [
+            { t: "2010-02-27 06:00", v: "2.1", ty: "H", f: "0,0" },
+            { t: "2010-02-30 12:00", v: "1.9", ty: "L", f: "0,0" },
+            { t: "2010-02-28 00:00", v: "99999", ty: "H", f: "0,0" },
+            { t: "2010-02-28 06:00", v: " ", ty: "L", f: "0,0" },
+            { t: "2010-02-28 12:00", v: null, ty: "H", f: "0,0" },
+            { t: "2010-02-28 12:00junk", v: "1.9", ty: "L", f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const extremes = await coops.extremes(
+      "9455920",
+      new Date("2010-01-01Z"),
+      new Date("2011-01-01Z"),
+    );
+    assert.deepEqual(
+      extremes.map((e) => [new Date(e.time).toISOString().slice(0, 16), e.level, e.type]),
+      [["2010-02-27T06:00", 2.1, "high"]],
+    );
+  });
+
+  it("ignores hourly rows with no level, an impossible level or an impossible date", async () => {
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({
+          data: [
+            { t: "1996-03-01 00:06", v: "10.18", f: "0,0,0,0", q: "p" },
+            { t: "1996-03-01 01:06", v: "10.2", f: "0,0,0,0", q: "p" },
+          ],
+        }),
+      ],
+      [
+        /product=hourly_height/,
+        JSON.stringify({
+          data: [
+            { t: "1996-03-01 00:00", v: " ", f: "0,0" },
+            { t: "1996-03-01 01:00", v: "99999", f: "0,0" },
+            { t: "1996-02-30 00:00", v: "9.1", f: "0,0" },
+            { t: "1996-02-30 00:00", v: null, f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const levels = await coops.levels("9455920", new Date("1996-03-01Z"), new Date("1996-04-01Z"));
+    // No usable hourly height, so the hours keep their preliminary values.
+    assert.deepEqual(
+      levels.map((r) => [r.level, r.flag]),
+      [
+        [10.18, Flag.preliminary],
+        [10.2, Flag.preliminary],
+      ],
+    );
+  });
+
+  it("adds an hourly height only to an hour the 6-minute record has no value in", async () => {
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({ data: [{ t: "1995-03-01 05:06", v: "1.1", f: "0,0,0,0", q: "v" }] }),
+      ],
+      [
+        /product=hourly_height/,
+        JSON.stringify({
+          data: [
+            { t: "1995-03-01 05:00", v: "1.0", f: "0,0" },
+            { t: "1995-03-01 06:00", v: "1.2", f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const levels = await coops.levels("9435380", new Date("1995-03-01Z"), new Date("1995-04-01Z"));
+    assert.deepEqual(
+      levels.map((r) => r.level),
+      [1.1, 1.2],
+    );
+  });
+
+  it("fills every hour the 6-minute record lacks before 1997, not only those before its first value", async () => {
+    // 9435380 1995: the 6-minute record has the month's first and last days and nothing between.
+    serve([
+      [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
+      [
+        /product=water_level/,
+        JSON.stringify({
+          data: [
+            { t: "1995-03-01 00:00", v: "1.0", f: "0,0,0,0", q: "v" },
+            { t: "1995-03-01 00:06", v: "1.1", f: "0,0,0,0", q: "v" },
+            { t: "1995-03-31 23:00", v: "2.0", f: "0,0,0,0", q: "v" },
+          ],
+        }),
+      ],
+      [
+        /product=hourly_height/,
+        JSON.stringify({
+          data: [
+            { t: "1995-03-01 00:00", v: "1.0", f: "0,0" },
+            { t: "1995-03-01 01:00", v: "1.2", f: "0,0" },
+            { t: "1995-03-15 12:00", v: "1.5", f: "0,0" },
+            { t: "1995-03-31 23:00", v: "2.0", f: "0,0" },
+          ],
+        }),
+      ],
+    ]);
+    const levels = await coops.levels("9435380", new Date("1995-03-01Z"), new Date("1995-04-01Z"));
+    assert.deepEqual(
+      levels.map((r) => [new Date(r.time).toISOString().slice(0, 16), r.level]),
+      [
+        ["1995-03-01T00:00", 1.0],
+        ["1995-03-01T00:06", 1.1],
+        ["1995-03-01T01:00", 1.2],
+        ["1995-03-15T12:00", 1.5],
+        ["1995-03-31T23:00", 2.0],
+      ],
     );
   });
 
@@ -1718,7 +2351,7 @@ describe("coops", () => {
     );
   });
 
-  it("fills in hourly heights only before the 6-minute record starts", async () => {
+  it("keeps a verified 6-minute value over the hourly height at the same time", async () => {
     serve([
       [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
       [
@@ -1872,7 +2505,7 @@ describe("coops", () => {
         established: "sometime",
         removed: null,
       }),
-      /unreadable dates/,
+      /unreadable date/,
     );
   });
 
@@ -3391,6 +4024,29 @@ describe("usgs", () => {
     asked.length = 0;
     await fetch(2020, 2021);
     assert.deepEqual(asked, []);
+  });
+
+  it("refuses an empty answer that isn't a feature collection, since an empty year is recorded", async () => {
+    // Skipped for a campaign, but not trusted by publish.
+    assert.equal(usgs.metadata.skip_empty, true);
+    assert.equal(usgs.metadata.empty_means_none, undefined);
+    const year = () => usgs.levels("x", new Date(Date.UTC(2020, 0)), new Date(Date.UTC(2021, 0)));
+    setTransport(async () => collection([]));
+    assert.deepEqual(await year(), []);
+    const value = {
+      properties: { time: "2020-06-01T00:00:00+00:00", value: "1", approval_status: "Approved" },
+    };
+    for (const body of [
+      "{}",
+      JSON.stringify({ type: "FeatureCollection", features: [] }),
+      JSON.stringify({ features: [], numberReturned: 0 }),
+      // A page cut short of the count it gives, or with none.
+      JSON.stringify({ type: "FeatureCollection", features: [value], numberReturned: 2 }),
+      JSON.stringify({ type: "FeatureCollection", features: [value] }),
+    ]) {
+      setTransport(async () => body);
+      await assert.rejects(year(), /USGS continuous: not a feature collection/);
+    }
   });
 
   it("caches a page only when every value on it is approved", () => {

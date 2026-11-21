@@ -148,7 +148,12 @@ export function splitStarts(
   splits: EpochSplit[] | undefined,
   offsets: [number, number],
 ): Set<string> {
-  return new Set((splits ?? []).map((s) => iso(dayStart(s.since, offsets))));
+  // A `from` day too: a list that hasn't moved its epoch yet still starts it there.
+  return new Set(
+    (splits ?? []).flatMap((s) =>
+      [s.since, ...(s.from ? [s.from] : [])].map((d) => iso(dayStart(d, offsets))),
+    ),
+  );
 }
 
 /**
@@ -162,13 +167,21 @@ export function splitStarts(
 function applySplits(
   epochs: Epoch[],
   options: EpochOptions,
-): { epochs: Epoch[]; opened: string[]; first?: Epoch } {
+): { epochs: Epoch[]; opened: string[]; moved: string[]; first?: Epoch } {
   const opened: string[] = [];
+  const moved: string[] = [];
   let first: Epoch | undefined;
   const days = [...(options.splits?.[options.station] ?? [])].sort((a, b) =>
     a.since.localeCompare(b.since),
   );
-  if (epochs.some((e) => e.state === "held")) return { epochs, opened };
+  if (epochs.some((e) => e.state === "held")) return { epochs, opened, moved };
+  for (const { since: day, from } of days) {
+    const before = from ? moveSplit(epochs, from, day, options) : null;
+    if (before) {
+      moved.push(day);
+      first ??= before;
+    }
+  }
   for (const { since: day } of days) {
     const at = dayStart(day, options.offsets);
     const since = iso(at);
@@ -193,7 +206,29 @@ function applySplits(
     first ??= parent;
     opened.push(day);
   }
-  return { epochs, opened, first };
+  return { epochs, opened, moved, first };
+}
+
+/**
+ * Move the epoch a split opened at day `from` to start at day `to`, earlier,
+ * in place, and end the epoch before it there. Does nothing unless an open or
+ * closed epoch starts at `from` and the day falls after the start of the one
+ * before it, so each epoch moves once and ids stay in time order.
+ */
+function moveSplit(epochs: Epoch[], from: string, to: string, options: EpochOptions): Epoch | null {
+  const start = iso(dayStart(from, options.offsets));
+  const epoch = epochs.find(
+    (e) => e.since === start && (e.state === "open" || e.state === "closed"),
+  );
+  const before = epoch && epochs.filter((e) => e.id < epoch.id && e.state !== "rejected").at(-1);
+  const at = dayStart(to, options.offsets);
+  if (!epoch || !before || at >= Date.parse(start)) return null;
+  if (before.since !== null && at <= Date.parse(before.since)) return null;
+  epoch.since = iso(at);
+  const end = iso(dayStartEarliest(to, options.offsets));
+  // An earlier end, from a decision, stays.
+  if (before.until === null || end < before.until) before.until = end;
+  return before;
 }
 
 /** An epoch with no start, before any reference the source names. */
@@ -401,6 +436,11 @@ export function nextEpochs(
   }
 
   const person = applySplits(epochs, options);
+  if (person.moved.length) {
+    event ??= "opened";
+    reason ??= `moved the epoch of the split to ${person.moved.join(", ")}, where the zero moved; backfill the station from ${person.moved[0]}`;
+    decide ??= person.first;
+  }
   if (person.opened.length) {
     event ??= "opened";
     reason ??= `split where the zero moved on ${person.opened.join(", ")}; backfill the station from ${person.opened[0]}`;

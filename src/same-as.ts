@@ -72,7 +72,7 @@ export const LINKS: Decision[] = [
   {
     a: "bodc/ptb",
     b: "ea/E72624",
-    note: "The National Tide Gauge Network's Portbury gauge, which the EA names Avonmouth Portbury and places 2 km east; its other listing of the gauge, E72623, is 70 m from BODC's position. Both are in chart datum with a mean level about 7.4 m. BODC flags its whole record improbable, so its record counts as empty in `rank` and the EA's series is preferred: since November 2026 the mAOD series E72639, which names E72624 as its twin and joins the group.",
+    note: "The National Tide Gauge Network's Portbury gauge, which the EA names Avonmouth Portbury and places 2 km east; its other listing of the gauge, E72623, is 70 m from BODC's position. Both are in chart datum with a mean level about 7.4 m. BODC flags its whole record improbable, so its record counts as zero length in `rank` and the EA's series is preferred: since November 2026 the mAOD series E72639, which names E72624 as its twin and joins the group.",
   },
   {
     a: "gesla/rostocktg-ros-deu-cmems",
@@ -82,7 +82,7 @@ export const LINKS: Decision[] = [
   {
     a: "gesla/wangeroogetg-wan-deu-cmems",
     b: "pegelonline/9420040",
-    note: "CMEMS's copy of WSV's Wangerooge West gauge, though CMEMS places it 40 m from Wangerooge Nord: 302 of the 316 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 5.05 m below PEGELONLINE's gauge zero, its NHN offset; the rest hold CMEMS's stuck readings. Nord differs by 101 mm RMS in the median month, and in all but one month by more than 10 mm. West is 5.2 km away, beyond the copy rule's 2 km.",
+    note: "CMEMS's copy of WSV's Wangerooge West gauge, though CMEMS places it 40 m from Wangerooge Nord: 302 of the 316 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 5.05 m below PEGELONLINE's gauge zero, its NHN offset; the rest hold CMEMS's stuck readings. Nord differs by 101 mm RMS in the median month, and in all but one month by more than 10 mm. West is 5.2 km away, beyond the copy rule's 2 km. Since November 2026 West reads tidal and their levels agree within 6 mm RMS, so the levels rule links them too, but only while West's verdict holds: a failed sensor's held values, as in October 2026 (erratum `pegelonline-wangerooge-west-2026-dropout`), can make it read not tidal again and drop that link. This decision keeps the pair linked then, and keeps the TICON inventory matching the record to West rather than to Nord at CMEMS's position.",
   },
   {
     a: "gesla/kielholtenautg-kie-deu-cmems",
@@ -321,6 +321,10 @@ export interface LinkReport {
 /** The order links join groups in: `LINKS` first, inferred ones last. */
 const ORDER: How[] = ["manual", "id", "data", "near", "copy"];
 
+/** Whether a station joins no group: a GESLA record whose values are another gauge's (`isDropped`). */
+export const joinsNoGroup = (s: Pick<Station, "source" | "source_id">): boolean =>
+  s.source === "gesla" && isDropped(s.source_id);
+
 /**
  * Link every station to the others sharing its gauge, and name each group's
  * preferred series. A station with no links is its own preferred series.
@@ -332,10 +336,7 @@ export function linkGauges<T extends Station>(
   matches: DataMatch[] = [],
 ): { stations: (T & { preferred: string })[]; report: LinkReport } {
   const byId = new Map(stations.map((s) => [s.id, s]));
-  // GESLA's records whose values are another gauge's join no group.
-  const alone = new Set(
-    stations.filter((s) => s.source === "gesla" && isDropped(s.source_id)).map((s) => s.id),
-  );
+  const alone = new Set(stations.filter(joinsNoGroup).map((s) => s.id));
   const linkable = stations.filter((s) => !alone.has(s.id));
   const edges = new Map<string, How>();
   const dropped: LinkReport["dropped"] = [];
@@ -538,8 +539,10 @@ function pairKey(a: string, b: string): string {
 
 /**
  * Negative when `a` is the better series for the gauge's observed levels: a
- * choice in `PREFER`; one with levels; one whose terms allow commercial use, so
- * the API can serve it before tokens exist; one not from an assembled
+ * choice in `PREFER`; one with levels; one with a record in the store, from the
+ * bounds' `first` and `last` or a row in the years file (`usable`), so a station
+ * that lists levels but holds none never outranks one that does; one whose
+ * terms allow commercial use, so the API can serve it before tokens exist; one not from an assembled
  * collection (`ASSEMBLED`), which is the fallback; one still reporting; the
  * originator's over a copy (a redistributor's, or one of `copies`, the
  * group's `COPIES` stations); the longer record in the store, its span from `first` to
@@ -556,6 +559,10 @@ export function rank(
 ): number {
   const copy = (s: Station) => redistributed(s) || copies.has(s.id);
   const levels = (s: Station) => s.products.includes("levels");
+  // The bounds lag a first backfill until compaction, which the years file doesn't.
+  const stored = (s: Station) =>
+    (Number.isFinite(Date.parse(s.first ?? "")) && Number.isFinite(Date.parse(s.last ?? ""))) ||
+    usable.has(s.id);
   const reporting = (s: Station) =>
     s.status === "active" && s.last !== null && now.getTime() - Date.parse(s.last) < REPORTING_MS;
   const span = (s: Station) => {
@@ -565,6 +572,7 @@ export function rank(
   const tests: [boolean | number, boolean | number][] = [
     [a.id in PREFER, b.id in PREFER],
     [levels(a), levels(b)],
+    [stored(a), stored(b)],
     [a.commercial_use, b.commercial_use],
     [!ASSEMBLED.has(a.source), !ASSEMBLED.has(b.source)],
     [reporting(a), reporting(b)],

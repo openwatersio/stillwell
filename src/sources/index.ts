@@ -1,4 +1,4 @@
-import { readErrata, withErrata } from "../errata.ts";
+import { readErrata, withErrata, type ErrataFile } from "../errata.ts";
 import type { Observation, Source } from "../schema.ts";
 import { possible } from "../span.ts";
 import { source as bodc } from "./bodc/index.ts";
@@ -14,6 +14,7 @@ import { source as dwr } from "./dwr/index.ts";
 import { source as ea } from "./ea/index.ts";
 import { source as gesla } from "./gesla/index.ts";
 import { source as ign } from "./ign/index.ts";
+import { source as ispra } from "./ispra/index.ts";
 import { source as jma } from "./jma/index.ts";
 import { source as jodc } from "./jodc/index.ts";
 import { source as kartverket } from "./kartverket/index.ts";
@@ -28,30 +29,31 @@ import { source as uhslc } from "./uhslc/index.ts";
 import { source as unam } from "./unam/index.ts";
 import { source as usace } from "./usace/index.ts";
 import { source as usgs } from "./usgs/index.ts";
-import bodcErrata from "./bodc/errata.json" with { type: "json" };
-import bomErrata from "./bom/errata.json" with { type: "json" };
-import ccoErrata from "./cco/errata.json" with { type: "json" };
-import cdecErrata from "./cdec/errata.json" with { type: "json" };
-import cmemsErrata from "./cmems/errata.json" with { type: "json" };
-import coopsErrata from "./coops/errata.json" with { type: "json" };
-import crmsErrata from "./crms/errata.json" with { type: "json" };
-import dmiErrata from "./dmi/errata.json" with { type: "json" };
-import dwrErrata from "./dwr/errata.json" with { type: "json" };
-import eaErrata from "./ea/errata.json" with { type: "json" };
-import geslaErrata from "./gesla/errata.json" with { type: "json" };
-import ignErrata from "./ign/errata.json" with { type: "json" };
-import jmaErrata from "./jma/errata.json" with { type: "json" };
-import jodcErrata from "./jodc/errata.json" with { type: "json" };
-import linzErrata from "./linz/errata.json" with { type: "json" };
-import marineInstituteErrata from "./marine-institute/errata.json" with { type: "json" };
-import pegelonlineErrata from "./pegelonline/errata.json" with { type: "json" };
-import refmarErrata from "./refmar/errata.json" with { type: "json" };
-import rwsErrata from "./rws/errata.json" with { type: "json" };
-import sfwmdErrata from "./sfwmd/errata.json" with { type: "json" };
-import smhiErrata from "./smhi/errata.json" with { type: "json" };
-import uhslcErrata from "./uhslc/errata.json" with { type: "json" };
-import usaceErrata from "./usace/errata.json" with { type: "json" };
-import usgsErrata from "./usgs/errata.json" with { type: "json" };
+import bodcErrata from "./bodc/errata.ts";
+import bomErrata from "./bom/errata.ts";
+import ccoErrata from "./cco/errata.ts";
+import cdecErrata from "./cdec/errata.ts";
+import cmemsErrata from "./cmems/errata.ts";
+import coopsErrata from "./coops/errata.ts";
+import crmsErrata from "./crms/errata.ts";
+import dmiErrata from "./dmi/errata.ts";
+import dwrErrata from "./dwr/errata.ts";
+import eaErrata from "./ea/errata.ts";
+import geslaErrata from "./gesla/errata.ts";
+import ignErrata from "./ign/errata.ts";
+import ispraErrata from "./ispra/errata.ts";
+import jmaErrata from "./jma/errata.ts";
+import jodcErrata from "./jodc/errata.ts";
+import linzErrata from "./linz/errata.ts";
+import marineInstituteErrata from "./marine-institute/errata.ts";
+import pegelonlineErrata from "./pegelonline/errata.ts";
+import refmarErrata from "./refmar/errata.ts";
+import rwsErrata from "./rws/errata.ts";
+import sfwmdErrata from "./sfwmd/errata.ts";
+import smhiErrata from "./smhi/errata.ts";
+import uhslcErrata from "./uhslc/errata.ts";
+import usaceErrata from "./usace/errata.ts";
+import usgsErrata from "./usgs/errata.ts";
 
 const adapters: Record<string, Source> = {
   bodc,
@@ -67,6 +69,7 @@ const adapters: Record<string, Source> = {
   ea,
   gesla,
   ign,
+  ispra,
   jma,
   jodc,
   kartverket,
@@ -84,11 +87,11 @@ const adapters: Record<string, Source> = {
 };
 
 /**
- * Each source's `errata.json`, imported rather than read so the registry needs
+ * Each source's `errata.ts`, imported rather than read so the registry needs
  * no file system. A source that starts one adds it here; a test checks that
  * every file is.
  */
-export const errataFiles: Record<string, unknown> = {
+export const errataFiles: Record<string, ErrataFile> = {
   bodc: bodcErrata,
   bom: bomErrata,
   cco: ccoErrata,
@@ -101,6 +104,7 @@ export const errataFiles: Record<string, unknown> = {
   ea: eaErrata,
   gesla: geslaErrata,
   ign: ignErrata,
+  ispra: ispraErrata,
   jma: jmaErrata,
   jodc: jodcErrata,
   linz: linzErrata,

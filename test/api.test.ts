@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { buildCatalog, type CatalogStation } from "../src/api/catalog.ts";
-import { apiHandler } from "../src/api/handler.ts";
 import {
   conversionFor,
   levelsResponse,
@@ -9,10 +8,11 @@ import {
   parseLevels,
   sample,
   statusOf,
+  stepSampler,
+  usableFor,
   type LevelsQuery,
   type StoredLevel,
 } from "../src/api/levels.ts";
-import { clickhouse, migrate } from "../src/realtime/clickhouse.ts";
 import { Flag } from "../src/schema.ts";
 
 const MIN = 60_000;
@@ -128,9 +128,16 @@ describe("parseLevels", () => {
     ]);
   });
 
-  it("refuses a range reaching back past the window, given twice, reversed or too long", () => {
+  it("takes a range any time back, and refuses one given twice, reversed or too long", () => {
+    for (const search of [
+      "start=2001-01-01&end=2002-01-01",
+      "start=2001-01-01&end=2001-02-01&step=raw",
+      `start=${new Date(NOW - 8 * DAY).toISOString()}`,
+    ])
+      assert.ok("query" in parseLevels(new URLSearchParams(search), NOW), search);
     for (const [search, path] of [
-      [`start=${new Date(NOW - 8 * DAY).toISOString()}`, "start"],
+      ["start=2001-01-01&end=2002-01-03", "end"],
+      ["start=2001-01-01&end=2001-02-02&step=raw", "end"],
       [
         `start=${new Date(NOW - DAY).toISOString()}&start=${new Date(NOW - DAY).toISOString()}`,
         "start",
@@ -223,6 +230,42 @@ describe("sample", () => {
   });
 });
 
+describe("stepSampler", () => {
+  it("keeps the values sample picks, whatever their order", () => {
+    // Irregular values in both epochs, some bad, some at exactly half a step, shuffled.
+    let seed = 7;
+    const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const times = [...Array(9 * 120).keys()]
+      .filter(() => random() < 0.4)
+      .map((half) => NOW - 9 * HOUR + half * 30_000);
+    const values = times
+      .map((time) =>
+        value(
+          time,
+          random(),
+          random() < 0.2 ? Flag.bad : Flag.preliminary,
+          time < NOW - 6 * HOUR ? 1 : 2,
+        ),
+      )
+      .sort(() => random() - 0.5);
+    for (const step of [6 * MIN, 15 * MIN, HOUR])
+      for (const includeBad of [false, true])
+        for (const conversion of [{ named: null }, { named: "MLLW" }]) {
+          const q = query({ start: NOW - 8 * HOUR, end: NOW - HOUR, step, includeBad });
+          const sampler = stepSampler(step, usableFor(seattle(), conversion, includeBad));
+          for (const v of values) sampler.add(v);
+          assert.ok(sampler.values().length <= 2 * ((9 * HOUR) / step + 1));
+          const picked = sample(seattle(), conversion, values, q);
+          assert.ok(picked.length >= 5);
+          assert.deepEqual(
+            sample(seattle(), conversion, sampler.values(), q),
+            picked,
+            `${step} ${includeBad} ${conversion.named}`,
+          );
+        }
+  });
+});
+
 describe("held epochs and offsets", () => {
   it("leaves out a held epoch's values in every datum", () => {
     const held = catalog({ state: ["held", "open"] }).get("coops/9447130")!;
@@ -280,116 +323,5 @@ describe("the response", () => {
     assert.equal(maxAge(seattle(), NOW, NOW), 300);
     assert.equal(maxAge(catalog({ min_interval_s: 60 }).get("coops/9447130")!, NOW, NOW), 60);
     assert.equal(maxAge(seattle(), NOW - 8 * DAY, NOW), 86_400);
-  });
-});
-
-// Runs against a real ClickHouse only when CLICKHOUSE_URL names one, as CI's service does.
-describe("stillwell-api on ClickHouse", { skip: !process.env.CLICKHOUSE_URL }, () => {
-  it("serves a station's levels, and refuses what it can't serve", async () => {
-    const now = Math.floor(Date.now() / HOUR) * HOUR;
-    const ch = clickhouse(`stillwell_api_test_${process.pid}`);
-    await migrate(ch);
-    try {
-      const station = "coops/9447130";
-      await ch.insert(
-        "observations",
-        [
-          { time: now - 12 * MIN, level: 3, flag: Flag.preliminary, version: 1 },
-          { time: now - 6 * MIN, level: 3.1, flag: Flag.preliminary, version: 1 },
-          { time: now - 6 * MIN, level: 3.2, flag: Flag.preliminary, version: 2 }, // a revision
-          { time: now, level: 9, flag: Flag.bad, version: 1 },
-        ].map((r) => ({
-          station,
-          epoch: 2,
-          ...r,
-          time: new Date(r.time).toISOString(),
-          source_flag: null,
-          received: null,
-        })),
-      );
-      const poll = (finished: number, ok: boolean, intervals: number[]) => ({
-        source: "coops",
-        started: new Date(finished - MIN).toISOString(),
-        finished: new Date(finished).toISOString(),
-        intervals,
-        ok,
-        stations: 1,
-        updated: 1,
-        values: 1,
-        stale: [],
-        failed: [],
-        blocked: false,
-        datum_changed: false,
-      });
-      await ch.insert("polls", [
-        poll(now - 3 * MIN, true, [360]),
-        poll(now - 2 * MIN, true, [60]), // another group's
-        poll(now - MIN, false, [360]), // failed
-      ]);
-      // A newer value in an epoch the published list doesn't have yet: not shown, nor counted in as_of.
-      await ch.insert("observations", [
-        {
-          station,
-          epoch: 3,
-          time: new Date(now - MIN).toISOString(),
-          level: 1,
-          flag: Flag.preliminary,
-          source_flag: null,
-          received: null,
-          version: 1,
-        },
-      ]);
-      // Newer still, in epoch 1 after its until: outside its span, so neither shown nor counted.
-      await ch.insert("observations", [
-        {
-          station,
-          epoch: 1,
-          time: new Date(now - MIN / 2).toISOString(),
-          level: 1,
-          flag: Flag.preliminary,
-          source_flag: null,
-          received: null,
-          version: 1,
-        },
-      ]);
-      const stations = catalog({
-        since: [null, new Date(now - DAY).toISOString()],
-        until: [new Date(now - DAY).toISOString(), null],
-      });
-      const handle = apiHandler({ ch, catalog: () => stations, now: () => now });
-
-      const ok = await handle("GET", `/water-levels/stations/coops/9447130/levels?datum=station`);
-      assert.equal(ok.status, 200, ok.body);
-      assert.equal(ok.headers["cache-control"], "public, max-age=300");
-      const body = JSON.parse(ok.body);
-      assert.deepEqual(
-        body.levels.map((l: { level: number }) => l.level),
-        [3, 3.2],
-      );
-      assert.equal(body.datum, "STND");
-      assert.equal(body.as_of, new Date(now - 6 * MIN).toISOString().replace(".000Z", "Z"));
-      assert.equal(body.updated, new Date(now - 3 * MIN).toISOString().replace(".000Z", "Z"));
-
-      const encoded = await handle("GET", `/water-levels/stations/coops/9447130%2Fx/levels`);
-      assert.equal(encoded.status, 404);
-      assert.equal((await handle("GET", `/water-levels/stations/smhi/2130/levels`)).status, 451);
-      const unpolled = catalog({ live: false });
-      const notPolled = await apiHandler({ ch, catalog: () => unpolled, now: () => now })(
-        "GET",
-        `/water-levels/stations/coops/9447130/levels`,
-      );
-      assert.equal(notPolled.status, 404);
-      const bad = await handle("GET", `/water-levels/stations/coops/9447130/levels?datum=NAVD88`);
-      assert.equal(bad.status, 400);
-      assert.equal(JSON.parse(bad.body).errors[0].path, "datum");
-      assert.equal(
-        (await handle("POST", `/water-levels/stations/coops/9447130/levels`)).status,
-        405,
-      );
-      assert.equal((await handle("GET", `/health`)).status, 200);
-      assert.equal((await apiHandler({ ch, catalog: () => null })("GET", "/health")).status, 503);
-    } finally {
-      await ch.exec(`DROP DATABASE IF EXISTS ${ch.database}`);
-    }
   });
 });

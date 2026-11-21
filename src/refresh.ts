@@ -27,7 +27,9 @@ import {
   sourceEpochDirs,
   sourceFirstEpochFiles,
   stationDir,
-  recentPath,
+  recentDayPath,
+  recentDayPaths,
+  RECENT_DAYS,
   historyPath,
   stationListPath,
   stationsPath,
@@ -70,7 +72,7 @@ export interface RefreshReport {
   retired: string[];
   /** Retired by the source itself, listed inactive, rather than dropped from its list. */
   withdrawn: string[];
-  /** Withheld (`Source.withheld`): dropped from the list, with their rows in the bounds and recent window. */
+  /** Withheld (`Source.withheld`): dropped from the list, with their rows in the bounds and daily files. */
   removed: string[];
   /** Removed stations whose series files are still in the store, for `ingest withhold` to delete. */
   unwithheld: string[];
@@ -208,7 +210,7 @@ export async function refreshSource(
 
 /**
  * A new epoch takes an `id` above any epoch directory already in the store, or
- * any epoch the recent window still has rows for, so one restored from a
+ * any epoch the daily files of the last `RECENT_DAYS` have rows for, so one restored from a
  * snapshot never reuses another's files or rows.
  */
 async function renumberAboveFiles(
@@ -231,7 +233,9 @@ async function renumberAboveFiles(
       ? PRODUCTS.map((p) => sourceEpochDirs(store, p, changed[0]!.source))
       : changed.flatMap((s) => PRODUCTS.map((p) => epochDirs(store, p, s.source, s.source_id)));
   const onDiskOf = await highestEpochs(patterns);
-  const inRecent = await recentEpochs(recentPath(store, changed[0]!.source));
+  const inRecent = await recentEpochs(
+    recentDayPaths(store, changed[0]!.source, Date.now(), RECENT_DAYS),
+  );
   for (const station of changed) {
     const known = before.get(station.id) ?? new Set<number>();
     const fresh = station.epochs.filter((e) => !known.has(e.id));
@@ -259,7 +263,7 @@ async function renumberAboveFiles(
  * preferred series as the file is built (`src/same-as.ts`), and the result
  * says what was linked. Each station carries the IDs of its `errata`, and
  * `errata.json` those of the sources the store holds (each source's
- * `errata.json`, read by `src/errata.ts`); the result names any station an erratum lists that a source in the store
+ * `errata.ts`, read by `src/errata.ts`); the result names any station an erratum lists that a source in the store
  * doesn't, a typo or a station since removed.
  */
 export async function publishStations(
@@ -379,10 +383,11 @@ async function linkedStations(
       const step = analysis.get(s.id)?.step_s;
       if (s.interval_s === null && step != null) steps.set(s.id, step);
     }
-    // Only a tie-breaker in `rank`, so a years file that can't be read doesn't stop publishing.
+    // A years file that can't be read doesn't stop publishing. Its stations count as having a
+    // record, whole, so `rank` never demotes one for a read that failed.
     const shares = await usableShares(store, source.metadata.id).catch((error: unknown) => {
       console.warn(`${source.metadata.id}: ranking without the years file: ${String(error)}`);
-      return new Map<string, number>();
+      return new Map(kept.map((s) => [s.id, 1] as const));
     });
     for (const [id, share] of shares) usable.set(id, share);
   }
@@ -409,11 +414,20 @@ export async function stationsToMeasure(store: string, all: Source[]): Promise<S
 
 /**
  * Metadata that is ingest's business, not part of a source's terms, so
- * `sources.json` leaves it out: offsets, the archive's reference,
- * and which scheduled jobs run for the source. `finalizes` stays in, since it
+ * `sources.json` leaves it out: offsets, the archive's reference, the datum
+ * names datums.ts reads, and which jobs and poller run for the source. `finalizes` stays in, since it
  * tells a reader whether the source's `preliminary` values will ever change.
  */
-const INGEST_ONLY = new Set(["utc_offsets", "archive", "hourly", "empty_means_none"]);
+const INGEST_ONLY = new Set([
+  "utc_offsets",
+  "archive",
+  "hourly",
+  "empty_means_none",
+  "skip_empty",
+  "poller",
+  "chart_datum",
+  "datum_aliases",
+]);
 
 /**
  * A source's entry in `sources.json`: its metadata less what only ingest uses,
@@ -462,7 +476,7 @@ export function withoutWithheld(source: Source, list: StoredStation[]): StoredSt
  * A source's list from the store, with each station's analysis, or null for a source whose list was never
  * started, such as one registered since the last Monthly refresh. A list that
  * existed and is gone, or series with no list, are still errors. Over HTTP, which can't list files, a list
- * counts as having existed when the published `stations.parquet` names the source, and series as a recent window.
+ * counts as having existed when the published `stations.parquet` names the source, and series as a daily file of the last `RECENT_DAYS`.
  */
 export async function startedListOf(
   store: string,
@@ -471,15 +485,16 @@ export async function startedListOf(
   const sourceId = source.metadata.id;
   const list = await readStationList(stationListPath(store, sourceId));
   if (list) return withAnalysis(store, sourceId, withoutWithheld(source, list));
-  // HTTP can't list the history or series files, so a reader there checks the published list and the recent
-  // window; a list lost before its source was first published reads as never started.
+  // HTTP can't list the history or series files, so a reader there checks the published list and the daily
+  // files; a list lost before its source was first published reads as never started.
   if (!listable(store)) {
     // Every store has a stations.parquet once it publishes, so none means a wrong store URL.
     if (!(await exists(stationsPath(store)))) throw new Error(`no ${stationsPath(store)}`);
     if ((await publishedSources(stationsPath(store))).includes(sourceId))
       throw new Error(lostList(store, sourceId));
-    if (await exists(recentPath(store, sourceId)))
-      throw new Error(`the store has ${sourceId} series but no list for it`);
+    for (const path of recentDayPaths(store, sourceId, Date.now(), RECENT_DAYS))
+      if (await exists(path))
+        throw new Error(`the store has ${sourceId} series but no list for it`);
     return null;
   }
   if (await hasHistory(store, sourceId)) throw new Error(lostList(store, sourceId));
@@ -489,15 +504,15 @@ export async function startedListOf(
   return null;
 }
 
-/** Whether `store` holds any of a source's values: series files in any epoch, or a recent window. */
+/** Whether `store` holds any of a source's values: series files in any epoch, or a daily file. */
 async function hasSeries(store: string, sourceId: string): Promise<boolean> {
-  if (await exists(recentPath(store, sourceId))) return true;
-  return anyFile(
-    PRODUCTS.flatMap((p) => [
+  return anyFile([
+    recentDayPath(store, sourceId, "*"),
+    ...PRODUCTS.flatMap((p) => [
       sourceFirstEpochFiles(store, p, sourceId),
       sourceEpochDirs(store, p, sourceId),
     ]),
-  );
+  ]);
 }
 
 /** Whether a source's list has ever been written to `store`. */

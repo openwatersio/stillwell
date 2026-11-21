@@ -13,6 +13,7 @@ import {
   Unjudged,
 } from "../../schema.ts";
 import { TIDAL } from "../dwr/index.ts";
+import { idOfGeslaFile as ispraId } from "../ispra/index.ts";
 import { seriesOf } from "../unam/index.ts";
 import { CONTRIBUTORS as UHSLC_CONTRIBUTORS } from "../uhslc/contributors.ts";
 import { withheld as uhslcWithheld } from "../uhslc/index.ts";
@@ -41,6 +42,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "GESLA-4.1 (Haigh et al. 2023; Woodworth et al. 2017)",
+  // The address every 4.1 file's header and UHSLC's ERDDAP give for GESLA.
   contact: {
     email: "gesla.help@gmail.com",
     url: "https://gesla787883612.wordpress.com/contact/",
@@ -182,6 +184,7 @@ function countryOf(code: string): string | null {
   return iso;
 }
 
+// GESLA's gauge type, kept for tidal rivers too, since the copy rule in src/same-as.ts matches on `kind`.
 const KINDS: Record<string, Kind> = { Coastal: "coastal", River: "river", Lake: "lake" };
 
 /** A share's signed download URL for `filename`, which the share's own name doesn't matter to. */
@@ -359,6 +362,11 @@ export function originatorIds(
       return [`smhi/${code}`];
     case "REFMAR":
       return [`refmar/${code}`];
+    case "ISPRA": {
+      // The file's name gives the gauge: the codes repeat (two PAL, two POR).
+      const id = ispraId(file);
+      return id ? [id] : [];
+    }
     case "NHS":
       return [`kartverket/${upper}`];
     case "CDWR":

@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
+import linzErrata from "../src/sources/linz/errata.ts";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
 import { crc32, deflateRawSync } from "node:zlib";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import { firstEpochs, nextEpochs } from "../src/epochs.ts";
+import { IDS } from "../src/migrations/20261120-linz-errata-spans.ts";
 import * as linz from "../src/sources/linz/index.ts";
 
 const fixture = (name: string) =>
@@ -451,9 +453,7 @@ describe("linz", () => {
   });
 
   it("backs every sensor 41 span with an erratum for its station and days", () => {
-    const errata = JSON.parse(
-      readFileSync(new URL("../src/sources/linz/errata.json", import.meta.url), "utf8"),
-    ).errata as {
+    const errata = linzErrata.errata as {
       stations: string[] | null;
       since: string | null;
       until: string | null;
@@ -1153,5 +1153,15 @@ describe("linz Antarctic files in a layout it doesn't know", () => {
     assert.deepEqual(await linz.levels("ROBT", ...span), []);
     serve(route("not,a,layout"));
     await assert.rejects(linz.levels("ROBT", ...span), /none of a layout this reads/);
+  });
+});
+
+describe("linz errata migration", () => {
+  it("checks errata that exist and have a check", () => {
+    for (const id of IDS)
+      assert.ok(
+        linzErrata.errata.some((e) => e.id === id && e.check),
+        `${id} isn't a LINZ erratum with a check`,
+      );
   });
 });

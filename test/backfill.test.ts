@@ -40,8 +40,7 @@ import {
   stationListPath,
 } from "../src/store/paths.ts";
 import { writeYears } from "../src/store/years.ts";
-import { REFETCH_YEARS } from "../src/store/recent.ts";
-import { readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
+import { keepsEmptyYears, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import { readBackfilled } from "../src/backfilled.ts";
 import {
   Flag,
@@ -446,20 +445,6 @@ describe("preliminaryRuns with skipUnscreened", () => {
   });
 });
 
-describe("monthly refetch", () => {
-  it("reaches back as far as compaction looks for preliminary values", () => {
-    // Monthly's refetch step and the server's both run scripts/monthly.sh.
-    const workflow = readFileSync("scripts/monthly.sh", "utf8");
-    assert.match(workflow, new RegExp(`from=\\$\\(\\(year - ${REFETCH_YEARS}\\)\\)`));
-    assert.match(workflow, /backfill "\$SOURCE" "\$which" "\$from" "\$@"/);
-    // California DWR, which nothing else fetches, reads every active station from last January.
-    assert.match(
-      workflow,
-      /dwr\) which=all from=\$\(\(year - 1\)\) && set -- "\$\(date -u \+%F\)" --refetch ;;/,
-    );
-  });
-});
-
 describe("earliestPreliminary", () => {
   it("reads the earliest value the source sent as preliminary across a station's files", async () => {
     const root = mkdtempSync(join(tmpdir(), "stillwell-backfill-"));
@@ -764,6 +749,15 @@ describe("backfill script", () => {
     assert.equal(run.status, 0, run.stderr);
     assert.doesNotMatch(run.stderr, /^fetch /m);
     assert.equal((await readStationBounds(path)).get("coops/7")?.preliminary, late);
+  });
+
+  it("keeps a record for a source whose empty answer is sure, or that skips empty years anyway", () => {
+    assert.deepEqual(
+      [{}, { empty_means_none: true }, { skip_empty: true }, { empty_means_none: false }].map(
+        keepsEmptyYears,
+      ),
+      [false, true, true, false],
+    );
   });
 
   it("with --skip-written, skips a year it found empty, for 30 days", async () => {

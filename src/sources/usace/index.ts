@@ -1,3 +1,4 @@
+import { firstOfMonth, REFETCH_YEARS, yearOf } from "../schedule.ts";
 import { getJson } from "../../http.ts";
 import {
   Flag,
@@ -30,6 +31,11 @@ export const metadata: SourceMetadata = {
   id: "usace",
   name: "U.S. Army Corps of Engineers, Corps Water Management System (CWMS)",
   url: "https://cwms-data.usace.army.mil/cwms-data/",
+  // CDA has no license or terms page, and its responses carry none. The stage is data the Corps
+  // produces, which 17 U.S.C. § 105 keeps out of copyright, and 33 U.S.C. § 2342 (`url`) requires
+  // the Corps to publish its water projects' data on the Internet "as quickly as practicable".
+  // CDA's code is MIT-licensed. CDA's page shows the consent banner every DoD site shows, a
+  // monitoring notice rather than a license; the API serves the data without a key to any origin.
   license: {
     id: "US-Government-Works",
     name: "U.S. Government work, public domain",
@@ -37,15 +43,19 @@ export const metadata: SourceMetadata = {
     commercial_use: true,
     redistribution: true,
   },
+  // The Corps asks for no attribution.
   attribution: "U.S. Army Corps of Engineers",
+  // The contact button on RiverGages (https://rivergages.mvr.usace.army.mil/WaterControl/new/layout.cfm),
+  // which shows the same CWMS stages. CDA itself has no contact but its software's public GitHub
+  // discussions, and a district may answer faster about its own gauges.
   contact: { email: "CEMVRRiverGages@usace.army.mil" },
   // Offices that screen do so after the fact; the refetch skips stations never screened.
   hourly: true,
   finalizes: true,
   // Central and Eastern time, standard or daylight.
   utc_offsets: [-6, -4],
-  terms:
-    "Unscreened values are as the gauge reported them, and the Corps may revise them. The Corps assumes no liability for their accuracy.",
+  // From older Corps district pages.
+  terms: "The United States assumes no liability for the accuracy of the Corps' data.",
 };
 
 /** Levels are stage, the height above the gauge's own zero. */
@@ -613,6 +623,19 @@ function seriesOf(station: Station): [string, string] {
 
 export const source: Source = {
   metadata,
+  // Some offices screen nothing, so their values stay preliminary for good: --skip-unscreened leaves out a
+  // station with a year of record and no screened value, but January's run takes them all, so a station whose
+  // office began screening since, or a new epoch's, can rejoin.
+  schedule: {
+    refetch: (today) => [
+      [
+        "preliminary",
+        `${yearOf(today) - REFETCH_YEARS}`,
+        firstOfMonth(today),
+        ...(today.getUTCMonth() ? ["--skip-unscreened"] : []),
+      ],
+    ],
+  },
   stations,
   observations: async (s: Station, start, end) => {
     const [office, series] = seriesOf(s);

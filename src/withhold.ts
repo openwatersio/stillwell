@@ -1,7 +1,8 @@
+import { deletesFiles } from "./sources/gesla/dropped.ts";
 /**
- * Stations withheld from the store for licensing, identity or evidence reasons
- * (`Source.withheld`). A refresh drops them from the source's list and their
- * rows from its bounds, years, recent window, empty-years record, backfilled years, requalify list and analysis, and publishing
+ * Stations withheld from the store, because their owner refused republication,
+ * their values aren't water levels, or the evidence doesn't support publishing them (`Source.withheld`). A refresh drops them from the source's list and their
+ * rows from its bounds, years, daily files, empty-years record, backfilled years, requalify list and analysis, and publishing
  * leaves them out of stations.parquet. `ingest withhold <source>` deletes
  * their series files, and their rows, from a store that still holds them.
  */
@@ -11,6 +12,7 @@ import { rm } from "node:fs/promises";
 import {
   exists,
   listFiles,
+  listable,
   listedIds,
   readJsonArray,
   readRecent,
@@ -27,7 +29,9 @@ import {
   emptyYearsPath,
   historyPath,
   PRODUCTS,
-  recentPath,
+  recentDayPath,
+  recentDayPaths,
+  RECENT_DAYS,
   requalifyLeftPath,
   sourceEpochDirs,
   sourceFirstEpochFiles,
@@ -45,7 +49,7 @@ export function withheldReason(source: Source, id: string): string | null {
 }
 
 /**
- * Drop withheld stations' rows from the source's bounds, years, recent window,
+ * Drop withheld stations' rows from the source's bounds, years, daily files,
  * empty-years record, backfilled years, requalify list and analysis, with its history, in `store`, rewriting only a file that holds one. Returns
  * the station IDs it dropped rows for.
  */
@@ -70,12 +74,12 @@ export async function dropWithheldRows(store: string, source: Source): Promise<s
     );
   }
 
-  const recent = recentPath(store, id);
-  const inRecent = (await recentStations(recent)).filter(held);
-  if (inRecent.length) {
+  for (const path of await recentFiles(store, id)) {
+    const inRecent = (await recentStations(path)).filter(held);
+    if (!inRecent.length) continue;
     for (const station of inRecent) dropped.add(station);
-    const rows = await readRecent(recent);
-    await writeRecent(recent, [rows.filter((r) => !held(r.station))]);
+    const rows = await readRecent(path);
+    await writeRecent(path, [rows.filter((r) => !held(r.station))]);
   }
 
   const emptyPath = emptyYearsPath(store, id);
@@ -105,8 +109,18 @@ export async function dropWithheldRows(store: string, source: Source): Promise<s
 }
 
 /**
+ * A source's daily files: those a listing finds, where the store can be
+ * listed, and the last `RECENT_DAYS` days', which a short listing may miss.
+ * A day with no file reads as empty.
+ */
+async function recentFiles(store: string, id: string): Promise<string[]> {
+  const listed = listable(store) ? await listFiles(recentDayPath(store, id, "*")) : [];
+  return [...new Set([...listed, ...recentDayPaths(store, id, Date.now(), RECENT_DAYS)])].sort();
+}
+
+/**
  * Every withheld station of a source that `store` has known: in its list, any
- * snapshot of the list in history, its bounds, its recent window or, unless
+ * snapshot of the list in history, its bounds, its daily files or, unless
  * `files` is false, a directory of its files, so a run after the refresh
  * dropped them from the list still finds them. Listing the files reads every
  * one of the source's, so a refresh leaves it out. Also returns how many
@@ -135,7 +149,7 @@ export async function withheldStations(
     ...dirs,
     ...(await listedIds(lists)),
     ...(await readStationBounds(boundsPath(store, id))).keys(),
-    ...(await recentStations(recentPath(store, id))),
+    ...(await recentStations(await recentFiles(store, id))),
     ...(await readAnalysis(store, id)).keys(),
   ]);
   return {
@@ -313,7 +327,7 @@ export function tooManyWithheld(source: string, count: number, known: number): s
 
 /**
  * Remove a source's withheld stations from `store`: delete their series files,
- * then drop their rows from the bounds, years, recent window, empty-years record, backfilled years and requalify list.
+ * then drop their rows from the bounds, years, daily files, empty-years record, backfilled years and requalify list.
  * Their list rows go at the source's next refresh. Refuses more stations than
  * `withholdLimit` allows unless `accept`, and a store it can't delete from.
  */
@@ -340,3 +354,6 @@ export async function withhold(
   const rows = await dropWithheldRows(store, source);
   return { ids, prefixes, rows };
 }
+
+/** The records whose files `drop` deletes, by source; a dropped record is known only through its source's list. */
+export const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFiles };

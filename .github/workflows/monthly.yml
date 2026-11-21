@@ -7,17 +7,15 @@ name: Monthly
 # cross-station checks, and keep the scheduled workflows enabled. On the 9th,
 # refetch every station's values that were still
 # preliminary, from the earliest, so the ones the source has finalized since
-# replace them. Ingest hourly starts a refresh of one source, at
+# replace them. The poller starts a refresh of one source, at
 # most once a day, when that source reports a station in another datum.
 run-name: ${{ (inputs.refetch || github.event.schedule == '40 3 9 * *') && (inputs.sources && format('Refetch {0}', inputs.sources) || 'Refetch') || inputs.sources && format('Refresh {0}', inputs.sources) || 'Monthly' }}
 
-# Each job waits in its source's group. GitHub keeps one job waiting per
-# group and cancels it when a newer one arrives, so a job queued behind
-# anything that outlasts the hour, a manual backfill or a long refresh, is
-# cancelled by the next hourly run. Starting at 01:25 and 03:35, after that
-# hour's run and compaction, the groups are usually free; rerun a cancelled
-# job from Actions. The refetch runs on its own day for the same reason: queued
-# behind the refreshes, it would be cancelled.
+# Each job waits in its source's group, which sets `queue: max`, so a job
+# queued behind a manual backfill or a long refresh waits its turn rather
+# than being cancelled by the next. Starting at 01:25 and 03:35, after that
+# night's compaction, the groups are usually free. The refetch runs on its
+# own day so it doesn't wait behind the refreshes.
 #
 # The Worker in workers/cron dispatches both at those times, since GitHub's
 # schedule runs late or not at all. The schedule, five minutes later, is a
@@ -106,7 +104,7 @@ jobs:
 
   # Each list in its source's group, the one every job that writes the source's
   # files or list shares, so a refresh that opens a datum epoch never lands
-  # while a backfill, hourly, compaction or other refresh is writing that source.
+  # while a backfill, compaction or other refresh is writing that source.
   lists:
     needs: plan
     if: needs.plan.outputs.sources != '[]'
@@ -117,6 +115,7 @@ jobs:
     concurrency:
       group: store-${{ matrix.source }}
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     # CO-OPS's datums take up to 2 hours (refreshBudgetMs) and analysis's
     # requalify 2 hours. The requalify of the last two months starts stations
@@ -133,14 +132,9 @@ jobs:
         with:
           node-version-file: .mise.toml
           cache: npm
-      # A source that moved to the server's job queue since this run's commit is written only there.
-      - id: owns
-        run: scripts/server-owns.sh "$SOURCE"
-        env:
-          SOURCE: ${{ matrix.source }}
       - run: npm ci
       # stations.parquet is rebuilt once, from every list, by the next job.
-      # Each step is a step of scripts/monthly.sh, which the server's job queue runs too, and which says why.
+      # Each step is a step of scripts/monthly.sh, which says why.
       - run: scripts/monthly.sh refresh "$SOURCE" ${ACCEPT_EPOCHS:+--accept-epochs} ${ACCEPT_WITHHELD:+--accept-withheld}
         env:
           SOURCE: ${{ matrix.source }}
@@ -154,7 +148,7 @@ jobs:
           CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
           CCO_REFERER: ${{ secrets.CCO_REFERER }}
       # The steps after a failed one still run, but none once the guard has refused the source.
-      - if: ${{ !cancelled() && steps.owns.outcome == 'success' }}
+      - if: ${{ !cancelled() }}
         run: scripts/monthly.sh analyze "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
@@ -162,7 +156,7 @@ jobs:
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
-      - if: ${{ !cancelled() && steps.owns.outcome == 'success' && !inputs.sources }}
+      - if: ${{ !cancelled() && !inputs.sources }}
         run: scripts/monthly.sh requalify-recent "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
@@ -170,14 +164,17 @@ jobs:
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
-      - if: ${{ !cancelled() && steps.owns.outcome == 'success' && matrix.source == 'bsh' }}
-        run: scripts/monthly.sh bsh-predictions "$SOURCE"
+      - if: ${{ !cancelled() }}
+        run: scripts/monthly.sh list-backfills "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
           STILLWELL_STORE: s3://water-levels
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
+          CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
+          CCO_REFERER: ${{ secrets.CCO_REFERER }}
 
   # Pairs of stations within 10 km, and every linked pair, compared by their
   # hourly levels (src/matches.ts), for publish to link those that agree within
@@ -187,13 +184,15 @@ jobs:
   # once the file is written. It runs before links, which measures offsets
   # along the links publish makes. Only a full refresh runs it; a cancelled run
   # skips it, and publish uses last month's file. The matches group keeps a
-  # hand-run Ingest `matches` from writing the file at the same time.
+  # hand-run Ingest `matches`, or the prune after an Ingest `withhold` or
+  # `drop`, from writing the file at the same time.
   matches:
     needs: [plan, lists]
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' && !inputs.sources }}
     concurrency:
       group: matches
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 300
     environment: lake
@@ -221,17 +220,20 @@ jobs:
   # for publish to carry MSL, LAT and chart datum along. It reads levels and
   # writes only stations/links.parquet, which publish reads, so it needs no
   # source's group; a row the run doesn't replace is kept unless its pair was
-  # read and didn't measure, and a failed read fails the job once the file is
+  # read and didn't measure, is no longer linked, or names a withheld station
+  # or a dropped GESLA record, and a failed read fails the job once the file is
   # written. Only
   # a full refresh runs it; a cancelled run skips it, and publish uses last
-  # month's file. The links group keeps a hand-run Ingest `links` from writing
-  # the file at the same time.
+  # month's file. The links group keeps a hand-run Ingest `links`, or the
+  # prune after an Ingest `withhold` or `drop`, from writing the file at the
+  # same time.
   links:
     needs: [plan, lists, matches]
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' && !inputs.sources }}
     concurrency:
       group: links
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 180
     environment: lake
@@ -262,6 +264,7 @@ jobs:
     concurrency:
       group: store
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: lake
@@ -288,12 +291,12 @@ jobs:
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
   # Backfill takes every station whose bounds hold a preliminary value, active
-  # or not (California DWR excepted, below), and fetches again from that value's month on, skipping ended years
+  # or not (unless the source's `schedule` gives its own runs), and fetches again from that value's month on, skipping ended years
   # with none (yearDone in src/backfill.ts), so values the source has finalized
   # since replace the ones compaction wrote. It then reads each station's
   # earliest preliminary value again into the bounds. Values preliminary from
   # before the cutoff, January three years back (REFETCH_YEARS in
-  # src/store/recent.ts), aren't fetched again, though their stations' later
+  # src/sources/schedule.ts), aren't fetched again, though their stations' later
   # years are; the run's page lists a station once its value falls behind it.
   # Backfill refuses bounds an older build wrote, without the column, until
   # `compact <source> --rebuild-bounds` from the Ingest workflow fills it in.
@@ -307,6 +310,7 @@ jobs:
     concurrency:
       group: store-${{ matrix.source }}
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 360
     environment: lake
@@ -318,12 +322,8 @@ jobs:
         with:
           node-version-file: .mise.toml
           cache: npm
-      # A source that moved to the server's job queue since this run's commit is written only there.
-      - run: scripts/server-owns.sh "$SOURCE"
-        env:
-          SOURCE: ${{ matrix.source }}
       - run: npm ci
-      # Which stations and years each source refetches, and why, is in scripts/monthly.sh, which the server runs too.
+      # Which stations and years each source refetches, and why, is in its adapter's `schedule`; scripts/monthly.sh runs it.
       - run: scripts/monthly.sh refetch "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
@@ -339,7 +339,7 @@ jobs:
   # so far and the five before: months one gauge holds another's data, clock errors and level
   # steps that QC of one station at a time misses. Each region's report is in
   # the job summary and an artifact, for a person to read and turn into errata
-  # (CONTRIBUTING.md). It reads the public bucket and changes nothing, so it
+  # (docs/contributing/checks.md). It reads the public bucket and changes nothing, so it
   # needs no store credentials or group. Only a full refresh runs it, once the
   # station lists are published.
   cross-check:
@@ -399,7 +399,7 @@ jobs:
       - run: |
           # Monthly first, since it enables the rest; one failure doesn't stop the others.
           failed=0
-          for workflow in monthly.yml ingest-hourly.yml compact-daily.yml bucket-check.yml canary.yml site.yml; do
+          for workflow in monthly.yml compact-daily.yml migrations.yml bucket-check.yml canary.yml site.yml; do
             if ! state=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow" --jq .state); then
               failed=1
             elif [ "$state" = disabled_manually ]; then

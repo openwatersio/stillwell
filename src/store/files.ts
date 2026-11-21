@@ -270,13 +270,13 @@ const STATION_COLUMNS: Column[] = [
     name: "status",
     type: "VARCHAR",
     description:
-      "`active` or `inactive`. A station the source stops listing, lists as ended (such as a CO-OPS station with a `removed` date), or that has stopped reporting by its source's own test (as at DWR, JODC, CDEC, SFWMD, JMA and SMHI), stays in the store, inactive, with its history, so its ID is never reused; so does a record set aside as another gauge's, such as GESLA's Uddevalla. A station withheld at its owner's request is removed entirely.",
+      "`active` or `inactive`. A station the source stops listing, lists as ended (such as a CO-OPS station with a `removed` date), or that has stopped reporting by its source's own test (as at DWR, JODC, CDEC, SFWMD, JMA and SMHI), stays in the store, inactive, with its history, so its ID is never reused; so does a record set aside as another gauge's, such as GESLA's Uddevalla. A station withheld, at its owner's request or because its values aren't water levels, is removed entirely.",
   },
   {
     name: "live",
     type: "BOOLEAN",
     description:
-      "Whether the station's latest values are fetched as they come in. Its last 7 days are in `recent/`, which is rewritten every hour.",
+      "Whether the station's latest values are fetched as they come in. Its values are in `recent/`, one file per UTC day, with today's rewritten every hour.",
   },
   {
     name: "min_interval_s",
@@ -698,11 +698,11 @@ export const FILES = {
     sort: ["id"],
   },
   recent: {
-    path: "recent/<source>.parquet",
-    example: "recent/rws.parquet",
+    path: "recent/<source>/<YYYY-MM-DD>.parquet",
+    example: "recent/rws/2026-11-19.parquet",
     title: "Recent levels",
     description:
-      "The last 7 days of observed levels from a source's live stations, refreshed hourly.",
+      "One UTC day of observed levels from a source's live stations, by `time`. Today's file is rewritten hourly and the 6 days before it each night, so a day's file is final once it's 6 days old, and each file is deleted after 30 days.",
     columns: [
       {
         name: "station",
@@ -863,7 +863,7 @@ export const SOURCES_SCHEMA: JsonSchema = {
         additionalProperties: false,
         properties: {
           email: { type: nullable("string"), description: "The agency's published mailbox." },
-          url: { type: nullable("string"), description: "The agency's contact form." },
+          url: { type: nullable("string"), description: "The agency's contact page." },
         },
         anyOf: [
           { required: ["email"], properties: { email: { type: "string" } } },
@@ -872,7 +872,8 @@ export const SOURCES_SCHEMA: JsonSchema = {
       },
       terms: {
         type: nullable("string"),
-        description: "Anything a user of the data should know about the terms.",
+        description:
+          "Anything a user of the data should know about the source's conditions of use. Stillwell changes every source's data the same way: levels in meters, times in UTC, values the source marks missing left out, and a quality flag on each value. Each source's quality codes map to the flag as its README says. The source's README and errata describe any other change.",
       },
       finalizes: {
         type: "boolean",

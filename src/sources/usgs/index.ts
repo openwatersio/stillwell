@@ -1,3 +1,4 @@
+import { firstOfMonth, REFETCH_YEARS, yearOf } from "../schedule.ts";
 import { getJson, type RequestOptions } from "../../http.ts";
 import {
   Flag,
@@ -33,11 +34,16 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "U.S. Geological Survey",
+  // The service contact in the Water Data API's OpenAPI description, https://api.waterdata.usgs.gov/ogcapi/v1/openapi?f=json.
   contact: { email: "wdfn@usgs.gov", url: "https://waterdata.usgs.gov/questions-comments/" },
   // Provisional values are approved months to years later.
   hourly: true,
   finalizes: true,
-  terms: "Provisional data are subject to revision until USGS approves them.",
+  // The API answers a failure with an error status, 500 in its OpenAPI description, which
+  // `fetchText` throws on, and `featurePages` refuses an empty answer that isn't a feature
+  // collection. Nothing shows an outage never answers with an empty one, so publish still
+  // counts such a year missing.
+  skip_empty: true,
 };
 
 /** The gage's own zero, which gage height (00065) is measured from. */
@@ -307,6 +313,7 @@ export const GAGE_DATUMS: Record<
   },
 };
 
+// The international foot; the survey foot differs by 2 parts per million, a quarter of a millimeter at 400 ft.
 const FEET = 0.3048;
 const DAY_MS = 86_400_000;
 
@@ -338,7 +345,9 @@ interface ApiLocation {
 }
 
 interface Collection<T> {
+  type?: string;
   features: { id?: string; properties: T; geometry: { coordinates: number[] } | null }[];
+  numberReturned?: number;
   links?: { rel: string; href: string }[];
 }
 
@@ -571,7 +580,7 @@ function toStation(
   } else if (datum === GAGE && surveyed && vertical && typeof location.altitude === "number")
     datums[vertical] = Math.round(location.altitude * FEET * 1000) / 1000 + 0; // + 0 turns -0 into 0
   // An unsurveyed altitude, or an unsurveyed method with no altitude, says the stored offsets aren't the gage's zero.
-  // A survey method with the altitude missing is a gap too, and keeps them.
+  // A survey method with the altitude missing, or a surveyed altitude in a datum VERTICAL_DATUMS lacks, keeps them.
   else if (datum === GAGE && !decided && !gap)
     noDatums =
       typeof location.altitude === "number"
@@ -888,6 +897,16 @@ async function* featurePages<T>(
   let url: string | undefined = `${API}/collections/${collection}/items?${query}`;
   while (url) {
     const page: Collection<T> = await request<Collection<T>>(url, options);
+    // An empty answer means no values (`skip_empty`) only as a whole feature collection: USGS
+    // sends `type` and `numberReturned` with every page from `continuous`, `time-series-metadata`
+    // and `monitoring-locations`, 0 with an empty one. A page whose count is missing or disagrees
+    // with its features was cut short.
+    if (
+      page?.type !== "FeatureCollection" ||
+      !Array.isArray(page.features) ||
+      page.numberReturned !== page.features.length
+    )
+      throw new Error(`USGS ${collection}: not a feature collection`);
     yield page.features;
     url = page.links?.find((l) => l.rel === "next")?.href;
     // The key goes with every request, so only ever to the API itself.
@@ -976,6 +995,20 @@ function checked(station: Station): string {
 
 export const source: Source = {
   metadata,
+  // USGS approves months to years later, a year a request at one every 4.8 seconds, too many for one run across
+  // 11,000 stations, so each month takes a twelfth of them, by --shard, and each station comes round once a
+  // year; the current year is left to compaction. A run that stops partway needs a rerun within the month.
+  schedule: {
+    refetch: (today) => [
+      [
+        "preliminary",
+        `${yearOf(today) - REFETCH_YEARS}`,
+        `${yearOf(today)}`,
+        "--shard",
+        `${today.getUTCMonth() + 1}/12`,
+      ],
+    ],
+  },
   stations,
   seriesChanged,
   observations: async (s: Station, start, end) => {

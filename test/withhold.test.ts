@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { chmod, mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { chmod, mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -15,14 +15,18 @@ import {
   writeObservations,
   writeRecent,
   writeStationBounds,
+  writeStationList,
 } from "../src/store/parquet.ts";
 import {
   boundsPath,
   analysisHistoryPath,
   emptyYearsPath,
-  recentPath,
+  recentDayPath,
+  recentDays,
   requalifyLeftPath,
   backfilledPath,
+  linksPath,
+  matchesPath,
   seriesPath,
   stationListPath,
   stationsPath,
@@ -45,6 +49,8 @@ import * as gesla from "../src/sources/gesla/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
 import { deletesFiles, isDropped, KEEP_FILES } from "../src/sources/gesla/dropped.ts";
 import { readYears, writeYears } from "../src/store/years.ts";
+import { readLinks, writeLinks, type LinkOffset } from "../src/links.ts";
+import { readMatches, writeMatches, type DataMatch } from "../src/matches.ts";
 import {
   awsRemoveArgs,
   dropFiles,
@@ -125,7 +131,7 @@ beforeEach(async () => {
 afterEach(() => rm(store, { recursive: true }));
 
 describe("refreshSource with withheld stations", () => {
-  it("drops them from the list, its snapshot, bounds and recent window, without tripping the shrink guard", async () => {
+  it("drops them from the list, its snapshot, bounds and daily files, without tripping the shrink guard", async () => {
     // 20 active stations, 12 of them withheld: the 8 left would be a sharp shrink.
     const codes = Array.from({ length: 20 }, (_, i) => (i < 12 ? `x${i}` : `k${i}`));
     const all = codes.map((c) => listed("test", c));
@@ -140,15 +146,18 @@ describe("refreshSource with withheld stations", () => {
         screened: true,
       })),
     );
-    await writeRecent(recentPath(store, "test"), [
-      ["test/x0", "test/k12"].map((station) => ({
-        station,
-        epoch: 1,
-        time: T,
-        level: 1,
-        flag: Flag.preliminary,
-      })),
-    ]);
+    // Yesterday and today, and a day older than the last 30 that only a listing finds; the day between has no file.
+    const days = [...recentDays(Date.now(), 3).filter((_, i) => i !== 1), "2020-01-01"];
+    for (const day of days)
+      await writeRecent(recentDayPath(store, "test", day), [
+        ["test/x0", "test/k12"].map((station) => ({
+          station,
+          epoch: 1,
+          time: T,
+          level: 1,
+          flag: Flag.preliminary,
+        })),
+      ]);
     await writeJsonArray(emptyYearsPath(store, "test"), [
       { key: "test/x0 levels 1 1990", seen: NOW },
       { key: "test/k12 levels 1 1990", seen: NOW },
@@ -225,10 +234,12 @@ describe("refreshSource with withheld stations", () => {
       [...(await readStationBounds(boundsPath(store, "test"))).keys()],
       ["test/k12"],
     );
-    assert.deepEqual(
-      (await readRecent(recentPath(store, "test"))).map((r) => r.station),
-      ["test/k12"],
-    );
+    for (const day of days)
+      assert.deepEqual(
+        (await readRecent(recentDayPath(store, "test", day))).map((r) => r.station),
+        ["test/k12"],
+        day,
+      );
     assert.deepEqual(
       JSON.parse(await readFile(emptyYearsPath(store, "test"), "utf8")).map(
         (r: { key: string }) => r.key,
@@ -656,6 +667,85 @@ describe("withhold", () => {
     assert.match(run.stdout, /gesla: 1 dropped stations' backfilled years to clear \(dry run\)/);
     assert.equal(existsSync(seriesPath(store, "levels", "gesla", codes[0], 2015, 1)), true);
     assert.equal(((await readJsonArray(backfilledPath(store, "gesla"))) as unknown[]).length, 3);
+  });
+
+  it("takes a dropped record's rows out of the link and match files with `--prune`", async () => {
+    const dropped = "gesla/crms0153-crms0153-usa-crms";
+    await refreshSource(
+      store,
+      sourceOf([listed("gesla", "crms0153-crms0153-usa-crms")], undefined, "gesla"),
+      { now: NOW },
+    );
+    const span = { since: "2023-01-01T00:00:00.000Z", until: "2026-01-01T00:00:00.000Z" };
+    const link = (a: string, b: string): LinkOffset => ({
+      a,
+      b,
+      a_epoch: 1,
+      b_epoch: 1,
+      ...span,
+      hours: 8760,
+      offset_m: 0.1,
+      spread_m: 0.005,
+    });
+    const match = (a: string, b: string): DataMatch => ({
+      a,
+      b,
+      ...span,
+      months: 36,
+      hours: 26000,
+      rms_m: 0.004,
+      lag_h: 0,
+      lag_rms_m: 0.004,
+    });
+    await writeLinks(store, [link("crms/CRMS0153-H01", dropped), link("coops/1", "coops/2")]);
+    await writeMatches(store, [match("coops/1", "coops/2"), match("crms/CRMS0153-H01", dropped)]);
+    const prune = (command: string) =>
+      spawnSync(process.execPath, ["scripts/ingest.ts", command, "--prune"], {
+        encoding: "utf8",
+        env: {
+          ...process.env,
+          STILLWELL_STORE: store,
+          STILLWELL_CACHE: join(store, "..", "cache"),
+        },
+      });
+    for (const command of ["links", "matches"]) {
+      const run = prune(command);
+      assert.equal(run.status, 0, run.stderr);
+      assert.match(run.stdout, /: 1 rows naming a withheld or dropped station taken out, 1 kept/);
+    }
+    // Measuring nothing, so the pair that isn't gone keeps last month's row as it was.
+    assert.deepEqual(await readLinks(store), [link("coops/1", "coops/2")]);
+    assert.deepEqual(await readMatches(store), [match("coops/1", "coops/2")]);
+    // A file with nothing gone isn't written again.
+    for (const [command, path] of [
+      ["links", linksPath(store)],
+      ["matches", matchesPath(store)],
+    ] as const) {
+      const written = (await stat(path)).mtimeMs;
+      const again = prune(command);
+      assert.match(again.stdout, /: 0 rows naming a withheld or dropped station taken out, 1 kept/);
+      assert.equal((await stat(path)).mtimeMs, written, command);
+    }
+    // Without GESLA's list a dropped record can't be told apart, though other lists are read,
+    // so the files stay and the run fails.
+    const geslaList = (await readStationList(stationListPath(store, "gesla")))!;
+    await rm(stationListPath(store, "gesla"));
+    await refreshSource(store, sourceOf([listed("coops", "1")], undefined, "coops"), { now: NOW });
+    await writeLinks(store, [link("crms/CRMS0153-H01", dropped)]);
+    await writeMatches(store, [match("crms/CRMS0153-H01", dropped)]);
+    for (const command of ["links", "matches"]) {
+      const blind = prune(command);
+      assert.equal(blind.status, 1);
+      assert.match(blind.stderr, new RegExp(`no list for gesla; ${command} unchanged`));
+    }
+    assert.deepEqual(await readLinks(store), [link("crms/CRMS0153-H01", dropped)]);
+    assert.deepEqual(await readMatches(store), [match("crms/CRMS0153-H01", dropped)]);
+    // A store whose only list holds nothing but the dropped record still prunes.
+    await rm(stationListPath(store, "coops"));
+    await writeStationList(stationListPath(store, "gesla"), geslaList);
+    const alone = prune("links");
+    assert.equal(alone.status, 0, alone.stderr);
+    assert.deepEqual(await readLinks(store), []);
   });
 
   it("refuses a rule that withholds more stations than a mistake would explain", async () => {

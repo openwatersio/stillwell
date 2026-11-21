@@ -1,3 +1,4 @@
+import { yearOf } from "../schedule.ts";
 import { getJson, getText } from "../../http.ts";
 import {
   Flag,
@@ -39,7 +40,9 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: ATTRIBUTION,
+  // The tide service's mailbox, given on https://gezeiten.bsh.de/.
   contact: { email: "gezeiten@bsh.de" },
+  chart_datum: "SKN",
   // Predictions only, published a year ahead; nothing to poll or finalize.
   hourly: false,
   finalizes: false,
@@ -293,6 +296,14 @@ async function byYear<T extends { time: number }>(
 
 export const source: Source = {
   metadata,
+  // Nothing else fetches BSH. Each list refresh fetches this year's predictions for every gauge, so a gauge
+  // added in the year, or a month whose run failed, is filled by the next, and from August, when BSH publishes
+  // them, next year's too.
+  schedule: {
+    lists: (today) => [
+      ["all", `${yearOf(today)}`, `${yearOf(today) + (today.getUTCMonth() >= 7 ? 2 : 1)}`],
+    ],
+  },
   stations,
   predictions: (s, start, end) => byYear(start, end, (year) => curve(s.source_id, year, s.datum)),
   predictedExtremes: (s, start, end) =>

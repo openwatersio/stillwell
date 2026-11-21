@@ -5,6 +5,7 @@ import { ID_KM } from "./same-as.ts";
 import { isDropped } from "./sources/gesla/dropped.ts";
 import type { Epoch, StoredStation } from "./schema.ts";
 import { km } from "./ticon.ts";
+import { sources } from "./sources/index.ts";
 
 /**
  * Offsets to MSL, LAT and chart datum for each station, and its link to
@@ -96,28 +97,6 @@ const GESLA_ZEROS: [RegExp, string][] = [
   [/^RH 2000\b/, "RH2000"],
   [/^Admiralty Chart Datum\b/, "ACD"],
 ];
-
-/** A source's datum names that are another name for a reference. */
-const ALIASES: Record<string, Record<string, string>> = {
-  // BODC's chart datum is Admiralty Chart Datum, as EA's is.
-  bodc: { CD: "ACD" },
-  ea: { CD: "ACD" },
-  // CCO adds the Admiralty Tide Tables' offset to its Ordnance Datum levels (tide QC manual, 2.4).
-  cco: { CD: "ACD" },
-};
-
-/** The chart datum a source's own offsets give, for a station slackwater-database has no record of. */
-const CHART: Record<string, string> = {
-  coops: "MLLW",
-  bsh: "SKN",
-  pegelonline: "SKN",
-  kartverket: "CD",
-  bodc: "CD",
-  cco: "CD",
-  ea: "CD",
-  refmar: "ZH",
-  "marine-institute": "LAT",
-};
 
 /** Datums a tidal epoch moves, which a source's `datums_period` dates. */
 const TIDAL_DATUMS = ["MHHW", "MHW", "DTL", "MTL", "MSL", "MLW", "MLLW", "LAT", "HAT"];
@@ -267,7 +246,7 @@ export function withDatums(
       if (gave) report.fromTide++;
     }
     // Otherwise the source's own chart datum, before any is carried in.
-    const fallback = CHART[s.source];
+    const fallback = sources[s.source]?.metadata.chart_datum;
     if (!station.chart_datum && fallback && fallback in offsetsOf(station))
       station.chart_datum = fallback;
     out.set(s.id, station);
@@ -357,7 +336,7 @@ const allowed = (record: TideStation, station: StoredStation) =>
 /** A station's offsets with its own datum and any name it has for a reference. */
 function offsetsOf(s: StoredStation): Record<string, number> {
   const offsets: Record<string, number> = { ...s.datums, [s.datum]: 0 };
-  for (const [name, reference] of Object.entries(ALIASES[s.source] ?? {}))
+  for (const [name, reference] of Object.entries(sources[s.source]?.metadata.datum_aliases ?? {}))
     if (offsets[name] !== undefined) offsets[reference] ??= offsets[name];
   const note = (s as { datum_information?: string }).datum_information;
   const zero = note && GESLA_ZEROS.find(([pattern]) => pattern.test(note))?.[1];

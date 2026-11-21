@@ -26,7 +26,7 @@ Each pair is measured in the latest calendar year of their open epochs that meas
 
 Publish carries offsets along a pair whose `spread_m` is 1 cm or less and whose `a_epoch` and `b_epoch` are still the stations' open epochs. A station that opens a new epoch waits for the next month's measurement. Publish leaves out a row whose stations have since moved more than 1 km apart.
 
-A row the month's run doesn't replace is kept, so a missing file or a failed read takes nothing away. A pair whose values were read but don't measure, or that is no longer linked, loses its row.
+A row the month's run doesn't replace is kept, so a missing file or a failed read takes nothing away. A pair whose values were read but don't measure, or that is no longer linked, loses its row, as does a pair with a withheld station or a GESLA record dropped for holding another gauge's values. The file changes only when `links` writes it, each month or by hand, or when it takes out the rows of a station since withheld or dropped, right after the withhold or drop, while publish can unlink a pair at any build, so join the rows to `same_as` to keep only pairs linked now.
 
 ## Terms
 

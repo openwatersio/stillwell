@@ -27,6 +27,7 @@ The public store aims to hold any source that publishes water level data and all
 - [Environment Agency](src/sources/ea/README.md): real-time 15-minute tidal levels around England and the UK network.
 - [GESLA](src/sources/gesla/README.md): GESLA 4.1's static release of sea level records from more than 40 agencies.
 - [IGN Spain](src/sources/ign/README.md): Coruña reviewed hourly observations, 2000–2023, with suspect clocks; other IGN coverage withheld.
+- [ISPRA](src/sources/ispra/README.md): 10-minute levels from Italy's national tide gauge network, 2010 to 2023, from the open monthly files.
 - [JMA](src/sources/jma/README.md): hourly tide levels at Japanese gauges.
 - [JODC](src/sources/jodc/README.md): hourly tide levels back to 1910 at Japanese gauges of the Japan Coast Guard, GSI and port authorities.
 - [Kartverket](src/sources/kartverket/README.md): 10-minute levels at Norway's and Svalbard's permanent tide gauges.
@@ -81,11 +82,11 @@ The [contributing guide](CONTRIBUTING.md) covers running ingest, the checks, and
 - Stations with `commercial_use` false keep their source's terms.
 - Show each station's `attribution` from [`stations.parquet`](https://stillwell.openwaters.io/stations.parquet) wherever its data is used, and its `datums_attribution` wherever you use its datum offsets.
 
-For example, this query reads the last week of REFMAR levels that allow commercial use, with each station's attribution:
+For example, this query reads yesterday's REFMAR levels that allow commercial use, with each station's attribution:
 
 ```sql
 SELECT r.time, r.station, r.level_m, s.attribution
-FROM 'https://stillwell.openwaters.io/recent/refmar.parquet' r
+FROM read_parquet('https://stillwell.openwaters.io/recent/refmar/' || strftime(current_date - 1, '%Y-%m-%d') || '.parquet') r
 JOIN 'https://stillwell.openwaters.io/stations.parquet' s ON s.id = r.station
 WHERE s.commercial_use;
 ```

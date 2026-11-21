@@ -29,9 +29,9 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Danish Meteorological Institute (DMI)",
+  terms: "DMI gives no warranty for its data.",
+  // The open-data team, named in DMI's terms of use (`license.url`).
   contact: { email: "friedata_kontakt@dmi.dk" },
-  terms:
-    "DMI's open data is licensed under CC BY 4.0: give appropriate credit, link to the license (https://creativecommons.org/licenses/by/4.0/) and indicate if changes were made. DMI says its observations are raw measurements that may be faulty, that its databases may change as errors are found, and that it gives no warranty. Changes in the store: levels converted from centimeters to meters, and quality flags added.",
   // Values arrive a minute or two after they're measured.
   hourly: true,
   // Hand checks stopped in 2013, so `auto` values stay as they are; a refetch would find nothing new.
@@ -177,7 +177,7 @@ export async function stations(previous: Station[] = []): Promise<DmiStation[]> 
       handedOver === null ? undefined : new Date(handedOver - DAY_MS).toISOString().slice(0, 10),
     ].filter((d): d is string => !!d);
     const recordEnd = ends.sort()[0] ?? null;
-    // A handover the stored list doesn't end at yet: hourly ingest may have stored
+    // A handover the stored list doesn't end at yet: the poller may have stored
     // the new owner's values since, which have to be deleted by hand. A station
     // the store has never listed has no values to delete but still counts toward
     // the floor; one stored inactive with no end isn't read hourly, so neither.
