@@ -8,6 +8,9 @@ pacing.dataMs = 0;
 pacing.blockedMs = 1;
 globalThis.fetch = (async (url: string | URL | Request) => {
   if (String(url).includes("/mdapi/")) return new Response("{}");
+  // The inventory answers a station it has no record of with a fault, and is not a data request.
+  if (String(url).includes("/datainventory/"))
+    return new Response("<soapenv:Fault><faultstring>No meta data available</faultstring></soapenv:Fault>");
   console.error(`fetch ${String(url)}`);
   return new Response("Forbidden", { status: 403 });
 }) as typeof fetch;

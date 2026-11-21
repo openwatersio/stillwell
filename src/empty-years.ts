@@ -5,12 +5,13 @@
  * empty answer can't block its refill.
  *
  * Such a year writes no file, so without a record each run of a campaign asks
- * for it again before reaching new stations: CO-OPS lists Alameda from 1939
- * but serves nothing before 1985, which costs every run about 25 seconds a
- * year, and most of a run across the first stations. Only a source whose
- * metadata sets `empty_means_none` or `skip_empty` keeps a record
- * (`keepsEmptyYears`), and an entry still lasts only `EMPTY_KEEP_DAYS`, so a
- * later campaign asks again. Only `--skip-written` reads the record; a plain or refetching
+ * for it again before reaching new stations: a source that serves nothing
+ * for a station before some year, within the dates it lists, costs every run
+ * a request a month for each of those years, and most of a run across the
+ * first stations. Only a source whose metadata sets `empty_means_none` or
+ * `skip_empty` keeps a record (`keepsEmptyYears`), and an entry still lasts
+ * only `EMPTY_KEEP_DAYS`, so a later campaign asks again. Only
+ * `--skip-written` reads the record; a plain or refetching
  * backfill asks for every year as before.
  */
 import type { SourceMetadata } from "./schema.ts";
