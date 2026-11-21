@@ -6,6 +6,7 @@ import { crc32, deflateRawSync } from "node:zlib";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import { firstEpochs, nextEpochs } from "../src/epochs.ts";
+import { IDS } from "../src/migrations/20261120-linz-errata-spans.ts";
 import * as linz from "../src/sources/linz/index.ts";
 
 const fixture = (name: string) =>
@@ -1152,5 +1153,15 @@ describe("linz Antarctic files in a layout it doesn't know", () => {
     assert.deepEqual(await linz.levels("ROBT", ...span), []);
     serve(route("not,a,layout"));
     await assert.rejects(linz.levels("ROBT", ...span), /none of a layout this reads/);
+  });
+});
+
+describe("linz errata migration", () => {
+  it("checks errata that exist and have a check", () => {
+    for (const id of IDS)
+      assert.ok(
+        linzErrata.errata.some((e) => e.id === id && e.check),
+        `${id} isn't a LINZ erratum with a check`,
+      );
   });
 });
