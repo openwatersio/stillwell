@@ -75,6 +75,17 @@ interface ApiDatums {
 }
 
 /**
+ * Why a station is withheld from the store, or null. CO-OPS lists "GPS Buoy,
+ * San Francisco Bay" with its water levels, but its values are not levels
+ * above STND (erratum `coops-gps-buoy-9414796`).
+ */
+export function withheld(sourceId: string): string | null {
+  return sourceId === "9414796"
+    ? "a GPS buoy, whose values are probably not levels above STND"
+    : null;
+}
+
+/**
  * Every station with water levels, current or historical. Stations on the
  * current network are live; the rest are listed for their history.
  */
@@ -100,6 +111,7 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
   const listed = new Map(all.stations.map((s) => [s.id, s]));
   // A few current stations aren't on the historical list yet.
   for (const s of current.stations) if (!listed.has(s.id)) listed.set(s.id, s);
+  for (const id of [...listed.keys()]) if (withheld(id)) listed.delete(id);
   const stations: CoopsStation[] = [];
   const failed: string[] = [];
   let inARow = 0;
@@ -667,6 +679,8 @@ function sleep(ms: number): Promise<void> {
 
 /** Every request is in STND, so a station committed in any other datum is refused. */
 function checked(station: Station): string {
+  const why = withheld(station.source_id);
+  if (why) throw new Error(`CO-OPS ${station.source_id} is withheld: ${why}`);
   if (station.datum !== DATUM)
     throw new Error(`${station.id} is in ${station.datum}; CO-OPS levels come in ${DATUM}`);
   return station.source_id;
@@ -675,6 +689,7 @@ function checked(station: Station): string {
 export const source: Source = {
   metadata,
   stations,
+  withheld,
   observations: (s: Station, start, end) => levels(checked(s), start, end, s as CoopsStation),
   extremes: (s: Station, start, end) => extremes(checked(s), start, end, s as CoopsStation),
 };
