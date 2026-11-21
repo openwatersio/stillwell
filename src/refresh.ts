@@ -381,10 +381,11 @@ async function linkedStations(
       const step = analysis.get(s.id)?.step_s;
       if (s.interval_s === null && step != null) steps.set(s.id, step);
     }
-    // Only a tie-breaker in `rank`, so a years file that can't be read doesn't stop publishing.
+    // A years file that can't be read doesn't stop publishing. Its stations count as having a
+    // record, whole, so `rank` never demotes one for a read that failed.
     const shares = await usableShares(store, source.metadata.id).catch((error: unknown) => {
       console.warn(`${source.metadata.id}: ranking without the years file: ${String(error)}`);
-      return new Map<string, number>();
+      return new Map(kept.map((s) => [s.id, 1] as const));
     });
     for (const [id, share] of shares) usable.set(id, share);
   }

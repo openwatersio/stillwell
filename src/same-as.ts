@@ -57,7 +57,7 @@ export const LINKS: Decision[] = [
   {
     a: "bodc/ptb",
     b: "ea/E72624",
-    note: "The National Tide Gauge Network's Portbury gauge, which the EA names Avonmouth Portbury and places 2 km east; its other listing of the gauge, E72623, is 70 m from BODC's position. Both are in chart datum with a mean level about 7.4 m. BODC flags its whole record improbable, so its record counts as empty in `rank` and the EA's series is preferred: since November 2026 the mAOD series E72639, which names E72624 as its twin and joins the group.",
+    note: "The National Tide Gauge Network's Portbury gauge, which the EA names Avonmouth Portbury and places 2 km east; its other listing of the gauge, E72623, is 70 m from BODC's position. Both are in chart datum with a mean level about 7.4 m. BODC flags its whole record improbable, so its record counts as zero length in `rank` and the EA's series is preferred: since November 2026 the mAOD series E72639, which names E72624 as its twin and joins the group.",
   },
   {
     a: "gesla/rostocktg-ros-deu-cmems",
@@ -515,8 +515,10 @@ function pairKey(a: string, b: string): string {
 
 /**
  * Negative when `a` is the better series for the gauge's observed levels: a
- * choice in `PREFER`; one with levels; one whose terms allow commercial use, so
- * the API can serve it before tokens exist; one not from an assembled
+ * choice in `PREFER`; one with levels; one with a record in the store, from the
+ * bounds' `first` and `last` or a row in the years file (`usable`), so a station
+ * that lists levels but holds none never outranks one that does; one whose
+ * terms allow commercial use, so the API can serve it before tokens exist; one not from an assembled
  * collection (`ASSEMBLED`), which is the fallback; one still reporting; the
  * originator's over a copy (a redistributor's, or one of `copies`, the
  * group's `COPIES` stations); the longer record in the store, its span from `first` to
@@ -533,6 +535,10 @@ export function rank(
 ): number {
   const copy = (s: Station) => redistributed(s) || copies.has(s.id);
   const levels = (s: Station) => s.products.includes("levels");
+  // The bounds lag a first backfill until compaction, which the years file doesn't.
+  const stored = (s: Station) =>
+    (Number.isFinite(Date.parse(s.first ?? "")) && Number.isFinite(Date.parse(s.last ?? ""))) ||
+    usable.has(s.id);
   const reporting = (s: Station) =>
     s.status === "active" && s.last !== null && now.getTime() - Date.parse(s.last) < REPORTING_MS;
   const span = (s: Station) => {
@@ -542,6 +548,7 @@ export function rank(
   const tests: [boolean | number, boolean | number][] = [
     [a.id in PREFER, b.id in PREFER],
     [levels(a), levels(b)],
+    [stored(a), stored(b)],
     [a.commercial_use, b.commercial_use],
     [!ASSEMBLED.has(a.source), !ASSEMBLED.has(b.source)],
     [reporting(a), reporting(b)],

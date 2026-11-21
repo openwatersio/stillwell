@@ -798,9 +798,56 @@ describe("rank", () => {
     );
     // Even over a live series: the API serves only commercial terms until tokens exist.
     assert.equal(
-      best(station("dmi/1", { commercial_use: false, ...live }), station("uhslc/837a")),
+      best(station("dmi/1", { commercial_use: false, ...live }), station("uhslc/837a", live)),
       "uhslc/837a",
     );
+  });
+
+  it("prefers a series with a record in the store over one with none", () => {
+    // Both list levels; the originator, the finer interval and the ID favor the
+    // empty one, and only the GESLA record holds values, so it wins.
+    const empty = station("dwr/B95580", { status: "inactive", interval_s: 900 });
+    const copy = station("gesla/b95580", live);
+    assert.equal(best(empty, copy), "gesla/b95580");
+    assert.equal(best(copy, empty), "gesla/b95580");
+    // Even a copy whose terms bar commercial use, since it's the one with values.
+    assert.equal(
+      best(empty, station("gesla/b95580", { commercial_use: false, ...live })),
+      "gesla/b95580",
+    );
+    // A choice in `PREFER` still comes first.
+    PREFER["uhslc/071"] = "test";
+    try {
+      assert.equal(
+        best(station("uhslc/071", { status: "inactive" }), station("linz/x", live)),
+        "uhslc/071",
+      );
+    } finally {
+      delete PREFER["uhslc/071"];
+    }
+    // A row in the years file counts as a record while the bounds lag a first backfill.
+    assert.equal(
+      rank(
+        empty,
+        station("gesla/b95580", { commercial_use: false }),
+        NOW,
+        new Set(),
+        new Map([["dwr/B95580", 1]]),
+      ) < 0,
+      true,
+    );
+    // Two with none fall through to the later tests.
+    assert.equal(best(station("rws/b"), empty), "dwr/B95580");
+    const group = linkGauges([
+      station("coops/9415105", {
+        status: "inactive",
+        interval_s: null,
+        products: ["levels", "extremes"],
+      }),
+      { ...empty, same_as: ["coops/9415105", "gesla/b95580"] },
+      { ...copy, same_as: ["coops/9415105", "dwr/B95580"] },
+    ]).stations;
+    for (const s of group) assert.equal(s.preferred, "gesla/b95580");
   });
 
   it("then one still reporting", () => {
