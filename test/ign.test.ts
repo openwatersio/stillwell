@@ -68,26 +68,17 @@ describe("IGN", () => {
     assert.equal(rows[0]!.time, Date.UTC(2000, 0, 2));
     assert.ok(
       rows.every(
-        (r) => Number.isFinite(r.level) && r.flag === Flag.suspect && r.source_flag === Flag.good,
+        (r) => Number.isFinite(r.level) && r.flag === Flag.good && r.source_flag === Flag.good,
       ),
     );
   });
 
-  it("ties stored clock requalification to exactly the admitted interval", () => {
-    const expected = [Date.UTC(2000, 0, 1), Date.UTC(2024, 0, 1)];
-    assert.deepEqual(ign.CORUNA_PERIOD, expected);
-    const covered = spans({ id: "ign/ACOR1" }, errata);
-    assert.deepEqual(covered, [ign.CORUNA_PERIOD]);
-    const rows = [expected[0]! - 1, expected[0]!, expected[1]! - 1, expected[1]!].map((time) => ({
-      time,
-      level: -4,
-      flag: Flag.suspect,
-      source_flag: Flag.good,
-    }));
-    assert.deepEqual(
-      fromSource(rows, covered).map((r) => r.flag),
-      [Flag.good, Flag.suspect, Flag.suspect, Flag.good],
-    );
+  it("keeps the Coruña clock erratum as a note, flagging no span", () => {
+    assert.deepEqual(ign.CORUNA_PERIOD, [Date.UTC(2000, 0, 1), Date.UTC(2024, 0, 1)]);
+    const clock = errata.find((e) => e.id === "ign-coruna-clock")!;
+    assert.equal(clock.handling, "kept");
+    assert.deepEqual([clock.since, clock.until], ["2000-01-01", "2024-01-01"]);
+    assert.deepEqual(spans({ id: "ign/ACOR1" }, errata), []);
   });
 
   it("credits source-only metadata with the known product period without inventing stored bounds", () => {
@@ -137,13 +128,13 @@ describe("IGN", () => {
       new Date("2025-01-01Z"),
     );
     assert.equal(rows.length, 210384);
-    assert.ok(rows.every((r) => r.flag === Flag.suspect && r.source_flag === Flag.good));
+    assert.ok(rows.every((r) => r.flag === Flag.good && r.source_flag === Flag.good));
     assert.equal(rows[0]!.time, Date.UTC(2000, 0, 1));
     assert.equal(rows.at(-1)!.time, Date.UTC(2023, 11, 31, 23));
     assert.ok(
       (
         await ign.source.observations!(station, new Date("2000-01-01Z"), new Date("2000-01-02Z"))
-      ).every((r) => r.flag === Flag.suspect),
+      ).every((r) => r.flag === Flag.good),
     );
     await assert.rejects(
       () =>
@@ -197,7 +188,7 @@ describe("IGN", () => {
     const rows = await ign.corunaHourly(new Date("2001-01-01Z"), new Date("2001-01-02Z"));
     assert.equal(rows.length, 24);
     assert.equal(rows[0]!.level, -4.1);
-    assert.equal(rows[0]!.flag, Flag.suspect);
+    assert.equal(rows[0]!.flag, Flag.good);
     serve({
       "ACOR1/procesados/horarios/200031_horarios_2000_JM.txt": hourlyYear(2000).replace(
         "NP-615",
@@ -277,7 +268,7 @@ describe("IGN", () => {
     assert.equal(marker.flag, Flag.bad);
     assert.equal(marker.source_flag, Flag.bad);
     assert.ok(Number.isNaN(marker.level));
-    const prior = { time: marker.time, level: -4.1, flag: Flag.suspect, source_flag: Flag.good };
+    const prior = { time: marker.time, level: -4.1, flag: Flag.good, source_flag: Flag.good };
     const merged = judgeFetched(
       [prior],
       [marker],

@@ -84,7 +84,7 @@ export default {
     { ingest: "compact ign --rebuild-bounds" },
     {
       check:
-        "ign/ACOR1 has 24 year files, 2000 to 2023, whose every time and level is the validated one, each time in its own year, every quality flag at least suspect and every source flag good",
+        "ign/ACOR1 has 24 year files, 2000 to 2023, whose every time and level is the validated one, each time in its own year and every source flag good",
       async verify(store) {
         const years = await listYears(seriesDir(store, "levels", "ign", "ACOR1"));
         const held = [...years].sort((a, b) => a - b);
@@ -99,7 +99,6 @@ export default {
             const at = new Date(o.time).toISOString();
             if (new Date(o.time).getUTCFullYear() !== year)
               throw new Error(`${ID} ${year}: a level at ${at}`);
-            if (o.flag < Flag.suspect) throw new Error(`${ID} ${year}: flag ${o.flag} at ${at}`);
             if (o.source_flag !== Flag.good)
               throw new Error(`${ID} ${year}: source flag ${o.source_flag} at ${at}`);
             digest.update(`${o.time},${o.level}\n`);
@@ -115,7 +114,7 @@ export default {
     { ingest: `requalify ign ACOR1 ${FIRST_YEAR} 2025` },
     {
       check:
-        "IGN's years file holds the 24 year files of ign/ACOR1, and requalifying kept every quality flag at least suspect",
+        "IGN's years file holds the 24 year files of ign/ACOR1, and at least 99% of its levels are good after requalifying",
       async verify(store) {
         const rows = await readRows(yearsPath(store, "ign"));
         const files = rows.filter((r) => r.year !== null);
@@ -125,9 +124,13 @@ export default {
           throw new Error(
             `IGN's years file holds ${files.length} files, not ${YEARS.length} of ${ID}`,
           );
-        for (const [year, observations] of await readAll(store))
-          if (observations.some((o) => o.flag < Flag.suspect))
-            throw new Error(`${ID} ${year}: a level below suspect after requalifying`);
+        let good = 0;
+        let total = 0;
+        for (const [, observations] of await readAll(store)) {
+          total += observations.length;
+          good += observations.filter((o) => o.flag === Flag.good).length;
+        }
+        if (good < total * 0.99) throw new Error(`only ${good} of ${total} ${ID} levels are good`);
       },
     },
     {

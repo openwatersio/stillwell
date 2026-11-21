@@ -31,7 +31,7 @@ export const metadata: SourceMetadata = {
   attribution: `Obra derivada de Red de Mareógrafos, Coruña horarios ${productYears} CC-BY 4.0 ign.es; Área de Geodesia, Instituto Geográfico Nacional (IGN)`,
   contact: { email: "ign@transportes.gob.es", url: "https://www.ign.es/web/gds-red-mareografos" },
   terms:
-    "IGN confirmed on 2026-11-17 that its tide-gauge series are CC BY 4.0 under Orden FOM/2807/2015, including commercial use and redistribution. Cite Área de Geodesia, IGN and use the product and data date in IGN's attribution formula: <product> <date> CC-BY 4.0 ign.es; prefix derived products with Obra derivada de. See https://github.com/openwatersio/stillwell/issues/181#issuecomment-6945552785. The public release contains only Coruña reviewed hourly JM observations from 2000 through 2023, converted from millimeters to meters. Historical clock labels are unconfirmed and every released observation is suspect. Other series, products and periods are withheld pending issue #181.",
+    "IGN confirmed on 2026-11-17 that its tide-gauge series are CC BY 4.0 under Orden FOM/2807/2015, including commercial use and redistribution. Cite Área de Geodesia, IGN and use the product and data date in IGN's attribution formula: <product> <date> CC-BY 4.0 ign.es; prefix derived products with Obra derivada de. See https://github.com/openwatersio/stillwell/issues/181#issuecomment-6945552785. The public release contains only Coruña reviewed hourly JM observations from 2000 through 2023, converted from millimeters to meters. IGN hasn't confirmed the historical clock convention; the labels are stored as UTC, and a clock check against other originators' records of the gauge agrees for every year. Other series, products and periods are withheld pending issue #181.",
   archive: "current",
   hourly: false,
   finalizes: false,
@@ -453,7 +453,7 @@ export async function corunaHourly(start: Date, end: Date, datum = "JM"): Promis
         out.set(row.time, {
           ...value,
           source_flag: value.flag,
-          flag: Math.max(value.flag, Flag.suspect) as Flag,
+          flag: value.flag,
         });
       }
   }

@@ -1,8 +1,21 @@
-import { flaggedSpan, type ErrataFile, type StoreReader } from "../../errata.ts";
+import { type ErrataFile, type StoreReader } from "../../errata.ts";
 import { Flag } from "../../schema.ts";
 
 /** Coruña's levels over the admitted interval, read once per check. */
 const held = (store: StoreReader) => store.levels("ign/ACOR1", "2000-01-01", "2024-01-01");
+
+/** Pearson's r of two equal-length series. */
+function correlation(a: number[], b: number[]): number {
+  const mean = (v: number[]) => v.reduce((s, x) => s + x, 0) / v.length;
+  const [ma, mb] = [mean(a), mean(b)];
+  let [ab, aa, bb] = [0, 0, 0];
+  for (let i = 0; i < a.length; i++) {
+    ab += (a[i]! - ma) * (b[i]! - mb);
+    aa += (a[i]! - ma) ** 2;
+    bb += (b[i]! - mb) ** 2;
+  }
+  return ab / Math.sqrt(aa * bb);
+}
 
 /** Throws unless the store lists the admitted series and holds levels for it. */
 async function listed(store: StoreReader) {
@@ -122,19 +135,51 @@ export default {
       stations: ["ign/ACOR1"],
       since: "2000-01-01",
       until: "2024-01-01",
-      handling: "flagged",
+      handling: "kept",
       error:
-        "IGN has not confirmed the historical time convention of the published hourly labels. Independent tidal agreement does not establish an agency UTC convention.",
+        "IGN hasn't confirmed the time convention of its historical hourly labels. Its server README says reviewed processing corrects temporal phase, and neither it nor IGN's 17 November reply names UTC.",
       response:
-        "Keep the maintainer-approved Coruña hourly 2000–2023 subset with every observation suspect. Preserve the reviewed source flag separately. Interpret labels provisionally as UTC for storage; do not apply inferred shifts or promote these rows to good during QC/requalification.",
+        "The labels are stored as UTC, with no shift, and the values keep the flags QC and IGN's reviewed source flag give them. The record agrees with other originators' records of the gauge in every year, so it is kept; a change in that agreement shows in this entry's check.",
       evidence:
-        "All 24 reviewed Coruña hourly years 2000–2023 were compared in full against an independent IEO-origin reference: zero-lag correlation 0.98686–0.99501, best lag −10 to +10 minutes, K1 −4.87 to +15.90 minutes. IGN Leeme.txt and the 17 November reply do not establish historical UTC; see https://github.com/openwatersio/stillwell/issues/181 and docs/results/ign-validation-2026-11-17.md. Maintainer accepted the suspect subset on 18 November 2026.",
-      check: async (store, e) => {
+        "Each of the 24 years, 2000 to 2023, was cross-correlated with the TICON constants of IEO's Coruña gauge 0.7 km away, UHSLC's La Coruña and CMEMS's Coruna2TG, at lags of up to 3 hours: best lag 0 minutes in 57 of the 72 fits and ±10 minutes in the rest, K1 phase −9 to +16 minutes, zero-lag correlation 0.987 to 0.995. A whole-hour or seasonal shift would show as a lag of an hour or more. IEO's gauge is the independent reference: the CMEMS copy may be IGN's own data, and UHSLC's may come from IEO. See docs/results/ign-coruna-clock-check-2026-11-21.md.",
+      check: async (store) => {
         await listed(store);
-        await flaggedSpan(store, e);
-        for (const row of await held(store))
-          if (row.flag < Flag.suspect)
-            throw new Error(`ign/ACOR1 holds a level flagged below suspect at ${row.time}`);
+        // The CMEMS copy of the gauge, hourly from November 2019: its levels fit IGN's at zero lag, not an hour either way.
+        const fit = async (lag: number) => {
+          const copy = await store.levels(
+            "gesla/coruna2tg-cor-esp-cmems",
+            "2020-01-01",
+            "2021-01-01",
+          );
+          if (!copy.length) throw new Error("the store holds no CMEMS Coruña levels in 2020");
+          const ign = new Map(
+            (await store.levels("ign/ACOR1", "2019-12-31", "2021-01-02")).map((o) => [
+              o.time,
+              o.level,
+            ]),
+          );
+          const a: number[] = [];
+          const b: number[] = [];
+          for (const o of copy) {
+            const w = ign.get(o.time - lag * 60_000);
+            if (w !== undefined) {
+              a.push(o.level);
+              b.push(w);
+            }
+          }
+          if (a.length < 5000)
+            throw new Error(`only ${a.length} hours of 2020 are in both records`);
+          return correlation(a, b);
+        };
+        const [early, now, late] = [await fit(-60), await fit(0), await fit(60)];
+        if (now < 0.98 || now - Math.max(early, late) < 0.05)
+          throw new Error(
+            `ign/ACOR1 fits the CMEMS copy at r ${now.toFixed(3)}, against ${early.toFixed(3)} an hour early and ${late.toFixed(3)} an hour late`,
+          );
+        const levels = await held(store);
+        const good = levels.filter((o) => o.flag === Flag.good).length;
+        if (good < levels.length * 0.99)
+          throw new Error(`only ${good} of ${levels.length} ign/ACOR1 levels are good`);
       },
     },
     {
