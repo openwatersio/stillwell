@@ -1,6 +1,6 @@
 /**
- * Stations withheld from the store because their owner refused republication
- * (`Source.withheld`). A refresh drops them from the source's list and their
+ * Stations withheld from the store, because their owner refused republication
+ * or their values aren't water levels (`Source.withheld`). A refresh drops them from the source's list and their
  * rows from its bounds, years, daily files, empty-years record, backfilled years, requalify list and analysis, and publishing
  * leaves them out of stations.parquet. `ingest withhold <source>` deletes
  * their series files, and their rows, from a store that still holds them.

@@ -4,6 +4,28 @@ import { Flag } from "../../schema.ts";
 export default {
   errata: [
     {
+      id: "coops-gps-buoy-9414796",
+      stations: ["coops/9414796"],
+      handling: "avoided",
+      error:
+        'CO-OPS lists "GPS Buoy, San Francisco Bay" (9414796) among its water-level stations, but its station details answer 404 and its data is not a level above STND. Of the weeks in March of 1996, 2000, 2010, 2020 and 2025, only 2000 answers values, 6-minute values from −32.088 to −31.672 m; the others answer "No data was found". The reference of those values is not confirmed; −32 m is about the geoid height in San Francisco Bay, so they are probably heights above the ellipsoid.',
+      response:
+        "The station is withheld: the adapter never lists or fetches it, a refresh drops it from the store's list, and `withhold` deletes any files. A backfill no longer fails every year of both products looking its details up.",
+      evidence:
+        "Requests of 2026-11-21: `details.json` answers 404 while `stations/9414796.json` answers 200; `water_level` for 9414796 in the first week of March 1996, 2000, 2010, 2020 and 2025 answers values only in 2000. Only those five weeks were asked for, so other years may hold data.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        // A list that doesn't read at all would pass for one without the buoy.
+        if (!(await store.station("coops/9447130")))
+          throw new Error("the store doesn't list CO-OPS");
+        if (await store.station(id)) throw new Error(`the store lists ${id}`);
+        const rows = await store.rows("stations.parquet");
+        if (!rows.some((r) => String(r.id).startsWith("coops/")))
+          throw new Error("stations.parquet lists no CO-OPS station");
+        if (rows.some((r) => r.id === id)) throw new Error(`stations.parquet lists ${id}`);
+      },
+    },
+    {
       id: "coops-boston-light-2001-offset",
       stations: ["coops/8444162"],
       since: "2001-03-06",

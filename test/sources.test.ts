@@ -1672,6 +1672,33 @@ describe("coops", () => {
     });
   });
 
+  it("leaves the GPS buoy out of the list without asking for its datums", async () => {
+    const buoy = station({ id: "9414796", name: "GPS Buoy, San Francisco Bay" });
+    serve([
+      [/type=historicwl/, JSON.stringify({ stations: [station({}), buoy] })],
+      [/type=waterlevels/, JSON.stringify({ stations: [station({}), buoy] })],
+      [/9447130\/datums/, JSON.stringify({ datums: null, LAT: null })],
+    ]);
+    assert.deepEqual(
+      (await coops.stations()).map((s) => s.id),
+      ["coops/9447130"],
+    );
+  });
+
+  it("refuses to fetch the withheld GPS buoy", async () => {
+    assert.match(coops.withheld("9414796")!, /GPS buoy/);
+    assert.equal(coops.withheld("9447130"), null);
+    await assert.rejects(
+      async () =>
+        coops.source.observations!(
+          { source_id: "9414796", datum: "STND" } as Station,
+          new Date("2000-01-01T00:00:00Z"),
+          new Date("2000-02-01T00:00:00Z"),
+        ),
+      /9414796 is withheld/,
+    );
+  });
+
   it("refuses a historical list under half the stored one", async () => {
     serve([
       [/type=historicwl/, JSON.stringify({ stations: [station({})] })],

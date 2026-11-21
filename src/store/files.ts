@@ -270,7 +270,7 @@ const STATION_COLUMNS: Column[] = [
     name: "status",
     type: "VARCHAR",
     description:
-      "`active` or `inactive`. A station the source stops listing, lists as ended (such as a CO-OPS station with a `removed` date), or that has stopped reporting by its source's own test (as at DWR, JODC, CDEC, SFWMD, JMA and SMHI), stays in the store, inactive, with its history, so its ID is never reused; so does a record set aside as another gauge's, such as GESLA's Uddevalla. A station withheld at its owner's request is removed entirely.",
+      "`active` or `inactive`. A station the source stops listing, lists as ended (such as a CO-OPS station with a `removed` date), or that has stopped reporting by its source's own test (as at DWR, JODC, CDEC, SFWMD, JMA and SMHI), stays in the store, inactive, with its history, so its ID is never reused; so does a record set aside as another gauge's, such as GESLA's Uddevalla. A station withheld, at its owner's request or because its values aren't water levels, is removed entirely.",
   },
   {
     name: "live",
