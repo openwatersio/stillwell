@@ -299,3 +299,18 @@ export async function dropYears(
   );
   return [...new Set(gone.map((r) => r.id))];
 }
+
+/** Drop the rows of the year files `files` names, which a run has deleted; returns how many rows it dropped. */
+export async function dropYearFiles(
+  store: string,
+  source: string,
+  files: { id: string; epoch: number; year: number }[],
+): Promise<number> {
+  const rows = await readYears(store, source);
+  if (!rows) return 0;
+  const gone = files.map(key).filter((k) => rows.has(k));
+  if (!gone.length) return 0;
+  for (const k of gone) rows.delete(k);
+  await writeYears(store, source, [...rows.values()]);
+  return gone.length;
+}

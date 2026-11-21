@@ -13,6 +13,7 @@ const ARITY: Record<string, number> = {
   withhold: 1,
   drop: 1,
   misplaced: 1,
+  "delete-years": 4,
   years: 1,
   analyze: 1,
   stations: 1,
