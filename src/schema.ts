@@ -98,7 +98,7 @@ export interface Station {
    * `stations.parquet` is built, never by an adapter.
    */
   preferred?: string;
-  /** The IDs of the errata, from `src/sources/<source>/errata.ts`, that affect the station. Set as `stations.parquet` is built. */
+  /** The IDs of the errata that affect the station: its source's, from `src/sources/<source>/errata.ts`, and those listing it as a copy. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
   /** Whether ingest asks for this station's current values: the poller. */

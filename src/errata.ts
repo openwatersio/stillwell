@@ -40,7 +40,9 @@ export interface Erratum {
   /**
    * Store station IDs known to be affected; null for every station of the
    * source. Partial or empty where the source doesn't say which stations, or
-   * they aren't in the store; `error` says which.
+   * they aren't in the store; `error` says which. Other sources' records that
+   * copy the source's values, such as GESLA's copy of a gauge, are listed here
+   * too, so one erratum covers every record that carries the error.
    */
   stations: string[] | null;
   /**
@@ -260,7 +262,10 @@ export function parseErrata(
       throw new Error(`${at}: "stations" is neither a list nor "every station"`);
     const stations = listed === "every station" ? null : (listed as string[]);
     for (const s of stations ?? [])
-      if (!s.startsWith(`${source}/`)) throw new Error(`${at}: station ${s} isn't ${source}'s`);
+      if (!/^[a-z0-9-]+\/./.test(s)) throw new Error(`${at}: station ${s} isn't <source>/<id>`);
+    // Another source's record is listed only beside the original it copies.
+    if (stations?.length && !stations.some((s) => s.startsWith(`${source}/`)))
+      throw new Error(`${at}: lists none of ${source}'s stations`);
     const [since, until] = [day("since"), day("until")];
     if (since && until && since >= until) throw new Error(`${at}: "since" isn't before "until"`);
     if (raw.check !== undefined && typeof raw.check !== "function")
@@ -290,12 +295,15 @@ export function parseErrata(
  * Every source's errata, from each one's `errata.ts`, by source ID, and what
  * is wrong with them: a file whose entries break the rules is left out whole,
  * and an ID two entries share or one retired anywhere leaves out the later
- * entry. The registry reads them as it loads, so such a file must cost only
+ * entry, as does one listing a station of a source not in `known`. The registry reads them as it loads, so such a file must cost only
  * its own errata, not every job; the tests and `publish` fail on the problems.
  * A file that doesn't load fails the registry's import, which the type check
  * and the tests catch before it merges.
  */
-export function readErrata(files: Record<string, unknown>): {
+export function readErrata(
+  files: Record<string, unknown>,
+  known: string[] = Object.keys(files),
+): {
   errata: Erratum[];
   problems: string[];
 } {
@@ -315,8 +323,14 @@ export function readErrata(files: Record<string, unknown>): {
     .filter((e) => {
       const problem = seen.has(e.id) ? "used twice" : retired.has(e.id) ? "retired" : null;
       if (problem) problems.push(`erratum ID ${e.id} is ${problem}`);
+      // A copy's station is checked here, where every source is known: one of no source would flag nothing.
+      const stranger = (e.stations ?? []).find(
+        (id) => !known.includes(id.slice(0, id.indexOf("/"))),
+      );
+      if (stranger)
+        problems.push(`erratum ${e.id} lists ${stranger}, a station of no registered source`);
       seen.add(e.id);
-      return !problem;
+      return !problem && !stranger;
     });
   return { errata, problems };
 }
@@ -347,7 +361,7 @@ export function spans(station: { id: string }, errata: Erratum[]): [number, numb
  * flag as `source_flag`.
  */
 export function withErrata(source: Source, errata: Erratum[]): Source {
-  const own = errata.filter((e) => e.source === source.metadata.id);
+  const own = errata.filter((e) => covers(e, source.metadata.id));
   if (!own.some((e) => e.handling === "flagged")) return source;
   const mark = (station: { id: string }, rows: Observation[]): Observation[] => {
     const marked = spans(station, own);
@@ -402,6 +416,11 @@ export function published(errata: Erratum[]): object[] {
 /** The IDs of the errata that affect a station. */
 export function errataOf(station: { id: string; source: string }, errata: Erratum[]): string[] {
   return errata
-    .filter((e) => e.source === station.source && (!e.stations || e.stations.includes(station.id)))
+    .filter((e) => (e.stations ? e.stations.includes(station.id) : e.source === station.source))
     .map((e) => e.id);
+}
+
+/** Whether `e` is `source`'s, or lists one of its stations as a copy. */
+export function covers(e: Erratum, source: string): boolean {
+  return e.source === source || (e.stations ?? []).some((s) => s.startsWith(`${source}/`));
 }

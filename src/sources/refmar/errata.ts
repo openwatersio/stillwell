@@ -70,7 +70,12 @@ export default {
   errata: [
     {
       id: "refmar-pointe-a-pitre-clock",
-      stations: ["refmar/125"],
+      stations: [
+        "refmar/125",
+        "cmems/PointeAPitreTG",
+        "gesla/pointe_a_pitre-125-fra-refmar",
+        "gesla/pointeapitretg_60minute-poi-fra-cmems",
+      ],
       since: "2020-01-01",
       until: "2025-01-01",
       handling: "flagged",
@@ -78,7 +83,7 @@ export default {
         "SHOM's Pointe-à-Pitre levels run 60 to 70 minutes late in 2023 against UHSLC's, CMEMS's and REFMAR's own TICON records, and hardly fit at all in 2020 and 2024, with no steady offset; 2025 fits again.",
       response: "2020 to 2024 is flagged `suspect`, keeping SHOM's own flag as `source_flag`.",
       evidence:
-        "`scripts/clock-check.ts`, November 2026: within 10 minutes of UHSLC's record in 2015, 2018, 2021, 2022 and 2025; 60 to 70 minutes late in 2023 against UHSLC's, CMEMS's and REFMAR's own TICON records; r 0.36 in 2020 and 0.15 in 2024.",
+        "`scripts/clock-check.ts`, November 2026: within 10 minutes of UHSLC's record in 2015, 2018, 2021, 2022 and 2025; 60 to 70 minutes late in 2023 against UHSLC's, CMEMS's and REFMAR's own TICON records; r 0.36 in 2020 and 0.15 in 2024. `npm run errata:copies` found the copies `cmems/PointeAPitreTG` and `gesla/pointe_a_pitre-125-fra-refmar` and `gesla/pointeapitretg_60minute-poi-fra-cmems` equal to the record inside the span to 0.4 cm RMS, with their datums lined up on the 7 days either side, over 150 of its 1,827 days, in 5 pieces spread over it (November 2026), so they carry the error too.",
       reported: "2026-11-06",
       report:
         "Sent to refmar@shom.fr on 2026-11-06, in French, with the yearly results above. No answer yet.",
