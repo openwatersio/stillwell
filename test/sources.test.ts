@@ -3632,12 +3632,24 @@ describe("usgs", () => {
           series("02035000", "00065"),
           series("422340071043201", "00065"),
           series("02037500", "00065"),
+          // A site whose only series has no begin or end has no values; one with a dated series besides keeps its site.
+          series("02130700", "00065", { begin: null, end: null }),
+          series("02130800", "00065", { begin: null, end: null }),
           series("09469000", "00065"),
           series("08000001", "00065"),
           series("08000002", "00065"),
         ]),
       ],
-      [/parameter_code=62620/, collection([series("0158540095", "62620")])],
+      [
+        /parameter_code=62620/,
+        collection([
+          series("0158540095", "62620"),
+          series("02130800", "62620", {
+            begin: "1990-01-01T00:00:00+00:00",
+            end: "2001-01-01T00:00:00+00:00",
+          }),
+        ]),
+      ],
       [/parameter_code=63160/, collection([series("02198820", "63160")])],
       [/parameter_code=/, collection([series("02198820", "72279", { unit_of_measure: "m" })])],
       [
@@ -3702,6 +3714,8 @@ describe("usgs", () => {
           }),
           // An estimated method with the altitude missing still clears the stored offsets.
           location("02037500", -77.55, 37.56, { altitude_method_code: "N" }),
+          location("02130700", -80.1, 33.9, {}),
+          location("02130800", -80.2, 33.9, {}),
           // A decided site answering with no altitude is a gap, and keeps what the store holds.
           location("09469000", -110.5, 33.2, {}),
           // A surveyed altitude in a datum the store doesn't name gives no offsets, but clears none.
@@ -3737,6 +3751,8 @@ describe("usgs", () => {
         ["usgs/02035000", "river", "GAGE", {}, "02035000-00065", true, "US"],
         ["usgs/02037500", "river", "GAGE", {}, "02037500-00065", true, "US"],
         // Daily tidal highs and lows mark a stream as tidal.
+        // Its undated gage height is chosen, as before; the site stays listed for the dated series beside it, which is tidal-only, so an estuary.
+        ["usgs/02130800", "estuary", "GAGE", {}, "02130800-00065", false, "US"],
         ["usgs/02171645", "estuary", "GAGE", {}, "02171645-00065", true, "PR"],
         // Gage height is preferred to an elevation series at the same site.
         ["usgs/02198820", "estuary", "GAGE", { NAVD88: 0 }, "02198820-00065", true, "US"],
@@ -3763,6 +3779,33 @@ describe("usgs", () => {
       ],
     );
     assert.equal(list.find((s) => s.id === "usgs/09469000")!.ground_m, 762.6);
+    // A station that was live and now has no dates in the reply is a reply that lost them, not a station without data.
+    await assert.rejects(
+      usgs.stations([{ id: "usgs/02130700", status: "active", live: true }] as never),
+      /no begin or end date for 1 series that had one, e\.g\. usgs\/02130700/,
+    );
+    // Stations already inactive with their old dates aren't a loss, and up to ten active ones lost are tolerated.
+    const stored = (id: string, fields: object) => ({
+      id,
+      status: "active",
+      live: false,
+      ...fields,
+    });
+    assert.ok(
+      await usgs.stations([
+        stored("usgs/02130700", { status: "inactive", series_begin: "2001-01-01T00:00:00+00:00" }),
+      ] as never),
+    );
+    assert.ok(
+      await usgs.stations([
+        stored("usgs/02130700", { series_begin: "2001-01-01T00:00:00+00:00" }),
+      ] as never),
+    );
+    // A site with no dated series isn't listed.
+    assert.equal(
+      list.some((s) => s.id === "usgs/02130700"),
+      false,
+    );
     // Only an unsurveyed altitude clears what the store holds; a site with none keeps it.
     assert.deepEqual(
       list.filter((s) => s.no_datums).map((s) => [s.id, s.ground_m]),
