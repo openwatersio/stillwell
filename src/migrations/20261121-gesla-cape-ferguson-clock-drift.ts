@@ -9,7 +9,6 @@ export default {
   description: "Flag GESLA's Cape Ferguson values from the years its clock ran late",
   steps: [
     { ingest: "requalify gesla cape_ferguson-h033007a-aus-bom 2019 2023" },
-    { ingest: "publish" },
     {
       check: "the erratum's span holds the record's levels flagged suspect",
       async verify(store) {
@@ -21,5 +20,6 @@ export default {
         );
       },
     },
+    { ingest: "publish" },
   ],
 } satisfies Migration;
