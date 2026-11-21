@@ -4,6 +4,26 @@ import { Flag } from "../../schema.ts";
 export default {
   errata: [
     {
+      id: "coops-inventory-omits-preliminary-before-1997",
+      stations: ["coops/1840000"],
+      since: "1994-11-01",
+      until: "1994-12-01",
+      handling: "avoided",
+      error:
+        "CO-OPS's data inventory for Chuuk, Moen Island (1840000) lists no 6-minute period at all, though the data API answers 7,200 preliminary 6-minute values for November 1994.",
+      response:
+        "A month before 1997 is asked for if its hourly or its 6-minute period covers it, and its hourly heights come with its 6-minute values, which they replace by erratum `coops-preliminary-offset-before-1997`. The month is requested through the hourly period, and the inventory's gap costs nothing.",
+      evidence:
+        "Requests of 2026-11-21: of 300 months outside every period the inventory lists for 20 stations (months next to a period excluded), this was the one with values. Only 20 stations were sampled, so other stations may omit preliminary periods too.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        const rows = await store.levels(id, "1994-11-01", "1994-12-01");
+        if (!rows.length) throw new Error(`the store holds no ${id} levels in November 1994`);
+        if (rows.some((o) => o.flag === Flag.preliminary))
+          throw new Error(`the store holds preliminary ${id} levels in November 1994`);
+      },
+    },
+    {
       id: "coops-gps-buoy-9414796",
       stations: ["coops/9414796"],
       handling: "avoided",

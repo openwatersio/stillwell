@@ -12,7 +12,9 @@ pacing.dataMs = 0;
 let requests = 0;
 globalThis.fetch = (async (url: string | URL | Request) => {
   if (String(url).includes("/mdapi/")) return new Response("{}");
-  if (String(url).includes("/datainventory/")) return new Response("<fault/>");
+  if (String(url).includes("/datainventory/")) return new Response(
+      "<soapenv:Fault><faultstring>No meta data available</faultstring></soapenv:Fault>",
+    );
   console.error(`fetch ${String(url)}`);
   if (++requests === Number(process.env.EXIT_AFTER)) process.exit(9);
   const begin = new URL(String(url)).searchParams.get("begin_date")!;

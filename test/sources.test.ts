@@ -41,7 +41,11 @@ import * as usgs from "../src/sources/usgs/index.ts";
  */
 function setTransport(next: Transport): void {
   setHttpTransport((url, options) =>
-    url.includes("/datainventory/") ? Promise.resolve("<fault/>") : next(url, options),
+    url.includes("/datainventory/")
+      ? Promise.resolve(
+          "<soapenv:Fault><faultstring>No meta data available</faultstring></soapenv:Fault>",
+        )
+      : next(url, options),
   );
 }
 
@@ -1872,6 +1876,8 @@ describe("coops", () => {
   });
 
   describe("data inventory", () => {
+    beforeEach(() => coops.resetPacing());
+
     const inventory = (...periods: [string, string, string][]) =>
       `<?xml version="1.0"?><soapenv:Envelope><DataInventory><station ID="1" name="x"><metadata/>${periods
         .map(([first, last, name]) => `<parameter first="${first}" last="${last}" name="${name}"/>`)
@@ -1952,7 +1958,9 @@ describe("coops", () => {
     });
 
     it("falls back to the station's dates when the inventory doesn't know it", async () => {
-      const asked = serveInventory("<soapenv:Fault>No meta data available</soapenv:Fault>");
+      const asked = serveInventory(
+        "<soapenv:Fault><faultstring>No meta data available</faultstring></soapenv:Fault>",
+      );
       await coops.levels("9990006", ...span("2010-01-01Z", "2010-03-01Z"), {
         established: "2010-02-01T00:00:00Z",
         removed: null,
@@ -1971,11 +1979,87 @@ describe("coops", () => {
       assert.equal(inventoried, 0);
     });
 
+    it("reads attributes in any order and a parameter of any name", async () => {
+      const asked = serveInventory(
+        `<DataInventory><station ID="1"><parameter name="Verified 6-Minute Water Level" type="v" last="2005-02-16 13:54" first="2005-01-04 11:00"/><parameter first="2005-01-04 11:00" last="2005-02-16 13:54" name="Wind"/></station></DataInventory>`,
+      );
+      await coops.levels("9990009", ...span("2004-12-01Z", "2005-04-01Z"));
+      assert.deepEqual(asked, ["water_level 200501", "water_level 200502"]);
+    });
+
+    it("uses the station's dates when the inventory is cut off, lists no parameters or names a water level it doesn't know", async () => {
+      for (const [id, body] of [
+        [
+          "9990010",
+          `<DataInventory><station ID="1"><parameter first="2005-01-01 00:00" last="2005-01-31 00:00" name="Verified 6-Minute Water Level"/>`,
+        ],
+        ["9990011", `<DataInventory><station ID="1"></station></DataInventory>`],
+        [
+          "9990019",
+          `<DataInventory><station ID="1"><parameter first="2005-01-01 00:00" last="2005-01-31 00:00" name="Water Level, 6-Minute"/></station></DataInventory>`,
+        ],
+      ] as const) {
+        const asked = serveInventory(body);
+        await coops.levels(id, ...span("2005-01-01Z", "2005-03-01Z"), {
+          established: "2005-02-01T00:00:00Z",
+          removed: null,
+        });
+        assert.deepEqual(asked, ["water_level 200502"]);
+      }
+    });
+
+    it("asks the inventory again after a failure, and stops after three in a row", async () => {
+      let inventoried = 0;
+      setHttpTransport(async (url) => {
+        if (url.includes("/datainventory/")) {
+          inventoried++;
+          throw new Error(`GET ${url} returned 500`);
+        }
+        return JSON.stringify({ data: [] });
+      });
+      const station = { established: "2005-01-01T00:00:00Z", removed: null };
+      for (const id of ["9990012", "9990012", "9990013", "9990014", "9990015"])
+        await coops.levels(id, ...span("2005-01-01Z", "2005-02-01Z"), station);
+      assert.equal(inventoried, 3);
+    });
+
+    it("asks a live station's recent months and the inventory's for the rest", async () => {
+      const month = new Date();
+      month.setUTCDate(1);
+      month.setUTCHours(0, 0, 0, 0);
+      const asked = serveInventory(
+        inventory(["2001-01-01 00:00", "2001-01-31 23:54", "Verified 6-Minute Water Level"]),
+      );
+      await coops.levels(
+        "9990016",
+        new Date("2000-12-01Z"),
+        new Date(month.getTime() + 86_400_000),
+        {
+          live: true,
+        },
+      );
+      assert.deepEqual(asked.slice(0, 1), ["water_level 200101"]);
+      assert.ok(asked.length < 4, asked.join());
+    });
+
+    it("fails on a date that rolls over or a period that ends before it starts", async () => {
+      for (const [id, first, last] of [
+        ["9990017", "2005-02-31 00:00", "2005-03-05 00:00"],
+        ["9990018", "2005-02-28 00:00", "2005-02-01 00:00"],
+      ]) {
+        serveInventory(inventory([first!, last!, "Verified 6-Minute Water Level"]));
+        await assert.rejects(
+          coops.levels(id!, ...span("2005-02-01Z", "2005-03-01Z")),
+          /unreadable date|ends before/,
+        );
+      }
+    });
+
     it("fails on a date it can't read rather than skipping the station", async () => {
       serveInventory(inventory(["soon", "later", "Verified 6-Minute Water Level"]));
       await assert.rejects(
         coops.levels("9990008", ...span("2010-01-01Z", "2010-03-01Z")),
-        /unreadable dates/,
+        /unreadable date/,
       );
     });
   });
@@ -2388,7 +2472,7 @@ describe("coops", () => {
         established: "sometime",
         removed: null,
       }),
-      /unreadable dates/,
+      /unreadable date/,
     );
   });
 

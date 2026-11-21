@@ -48,7 +48,7 @@ export const metadata: SourceMetadata = {
   // Preliminary 6-minute values are verified a month or two later.
   hourly: true,
   finalizes: true,
-  // `rowsOf` returns nothing only for "No data was found"; any other error body or status throws.
+  // `rowsOf` returns nothing only for "No data was found", and the inventory only where it lists no period; any other error body or status throws.
   empty_means_none: true,
 };
 
@@ -323,7 +323,7 @@ export async function levels(
   end: Date,
   station: Partial<Pick<CoopsStation, "live" | "established" | "removed">> = {},
 ): Promise<Observation[]> {
-  const spans = await operated(id, end, station);
+  const spans = await operated(id, start, end, station);
   const out: Observation[] = [];
   // Hourly heights go up to 365 days a request, so the first month before 1997
   // asks for the rest of its year, and later months take their share.
@@ -331,10 +331,11 @@ export async function levels(
   let hourlyRows: Row[] = [];
   for (const [from, to] of chunks(start, end, "month")) {
     const early = from.getTime() < SIX_MINUTE_ERA;
-    const hasHourly = early && spans.hourly(from, to);
-    // Before 1997 a month is asked for if either record covers it: the
-    // inventory lists only some preliminary 6-minute values there, and the
-    // hourly heights replace those.
+    const hasHourly = early && (spans.hourly(from, to) || spans.sixMinute(from, to));
+    // Before 1997 a month is asked for if either record covers it, and its
+    // hourly heights come with its 6-minute values: the inventory lists only
+    // some preliminary 6-minute values there, the hourly heights replace
+    // them, and a month's rows replace the stored month whole.
     if (!spans.sixMinute(from, to) && !hasHourly) continue;
     let sixMinute = await rowsOf("water_level", id, from, to);
     // Before 1997, the verified hourly heights lead. Some stations' preliminary
@@ -385,7 +386,7 @@ export async function extremes(
   end: Date,
   station: Partial<Pick<CoopsStation, "live" | "established" | "removed">> = {},
 ): Promise<PublishedExtreme[]> {
-  const spans = await operated(id, end, station);
+  const spans = await operated(id, start, end, station);
   const out: PublishedExtreme[] = [];
   for (const [from, to] of [...chunks(start, end, "year")].flatMap(within365)) {
     if (!spans.highLow(from, to)) continue;
@@ -472,72 +473,148 @@ const everything: Covers = () => true;
 // dates, else from the station's details. A live station's last month needs
 // none of them.
 const inventories = new Map<string, Promise<Spans | null>>();
+/** Inventory requests failing in a row; at `INVENTORY_FAILURES` the rest of the process uses dates. */
+let inventoryFailures = 0;
+const INVENTORY_FAILURES = 3;
 
 async function operated(
   id: string,
+  start: Date,
   end: Date,
   station: Partial<Pick<CoopsStation, "live" | "established" | "removed">>,
 ): Promise<Spans> {
-  if (station.live && end.getTime() > Date.now() - 31 * DAY_MS)
+  const recent = Date.now() - 31 * DAY_MS;
+  // A live station's last month needs no lookup.
+  if (station.live && start.getTime() > recent)
     return { sixMinute: everything, hourly: everything, highLow: everything };
-  let spans = inventories.get(id);
-  if (!spans) {
-    spans = inventoryOf(id);
-    // A failed lookup is tried again next time rather than remembered.
-    spans.catch(() => inventories.delete(id));
-    inventories.set(id, spans);
-  }
-  const found = await spans;
-  if (found) return found;
+  const spans = await inventorySpans(id);
+  const base: Spans = spans ?? (await datesSpans(id, station));
+  if (!station.live) return base;
+  // Whatever the inventory says, a live station has values in its last month.
+  const covers =
+    (c: Covers): Covers =>
+    (from, to) =>
+      to.getTime() > recent || c(from, to);
+  return {
+    sixMinute: covers(base.sixMinute),
+    hourly: covers(base.hourly),
+    highLow: covers(base.highLow),
+  };
+}
+
+/** The station's dates as the periods of every product, for a station with no inventory. */
+async function datesSpans(
+  id: string,
+  station: Partial<Pick<CoopsStation, "live" | "established" | "removed">>,
+): Promise<Spans> {
   const window = await windowFor(id, station);
   const covers: Covers = (from, to) => overlaps(window, from, to);
   return { sixMinute: covers, hourly: covers, highLow: covers };
 }
 
 /**
- * The periods CO-OPS's data inventory gives for each product, or null when it
- * has none for the station (its answer is a SOAP fault) or can't be reached.
- * A period is a first and last time, and a product lists one for each stretch
- * between its gaps. Preliminary 6-minute periods are an envelope, so a month
- * in one may hold none, and the inventory omits some of them before 1997
- * (Chuuk, 1840000, November 1994).
+ * A station's inventory, or null where CO-OPS has none or can't be read. An
+ * answer that fails is not remembered, so the next call asks again, until
+ * `INVENTORY_FAILURES` fail in a row.
+ */
+async function inventorySpans(id: string): Promise<Spans | null> {
+  let spans = inventories.get(id);
+  if (!spans) {
+    if (inventoryFailures >= INVENTORY_FAILURES) return null;
+    // Counted where the request is made, so callers sharing it count it once.
+    spans = inventoryOf(id).then(
+      (found) => {
+        inventoryFailures = 0;
+        return found;
+      },
+      (error) => {
+        if (!(error instanceof Blocked || error instanceof InventoryDates)) inventoryFailures++;
+        inventories.delete(id);
+        throw error;
+      },
+    );
+    inventories.set(id, spans);
+  }
+  try {
+    return await spans;
+  } catch (error) {
+    if (error instanceof Blocked || error instanceof InventoryDates) throw error;
+    console.warn(
+      `CO-OPS ${id} inventory: ${error instanceof Error ? error.message : error}; using its dates`,
+    );
+    return null;
+  }
+}
+
+/** An inventory date that isn't a real GMT time, which fails the backfill rather than moving a period's edge. */
+class InventoryDates extends Error {}
+
+/** A GMT time, `YYYY-MM-DD HH:MM`, as an epoch; throws on one that isn't a real time. */
+function inventoryTime(id: string, text: string): number {
+  const match = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/.exec(text.trim());
+  const time = match ? Date.parse(`${match[1]}T${match[2]}:00Z`) : NaN;
+  if (
+    Number.isNaN(time) ||
+    new Date(time).toISOString().slice(0, 16) !== `${match![1]}T${match![2]}`
+  )
+    throw new InventoryDates(`CO-OPS ${id} inventory has an unreadable date: ${text}`);
+  return time;
+}
+
+/**
+ * The periods CO-OPS's data inventory gives for each product, in GMT (the
+ * latest preliminary period of Anchorage, 9455920, ended at 16:06 at about
+ * 16:10 UTC on 2026-11-21), or null when it has no record of the station (its
+ * answer is a SOAP fault). A period is a first and last time, and a product
+ * lists one for each stretch between its gaps. Preliminary 6-minute periods
+ * are an envelope, so a month in one may hold none, and the inventory omits
+ * some of them before 1997 (erratum `coops-inventory-omits-preliminary-before-1997`).
+ * A page that isn't whole throws, and one that lists no parameters is read as
+ * no record of the station: some stations with data list none.
  */
 function inventoryOf(id: string): Promise<Spans | null> {
   return paced(async () => {
-    let text: string;
-    try {
-      text = await getText(
-        `${INVENTORY}?stationId=${encodeURIComponent(id)}&format=xml&Submit=Submit`,
-        {
-          fresh: true,
-        },
-      );
-    } catch (error) {
-      if (error instanceof Blocked) throw error;
-      console.warn(`CO-OPS ${id} inventory: ${error instanceof Error ? error.message : error}`);
-      return null;
+    const text = await getText(
+      `${INVENTORY}?stationId=${encodeURIComponent(id)}&format=xml&Submit=Submit`,
+      { fresh: true, timeout: 60 },
+    );
+    if (!/<station[\s>]/.test(text)) {
+      if (/<(\w+:)?Fault\b/.test(text)) return null;
+      throw new Error("the inventory is not a station's");
     }
-    if (!text.includes("<station ")) return null;
+    if (!text.includes("</station>")) throw new Error("the inventory ends before the station does");
+    const tags = [...text.matchAll(/<parameter\b([^>]*)>/g)];
+    // Some stations with data list none, so an empty list says nothing.
+    if (!tags.length) return null;
     const periods: Record<"sixMinute" | "hourly" | "highLow", [number, number][]> = {
       sixMinute: [],
       hourly: [],
       highLow: [],
     };
-    for (const m of text.matchAll(/<parameter first="([^"]*)" last="([^"]*)" name="([^"]*)"/g)) {
-      const [, first, last, name] = m;
-      const product = /6-Minute Water Level/.test(name!)
+    for (const [, attributes] of tags) {
+      const attribute = (name: string) => new RegExp(`\\b${name}="([^"]*)"`).exec(attributes!)?.[1];
+      const [first, last, name] = [attribute("first"), attribute("last"), attribute("name")];
+      if (first === undefined || last === undefined || name === undefined)
+        throw new Error(`the inventory has a parameter this reads no period from: ${attributes}`);
+      const product = /6-Minute Water Level/.test(name)
         ? "sixMinute"
-        : /Hourly Height Water Level/.test(name!)
+        : /Hourly Height Water Level/.test(name)
           ? "hourly"
-          : /High\/Low Water Level/.test(name!)
+          : /High\/Low Water Level/.test(name)
             ? "highLow"
             : null;
-      if (!product) continue;
-      const from = timeOf(first!);
-      const to = timeOf(last!);
-      if (Number.isNaN(from) || Number.isNaN(to))
-        throw new Error(`CO-OPS ${id} inventory has unreadable dates: ${first}, ${last}`);
-      periods[product].push([from, to]);
+      if (!product) {
+        // Daily and monthly means, and other measurements, are not requested; a water level named another way is not understood.
+        if (/Water Level/.test(name) && !/(Daily|Monthly) Mean Water Level/.test(name))
+          throw new Error(`the inventory has a water-level parameter this does not know: ${name}`);
+        continue;
+      }
+      const period: [number, number] = [inventoryTime(id, first), inventoryTime(id, last)];
+      if (period[0] > period[1])
+        throw new InventoryDates(
+          `CO-OPS ${id} inventory has a period that ends before it starts: ${first}, ${last}`,
+        );
+      periods[product].push(period);
     }
     const covers =
       (list: [number, number][]): Covers =>
@@ -794,6 +871,7 @@ export function resetPacing(): void {
   dataHolds = 0;
   holdGeneration = 0;
   lastMetadata = 0;
+  inventoryFailures = 0;
 }
 
 function sleep(ms: number): Promise<void> {
