@@ -3,7 +3,7 @@ import { readBackfilled, recordYear, writeBackfilled } from "../backfilled.ts";
 import { withheldReason } from "../withhold.ts";
 import { Blocked } from "../http.ts";
 import { FLATLINE_S, fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
-import { Dropped, leaveOutInto, tallying } from "../span.ts";
+import { Dropped, leaveOutInto, possible, tallying } from "../span.ts";
 import { DatumChanged, isHeld, recentWindow } from "../epochs.ts";
 import {
   Flag,
@@ -393,7 +393,7 @@ export async function compactRecent({
               const fromIncoming = new Dropped();
               const fromFile = new Dropped();
               let kept = false;
-              const { before, stats } = await foldObservationFile(
+              const { before, stats, replaced } = await foldObservationFile(
                 file,
                 from,
                 epoch.datum,
@@ -442,6 +442,7 @@ export async function compactRecent({
                 carried.set(store, [...(carried.get(store) ?? []), [station.id, epochId, year]]);
               }
               noteDropped(summary, fromIncoming, station.id);
+              noteDropped(summary, replaced, station.id);
               if (!stats) continue;
               if (!kept) noteDropped(summary, fromFile, station.id);
               written.set(file, stats);
@@ -544,8 +545,8 @@ function spanOf(rows: Observation[], window: Span | null): FileBounds | null {
   if (!window) return null;
   // A loop, not Math.min(...): a one-minute year file has too many rows to spread.
   let [first, last, preliminary, screened] = [Infinity, -Infinity, Infinity, false];
-  for (const { time, flag, source_flag } of rows)
-    if (time >= window[0] && time < window[1]) {
+  for (const { time, level, flag, source_flag } of rows)
+    if (time >= window[0] && time < window[1] && possible(level)) {
       if (time < first) first = time;
       if (time > last) last = time;
       // As readTimeBounds: without `source_flag`, only a good or interpolated flag is the source's.
@@ -928,7 +929,7 @@ export function formatSummary(s: RunSummary, listed = 20): string {
   if (s.dropped?.count)
     lines.push(
       "",
-      `Left out ${s.dropped.describe()}. A station's first or last value may be among them, so after a run that rewrote stored years, run \`compact <source> --rebuild-bounds\` and \`publish\`.`,
+      `Left out ${s.dropped.describe()}.${s.title.startsWith("poll") ? "" : " Stored years that held some were rewritten, so run `compact <source> --rebuild-bounds` and `publish`."}`,
     );
   const phases = Object.entries(s.seconds ?? {});
   if (phases.length) {

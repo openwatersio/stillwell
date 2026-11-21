@@ -943,7 +943,7 @@ export const source: Source = {
     const [times, levels, source]: number[][] = [[], [], []];
     for await (const rows of record())
       for (const r of rows) {
-        // As `parse` leaves them out (erratum `gesla-fill-values`), until the store no longer holds any.
+        // As `parse` leaves them out (erratum `gesla-fill-values`); the store holds some in a year of nothing else.
         if (!possible(r.level)) continue;
         times.push(r.time);
         levels.push(r.level);

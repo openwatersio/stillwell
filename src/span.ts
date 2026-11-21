@@ -130,8 +130,8 @@ export function inSpan(level: number, time?: number, flag?: number): boolean {
   const ledger = ledgers.getStore();
   if (ledger) {
     ledger.dropped.add(level);
-    // Only a number can be a stored level; text that isn't one is counted and not kept.
-    if (ledger.rows && time !== undefined && Number.isFinite(level))
+    // Only a number the file's FLOAT holds can be a stored level; anything else is counted and not kept.
+    if (ledger.rows && time !== undefined && Number.isFinite(Math.fround(level)))
       ledger.rows.push({ time, level, ...(flag !== undefined && { flag }) });
   }
   return false;

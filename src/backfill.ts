@@ -64,6 +64,10 @@ const DAY_MS = 86_400_000;
  * Provisional years are fetched on every run, so a long campaign of runs
  * uses `--skip-written` (`yearWritten`) instead.
  *
+ * A year whose every level is outside the store's span, which backfill writes as rows
+ * flagged `bad`, isn't done either, so a source's later fix reaches it; `--skip-written`
+ * skips it like any other file.
+ *
  * A year the source returns nothing for writes no file, so it is fetched again
  * on every run in either mode; adapters that bound requests to each series'
  * dates (USGS, CO-OPS) send no request for those years outside them, and
@@ -80,7 +84,9 @@ export function yearDone(
 ): boolean {
   if (!wholeEndedYear(from, to, now)) return false;
   const unchecked = qcStart != null && to.getTime() <= Date.parse(qcStart);
-  if (!file || (file.preliminary > 0 && !unchecked) || file.months < 12) return false;
+  // A year of nothing but fill is asked for again, in case the source has since sent levels.
+  if (!file || file.usable === 0 || (file.preliminary > 0 && !unchecked) || file.months < 12)
+    return false;
   return file.last >= to.getTime() - 7 * DAY_MS;
 }
 

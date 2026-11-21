@@ -86,6 +86,9 @@ describe("tallying", () => {
       return 0;
     }, true);
     assert.deepEqual(rows, [{ time: 3, level: -9999, flag: 2 }]);
+    // Past what a FLOAT holds, so it's counted and not kept.
+    const huge = await tallying(async () => inSpan(1e300, 4, 0), true);
+    assert.deepEqual([huge.dropped.count, huge.rows], [1, []]);
   });
 
   it("counts nothing outside a tally, and counts stored rows into the tally it's given", () => {

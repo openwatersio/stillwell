@@ -600,11 +600,19 @@ describe("compactRecent", () => {
     await writeDays(root, [
       [{ ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id, epoch: 1 }],
     ]);
-    await compactRecent({ source: source({}), stations: [a], storeFor: () => root, start, end });
+    const folded = await compactRecent({
+      source: source({}),
+      stations: [a],
+      storeFor: () => root,
+      start,
+      end,
+    });
     assert.deepEqual(
       (await readObservations(file)).map((r) => r.level),
       [0.65],
     );
+    // The two fill rows it replaced are counted.
+    assert.equal(folded.dropped!.count, 2);
   });
 
   it("leaves a year file as it is when every row it would fold is outside the span", async () => {

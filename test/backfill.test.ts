@@ -26,6 +26,7 @@ import {
   readObservationFile,
   readObservations,
   readStationBounds,
+  readTimeBounds,
   readYearFiles,
   writeJsonArray,
   writeObservations,
@@ -65,6 +66,11 @@ const DONE = {
 };
 
 describe("yearDone", () => {
+  it("asks again for a year of nothing but fill", () => {
+    assert.equal(yearDone({ ...DONE, usable: 0 }, Y2024, Y2025, NOW), false);
+    assert.equal(yearDone({ ...DONE, usable: 8000 }, Y2024, Y2025, NOW), true);
+  });
+
   it("skips a past year whose file reaches the year's end with no preliminary values", () => {
     assert.equal(yearDone(DONE, Y2024, Y2025, NOW), true);
   });
@@ -173,8 +179,8 @@ describe("readYearFiles", () => {
     assert.deepEqual(
       [...files],
       [
-        [2023, { preliminary: 0, months: 1, last: t, backfilled: 2 }],
-        [2024, { preliminary: 2, months: 1, last: Date.UTC(2024, 0, 3), backfilled: 3 }],
+        [2023, { preliminary: 0, months: 1, last: t, backfilled: 2, usable: 2 }],
+        [2024, { preliminary: 2, months: 1, last: Date.UTC(2024, 0, 3), backfilled: 3, usable: 3 }],
       ],
     );
   });
@@ -1638,6 +1644,18 @@ describe("backfillYear", () => {
       );
       assert.equal(report.dropped.nan, hours.length);
       assert.ok(!(await listYears(dirOf(other))).has(2000));
+    });
+
+    it("bounds a station by its levels, not by a year of fill", async () => {
+      const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      await run(
+        store,
+        hours.map((r) => ({ ...r, level: -9999 })),
+        fresh(),
+      );
+      const file = path(store);
+      assert.equal((await readTimeBounds([{ file, window: [-Infinity, Infinity] }])).size, 0);
+      assert.equal((await readYearFiles(dirOf(store), [2000])).get(2000)!.usable, 0);
     });
 
     it("still calls a fetch of nothing empty", async () => {

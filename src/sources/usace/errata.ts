@@ -309,7 +309,7 @@ export default {
       error:
         "These 82 CWMS series hold levels no gauge can read, outside the store's span of −500 to 9,000 m: 409,338 values in 147 station-years from 1982 to 2026. Most are 99,999 ft (30,479.695 m) or −99,999 ft, and −1.04 × 10³⁸ m at the Cumberland River gauges; the rest are values such as 999,999 ft and 9,999,999 ft, up to 2 × 10¹⁶ m.",
       response:
-        "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. A year file of nothing else keeps its rows, flagged `bad`, with a warning.",
+        "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. Backfill writes a year of nothing else as its rows flagged `bad`, and requalify and compaction keep such a file, with a warning.",
       evidence:
         "November 2026. A scan of the range of levels in every year file of every source in the store (335,320 files) found 383 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span.",
       check: (store) => impossibleDropped(store, "usace/MVK.Helena", 2026),
