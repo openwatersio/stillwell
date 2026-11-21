@@ -2,7 +2,14 @@ import { tooManyWithheld, withheldReason } from "../withhold.ts";
 import { isHeld } from "../epochs.ts";
 import type { Observation, Source, StoredStation } from "../schema.ts";
 import type { StationObservation } from "../store/parquet.ts";
-import { chunks, emptySummary, pool, refreshStation, type RunSummary } from "../store/recent.ts";
+import {
+  chunks,
+  emptySummary,
+  fetchCounting,
+  pool,
+  refreshStation,
+  type RunSummary,
+} from "../store/recent.ts";
 import type { ObservationStore } from "./live.ts";
 
 const DAY_MS = 86_400_000;
@@ -59,9 +66,9 @@ export async function pollSource({
 
   let swept: Map<string, Observation[] | Error> | Error | undefined;
   if (source.recent)
-    swept = await source
-      .recent(fetching, new Date(since), new Date(now))
-      .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
+    swept = await fetchCounting(summary, undefined, () =>
+      source.recent!(fetching, new Date(since), new Date(now)),
+    ).catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
 
   for (const batch of chunks(live, BATCH)) {
     const previous = Map.groupBy(

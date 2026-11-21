@@ -547,6 +547,44 @@ describe("compactRecent", () => {
     );
   });
 
+  it("counts the levels a fold leaves out, and says when a year holds nothing else", async () => {
+    setConnections(4);
+    const root = store();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    await writeObservations(file, [at(start + HOUR, 0.6), at(start + 2 * HOUR, 30479.695)], "NAP");
+    await writeDays(root, [
+      [
+        { ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id, epoch: 1 },
+        { ...at(start + 3 * HOUR, -2438.095, start + 4 * HOUR), station: a.id, epoch: 1 },
+      ],
+    ]);
+    const summary = await compactRecent({
+      source: source({}),
+      stations: [a],
+      storeFor: () => root,
+      start,
+      end,
+    });
+    assert.deepEqual([summary.dropped!.below, summary.dropped!.above], [1, 1]);
+    assert.match(formatSummary(summary), /Left out 2 levels outside −500 to 9,000 m/);
+
+    const b = station("b");
+    const only = seriesPath(root, "levels", "test", "b", 2026);
+    await writeObservations(only, [at(start + 2 * HOUR, 30479.695)], "NAP");
+    await writeDays(root, [
+      [{ ...at(start + HOUR, 30479.695, start + 3 * HOUR), station: b.id, epoch: 1 }],
+    ]);
+    const kept = await compactRecent({
+      source: source({}),
+      stations: [b],
+      storeFor: () => root,
+      start,
+      end,
+    });
+    assert.match(kept.warned!.join(), /b 2026: holds only 2 levels outside −500 to 9,000 m/);
+  });
+
   it("leaves a year file as it is when every row it would fold is outside the span", async () => {
     setConnections(4);
     const root = store();

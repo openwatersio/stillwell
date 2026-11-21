@@ -1,3 +1,4 @@
+import { Dropped } from "../src/span.ts";
 import assert from "node:assert/strict";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -118,7 +119,12 @@ describe("requalify", () => {
     rows[200] = { ...rows[200]!, level: -2438.095, flag: Flag.bad };
     await writeObservations(path, qc(rows), "NAP");
     const result = await requalify(source(), station, root, 2024, 2025);
-    assert.deepEqual([result.files, result.dropped], [1, 2]);
+    assert.deepEqual([result.files, result.dropped.count], [1, 2]);
+    assert.deepEqual([result.dropped.above, result.dropped.below], [1, 1]);
+    assert.deepEqual(
+      [...result.dropped.values.keys()].sort((a, b) => a - b),
+      [-2438.095, 30479.6953],
+    );
     const after = await readObservations(path);
     assert.equal(after.length, rows.length - 2);
     assert.ok(after.every((r) => Math.abs(r.level) < 500));
@@ -131,8 +137,11 @@ describe("requalify", () => {
     }));
     await writeObservations(seriesPath(root, "levels", "test", "1", 2023), fills, "NAP");
     const kept = await requalify(source(), station, root, 2023, 2024);
-    assert.deepEqual([kept.files, kept.dropped], [0, 0]);
-    assert.match(kept.warnings.join(), /2023 holds only levels outside/);
+    assert.deepEqual([kept.files, kept.dropped.count], [0, 0]);
+    assert.match(
+      kept.warnings.join(),
+      /2023 holds only 24 levels outside −500 to 9,000 m \(24 above; 30,479.695 ×24\), so its file is kept/,
+    );
     assert.equal(
       (await readObservations(seriesPath(root, "levels", "test", "1", 2023))).length,
       24,
@@ -157,7 +166,7 @@ describe("requalify", () => {
     assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), {
       files: 1,
       changed: 9,
-      dropped: 0,
+      dropped: new Dropped(),
       warnings: [],
     });
     const after = await readObservations(path(2024));
@@ -169,7 +178,7 @@ describe("requalify", () => {
     assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), {
       files: 0,
       changed: 0,
-      dropped: 0,
+      dropped: new Dropped(),
       warnings: [],
     });
     // A stricter rule again flags them, and an erratum's span comes back from the source.
@@ -315,7 +324,7 @@ describe("requalify", () => {
       {
         files: 0,
         changed: 0,
-        dropped: 0,
+        dropped: new Dropped(),
         warnings: [],
       },
     );

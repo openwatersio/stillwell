@@ -1,6 +1,6 @@
 import { isUrlSafe, urlSafe } from "../../store/paths.ts";
 import { csvFields } from "../../csv.ts";
-import { possible } from "../../span.ts";
+import { inSpan, possible } from "../../span.ts";
 import { getJson, getText } from "../../http.ts";
 import {
   Flag,
@@ -523,6 +523,8 @@ export interface GeslaRecord {
   source: Uint8Array;
   /** `source`, worsened by the datum-jump check. */
   flags: Uint8Array;
+  /** Time and level of each value left out as outside the store's span, in file order. */
+  fill: { times: number[]; levels: number[] };
 }
 
 /**
@@ -556,6 +558,7 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
   let source = new Uint8Array(lines);
   let n = 0;
   let sorted = true;
+  const fill = { times: [] as number[], levels: [] as number[] };
   for (let at = 0; at < text.length;) {
     let end = text.indexOf("\n", at);
     if (end < 0) end = text.length;
@@ -566,18 +569,25 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
         .split(/\s+/);
       const qc = Number(fields[1]);
       const level = Number(fields[0]);
-      // A level no gauge can read is a fill value, such as CMEMS's 999,999.06 m, so it's
-      // missing (erratum `gesla-fill-values`).
-      if (qc >= 0 && qc <= 4 && fields[0] !== nul && possible(level)) {
+      if (qc >= 0 && qc <= 4 && fields[0] !== nul) {
         const flag = QC_FLAGS[qc]!;
         const time = timeOf(text, at);
         const more = clock?.extra && time >= clock.extra.since && time < clock.extra.until;
-        times[n] =
+        const stamped =
           time < since || time >= until
             ? time
             : (dayMonth ? swapDayMonth(time) : time) +
               shift +
               (more ? clock!.extra!.hours * HOUR_MS : 0);
+        // A level no gauge can read is a fill value, such as CMEMS's 999,999.06 m, so it's
+        // missing (erratum `gesla-fill-values`). `levels` counts it for the years it asks for.
+        if (!possible(level)) {
+          fill.times.push(stamped);
+          fill.levels.push(level);
+          at = end + 1;
+          continue;
+        }
+        times[n] = stamped;
         if (n && times[n]! < times[n - 1]!) sorted = false;
         levels[n] = level;
         source[n] = fields[2] === "0" ? Math.max(flag, Flag.suspect) : flag;
@@ -599,9 +609,11 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
     ];
   }
   // WSV's hourly means; a WSV record at another interval isn't one.
-  if (file.endsWith("-wsv") && medianStep(times) === HOUR_MS)
+  if (file.endsWith("-wsv") && medianStep(times) === HOUR_MS) {
     for (let i = 0; i < n; i++) times[i]! += WSV_SHIFT_MS;
-  const record: GeslaRecord = { times, levels, source, flags: new Uint8Array(0) };
+    for (let i = 0; i < fill.times.length; i++) fill.times[i]! += WSV_SHIFT_MS;
+  }
+  const record: GeslaRecord = { times, levels, source, flags: new Uint8Array(0), fill };
   record.flags = record.source.slice();
   if (kind === "coastal")
     for (const [from, to] of datumJumps(record))
@@ -886,6 +898,11 @@ export async function levels(
   if (isDropped(station.source_id))
     throw new Error(`GESLA's ${station.source_id} holds another gauge's values (see isDropped)`);
   const r = await record(station);
+  // Counted here, not in `parse`, which a cached record runs once for every year asked.
+  for (let i = 0; i < r.fill.times.length; i++) {
+    const time = r.fill.times[i]!;
+    if (time >= start.getTime() && time < end.getTime()) inSpan(r.fill.levels[i]!, time);
+  }
   const out: Observation[] = [];
   for (let i = lowerBound(r.times, start.getTime()); i < r.times.length; i++) {
     if (r.times[i]! >= end.getTime()) break;

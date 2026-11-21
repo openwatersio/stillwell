@@ -10,6 +10,8 @@ import {
 import type { StationObservation } from "../src/store/parquet.ts";
 import type { ObservationStore } from "../src/realtime/live.ts";
 import { difference, intervalOf, pollSource } from "../src/realtime/poll.ts";
+import { formatSummary } from "../src/store/recent.ts";
+import { withinSpan } from "../src/sources/index.ts";
 
 const HOUR = 3_600_000;
 const NOW = Date.UTC(2026, 10, 5, 12);
@@ -113,6 +115,26 @@ describe("pollSource", () => {
     const second = await poll(NOW + 10 * 60_000);
     assert.equal(second.values, 0);
     assert.equal(store.written, 2);
+  });
+
+  it("says why a station that sent only fill values went stale", async () => {
+    const a = station("a");
+    const fill = [at(NOW - 2 * HOUR, -9999), at(NOW - HOUR, -9999)];
+    const wrapped = withinSpan(source({ [a.id]: fill }));
+    const summary = await pollSource({
+      source: wrapped,
+      stations: [a],
+      store: memory(),
+      since: NOW - 6 * HOUR,
+      now: NOW,
+    });
+    assert.deepEqual(summary.stale, [a.id]);
+    assert.equal(summary.dropped!.count, 2);
+    assert.equal(summary.droppedBy!.get(a.id)!.below, 2);
+    assert.match(
+      formatSummary(summary),
+      /test\/a: its fetch left out 2 levels outside −500 to 9,000 m/,
+    );
   });
 
   it("writes a value whose source flag changed, keeping when it first arrived", async () => {

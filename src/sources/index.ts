@@ -1,6 +1,6 @@
 import { readErrata, withErrata, type ErrataFile } from "../errata.ts";
 import type { Observation, Source } from "../schema.ts";
-import { possible } from "../span.ts";
+import { leaveOut } from "../span.ts";
 import { source as bodc } from "./bodc/index.ts";
 import { source as bom } from "./bom/index.ts";
 import { source as bsh } from "./bsh/index.ts";
@@ -125,7 +125,7 @@ export const { errata, problems: errataProblems } = readErrata(errataFiles);
  * `pegelonline-fill-values`, and GESLA's and CMEMS's, whose adapters drop them too).
  */
 export function withinSpan(source: Source): Source {
-  const keep = (rows: Observation[]) => rows.filter((r) => possible(r.level));
+  const keep = (rows: Observation[]) => leaveOut(rows);
   const { observations, recent } = source;
   return {
     ...source,
