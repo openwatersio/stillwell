@@ -1,11 +1,12 @@
 import { tooManyWithheld, withheldReason } from "../withhold.ts";
 import { isHeld } from "../epochs.ts";
+import { sweepDrops } from "../span.ts";
 import type { Observation, Source, StoredStation } from "../schema.ts";
 import type { StationObservation } from "../store/parquet.ts";
 import {
   chunks,
   emptySummary,
-  fetchCounting,
+  noteDropped,
   pool,
   refreshStation,
   type RunSummary,
@@ -66,9 +67,14 @@ export async function pollSource({
 
   let swept: Map<string, Observation[] | Error> | Error | undefined;
   if (source.recent)
-    swept = await fetchCounting(summary, undefined, () =>
-      source.recent!(fetching, new Date(since), new Date(now)),
-    ).catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
+    swept = await source
+      .recent(fetching, new Date(since), new Date(now))
+      .then((answer) => {
+        for (const [station, dropped] of sweepDrops.get(answer) ?? [])
+          noteDropped(summary, dropped, station);
+        return answer;
+      })
+      .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
 
   for (const batch of chunks(live, BATCH)) {
     const previous = Map.groupBy(

@@ -357,7 +357,7 @@ export async function levels(
       hourly = hourlyRows.filter((r) => {
         // Dropped here, so a row for a level outside the span never reaches the loop below, which counts the rest.
         if (!usable(r)) {
-          if (inRangeOf(r, from, to)) countImpossible(r);
+          if (inRangeOf(r, from, to)) countImpossible(r, true);
           return false;
         }
         return timeOf(r.t) >= from.getTime() && timeOf(r.t) < to.getTime();
@@ -376,7 +376,7 @@ export async function levels(
     ] as const)
       for (const r of rows) {
         if (!usable(r)) {
-          countImpossible(r);
+          countImpossible(r, isHourly);
           continue;
         }
         out.push({ time: timeOf(r.t), level: Number(r.v), flag: flagOf(r, isHourly) });
@@ -701,9 +701,9 @@ function validTime(r: Row): boolean {
 }
 
 /** Counts a row left out for a level outside `SPAN_M`, if its time is a real date and its level isn't blank. */
-function countImpossible(r: Row): void {
+function countImpossible(r: Row, hourly = false): void {
   if (typeof r.v !== "string" || r.v.trim() === "" || !validTime(r)) return;
-  inSpan(Number(r.v), timeOf(r.t));
+  inSpan(Number(r.v), timeOf(r.t), flagOf(r, hourly));
 }
 
 /** Whether the row's time is a real date in [from, to). */

@@ -137,6 +137,28 @@ describe("pollSource", () => {
     );
   });
 
+  it("says which station of a sweep sent only fill values", async () => {
+    const [a, b] = [station("a"), station("b")];
+    const swept = withinSpan({
+      ...source({}),
+      recent: async () =>
+        new Map([
+          [a.id, [at(NOW - HOUR, -9999)]],
+          [b.id, [at(NOW - HOUR, 1.2)]],
+        ]),
+    });
+    const summary = await pollSource({
+      source: swept,
+      stations: [a, b],
+      store: memory(),
+      since: NOW - 6 * HOUR,
+      now: NOW,
+    });
+    assert.deepEqual([...summary.droppedBy!.keys()], [a.id]);
+    assert.deepEqual(summary.stale, [a.id]);
+    assert.match(formatSummary(summary), /test\/a: its fetch left out 1 level outside/);
+  });
+
   it("writes a value whose source flag changed, keeping when it first arrived", async () => {
     const a = station("a");
     const answers = { [a.id]: [at(NOW - HOUR, 1.2)] };

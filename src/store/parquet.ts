@@ -1,3 +1,4 @@
+import { SPAN_M } from "../span.ts";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
@@ -166,7 +167,12 @@ export function foldObservationFile(
   from: number,
   datum: string,
   window: [number, number] | null,
-  fold: (rows: Observation[], datums: string[]) => Promise<Observation[] | null>,
+  fold: (
+    rows: Observation[],
+    datums: string[],
+    /** Whether the rows before `from` are all levels outside the store's span, as a year of fill is. */
+    earlierOut: boolean,
+  ) => Promise<Observation[] | null>,
 ): Promise<{ before: FileBounds | null; stats: YearStats | null }> {
   return serial(async () => {
     const db = await connection();
@@ -234,11 +240,20 @@ export function foldObservationFile(
             Number(r!.screened) > 0,
           ];
       }
-      const merged = await fold(later, datums);
+      const [earlier] = (
+        await db.runAndReadAll(
+          `SELECT count(*) AS n, count(*) FILTER (WHERE level_m BETWEEN ${SPAN_M[0]} AND ${SPAN_M[1]}) AS ok FROM ${read} WHERE time_ms < ${from}`,
+        )
+      ).getRowObjects();
+      const earlierOut = Number(earlier!.n) > 0 && Number(earlier!.ok) === 0;
+      const merged = await fold(later, datums, earlierOut);
       if (!merged) return { before, stats: null };
-      await db.run(
-        `INSERT INTO ${write} (time_ms, level_m, flag, received_ms, source_flag) SELECT time_ms, level_m, flag, received_ms, source_flag FROM ${read} WHERE time_ms < ${from}`,
-      );
+      // A year of fill gives way to the levels the fold brings, so the file never holds both.
+      if (earlierOut && merged.length) before = null;
+      else
+        await db.run(
+          `INSERT INTO ${write} (time_ms, level_m, flag, received_ms, source_flag) SELECT time_ms, level_m, flag, received_ms, source_flag FROM ${read} WHERE time_ms < ${from}`,
+        );
       await appendObservations(write, merged);
       return { before, stats: await writeObservationTable(path, write, datum) };
     } finally {

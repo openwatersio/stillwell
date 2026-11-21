@@ -524,7 +524,7 @@ export interface GeslaRecord {
   /** `source`, worsened by the datum-jump check. */
   flags: Uint8Array;
   /** Time and level of each value left out as outside the store's span, in file order. */
-  fill: { times: number[]; levels: number[] };
+  fill: { times: number[]; levels: number[]; flags: number[] };
 }
 
 /**
@@ -558,7 +558,7 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
   let source = new Uint8Array(lines);
   let n = 0;
   let sorted = true;
-  const fill = { times: [] as number[], levels: [] as number[] };
+  const fill = { times: [] as number[], levels: [] as number[], flags: [] as number[] };
   for (let at = 0; at < text.length;) {
     let end = text.indexOf("\n", at);
     if (end < 0) end = text.length;
@@ -584,6 +584,7 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
         if (!possible(level)) {
           fill.times.push(stamped);
           fill.levels.push(level);
+          fill.flags.push(fields[2] === "0" ? Math.max(flag, Flag.suspect) : flag);
           at = end + 1;
           continue;
         }
@@ -901,7 +902,8 @@ export async function levels(
   // Counted here, not in `parse`, which a cached record runs once for every year asked.
   for (let i = 0; i < r.fill.times.length; i++) {
     const time = r.fill.times[i]!;
-    if (time >= start.getTime() && time < end.getTime()) inSpan(r.fill.levels[i]!, time);
+    if (time >= start.getTime() && time < end.getTime())
+      inSpan(r.fill.levels[i]!, time, r.fill.flags[i]);
   }
   const out: Observation[] = [];
   for (let i = lowerBound(r.times, start.getTime()); i < r.times.length; i++) {

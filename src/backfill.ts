@@ -508,7 +508,14 @@ export async function backfillYear(
     // An empty fetch is an outage, a year the source no longer publishes, or a
     // datum it no longer serves; it never empties a file.
     if (!rows.length && !bad) return "empty";
-    if (bad) rows = fetched.rows.map((r) => ({ time: r.time, level: r.level, flag: Flag.bad }));
+    // Flagged bad here, since no gauge reads such a level; the source's own flag stays as it sent it, where it's known.
+    if (bad)
+      rows = fetched.rows.map((r) => ({
+        time: r.time,
+        level: r.level,
+        flag: Flag.bad,
+        source_flag: (r.flag ?? Flag.bad) as Flag,
+      }));
     const { rows: stored, datums } = await series.get(year);
     await refuseOtherDatum(path, station, datums);
     // A stored level outside `SPAN_M` goes, as a fetch drops one.
@@ -521,7 +528,6 @@ export async function backfillYear(
           : leaveOutInto(stored, report.dropped);
     // The levels it holds stay, as they do when the fetch is empty.
     if (bad && existing.length) return "empty";
-    report.allOutOfSpan = bad;
     const keepAll = product === "levels" && source.keepsStored;
     let merged = mergeFetched(existing, rows, ...range, undefined, keepAll);
     if (product === "levels")
@@ -533,7 +539,9 @@ export async function backfillYear(
         [...(await series.get(year - 1)).rows, ...(await series.get(year + 1)).rows],
         keepAll,
       );
-    if (!merged.length || sameRows(stored, merged)) return undefined;
+    // Fill values such as 999,999.06 don't survive the file's FLOAT, so they're compared as it reads them back.
+    if (!merged.length || sameRows(stored, bad ? asWritten(merged) : merged)) return undefined;
+    report.allOutOfSpan = bad;
     let stats: YearStats;
     try {
       stats = await writeObservations(path, merged, station.datum);
@@ -548,7 +556,9 @@ export async function backfillYear(
   const series = files as SeriesFiles<PublishedExtreme>;
   const get = product === "extremes" ? source.extremes : source.predictedExtremes;
   if (!get) return undefined;
-  const rows = await get(station, from, to);
+  const fetched = await tallying(() => get(station, from, to));
+  report.dropped.merge(fetched.dropped);
+  const rows = fetched.result;
   if (!rows.length) return "empty";
   const { rows: existing, datums } = await series.get(year);
   await refuseOtherDatum(path, station, datums);

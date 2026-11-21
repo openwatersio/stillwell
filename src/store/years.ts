@@ -67,6 +67,16 @@ export async function listLevelFiles(store: string, source: string): Promise<str
 
 const key = (r: Pick<YearRow, "id" | "epoch" | "year">) => `${r.id} ${r.epoch} ${r.year}`;
 
+/**
+ * The hours a year file holds that a reader can use: none when every value in it is flagged
+ * `bad`, as a year of fill values is, and `hours` otherwise.
+ */
+export function usableHours(r: Pick<YearRow, "hours" | "flags">): number {
+  const { hours = 0, flags } = r;
+  const total = flags?.reduce((a, b) => a + b, 0) ?? 0;
+  return flags && total > 0 && flags[FLAGS.indexOf("bad")] === total ? 0 : hours;
+}
+
 /** A source's rows by `key`, or null when it has no file yet. */
 export async function readYears(
   store: string,

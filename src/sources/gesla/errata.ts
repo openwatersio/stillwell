@@ -1430,7 +1430,7 @@ export default {
       error:
         "These 31 GESLA records hold levels no gauge can read, outside the store's span of −500 to 9,000 m, as values rather than as GESLA's null of −99.9999: 42,040 values in 142 record-years from 2008 to 2026. Most are fill values: 999,999.06 m in CMEMS's AWG, K14 and L9 records, 99,999.01 m at Ceuta, −9,999.99 m at Pont Seudre, −10,000 m at Bayonne and Villefranque, and −6,999 m in Toitū Te Whenua's Cape Roberts. The CCO and CMEMS records of England's regional coastal monitoring gauges (Arun Platform, Brighton, Deal Pier, Exmouth, Hastings Pier, Sandown Pier, Scarborough, Second Severn Crossing, Swanage Pier and Teignmouth) hold hundreds of different values from about −1.05 × 10¹¹ m to 214,000 m, and Marienleuchte's and Saint-Pierre-et-Miquelon's records similar ones.",
       response:
-        "The adapter leaves out a value outside the store's span (`SPAN_M` in src/span.ts) as missing, as it does GESLA's null, and requalify drops any the store holds.",
+        "The adapter leaves out a value outside the store's span (`SPAN_M` in src/span.ts) as missing, as it does GESLA's null, counts them, and requalify drops any the store holds. A year of nothing else keeps its rows, flagged `bad`.",
       evidence:
         "November 2026. A scan of the range of levels in every one of the store's GESLA and CMEMS year files (145,149 files) found 205 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span.",
       // Cape Roberts' −6,999 m, most of its 2010, are left out, or kept flagged bad where nothing else is left.

@@ -20,7 +20,7 @@ describe("Dropped", () => {
     const d = new Dropped();
     for (let i = 0; i < 100; i++) d.add(10_000 + i);
     assert.equal(d.count, 100);
-    assert.equal(d.values.size, 8);
+    assert.equal(d.values.size, 50);
   });
 
   it("merges tallies", () => {
@@ -78,6 +78,16 @@ describe("tallying", () => {
     assert.deepEqual([b.dropped.count, b.rows.length], [2, 2]);
   });
 
+  it("keeps rows only for levels that are numbers, with the source's flag", async () => {
+    const { rows } = await tallying(async () => {
+      inSpan(Number.NaN, 1, 0);
+      inSpan(Number.POSITIVE_INFINITY, 2, 0);
+      inSpan(-9999, 3, 2);
+      return 0;
+    }, true);
+    assert.deepEqual(rows, [{ time: 3, level: -9999, flag: 2 }]);
+  });
+
   it("counts nothing outside a tally, and counts stored rows into the tally it's given", () => {
     assert.equal(inSpan(-9999), false);
     const d = new Dropped();
@@ -86,5 +96,14 @@ describe("tallying", () => {
       [1],
     );
     assert.deepEqual([d.below, d.above], [1, 1]);
+  });
+});
+
+describe("usableHours", () => {
+  it("counts no hours for a year of nothing but bad values", async () => {
+    const { usableHours } = await import("../src/store/years.ts");
+    assert.equal(usableHours({ hours: 8760, flags: [0, 0, 0, 0, 8760] }), 0);
+    assert.equal(usableHours({ hours: 8760, flags: [8000, 0, 0, 0, 760] }), 8760);
+    assert.equal(usableHours({ hours: 5 }), 5);
   });
 });

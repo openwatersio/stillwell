@@ -19,8 +19,11 @@ export const SPAN_M = [-500, 9000] as const;
 /** Whether a level is finite and within `SPAN_M`; NaN fails both comparisons. */
 export const possible = (level: number) => level >= SPAN_M[0] && level <= SPAN_M[1];
 
-/** Distinct out-of-span values a `Dropped` names, so a stream of junk can't grow it without bound. */
-const NAMED_VALUES = 8;
+/**
+ * Distinct out-of-span values a `Dropped` names, the first it sees, so a stream of
+ * junk can't grow it without bound. A fill value is one of a few, so it's among them.
+ */
+const NAMED_VALUES = 50;
 
 /**
  * Levels left out for being outside `SPAN_M`, and why: how many, on which
@@ -35,7 +38,7 @@ export class Dropped {
   above = 0;
   /** Not a number, which fails both sides of the span. */
   nan = 0;
-  /** The most frequent values, up to `NAMED_VALUES` distinct ones; the rest count in `count` only. */
+  /** Each of the first `NAMED_VALUES` distinct values and how often it came; the rest count in `count` only. */
   values = new Map<number, number>();
 
   add(level: number, times = 1): void {
@@ -89,9 +92,16 @@ export class Dropped {
 }
 
 /** The drops a `tallying` call is collecting, and the dropped rows when it asked for them. */
+export interface DroppedRow {
+  time: number;
+  level: number;
+  /** The source's own flag for the level, where the dropper knows it. */
+  flag?: number;
+}
+
 interface Ledger {
   dropped: Dropped;
-  rows?: { time: number; level: number }[];
+  rows?: DroppedRow[];
 }
 
 const ledgers = new AsyncLocalStorage<Ledger>();
@@ -105,7 +115,7 @@ const ledgers = new AsyncLocalStorage<Ledger>();
 export async function tallying<T>(
   work: () => Promise<T>,
   keepRows = false,
-): Promise<{ result: T; dropped: Dropped; rows: { time: number; level: number }[] }> {
+): Promise<{ result: T; dropped: Dropped; rows: DroppedRow[] }> {
   const ledger: Ledger = { dropped: new Dropped(), ...(keepRows && { rows: [] }) };
   const result = await ledgers.run(ledger, work);
   return { result, dropped: ledger.dropped, rows: ledger.rows ?? [] };
@@ -115,20 +125,27 @@ export async function tallying<T>(
  * `possible(level)`, counting a level outside the span in the running
  * `tallying`, if any. `time` goes with it for the rows a caller may keep.
  */
-export function inSpan(level: number, time?: number): boolean {
+export function inSpan(level: number, time?: number, flag?: number): boolean {
   if (possible(level)) return true;
   const ledger = ledgers.getStore();
   if (ledger) {
     ledger.dropped.add(level);
-    if (ledger.rows && time !== undefined) ledger.rows.push({ time, level });
+    // Only a number can be a stored level; text that isn't one is counted and not kept.
+    if (ledger.rows && time !== undefined && Number.isFinite(level))
+      ledger.rows.push({ time, level, ...(flag !== undefined && { flag }) });
   }
   return false;
 }
 
 /** The rows of `rows` within the span, the others counted as `inSpan` counts them. */
-export function leaveOut<T extends { time: number; level: number }>(rows: T[]): T[] {
-  return rows.filter((r) => inSpan(r.level, r.time));
+export function leaveOut<
+  T extends { time: number; level: number; flag?: number; source_flag?: number },
+>(rows: T[]): T[] {
+  return rows.filter((r) => inSpan(r.level, r.time, r.source_flag ?? r.flag));
 }
+
+/** What a sweep (`Source.recent`) left out for each station, by the map it returned. */
+export const sweepDrops = new WeakMap<object, Map<string, Dropped>>();
 
 /** The rows of `rows` within the span; each other is added to `dropped`, for the stored rows a writer rewrites. */
 export function leaveOutInto<T extends { level: number }>(rows: T[], dropped: Dropped): T[] {

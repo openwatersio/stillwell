@@ -1614,7 +1614,30 @@ describe("backfillYear", () => {
       const again = fresh();
       assert.equal(await run(store, fill, again), undefined);
       assert.equal(again.dropped.count, hours.length);
-      assert.equal(again.allOutOfSpan, true);
+      assert.equal(again.allOutOfSpan, false);
+    });
+
+    it("keeps the source's own flag on the rows it writes as bad, and no row for text that isn't a level", async () => {
+      const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      const fill = hours.map((r) => ({ ...r, level: 999999.06, flag: Flag.good }));
+      await run(store, fill, fresh());
+      const rows = await readObservations(path(store));
+      assert.ok(rows.every((r) => r.flag === Flag.bad && r.source_flag === Flag.good));
+      // A second run over the file it wrote finds nothing to change, though 999,999.06 doesn't fit a FLOAT.
+      assert.equal(await run(store, fill, fresh()), undefined);
+
+      const other = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      const report = fresh();
+      assert.equal(
+        await run(
+          other,
+          hours.map((r) => ({ ...r, level: Number.NaN })),
+          report,
+        ),
+        "empty",
+      );
+      assert.equal(report.dropped.nan, hours.length);
+      assert.ok(!(await listYears(dirOf(other))).has(2000));
     });
 
     it("still calls a fetch of nothing empty", async () => {
