@@ -1882,6 +1882,8 @@ describe("coops", () => {
       `<?xml version="1.0"?><soapenv:Envelope><DataInventory><station ID="1" name="x"><metadata/>${periods
         .map(([first, last, name]) => `<parameter first="${first}" last="${last}" name="${name}"/>`)
         .join("")}</station></DataInventory></soapenv:Envelope>`;
+    const fault =
+      "<soapenv:Fault><faultstring>No meta data available</faultstring></soapenv:Fault>";
     const serveInventory = (xml: string) => {
       const asked: string[] = [];
       setHttpTransport(async (url) => {
@@ -1893,74 +1895,69 @@ describe("coops", () => {
       return asked;
     };
     const span = (a: string, b: string) => [new Date(a), new Date(b)] as const;
+    const old = { established: "1950-01-01T00:00:00Z", removed: null };
+    const verified = (first: string, last: string): [string, string, string] => [
+      first,
+      last,
+      "Verified 6-Minute Water Level",
+    ];
 
-    it("asks only for the months each product has values in", async () => {
+    it("starts at the first period of a level product, filling the gaps after it", async () => {
       const asked = serveInventory(
         inventory(
-          ["2005-01-04 11:00", "2005-02-16 13:54", "Verified 6-Minute Water Level"],
-          ["2005-01-04 11:00", "2005-02-16 13:00", "Verified Hourly Height Water Level"],
-          ["2005-01-04 11:00", "2005-02-16 13:54", "Verified High/Low Water Level"],
+          verified("1999-03-04 11:00", "1999-03-31 23:54"),
+          verified("1999-06-01 00:00", "1999-06-30 23:54"),
+          ["1999-05-01 00:00", "1999-05-31 23:00", "Verified Hourly Height Water Level"],
           ["1979-05-01 00:00", "1979-05-31 23:54", "Verified Monthly Mean Water Level"],
         ),
       );
-      assert.deepEqual(await coops.levels("9990001", ...span("2004-01-01Z", "2006-01-01Z")), []);
-      assert.deepEqual(asked, ["water_level 200501", "water_level 200502"]);
+      assert.deepEqual(
+        await coops.levels("9990001", ...span("1998-01-01Z", "1999-08-01Z"), old),
+        [],
+      );
+      assert.deepEqual(
+        asked,
+        [3, 4, 5, 6, 7].map((m) => `water_level 1999${String(m).padStart(2, "0")}`),
+      );
+    });
+
+    it("asks every month of a station's dates from 2001 on, whatever the inventory lists", async () => {
+      const asked = serveInventory(inventory(verified("2005-01-04 11:00", "2005-02-16 13:54")));
+      await coops.levels("9990002", ...span("2004-11-01Z", "2005-04-01Z"), old);
+      assert.deepEqual(
+        asked,
+        ["200411", "200412", "200501", "200502", "200503"].map((m) => `water_level ${m}`),
+      );
       asked.length = 0;
-      await coops.extremes("9990001", ...span("2000-01-01Z", "2010-01-01Z"));
-      assert.deepEqual(asked, ["high_low 200501"]);
+      await coops.extremes("9990002", ...span("1999-01-01Z", "2003-01-01Z"), old);
+      assert.deepEqual(asked, ["high_low 200101", "high_low 200201"]);
     });
 
-    it("skips the months between a product's periods", async () => {
+    it("asks nothing before 2001 of a station listing no level, and its dates after", async () => {
       const asked = serveInventory(
         inventory(
-          ["2001-01-01 00:00", "2001-02-28 23:54", "Verified 6-Minute Water Level"],
-          ["2001-05-01 00:00", "2001-05-31 23:54", "Verified 6-Minute Water Level"],
-          ["2001-01-01 00:00", "2026-11-21 16:06", "Preliminary 6-Minute Water Level"],
+          ["1990-01-01 00:00", "1990-12-31 00:00", "Verified Monthly Mean Water Level"],
+          ["2010-01-01 00:00", "2012-01-01 00:00", "Wind"],
         ),
       );
-      await coops.levels("9990002", ...span("2001-01-01Z", "2001-07-01Z"));
-      // The preliminary period is an envelope over the whole span, so every month is asked.
-      assert.equal(asked.length, 6);
-      const verified = serveInventory(
-        inventory(
-          ["2001-01-01 00:00", "2001-02-28 23:54", "Verified 6-Minute Water Level"],
-          ["2001-05-01 00:00", "2001-05-31 23:54", "Verified 6-Minute Water Level"],
-        ),
-      );
-      await coops.levels("9990003", ...span("2001-01-01Z", "2001-07-01Z"));
-      assert.deepEqual(verified, [
-        "water_level 200101",
-        "water_level 200102",
-        "water_level 200105",
-      ]);
+      await coops.levels("9990003", ...span("2000-11-01Z", "2001-03-01Z"), old);
+      assert.deepEqual(asked, ["water_level 200101", "water_level 200102"]);
     });
 
-    it("asks a month before 1997 if either the 6-minute or the hourly record covers it", async () => {
+    it("asks a month before 1997 for its 6-minute and hourly values together", async () => {
       const asked = serveInventory(
-        inventory(
-          ["1994-11-01 00:00", "1994-11-30 23:54", "Verified 6-Minute Water Level"],
-          ["1994-10-01 00:00", "1994-12-31 23:00", "Verified Hourly Height Water Level"],
-        ),
+        inventory(verified("1994-11-01 00:00", "1994-11-30 23:54"), [
+          "1994-10-01 00:00",
+          "1994-12-31 23:00",
+          "Verified Hourly Height Water Level",
+        ]),
       );
-      await coops.levels("9990004", ...span("1994-09-01Z", "1995-02-01Z"));
-      assert.deepEqual(asked, [
-        "water_level 199410",
-        "hourly_height 199410",
-        "water_level 199411",
-        "water_level 199412",
-      ]);
-    });
-
-    it("asks for nothing at a station whose inventory lists no levels", async () => {
-      const asked = serveInventory(inventory(["2010-01-01 00:00", "2012-01-01 00:00", "Wind"]));
-      assert.deepEqual(await coops.levels("9990005", ...span("2010-01-01Z", "2012-01-01Z")), []);
-      assert.deepEqual(asked, []);
+      await coops.levels("9990004", ...span("1994-09-01Z", "1994-12-01Z"), old);
+      assert.deepEqual(asked, ["water_level 199410", "hourly_height 199410", "water_level 199411"]);
     });
 
     it("falls back to the station's dates when the inventory doesn't know it", async () => {
-      const asked = serveInventory(
-        "<soapenv:Fault><faultstring>No meta data available</faultstring></soapenv:Fault>",
-      );
+      const asked = serveInventory(fault);
       await coops.levels("9990006", ...span("2010-01-01Z", "2010-03-01Z"), {
         established: "2010-02-01T00:00:00Z",
         removed: null,
@@ -1979,12 +1976,31 @@ describe("coops", () => {
       assert.equal(inventoried, 0);
     });
 
+    it("asks a live station's recent months whatever the inventory says", async () => {
+      const month = new Date();
+      month.setUTCDate(1);
+      month.setUTCHours(0, 0, 0, 0);
+      const asked = serveInventory(inventory(verified("2001-01-01 00:00", "2001-01-31 23:54")));
+      await coops.levels(
+        "9990016",
+        new Date("1999-12-01Z"),
+        new Date(month.getTime() + 86_400_000),
+        {
+          live: true,
+          established: "2001-01-01T00:00:00Z",
+          removed: null,
+        },
+      );
+      assert.equal(asked[0], "water_level 200101");
+      assert.equal(asked.at(-1), `water_level ${month.toISOString().slice(0, 7).replace("-", "")}`);
+    });
+
     it("reads attributes in any order and a parameter of any name", async () => {
       const asked = serveInventory(
-        `<DataInventory><station ID="1"><parameter name="Verified 6-Minute Water Level" type="v" last="2005-02-16 13:54" first="2005-01-04 11:00"/><parameter first="2005-01-04 11:00" last="2005-02-16 13:54" name="Wind"/></station></DataInventory>`,
+        `<DataInventory><station ID="1"><parameter name="Verified 6-Minute Water Level" type="v" last="1999-02-16 13:54" first="1999-01-04 11:00"/><parameter first="1990-01-04 11:00" last="1999-02-16 13:54" name="Wind"/></station></DataInventory>`,
       );
-      await coops.levels("9990009", ...span("2004-12-01Z", "2005-04-01Z"));
-      assert.deepEqual(asked, ["water_level 200501", "water_level 200502"]);
+      await coops.levels("9990009", ...span("1998-12-01Z", "1999-04-01Z"), old);
+      assert.deepEqual(asked, ["water_level 199901", "water_level 199902", "water_level 199903"]);
     });
 
     it("uses the station's dates when the inventory is cut off, lists no parameters or names a water level it doesn't know", async () => {
@@ -2000,11 +2016,11 @@ describe("coops", () => {
         ],
       ] as const) {
         const asked = serveInventory(body);
-        await coops.levels(id, ...span("2005-01-01Z", "2005-03-01Z"), {
-          established: "2005-02-01T00:00:00Z",
+        await coops.levels(id, ...span("1999-01-01Z", "1999-03-01Z"), {
+          established: "1999-02-01T00:00:00Z",
           removed: null,
         });
-        assert.deepEqual(asked, ["water_level 200502"]);
+        assert.deepEqual(asked, ["water_level 199902"]);
       }
     });
 
@@ -2023,44 +2039,18 @@ describe("coops", () => {
       assert.equal(inventoried, 3);
     });
 
-    it("asks a live station's recent months and the inventory's for the rest", async () => {
-      const month = new Date();
-      month.setUTCDate(1);
-      month.setUTCHours(0, 0, 0, 0);
-      const asked = serveInventory(
-        inventory(["2001-01-01 00:00", "2001-01-31 23:54", "Verified 6-Minute Water Level"]),
-      );
-      await coops.levels(
-        "9990016",
-        new Date("2000-12-01Z"),
-        new Date(month.getTime() + 86_400_000),
-        {
-          live: true,
-        },
-      );
-      assert.deepEqual(asked.slice(0, 1), ["water_level 200101"]);
-      assert.ok(asked.length < 4, asked.join());
-    });
-
-    it("fails on a date that rolls over or a period that ends before it starts", async () => {
+    it("fails on a date that rolls over, one it can't read, or a period that ends before it starts", async () => {
       for (const [id, first, last] of [
         ["9990017", "2005-02-31 00:00", "2005-03-05 00:00"],
         ["9990018", "2005-02-28 00:00", "2005-02-01 00:00"],
-      ]) {
-        serveInventory(inventory([first!, last!, "Verified 6-Minute Water Level"]));
+        ["9990020", "soon", "later"],
+      ] as const) {
+        serveInventory(inventory(verified(first, last)));
         await assert.rejects(
-          coops.levels(id!, ...span("2005-02-01Z", "2005-03-01Z")),
+          coops.levels(id, ...span("1999-02-01Z", "1999-03-01Z"), old),
           /unreadable date|ends before/,
         );
       }
-    });
-
-    it("fails on a date it can't read rather than skipping the station", async () => {
-      serveInventory(inventory(["soon", "later", "Verified 6-Minute Water Level"]));
-      await assert.rejects(
-        coops.levels("9990008", ...span("2010-01-01Z", "2010-03-01Z")),
-        /unreadable date/,
-      );
     });
   });
 

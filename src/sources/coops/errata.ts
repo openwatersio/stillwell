@@ -10,11 +10,11 @@ export default {
       until: "1994-12-01",
       handling: "avoided",
       error:
-        "CO-OPS's data inventory for Chuuk, Moen Island (1840000) lists no 6-minute period at all, though the data API answers 7,200 preliminary 6-minute values for November 1994.",
+        "CO-OPS's data inventory for Chuuk, Moen Island (1840000) lists no 6-minute period at all, though the data API answers 7,200 preliminary 6-minute values for November 1994. Across the store, 10 of 14,872 written station-years at 8 stations fall outside every 6-minute and hourly period the inventory lists, all in 2001 or later.",
       response:
-        "A month before 1997 is asked for if its hourly or its 6-minute period covers it, and its hourly heights come with its 6-minute values, which they replace by erratum `coops-preliminary-offset-before-1997`. The month is requested through the hourly period, and the inventory's gap costs nothing.",
+        "A backfill asks for every month of a station's dates from 2001 on, and before then from the start of the station's first period of a level product, with a month's hourly heights beside its 6-minute values before 1997. The inventory's omissions cost nothing there.",
       evidence:
-        "Requests of 2026-11-21: of 300 months outside every period the inventory lists for 20 stations (months next to a period excluded), this was the one with values. Only 20 stations were sampled, so other stations may omit preliminary periods too.",
+        "2026-11-21: the inventories of 1,701 of CO-OPS's 2,931 stations against the store's years file, which holds the years CO-OPS answered with values; and 300 months outside every period the inventory lists at 20 stations, checked against the data API, of which one had values (this one).",
       check: async (store, e) => {
         const id = e.stations![0]!;
         const rows = await store.levels(id, "1994-11-01", "1994-12-01");
