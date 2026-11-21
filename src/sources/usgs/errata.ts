@@ -92,20 +92,35 @@ export default {
         "The levels stored for the station on 11 to 14 November 2026, and USGS's current series for the station (gage height, `continuous`, series 897594e7) over the same times, read on 21 November 2026.",
       check: async (store, e) => {
         const id = e.stations![0]!;
-        const high = (await store.levels(id, e.since!, e.until!)).filter((o) => o.level > 100);
+        const all = await store.levels(id, e.since!, e.until!);
+        const high = all.filter((o) => o.level > 100);
         // A count other than the one this entry describes means the store was refetched, or the readings changed.
         if (high.length !== 187)
           throw new Error(`the store holds ${high.length} ${id} levels above 100 m, not 187`);
         const unflagged = high.filter((o) => o.flag < Flag.bad);
         if (unflagged.length)
           throw new Error(`${unflagged.length} of ${id}'s 187 levels above 100 m aren't bad`);
-        const [first, last] = [high[0]!.time, high.at(-1)!.time];
-        if (
-          first !== Date.parse("2026-11-12T18:20:00Z") ||
-          last !== Date.parse("2026-11-13T11:20:00Z")
-        )
+        const [first, last] = [
+          Date.parse("2026-11-12T18:20:00Z"),
+          Date.parse("2026-11-13T11:20:00Z"),
+        ];
+        if (high.some((o) => o.time < first || o.time > last))
           throw new Error(
-            `${id}'s levels above 100 m run from ${new Date(first).toISOString()} to ${new Date(last).toISOString()}`,
+            `${id} has levels above 100 m outside 18:20 on 12 to 11:20 on 13 November`,
+          );
+        // Whole feet from 926 to 990, which is what USGS published.
+        const off = high.filter((o) => {
+          const feet = o.level / 0.3048;
+          return Math.abs(feet - Math.round(feet)) > 0.01 || feet < 925.5 || feet > 990.5;
+        });
+        if (off.length)
+          throw new Error(
+            `${off.length} of ${id}'s levels above 100 m aren't whole feet from 926 to 990`,
+          );
+        // The run sits among readings that look normal.
+        if (!all.some((o) => o.level < 10 && o.time > first && o.time < last))
+          throw new Error(
+            `${id} has no ordinary reading between 18:20 on 12 and 11:20 on 13 November`,
           );
       },
     },

@@ -815,3 +815,23 @@ describe("an archive in the reference of its time", () => {
     );
   });
 });
+
+describe("USGS's epoch decisions", () => {
+  it("name exactly the ten gages of the 2026-11-16 refresh, by the start it opened their second epoch at", async () => {
+    const { overrides } = await import("../src/sources/usgs/overrides.ts");
+    const keys = Object.keys(overrides.epochs!);
+    assert.deepEqual(keys.map((k) => k.split(" ")[0]).sort(), [
+      "usgs/06207500",
+      "usgs/07263883",
+      "usgs/08098295",
+      "usgs/08111056",
+      "usgs/08111070",
+      "usgs/08117857",
+      "usgs/08117858",
+      "usgs/09505400",
+      "usgs/09505800",
+      "usgs/09510200",
+    ]);
+    assert.ok(keys.every((k) => k.endsWith(" 2026-11-16T14:19:07Z")));
+  });
+});
