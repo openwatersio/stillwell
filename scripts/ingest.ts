@@ -443,7 +443,9 @@ switch (command) {
     const lines = [
       `${source}/${station}: ${files.length} year files deleted, ${rows} values flagged bad`,
       ...files.map((f) => `  ${f}`),
-      ...(gone.length ? [`${gone.length} named files were already gone`] : []),
+      ...(gone.length
+        ? [`${gone.length} named years had no file, deleted by an earlier run or never there`]
+        : []),
       `Run \`compact ${source} --rebuild-bounds\` and \`publish\` to rebuild the bounds and the missing years.`,
     ];
     for (const line of lines) console.log(line);

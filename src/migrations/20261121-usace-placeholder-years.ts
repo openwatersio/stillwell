@@ -92,17 +92,23 @@ export default {
             );
           if (Date.parse(b.last) < Date.UTC(last.year, 0, 1))
             throw new Error(`${id}: bounds end before ${last.year}, its last file`);
-          // Each of these stations is live, with files on both sides of its early years or after its late ones, so
-          // a year with no file is missing.
-          const missing = published.get(id)?.missing_years;
-          if (!missing)
+          // A year with no file is missing, unless `missingYears` is sure the source has nothing there: before the
+          // station's first file, after an inactive station's last, or in the current year of a station that isn't live.
+          const row = published.get(id);
+          if (!row?.missing_years)
             throw new Error(
               `${id}: missing_years is null, as while a run has the station marked; publish again`,
             );
-          const listed = list(missing);
-          for (const year of gone)
-            if (!own.some((f) => f.year === year) && !listed.includes(year))
+          const listed = list(row.missing_years);
+          const thisYear = new Date().getUTCFullYear();
+          for (const year of gone) {
+            const sure =
+              year < first.year ||
+              (row.status === "inactive" && year > last.year) ||
+              (year >= thisYear && row.live !== true);
+            if (!own.some((f) => f.year === year) && !sure && !listed.includes(year))
               throw new Error(`${id}: ${year} has no file and isn't in missing_years`);
+          }
         }
       },
     },

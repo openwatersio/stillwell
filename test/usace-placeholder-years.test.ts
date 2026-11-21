@@ -46,7 +46,7 @@ const verify = async () => {
 };
 
 /** The store as the steps leave it: the ten deleted, bounds and stations rebuilt from what remains. */
-async function afterSteps(missing = (id: string) => FILES[id]!): Promise<void> {
+async function afterSteps(missing = (id: string) => FILES[id]!, status = "active"): Promise<void> {
   for (const [id, years] of Object.entries(FILES)) {
     for (const y of years)
       await writeObservations(file(id, y), rows(y, Flag.bad, 30479.695), "NGVD29");
@@ -69,8 +69,13 @@ async function afterSteps(missing = (id: string) => FILES[id]!): Promise<void> {
   );
   await writeRows(
     stationsPath(store),
-    Object.keys(FILES).map((id) => ({ id: `usace/${id}`, missing_years: missing(id) })),
-    { id: "VARCHAR", missing_years: "INTEGER[]" },
+    Object.keys(FILES).map((id) => ({
+      id: `usace/${id}`,
+      missing_years: missing(id),
+      status,
+      live: status === "active",
+    })),
+    { id: "VARCHAR", missing_years: "INTEGER[]", status: "VARCHAR", live: "BOOLEAN" },
     "id",
   );
 }
@@ -100,12 +105,22 @@ describe("20261121-usace-placeholder-years", () => {
     await assert.rejects(verify, /2025 has no file and isn't in missing_years/);
   });
 
+  it("doesn't list years after an inactive station's last file", async () => {
+    await afterSteps((id) => (id.startsWith("MVS.Bethany") ? [] : FILES[id]!), "inactive");
+    await verify();
+  });
+
   it("fails when a publish left a station's missing_years null", async () => {
     await afterSteps();
     await writeRows(
       stationsPath(store),
-      Object.keys(FILES).map((id) => ({ id: `usace/${id}`, missing_years: null })),
-      { id: "VARCHAR", missing_years: "INTEGER[]" },
+      Object.keys(FILES).map((id) => ({
+        id: `usace/${id}`,
+        missing_years: null,
+        status: "active",
+        live: true,
+      })),
+      { id: "VARCHAR", missing_years: "INTEGER[]", status: "VARCHAR", live: "BOOLEAN" },
       "id",
     );
     await assert.rejects(verify, /missing_years is null/);
