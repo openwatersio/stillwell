@@ -65,6 +65,23 @@ describe("deleteYears", () => {
     assert.equal((await readYears(store, "usace"))!.size, 4);
   });
 
+  it("leaves its station marked when the delete fails, and clears the mark on the rerun", async () => {
+    await seed();
+    await assert.rejects(
+      deleteYears(store, "usace", "a", 1, [2025, 2026], async () => {
+        throw new Error("aws exited 1");
+      }),
+      /aws exited 1/,
+    );
+    const marked = (await readYears(store, "usace"))!;
+    assert.deepEqual(marked.get("usace/a null null"), { id: "usace/a", epoch: null, year: null });
+    await deleteYears(store, "usace", "a", 1, [2025, 2026], removePrefixes);
+    assert.deepEqual([...(await readYears(store, "usace"))!.keys()].sort(), [
+      "usace/a 1 2024",
+      "usace/b 1 2025",
+    ]);
+  });
+
   it("refuses a bad value inside the span, since it may be a reading", async () => {
     await seed();
     await writeObservations(

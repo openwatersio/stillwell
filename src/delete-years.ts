@@ -13,7 +13,7 @@ import { Flag } from "./schema.ts";
 import { possible } from "./span.ts";
 import { exists, readObservationFile } from "./store/parquet.ts";
 import { seriesPath } from "./store/paths.ts";
-import { dropYearFiles } from "./store/years.ts";
+import { dropYearFiles, markYears } from "./store/years.ts";
 import { removePrefixes, seriesPrefixes } from "./withhold.ts";
 
 export interface DeletedYears {
@@ -65,6 +65,8 @@ export async function deleteYears(
     rows += read.rows.length;
     files.push(file);
   }
+  // Marked before the delete, so a run that stops partway leaves the station's rows distrusted until the next reconcile.
+  if (files.length) await markYears(store, source, [`${source}/${sourceId}`]);
   if (files.length) await remove(store, files);
   await dropYearFiles(
     store,

@@ -59,7 +59,7 @@
  * the epoch holding their time already has, as an epoch opened with a start in
  * the past leaves them, and lists any others (src/store/misplaced.ts).
  * `delete-years` deletes a station's year files of levels that hold only values
- * flagged bad, which a year file can't be emptied of, and their rows in the
+ * flagged bad and outside the span, which a year file can't be emptied of, and their rows in the
  * years file (src/delete-years.ts); the bounds and `missing_years` follow
  * `compact --rebuild-bounds` and `publish`.
  * `years` reads the source's year files of levels into stations/years/<source>.parquet,
