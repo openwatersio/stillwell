@@ -39,6 +39,11 @@ export const metadata: SourceMetadata = {
   // Provisional values are approved months to years later.
   hourly: true,
   finalizes: true,
+  // The API answers a failure with an error status, 500 in its OpenAPI description, which
+  // `fetchText` throws on, and `featurePages` refuses an empty answer that isn't a feature
+  // collection. Nothing shows an outage never answers with an empty one, so publish still
+  // counts such a year missing.
+  skip_empty: true,
 };
 
 /** The gage's own zero, which gage height (00065) is measured from. */
@@ -340,7 +345,9 @@ interface ApiLocation {
 }
 
 interface Collection<T> {
+  type?: string;
   features: { id?: string; properties: T; geometry: { coordinates: number[] } | null }[];
+  numberReturned?: number;
   links?: { rel: string; href: string }[];
 }
 
@@ -618,9 +625,16 @@ function toStation(
   };
 }
 
-/** The part of [start, end) the station's series covers, or null when it covers none of it. */
+/**
+ * The part of [start, end) the station's series covers, or null when it covers
+ * none of it. A series that isn't live and that `time-series-metadata` lists
+ * with neither begin nor end has no values in `continuous`, so it covers
+ * nothing. `undefined`, from a list written before the fields, isn't known and
+ * covers everything, and so does a live series, whose end is left null.
+ */
 export function within(station: Station, start: Date, end: Date): [Date, Date] | null {
   const s = station as Station & Partial<UsgsStation>;
+  if (!s.live && s.series_begin === null && s.series_end === null) return null;
   const from = s.series_begin
     ? Math.max(start.getTime(), Date.parse(s.series_begin))
     : start.getTime();
@@ -890,6 +904,16 @@ async function* featurePages<T>(
   let url: string | undefined = `${API}/collections/${collection}/items?${query}`;
   while (url) {
     const page: Collection<T> = await request<Collection<T>>(url, options);
+    // An empty answer means no values (`skip_empty`) only as a whole feature collection: USGS
+    // sends `type` and `numberReturned: 0` with one from `continuous`, `time-series-metadata`
+    // and `monitoring-locations` alike. A page whose count disagrees with its features was cut short.
+    const count = page?.numberReturned;
+    if (
+      page?.type !== "FeatureCollection" ||
+      !Array.isArray(page.features) ||
+      (page.features.length ? count !== undefined && count !== page.features.length : count !== 0)
+    )
+      throw new Error(`USGS ${collection}: not a feature collection`);
     yield page.features;
     url = page.links?.find((l) => l.rel === "next")?.href;
     // The key goes with every request, so only ever to the API itself.

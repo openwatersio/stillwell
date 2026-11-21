@@ -97,7 +97,7 @@ import {
   years,
   yearsToFetch,
 } from "../src/backfill.ts";
-import { emptyKey, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
+import { emptyKey, keepsEmptyYears, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import {
   mergeBackfilled,
   readBackfilled,
@@ -663,10 +663,10 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   };
   let skipped = 0;
   // Years a skip-written campaign found empty lately, skipped rather than asked again.
-  // Only a source whose empty answer means no data, not an outage, keeps a
-  // record. One that can't be read is neither used nor written over this run.
+  // Only a source that says so keeps a record (`keepsEmptyYears`). One that
+  // can't be read is neither used nor written over this run.
   const empty =
-    mode === "written" && source.metadata.empty_means_none
+    mode === "written" && keepsEmptyYears(source.metadata)
       ? await readEmptyYears(store, sourceId, now).catch((error: Error) => {
           console.error(
             `${sourceId}: asking for every year, recording none; the empty-years record: ${error.message}`,

@@ -299,6 +299,12 @@ export interface SourceMetadata {
    */
   empty_means_none?: boolean;
   /**
+   * Whether a `--skip-written` backfill records a year with no file that came back empty and skips
+   * it for 30 days (`src/empty-years.ts`), though the adapter can't show the empty answer wasn't an
+   * outage, so publish still counts the year missing. `empty_means_none` implies it.
+   */
+  skip_empty?: boolean;
+  /**
    * The range of the source's local UTC offsets in hours, such as [-6, -4] for
    * US Central and Eastern time, so a date it gives can be turned into the
    * instants its day surely starts after and ends before. Defaults to [0, 0].
