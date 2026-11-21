@@ -425,13 +425,36 @@ export async function stations(previous: Station[] = []): Promise<UsgsStation[]>
     );
 
   checkAltitudes([...locations.values()].map((f) => f.properties));
+  // A site whose every series has neither a begin nor an end date has held no values, so it isn't listed, and a
+  // station stored for it is listed inactive by the merge. It's listed again at the first refresh that finds a
+  // series dated. A site with a dated series keeps the one `choose` picked.
+  const dated = new Set(
+    series.filter((s) => eligible(s) && (s.begin || s.end)).map((s) => s.monitoring_location_id),
+  );
+  const known = new Map(previous.map((p) => [p.id, p as Partial<UsgsStation> & Station]));
+  const dropped: string[] = [];
   const out: UsgsStation[] = [];
   for (const [id, s] of chosen) {
     const location = locations.get(id);
     if (!location?.geometry || location.properties.agency_code !== "USGS") continue;
+    if (!s.begin && !s.end && !dated.has(id)) {
+      dropped.push(`usgs/${id.replace(/^USGS-/, "")}`);
+      continue;
+    }
     const kind = kindOf(location.properties, tidal.has(id));
     out.push(toStation(location.properties, location.geometry.coordinates, s, kind, grounds));
   }
+  // A reply that lost its dates would retire stations that had them, live ones included.
+  const active = (id: string) => known.get(id)?.status === "active";
+  const lost = dropped.filter(
+    (id) =>
+      active(id) &&
+      (known.get(id)?.live || known.get(id)?.series_begin || known.get(id)?.series_end),
+  );
+  if (lost.length > 10 || dropped.some((id) => active(id) && known.get(id)?.live))
+    throw new Error(
+      `USGS gave no begin or end date for ${lost.length} series that had one, e.g. ${lost[0]}`,
+    );
   return out.sort((a, b) => a.id.localeCompare(b.id));
 }
 
@@ -489,14 +512,18 @@ export function choose(series: ApiSeries[]): Map<string, ApiSeries> {
   ];
   const chosen = new Map<string, ApiSeries>();
   for (const s of series) {
-    // A few instantaneous series carry no statistic code (Housatonic River at Shelton, 01208760).
-    const instantaneous = s.statistic_id === "00011" || s.statistic_id === null;
-    if (!DATUM_OF.has(s.parameter_code) || !instantaneous) continue;
-    if (s.unit_of_measure !== "ft") continue;
+    if (!eligible(s)) continue;
     const best = chosen.get(s.monitoring_location_id);
     if (!best || before(rank(s), rank(best))) chosen.set(s.monitoring_location_id, s);
   }
   return chosen;
+}
+
+/** Whether `choose` may pick a series: gage height or another water-level parameter, instantaneous, in feet. */
+function eligible(s: ApiSeries): boolean {
+  // A few instantaneous series carry no statistic code (Housatonic River at Shelton, 01208760).
+  const instantaneous = s.statistic_id === "00011" || s.statistic_id === null;
+  return DATUM_OF.has(s.parameter_code) && instantaneous && s.unit_of_measure === "ft";
 }
 
 /** A series that reported in the last year. */
