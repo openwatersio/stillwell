@@ -26,7 +26,7 @@ Observed water levels and verified high and low waters for the US National Water
 
 ### Backfill
 
-At a second a request, a backfill of every station (`all --with-inactive`) from 1996 on is about 210,000 requests: a month of 6-minute levels for each month between a station's established and removed dates, plus one or two `hourly_height` requests per year before 1997 and a `high_low` request per year at the non-lake stations, two in a leap year. That's about 58 hours, ten or more of the Ingest workflow's runs with `--skip-written` and `timeout` at 360 (its default is 180 minutes). Years a station returns nothing for write no file, and `--skip-written` records them and skips them for 30 days. Without it, each run asks again for every empty year inside a station's dates before reaching new stations, at about 15 seconds a year.
+At a second a request, a backfill of every station (`all --with-inactive`) from 1996 on is about 187,000 requests: a month of 6-minute levels for each month of a station's established and removed dates from 2001 and, before then, from its first inventory period (182,000 months, against 205,000 by dates alone), plus one or two `hourly_height` requests per year before 1997 and a `high_low` request per year at the non-lake stations, two in a leap year. That's about 52 hours, nine or more of the Ingest workflow's runs with `--skip-written` and `timeout` at 360 (its default is 180 minutes). Years a station returns nothing for write no file, and `--skip-written` records them and skips them for 30 days. Without it, each run asks again for every empty year inside a station's dates before reaching new stations, at about 15 seconds a year.
 
 ### Scheduled runs
 
