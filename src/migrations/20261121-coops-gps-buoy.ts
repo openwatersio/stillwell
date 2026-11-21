@@ -9,6 +9,8 @@ export default {
   steps: [
     { ingest: "stations coops --no-publish" },
     { ingest: "withhold coops" },
+    { ingest: "matches --prune" },
+    { ingest: "links --prune" },
     { ingest: "publish" },
     {
       check: "the erratum for CO-OPS's GPS buoy reads back from the store",
