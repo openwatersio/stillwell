@@ -492,7 +492,7 @@ function applyDecisions(epochs: Epoch[], options: EpochOptions): EpochEvent | nu
       event = "confirmed";
     }
     // The decision gives the instant the reference began, which leaves no reading between the two epochs.
-    if (decision.since) {
+    if (decision.since !== undefined) {
       const where = `${options.station}: since ${decision.since}`;
       const at = Date.parse(decision.since);
       if (Number.isNaN(at) || iso(at) !== decision.since)

@@ -141,8 +141,9 @@ export default {
         for (const [key, decision] of Object.entries(overrides.epochs ?? {})) {
           const id = key.split(" ")[0]!;
           const { epochs } = await listed(store, id);
-          if (decision.reject && !epochs.some((x) => x.state === "rejected"))
-            throw new Error(`${id} has no rejected epoch`);
+          const start = key.slice(id.length + 1);
+          if (decision.reject && !epochs.some((x) => x.state === "rejected" && x.since === start))
+            throw new Error(`${id} has no rejected epoch starting at ${start}`);
           if (decision.since) {
             const at = epochs.findIndex((x) => x.since === decision.since);
             if (at < 1 || epochs[at - 1]!.until !== decision.since)

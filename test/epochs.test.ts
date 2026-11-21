@@ -475,6 +475,7 @@ describe("nextEpochs, with decisions", () => {
           ),
         message,
       );
+    refuses({ since: "" }, /isn't an instant/);
     refuses({ since: "2027-05-20" }, /isn't an instant/);
     refuses({ since: "2027-02-30T00:00:00Z" }, /isn't an instant/);
     refuses({ since: "2026-03-01T00:00:00Z" }, /isn't after the epoch before/);
