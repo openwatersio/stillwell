@@ -3,9 +3,11 @@
  * QC of one station at a time misses: months holding another gauge's data,
  * clock drift and jumps, and level steps. Reads hourly values from the store's
  * year files and prints a Markdown report of what it finds for a person to
- * judge. It changes nothing in the store.
+ * judge. With `--findings`, it also writes what it found as JSON
+ * (src/findings.ts), for the errata report. It changes nothing in the store.
  *
  *   node scripts/cross-check.ts <minLat,minLon,maxLat,maxLon> <from> <to> [source,...]
+ *       [--findings <file.json> --region <name>]
  *   node scripts/cross-check.ts 53.2,6.5,55.3,9.2 2000 2026 pegelonline,gesla
  *
  * `to` is exclusive. Hourly values are cached in .cache/cross-check/, by store.
@@ -32,6 +34,7 @@ import { USER_AGENT } from "../src/http.ts";
 import { isMissing } from "../src/store/parquet.ts";
 import { seriesPath, stationsPath } from "../src/store/paths.ts";
 import { Flag } from "../src/schema.ts";
+import { finding, monthRuns, offsets, PAD_DAYS, type Finding } from "../src/findings.ts";
 
 const ROOT = resolve(import.meta.dirname, "..");
 const STORE = (process.env.STILLWELL_STORE ?? "https://stillwell.openwaters.io").replace(/\/$/, "");
@@ -54,7 +57,18 @@ const CONNECTIONS = 8;
 /** Bumped when what the cache holds changes, so older files aren't read. */
 const CACHE_FORMAT = 3;
 
-const [box, fromArg, toArg, sourceArg] = process.argv.slice(2);
+const args = process.argv.slice(2);
+// Taken out by hand, since parseArgs would read a box such as -45,... as an option.
+const flag = (name: string) => {
+  const at = args.indexOf(name);
+  if (at === -1) return undefined;
+  const value = args.splice(at, 2)[1];
+  if (!value || value.startsWith("--")) throw new Error(`${name} needs a value`);
+  return value;
+};
+const flags = { findings: flag("--findings"), region: flag("--region") };
+if (flags.findings && !flags.region) throw new Error("--findings needs --region");
+const [box, fromArg, toArg, sourceArg] = args;
 const bounds = box?.split(",").map(Number);
 const from = Number(fromArg);
 const to = Number(toArg);
@@ -71,6 +85,10 @@ if (
   );
 const [minLat, minLon, maxLat, maxLon] = bounds as [number, number, number, number];
 const sources = sourceArg?.split(",");
+const REGION = flags.region ?? "";
+const DAY_MS = 86_400_000;
+/** What `--findings` writes (src/findings.ts). */
+const findings: Finding[] = [];
 
 interface Listed {
   id: string;
@@ -133,6 +151,12 @@ const root = (id: string): string => (gauge.get(id) === id ? id : root(gauge.get
 for (const s of listed)
   for (const other of s.same_as) if (gauge.has(other)) gauge.set(root(other), root(s.id));
 const sameGauge = (a: string, b: string) => root(a) === root(b);
+/** Every record of `id`'s gauge, for a finding, so a reviewed entry for any of them settles it. */
+const recordsOf = (id: string) =>
+  listed
+    .filter((s) => sameGauge(s.id, id))
+    .map((s) => s.id)
+    .sort();
 
 await mkdir(CACHE, { recursive: true });
 const series = new Map<string, Hourly>();
@@ -290,9 +314,21 @@ for (const [i, a] of gauges.entries())
       twins.push(
         `${name(a.id)} and ${name(b.id)}, ${km.toFixed(1)} km, usual RMS ${cm(median(months.map((m) => m.rms)))} cm`,
       );
-    for (const c of copies(months))
+    const copied = copies(months);
+    for (const c of copied)
       console.log(
         `| ${name(a.id)} | ${name(b.id)} | ${km.toFixed(0)} | ${c.month} | ${c.hours} | ${c.r.toFixed(4)} | ${cm(c.rms)} | ${cm(c.usual)} |`,
+      );
+    for (const run of monthRuns(copied.map((c) => c.month)))
+      findings.push(
+        finding(
+          "copied",
+          a.id,
+          run.since,
+          run.until,
+          `${a.id} and ${b.id}, ${km.toFixed(0)} km apart, agree far better than usual from ${day(run.since)} to before ${day(run.until)}: one holds the other's data.`,
+          { other: b.id, records: recordsOf(a.id), otherRecords: recordsOf(b.id) },
+        ),
       );
   }
 console.log(`\n${pairMonths} pair-months compared.`);
@@ -361,8 +397,18 @@ for (const s of stations) {
   )) {
     const inside = found.filter((w) => w.time >= run.from && w.time <= run.to);
     const diurnal = inside.filter((w) => w.diurnal !== null).map((w) => w.diurnal! - diurnalCenter);
+    const late = median(inside.map((w) => w.semidiurnal)) - center;
     console.log(
-      `| ${name(s.id)} | ${date(run.from)} | ${date(run.to + WINDOW_DAYS * 86_400_000)} | ${run.count} | ${scatter.toFixed(1)} | ${(median(inside.map((w) => w.semidiurnal)) - center).toFixed(0)} | ${diurnal.length ? median(diurnal).toFixed(0) : ""} |`,
+      `| ${name(s.id)} | ${date(run.from)} | ${date(run.to + WINDOW_DAYS * 86_400_000)} | ${run.count} | ${scatter.toFixed(1)} | ${late.toFixed(0)} | ${diurnal.length ? median(diurnal).toFixed(0) : ""} |`,
+    );
+    findings.push(
+      finding(
+        "clock",
+        s.id,
+        Math.floor(run.from / DAY_MS),
+        Math.ceil((run.to + WINDOW_DAYS * DAY_MS) / DAY_MS),
+        `${s.id}'s tide runs ${Math.abs(late).toFixed(0)} minutes ${late > 0 ? "late" : "early"} against its usual timing over ${run.count} ${WINDOW_DAYS}-day windows, against ${scatter.toFixed(1)} minutes of scatter.`,
+      ),
     );
   }
 }
@@ -399,9 +445,50 @@ for (const s of stations) {
     console.log(
       `| ${name(s.id)} | ${day(step.day)} | ${cm(step.size)} | ${step.seen.join(", ")} | ${step.unseen.join(", ")} |`,
     );
+  const spans = offsets(found);
+  for (const o of spans)
+    findings.push(
+      finding(
+        "offset",
+        s.id,
+        o.since,
+        o.until,
+        `${s.id}'s levels sit about ${cm(Math.abs(o.size))} cm ${o.size > 0 ? "high" : "low"} against its neighboring gauges between a step and one back, with ${PAD_DAYS} days either side, as their 30-day medians date them.`,
+        { records: recordsOf(s.id) },
+      ),
+    );
+  for (const step of found.filter((t) => !spans.some((o) => o.steps.includes(t.day))))
+    findings.push(
+      finding(
+        "step",
+        s.id,
+        step.day - PAD_DAYS,
+        step.day + PAD_DAYS,
+        `${s.id}'s levels step by ${cm(step.size)} cm against ${step.seen.join(", ")} about ${day(step.day)}, and no step undoes it within 400 days in the years checked: a change of zero, a change at the gauge, or an offset that runs past the years checked.`,
+        { records: recordsOf(s.id) },
+      ),
+    );
 }
 console.log(`\n${stationDays} station-days checked.`);
 if (lonely.length)
   console.log(
     `\nUnder 2 other gauges within ${NEIGHBOR_KM} km, so not checked for steps: ${lonely.join(", ")}.`,
   );
+
+if (flags.findings) {
+  await writeFile(
+    flags.findings,
+    JSON.stringify({
+      region: REGION,
+      from,
+      to,
+      // The run that wrote it, so a report read later shows how old it is.
+      run: process.env.GITHUB_RUN_ID
+        ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+        : "",
+      at: new Date().toISOString(),
+      findings,
+    }),
+  );
+  console.error(`${findings.length} findings written to ${flags.findings}`);
+}

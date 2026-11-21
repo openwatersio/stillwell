@@ -338,8 +338,8 @@ jobs:
   # The cross-station checks (scripts/cross-check.ts) over each region's year
   # so far and the five before: months one gauge holds another's data, clock errors and level
   # steps that QC of one station at a time misses. Each region's report is in
-  # the job summary and an artifact, for a person to read and turn into errata
-  # (docs/contributing/checks.md). It reads the public bucket and changes nothing, so it
+  # the job summary and an artifact, with its findings as JSON for the Errata
+  # check workflow's errata report (docs/contributing/checks.md). It reads the public bucket and changes nothing, so it
   # needs no store credentials or group. Only a full refresh runs it, once the
   # station lists are published.
   cross-check:
@@ -373,15 +373,20 @@ jobs:
       - run: npm ci
       - run: |
           year=$(date -u +%Y)
-          node scripts/cross-check.ts "$BOX" $((year - 5)) $((year + 1)) "$SOURCES" > report.md
+          node scripts/cross-check.ts "$BOX" $((year - 5)) $((year + 1)) "$SOURCES" \
+            --findings findings.json --region "$REGION" > report.md
           cat report.md >> "$GITHUB_STEP_SUMMARY"
         env:
           BOX: ${{ matrix.box }}
           SOURCES: ${{ matrix.sources }}
+          REGION: ${{ matrix.region }}
+      # The Errata check workflow reads findings.json into the errata report.
       - uses: actions/upload-artifact@v7
         with:
           name: cross-check ${{ matrix.region }}
-          path: report.md
+          path: |
+            report.md
+            findings.json
 
   # GitHub disables a public repo's scheduled workflows after 60 days without
   # a commit. Enabling a workflow through the API restarts that count, as the

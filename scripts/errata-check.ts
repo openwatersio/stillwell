@@ -10,7 +10,8 @@
  *   STILLWELL_STORE=https://stillwell.openwaters.io npm run errata:check
  *   npm run errata:check -- --report report.json  also write each result as JSON
  *
- * The report is what scripts/errata-issues.ts reads: `{ problems, results }`,
+ * The report is what scripts/errata-report.ts reads: `{ only, problems, results }`,
+ * `only` the sources or IDs asked for, empty for every erratum,
  * each result `{ id, source, error, unreadable }`, `error` null where the
  * check passed and `unreadable` true where it failed reading the store.
  */
@@ -66,6 +67,7 @@ if (report)
   writeFileSync(
     report,
     JSON.stringify({
+      only: args,
       problems: errataProblems,
       results: results.sort((a, b) => a.id.localeCompare(b.id)),
     }),
