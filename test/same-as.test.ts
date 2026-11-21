@@ -836,6 +836,12 @@ describe("rank", () => {
       ) < 0,
       true,
     );
+    // A share of 0, a station whose files hold only values flagged bad, is no record.
+    const gesla = station("gesla/b95580", { commercial_use: false });
+    assert.equal(
+      rank(empty, gesla, NOW, new Set(), new Map([["dwr/B95580", 0]])),
+      rank(empty, gesla, NOW, new Set(), new Map()),
+    );
     // Two with none fall through to the later tests.
     assert.equal(best(station("rws/b"), empty), "dwr/B95580");
     const group = linkGauges([
