@@ -13,7 +13,8 @@ export default {
       evidence:
         "The file's header names B95500, with variable code 821 and no notes, where B95580's own number belongs. Of all 71 WDL files the adapter reads, it's the only one. Found while backfilling California DWR; see [#55](https://github.com/openwatersio/stillwell/pull/55).",
       reported: "2026-11-07",
-      report: "Sent to wdlweb@water.ca.gov on 2026-11-07. No answer yet.",
+      report:
+        "Sent to wdlweb@water.ca.gov on 2026-11-07. Asked again on 2026-11-21, in the email about the stale files (#461), whether the file is meant to hold B95500. No answer yet.",
       // Another WDL station's levels show the read isn't empty for another reason.
       check: async (store) => {
         if (!(await store.levels("dwr/B95060", "2025-01-01", "2026-01-01")).length)
