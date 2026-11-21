@@ -8,9 +8,10 @@ const IDS = [
   "uhslc-vardo-zero-steps",
   "gesla-vardo-uhslc-1989-2003-decimeters",
   "gesla-vardo-uhslc-zero-steps",
+  "gesla-tregde-uhslc-1987-2003-decimeters",
 ];
 
-// Both entries keep the values as served, so publish carries them to the station list and errata.json.
+// The entries keep the values as served, so publish carries them to the station list and errata.json.
 export default {
   description:
     "Publish the UHSLC errata on Vardø and Tregde decimeter rounding and Vardø's zero steps",

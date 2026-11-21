@@ -477,11 +477,11 @@ export default {
       since: "1989-11-01",
       handling: "kept",
       error:
-        "GESLA 4.1 copies UHSLC's Vardø records (805 and 805a) with UHSLC's values, whose zero sits at four heights above Kartverket's chart datum from 1989 (erratum `uhslc-vardo-zero-steps`).",
+        "GESLA 4.1 copies UHSLC's Vardø records (805 and 805a) with UHSLC's values, whose readings sit at four different heights above Kartverket's, which uses chart datum, from 1989 (erratum `uhslc-vardo-zero-steps`).",
       response:
         "Kept as served, as UHSLC's own series is. Kartverket's own series of the gauge is the group's preferred series.",
       evidence:
-        "November 2026. Against `kartverket/VAW` at the same hours, the research-quality copy's median difference is 866 mm in March 1998 and 926 in June 2010, and the fast-delivery copy's is 907 mm in June 2022, as `uhslc/805`'s are.",
+        "November 2026. Against `kartverket/VAW` at the same hours, the research-quality copy's median difference is 866 mm in March 1998 and 925 to 926 in June 2010, and the fast-delivery copy's is 907 mm in June 2022, as `uhslc/805`'s are.",
       check: async (store) => {
         for (const [id, span, expected] of [
           ["gesla/vardo-805a-nor-uhslc_rq", ["1998-03-01", "1998-04-01"], 866],
@@ -498,6 +498,30 @@ export default {
           const mm = median(d) * 1000;
           if (Math.abs(mm - expected) > 6)
             throw new Error(`${id} sits ${mm.toFixed(0)} mm above kartverket/VAW, not ${expected}`);
+        }
+      },
+    },
+    {
+      id: "gesla-tregde-uhslc-1987-2003-decimeters",
+      stations: ["gesla/tregde-804-nor-uhslc_fd", "gesla/tregde-804a-nor-uhslc_rq"],
+      since: "1987-12-11",
+      until: "2004-01-01",
+      handling: "kept",
+      error:
+        "GESLA 4.1 copies UHSLC's Tregde records (804 and 804a) with UHSLC's values, which from 11 December 1987 to 2003 are whole decimeters (erratum `uhslc-tregde-1987-2003-decimeters`).",
+      response: "Kept as served, as UHSLC's own series is.",
+      evidence:
+        "November 2026. Both copies hold whole decimeters throughout 1998, as `uhslc/804` does.",
+      check: async (store) => {
+        for (const id of ["gesla/tregde-804-nor-uhslc_fd", "gesla/tregde-804a-nor-uhslc_rq"]) {
+          const rows = await levels(store, id, "1998-03-01", "1998-04-01");
+          const share =
+            rows.filter((o) => Math.abs(o.level * 10 - Math.round(o.level * 10)) < 1e-6).length /
+            rows.length;
+          if (share < 0.99)
+            throw new Error(
+              `${(100 * share).toFixed(1)}% of ${id}'s March 1998 values are whole decimeters`,
+            );
         }
       },
     },
