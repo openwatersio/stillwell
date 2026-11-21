@@ -8,7 +8,7 @@ import { deleteYears } from "../src/delete-years.ts";
 import { Flag, type Observation } from "../src/schema.ts";
 import { writeObservations } from "../src/store/parquet.ts";
 import { seriesPath } from "../src/store/paths.ts";
-import { readYears, reconcileYears } from "../src/store/years.ts";
+import { markYears, readYears, reconcileYears } from "../src/store/years.ts";
 import { removePrefixes } from "../src/withhold.ts";
 
 const HOUR = 3_600_000;
@@ -65,7 +65,7 @@ describe("deleteYears", () => {
     assert.equal((await readYears(store, "usace"))!.size, 4);
   });
 
-  it("leaves its station marked when the delete fails, and clears the mark on the rerun", async () => {
+  it("leaves its station marked when the delete fails, and the rerun leaves that mark for reconcile", async () => {
     await seed();
     await assert.rejects(
       deleteYears(store, "usace", "a", 1, [2025, 2026], async () => {
@@ -73,13 +73,29 @@ describe("deleteYears", () => {
       }),
       /aws exited 1/,
     );
-    const marked = (await readYears(store, "usace"))!;
-    assert.deepEqual(marked.get("usace/a null null"), { id: "usace/a", epoch: null, year: null });
+    const mark = { id: "usace/a", epoch: null, year: null };
+    assert.deepEqual((await readYears(store, "usace"))!.get("usace/a null null"), mark);
     await deleteYears(store, "usace", "a", 1, [2025, 2026], removePrefixes);
+    const left = (await readYears(store, "usace"))!;
+    assert.deepEqual([...left.keys()].sort(), [
+      "usace/a 1 2024",
+      "usace/a null null",
+      "usace/b 1 2025",
+    ]);
+    await reconcileYears(store, "usace");
     assert.deepEqual([...(await readYears(store, "usace"))!.keys()].sort(), [
       "usace/a 1 2024",
       "usace/b 1 2025",
     ]);
+  });
+
+  it("clears the mark it set, and one it finds stays", async () => {
+    await seed();
+    await deleteYears(store, "usace", "a", 1, [2025], removePrefixes);
+    assert.equal((await readYears(store, "usace"))!.has("usace/a null null"), false);
+    await markYears(store, "usace", ["usace/b"]);
+    await deleteYears(store, "usace", "b", 1, [2025], removePrefixes);
+    assert.equal((await readYears(store, "usace"))!.has("usace/b null null"), true);
   });
 
   it("refuses a bad value inside the span, since it may be a reading", async () => {

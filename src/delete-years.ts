@@ -66,12 +66,13 @@ export async function deleteYears(
     files.push(file);
   }
   // Marked before the delete, so a run that stops partway leaves the station's rows distrusted until the next reconcile.
-  if (files.length) await markYears(store, source, [`${source}/${sourceId}`]);
+  const marked = files.length ? await markYears(store, source, [`${source}/${sourceId}`]) : [];
   if (files.length) await remove(store, files);
   await dropYearFiles(
     store,
     source,
     sorted.map((year) => ({ id: `${source}/${sourceId}`, epoch, year })),
+    marked,
   );
   return { files, gone, rows };
 }

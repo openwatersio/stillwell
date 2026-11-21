@@ -84,8 +84,11 @@ export default {
           const last = ordered.at(-1)!;
           const times = async (f: { year: number; epoch: number }) =>
             readTimes(fileOf(f.year, f.epoch));
-          const lo = Math.min(...(await times(first)));
-          const hi = Math.max(...(await times(last)));
+          // Loops, since a year of 5-minute values has too many rows to spread.
+          let lo = Infinity;
+          let hi = -Infinity;
+          for (const t of await times(first)) lo = Math.min(lo, t);
+          for (const t of await times(last)) hi = Math.max(hi, t);
           if (!b?.first || !b.last || b.first < iso(lo) || b.last > iso(hi))
             throw new Error(
               `${id}: bounds ${b?.first} to ${b?.last}, files ${iso(lo)} to ${iso(hi)}`,
@@ -93,8 +96,8 @@ export default {
           if (Date.parse(b.last) < Date.UTC(last.year, 0, 1))
             throw new Error(`${id}: bounds end before ${last.year}, its last file`);
           // A live station is judged through this year, so a year with no file is missing there, unless
-          // `missingYears` is sure the source has nothing: before the station's first file. Another station's
-          // years are judged only as far as its record reaches.
+          // `missingYears` is sure the source has nothing: before the station's first file. A station that isn't live is
+          // judged only as far as its record reaches, so a year after its last file may go unlisted.
           const row = published.get(id);
           if (!row?.missing_years)
             throw new Error(
@@ -102,7 +105,7 @@ export default {
             );
           const listed = list(row.missing_years);
           for (const year of gone) {
-            const sure = year < first.year || row.live !== true;
+            const sure = year < first.year || (year > last.year && row.live !== true);
             if (!own.some((f) => f.year === year) && !sure && !listed.includes(year))
               throw new Error(`${id}: ${year} has no file and isn't in missing_years`);
           }

@@ -25,7 +25,7 @@ import type { Timer } from "./recent.ts";
  * and set their rows after, compaction does the same for the stations it
  * folds, then lists the source's files to drop rows whose file is gone and
  * read the files of marked stations (left by a run that stopped partway) or
- * with no row. `delete-years` marks its station, deletes the files and drops their rows. `withhold` and each refresh drop withheld stations' rows, and
+ * with no row. `delete-years` marks its station, deletes the files, then drops their rows and its mark. `withhold` and each refresh drop withheld stations' rows, and
  * reconcile leaves them out. A source without one gets none until `ingest
  * years <source>` reads every file. A writer that doesn't keep it, such as an
  * older build after a rollback, leaves rows out of date until `ingest years
@@ -302,17 +302,19 @@ export async function dropYears(
 
 /**
  * Drop the rows of the year files `files` names, which a run has deleted, and
- * the marks of their stations; returns how many rows it dropped.
+ * clear `marked`, the stations the run marked before deleting; a mark another
+ * run left stays for the next reconcile. Returns how many rows it dropped.
  */
 export async function dropYearFiles(
   store: string,
   source: string,
   files: { id: string; epoch: number; year: number }[],
+  marked: string[] = [],
 ): Promise<number> {
   const rows = await readYears(store, source);
   if (!rows) return 0;
   const gone = files.map(key).filter((k) => rows.has(k));
-  const marks = files.map((f) => markKey(f.id)).filter((k) => rows.has(k));
+  const marks = marked.map(markKey).filter((k) => rows.has(k));
   if (!gone.length && !marks.length) return 0;
   for (const k of [...gone, ...marks]) rows.delete(k);
   await writeYears(store, source, [...rows.values()]);
