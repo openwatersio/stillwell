@@ -1,5 +1,5 @@
 import type { Period } from "../../datums.ts";
-import { Blocked, getJson } from "../../http.ts";
+import { Blocked, getJson, getText } from "../../http.ts";
 import { possible } from "../../span.ts";
 import {
   Flag,
@@ -24,6 +24,7 @@ import {
  */
 const MDAPI = "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi";
 const DATA = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter";
+const INVENTORY = "https://opendap.co-ops.nos.noaa.gov/axis/webservices/datainventory/response.jsp";
 
 export const metadata: SourceMetadata = {
   id: "coops",
@@ -322,14 +323,19 @@ export async function levels(
   end: Date,
   station: Partial<Pick<CoopsStation, "live" | "established" | "removed">> = {},
 ): Promise<Observation[]> {
-  const window = await operated(id, end, station);
+  const spans = await operated(id, end, station);
   const out: Observation[] = [];
   // Hourly heights go up to 365 days a request, so the first month before 1997
   // asks for the rest of its year, and later months take their share.
   let hourlyYear: number | undefined;
   let hourlyRows: Row[] = [];
   for (const [from, to] of chunks(start, end, "month")) {
-    if (!overlaps(window, from, to)) continue;
+    const early = from.getTime() < SIX_MINUTE_ERA;
+    const hasHourly = early && spans.hourly(from, to);
+    // Before 1997 a month is asked for if either record covers it: the
+    // inventory lists only some preliminary 6-minute values there, and the
+    // hourly heights replace those.
+    if (!spans.sixMinute(from, to) && !hasHourly) continue;
     let sixMinute = await rowsOf("water_level", id, from, to);
     // Before 1997, the verified hourly heights lead. Some stations' preliminary
     // 6-minute values sit 0.66 m to 1.9 m off the verified hours on average
@@ -339,7 +345,7 @@ export async function levels(
     // values is an outage or a gap, and hourly heights would replace the
     // store's 6-minute values for that month.
     let hourly: Row[] = [];
-    if (from.getTime() < SIX_MINUTE_ERA) {
+    if (hasHourly) {
       if (hourlyYear !== from.getUTCFullYear()) {
         hourlyYear = from.getUTCFullYear();
         const until = new Date(
@@ -379,10 +385,10 @@ export async function extremes(
   end: Date,
   station: Partial<Pick<CoopsStation, "live" | "established" | "removed">> = {},
 ): Promise<PublishedExtreme[]> {
-  const window = await operated(id, end, station);
+  const spans = await operated(id, end, station);
   const out: PublishedExtreme[] = [];
   for (const [from, to] of [...chunks(start, end, "year")].flatMap(within365)) {
-    if (!overlaps(window, from, to)) continue;
+    if (!spans.highLow(from, to)) continue;
     for (const r of await rowsOf("high_low", id, from, to)) {
       const level = Number(r.v);
       if (r.v === "" || !Number.isFinite(level) || !r.ty) continue;
@@ -449,18 +455,107 @@ async function rowsOf(product: string, id: string, from: Date, to: Date): Promis
   return body.data;
 }
 
-// When the station operated, so a backfill doesn't ask for decades it wasn't
-// there: from the store's list when it has the dates, else from the
-// station's details. A live station's last month needs neither.
-const windows = new Map<string, Promise<[number, number]>>();
+/** Whether a product has values in [from, to): what a request for that span needs to be sent. */
+type Covers = (from: Date, to: Date) => boolean;
 
-function operated(
+interface Spans {
+  sixMinute: Covers;
+  hourly: Covers;
+  highLow: Covers;
+}
+
+const everything: Covers = () => true;
+
+// When the station has data, so a backfill doesn't ask for decades it has
+// none for: from CO-OPS's data inventory, which lists each product's periods
+// with their gaps; failing that, from the store's list when it has the
+// dates, else from the station's details. A live station's last month needs
+// none of them.
+const inventories = new Map<string, Promise<Spans | null>>();
+
+async function operated(
   id: string,
   end: Date,
+  station: Partial<Pick<CoopsStation, "live" | "established" | "removed">>,
+): Promise<Spans> {
+  if (station.live && end.getTime() > Date.now() - 31 * DAY_MS)
+    return { sixMinute: everything, hourly: everything, highLow: everything };
+  let spans = inventories.get(id);
+  if (!spans) {
+    spans = inventoryOf(id);
+    // A failed lookup is tried again next time rather than remembered.
+    spans.catch(() => inventories.delete(id));
+    inventories.set(id, spans);
+  }
+  const found = await spans;
+  if (found) return found;
+  const window = await windowFor(id, station);
+  const covers: Covers = (from, to) => overlaps(window, from, to);
+  return { sixMinute: covers, hourly: covers, highLow: covers };
+}
+
+/**
+ * The periods CO-OPS's data inventory gives for each product, or null when it
+ * has none for the station (its answer is a SOAP fault) or can't be reached.
+ * A period is a first and last time, and a product lists one for each stretch
+ * between its gaps. Preliminary 6-minute periods are an envelope, so a month
+ * in one may hold none, and the inventory omits some of them before 1997
+ * (Chuuk, 1840000, November 1994).
+ */
+function inventoryOf(id: string): Promise<Spans | null> {
+  return paced(async () => {
+    let text: string;
+    try {
+      text = await getText(
+        `${INVENTORY}?stationId=${encodeURIComponent(id)}&format=xml&Submit=Submit`,
+        {
+          fresh: true,
+        },
+      );
+    } catch (error) {
+      if (error instanceof Blocked) throw error;
+      console.warn(`CO-OPS ${id} inventory: ${error instanceof Error ? error.message : error}`);
+      return null;
+    }
+    if (!text.includes("<station ")) return null;
+    const periods: Record<"sixMinute" | "hourly" | "highLow", [number, number][]> = {
+      sixMinute: [],
+      hourly: [],
+      highLow: [],
+    };
+    for (const m of text.matchAll(/<parameter first="([^"]*)" last="([^"]*)" name="([^"]*)"/g)) {
+      const [, first, last, name] = m;
+      const product = /6-Minute Water Level/.test(name!)
+        ? "sixMinute"
+        : /Hourly Height Water Level/.test(name!)
+          ? "hourly"
+          : /High\/Low Water Level/.test(name!)
+            ? "highLow"
+            : null;
+      if (!product) continue;
+      const from = timeOf(first!);
+      const to = timeOf(last!);
+      if (Number.isNaN(from) || Number.isNaN(to))
+        throw new Error(`CO-OPS ${id} inventory has unreadable dates: ${first}, ${last}`);
+      periods[product].push([from, to]);
+    }
+    const covers =
+      (list: [number, number][]): Covers =>
+      (from, to) =>
+        list.some((p) => overlaps(p, from, to));
+    return {
+      sixMinute: covers(periods.sixMinute),
+      hourly: covers(periods.hourly),
+      highLow: covers(periods.highLow),
+    };
+  });
+}
+
+/** The [established, removed] window, from the store's list when it has the dates, else from the station's details. */
+function windowFor(
+  id: string,
   { live, established, removed }: Partial<Pick<CoopsStation, "live" | "established" | "removed">>,
 ): Promise<[number, number]> {
-  if (live && end.getTime() > Date.now() - 31 * DAY_MS)
-    return Promise.resolve([-Infinity, Infinity]);
   // A live station is running, whatever an old removed date says.
   const open = ([from, to]: [number, number]): [number, number] => [from, live ? Infinity : to];
   // Only dates the list actually gave count; a missing one is looked up.
@@ -484,6 +579,8 @@ function operated(
   }
   return window.then(open);
 }
+
+const windows = new Map<string, Promise<[number, number]>>();
 
 /** The [established, removed] window, refusing a date that doesn't parse rather than skipping every year. */
 function windowOf(
@@ -601,12 +698,17 @@ let lastMetadata = 0;
  * here fails only its request.
  */
 function metadataOf<T>(path: string, fresh = false): Promise<T> {
+  return paced(() => getJson<T>(`${MDAPI}/${path}`, { fresh }));
+}
+
+/** Runs a metadata-side request in the queue, a second after the last, waiting out a 403. */
+function paced<T>(request: () => Promise<T>): Promise<T> {
   const next = metadataQueue.then(async () => {
     for (let attempt = 1; ; attempt++) {
       await sleep(lastMetadata + pacing.metadataMs - Date.now());
       lastMetadata = Date.now();
       try {
-        return await getJson<T>(`${MDAPI}/${path}`, { fresh });
+        return await request();
       } catch (error) {
         if (attempt >= 3 || !String(error).includes("returned 403")) throw error;
         await sleep(pacing.blockedMs * attempt);
