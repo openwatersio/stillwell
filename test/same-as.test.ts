@@ -837,11 +837,13 @@ describe("rank", () => {
       true,
     );
     // A share of 0, a station whose files hold only values flagged bad, is no record.
-    const gesla = station("gesla/b95580", { commercial_use: false });
-    assert.equal(
-      rank(empty, gesla, NOW, new Set(), new Map([["dwr/B95580", 0]])),
-      rank(empty, gesla, NOW, new Set(), new Map()),
-    );
+    const gesla = station("gesla/b95580", {
+      commercial_use: false,
+      first: "2000-01-01T00:00:00Z",
+      last: "2001-01-01T00:00:00Z",
+    });
+    assert.equal(rank(empty, gesla, NOW, new Set(), new Map([["dwr/B95580", 0]])) > 0, true);
+    assert.equal(rank(empty, gesla, NOW, new Set(), new Map([["dwr/B95580", 1]])) < 0, true);
     // Two with none fall through to the later tests.
     assert.equal(best(station("rws/b"), empty), "dwr/B95580");
     const group = linkGauges([
