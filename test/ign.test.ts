@@ -526,7 +526,7 @@ describe("IGN", () => {
     });
     const linked = linkGauges(
       [
-        ...list,
+        ...list.map((s) => ({ ...s, first: "2000-01-01T00:00:00Z", last: "2023-12-31T23:00:00Z" })),
         copy(a, "gesla/alicantetg-ali-esp-cmems"),
         copy(b, "gesla/alicante2tg-ali-esp-cmems"),
       ],
