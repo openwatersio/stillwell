@@ -114,7 +114,7 @@ export default {
       until: "2004-01-01",
       handling: "kept",
       error:
-        "UHSLC's Vardø values (805) from 1 November 1989 to the end of 2003 are rounded to whole decimeters, so each is up to 5 cm from the level the gauge read. Before November 1989 they are in centimeters and from 2004 in millimeters. The research-quality version (805a) and the FD series carry the same values.",
+        "UHSLC's Vardø values (805) from 1 November 1989 to the end of 2003 are whole decimeters, apart from short runs in single days (135 of 117,361 values), so each rounded value is up to 5 cm from the level the gauge read. Before November 1989 they are in centimeters and from 2004 in millimeters. The research-quality version (805a) and the FD series carry the same values.",
       response:
         "Kept as served. The values are not rounded again or marked; nothing in the store says which are the rounded ones except this entry. Kartverket's own series of the gauge (`kartverket/VAW`), in tenths of a centimeter, is the group's preferred series and covers the span from 1 November 1989.",
       evidence:
@@ -151,15 +151,45 @@ export default {
       },
     },
     {
-      id: "uhslc-vardo-zero-steps",
-      stations: ["uhslc/805"],
+      id: "uhslc-tregde-1987-2003-decimeters",
+      stations: ["uhslc/804"],
+      since: "1987-12-11",
+      until: "2004-01-01",
       handling: "kept",
       error:
-        "UHSLC's Vardø values (805, 805a and the FD series) sit at four different heights above Kartverket's chart datum: 866 mm from November 1989 to 31 December 2006, about 925 mm from 1 January 2007 to 31 December 2018, 886 mm from 1 January 2019 to 31 May 2021 and 907 mm from 1 June 2021, while the store keeps them in one datum epoch, ZERO, from 1947. The offset steps by +59, −39 and +21 mm, each on the day it changes. UHSLC's documentation says its zero (TGZ) is chart datum + 907 mm.",
+        "UHSLC's Tregde values (804) from 11 December 1987 to the end of 2003 are whole decimeters, apart from short runs (20 of 134,733 values), so each rounded value is up to 5 cm from the level the gauge read. Before 1987 they are in centimeters and from 2004 in millimeters.",
+      response:
+        "Kept as served. Kartverket's own series of the gauge (`kartverket/TRG`) is in tenths of a centimeter.",
+      evidence:
+        "November 2026. Of the 134,733 values stored for 1987 to 2003, 134,713 are whole decimeters. The last value in a finer unit before the run is at 23:00 UTC on 31 December 1986, and UHSLC has none from then to 10 December 1987. In 2004 to 2012 about 1% are whole decimeters, by chance. Against `kartverket/TRG` in March 1998 the median difference is 494 mm. UHSLC's Andenes (800), Honningsvåg (801), Måløy (802) and Rørvik (803), the other Norwegian NHS records with a Kartverket counterpart, hold millimeters in 1991 and 1999. Zero steps against Kartverket weren't looked for at Tregde, Andenes, Måløy or Rørvik.",
+      // Whole decimeters in March 1998 and finer values in March 2005.
+      check: async (store) => {
+        const whole = (rows: { level: number }[]) =>
+          rows.filter((o) => Math.abs(o.level * 10 - Math.round(o.level * 10)) < 1e-6).length /
+          rows.length;
+        const early = whole(await read(store, "uhslc/804", "1998-03-01", "1998-04-01"));
+        const late = whole(await read(store, "uhslc/804", "2005-03-01", "2005-04-01"));
+        if (early < 0.99)
+          throw new Error(
+            `only ${(100 * early).toFixed(1)}% of Tregde's March 1998 values are whole decimeters`,
+          );
+        if (late > 0.2)
+          throw new Error(
+            `${(100 * late).toFixed(1)}% of Tregde's March 2005 values are whole decimeters`,
+          );
+      },
+    },
+    {
+      id: "uhslc-vardo-zero-steps",
+      stations: ["uhslc/805"],
+      since: "1989-11-01",
+      handling: "kept",
+      error:
+        "UHSLC's Vardø values (805, in the research-quality version and the FD series alike) sit at four different heights above Kartverket's chart datum: 866 mm from November 1989 to 31 December 2006, about 925 mm from 1 January 2007 to 31 December 2018, 886 mm from 1 January 2019 to 31 May 2021 and 907 mm from 1 June 2021, while the store keeps them in one datum epoch, ZERO, from 1947. The offset steps by +59, −39 and +21 mm, on the first day with values after each change. UHSLC's documentation gives the distance between its zero (TGZ) and chart datum as 907 mm.",
       response:
         "Kept as served, in one epoch: the store holds no offset from UHSLC's zero to chart datum, so UHSLC's Vardø and Kartverket's don't link, and a level read across 2007, 2019 or 2021 carries the step.",
       evidence:
-        "November 2026. The median of UHSLC's value less Kartverket's at the same hours, by year from 1990, is 863 to 867 mm to 2006, 924 to 926 in 2007 to 2018 (at lag 0; 925 at 5 minutes earlier, with the lag of erratum `uhslc-vardo-2007-2018-five-minutes-late`), 886 in 2019 and 2020 and 907 from 2022. By day it is 866 mm on 31 December 2006 and 937 on 1 January 2007, 926 on 30 December 2018 and 889 on 1 January 2019 (UHSLC has no value on 31 December), and 886 on 31 May 2021 and 907 on 1 June. GESLA's NHS copy of the gauge (`vardo-vaw-nor-nhs`) equals Kartverket's to 0 mm in every year from 1990 to 2026, so the steps are in UHSLC's values and not Kartverket's. UHSLC's Honningsvåg (801) against Kartverket's (HVG) steps at other dates: the yearly median is 53 to 61 mm to 2014 (45 in 2013), −28 to −33 mm from 2015 to 2020 and 0 to −1 mm from 2021, so both gauges step in 2021. UHSLC's documentation file for 805a says that the 2007 to 2014 values were replaced in January 2020 after NHS corrected systematic errors, and the 2007 step is in the values it serves. Only the 907 mm after 31 May 2021 agrees with the documented zero.",
+        "November 2026. The median of UHSLC's value less Kartverket's at the same hours, by year from 1990, is 863 to 867 mm to 2006, 924 to 926 in 2007 to 2018 (at lag 0; 925 at 5 minutes earlier, with the lag of erratum `uhslc-vardo-2007-2018-five-minutes-late`), 886 in 2019 and 2020 and 907 from 2022. By day it is 866 mm on 31 December 2006 and 937 on 1 January 2007, 926 on 30 December 2018 and 889 on 1 January 2019 (UHSLC has no value on 31 December), and 886 on 31 May 2021 and 907 on 1 June. GESLA's NHS copy of the gauge (`vardo-vaw-nor-nhs`) equals Kartverket's to 0 mm in every year from 1990 to 2026, so the steps are in UHSLC's values and not Kartverket's. UHSLC's Honningsvåg (801) against Kartverket's (HVG) steps at other dates: the yearly median is 53 to 61 mm to 2014 (45 in 2013), −28 to −33 mm from 2015 to 2020 and 0 to −1 mm from 2021, so both gauges step in 2021. UHSLC's documentation file for 805a says that the 2007 to 2014 values were replaced in January 2020 after NHS corrected systematic errors, and the 2007 step is in the values it serves. Only the offset after 31 May 2021 has the size the documentation gives, and its wording (TGZ = Chart Datum + 907 mm) doesn't say which way it runs; UHSLC's values read 907 mm above Kartverket's.",
       // The offset in a month of each span, at lag 0, within 6 mm of its value.
       check: async (store) => {
         for (const [span, expected] of [
