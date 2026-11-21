@@ -1,6 +1,7 @@
 import { impossibleDropped, type ErrataFile, type StoreReader } from "../../errata.ts";
-import type { StoredStation } from "../../schema.ts";
+import { Flag, type StoredStation } from "../../schema.ts";
 import { median } from "../../stats.ts";
+import { overrides } from "./overrides.ts";
 
 const HOUR_MS = 3_600_000;
 /** The week the altitude errata were measured over. */
@@ -75,6 +76,81 @@ export default {
         "November 2026. A scan of the range of levels in every year file of every source in the store (335,320 files) found 383 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span.",
       check: async (store, e) => {
         for (const id of e.stations!) await impossibleDropped(store, id, 2026);
+      },
+    },
+    {
+      id: "usgs-gila-painted-rock-high-readings",
+      stations: ["usgs/09519800"],
+      since: "2026-11-12",
+      until: "2026-11-14",
+      handling: "kept",
+      error:
+        "Gila River below Painted Rock Dam, Arizona, published 187 gage heights of 926 to 990 ft (282.24 to 301.75 m) between 18:20 UTC on 12 November 2026 and 11:20 on the 13th, at 5-minute steps among readings that look normal, as Provisional with no qualifier. The gage reads 0.3 to 3.7 m on every other day of the month. USGS now serves 10.4 ft at the 55 of those times that fall on its 15-minute steps, and no reading at the other 132.",
+      response:
+        "The store keeps the readings as USGS published them, and QC flags each one bad, so they're outside the good levels. A refetch of 2026 replaces the 55 USGS still serves; the other 132 stay, flagged bad, since a refetch only rewrites the times it fetched.",
+      evidence:
+        "The levels stored for the station on 11 to 14 November 2026, and USGS's current series for the station (gage height, `continuous`, series 897594e7) over the same times, read on 21 November 2026.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        const high = (await store.levels(id, e.since!, e.until!)).filter((o) => o.level > 100);
+        // A count other than the one this entry describes means the store was refetched, or the readings changed.
+        if (high.length !== 187)
+          throw new Error(`the store holds ${high.length} ${id} levels above 100 m, not 187`);
+        const unflagged = high.filter((o) => o.flag < Flag.bad);
+        if (unflagged.length)
+          throw new Error(`${unflagged.length} of ${id}'s 187 levels above 100 m aren't bad`);
+        const [first, last] = [high[0]!.time, high.at(-1)!.time];
+        if (
+          first !== Date.parse("2026-11-12T18:20:00Z") ||
+          last !== Date.parse("2026-11-13T11:20:00Z")
+        )
+          throw new Error(
+            `${id}'s levels above 100 m run from ${new Date(first).toISOString()} to ${new Date(last).toISOString()}`,
+          );
+      },
+    },
+    {
+      id: "usgs-undated-gage-changes",
+      stations: [
+        "usgs/06207500",
+        "usgs/07263883",
+        "usgs/08098295",
+        "usgs/08111056",
+        "usgs/08111070",
+        "usgs/08117857",
+        "usgs/08117858",
+        "usgs/09505400",
+        "usgs/09505800",
+        "usgs/09510200",
+      ],
+      since: "2026-11-05",
+      until: "2026-11-17",
+      handling: "corrected",
+      error:
+        "USGS dates none of a gage's changes of series or of listed altitude, so a refresh can say only that the change came after the last refresh that saw the old series and before the one that saw the new. At these ten gages that left the readings between 14:12 UTC on 5 November 2026 and 14:19 on the 16th outside every epoch's span. Eight changed only the series ID, or restated the altitude of a zero that didn't move (06207500 and 09505400). 09505800's new series starts at 22:45 on 10 November, with a step in gage height and a new altitude. 07263883 moved from its headwater series, which stopped on 8 November, to its tailwater series, which stopped on 2 October.",
+      response:
+        "The eight that kept their zero have the new epoch rejected, so the old one holds the readings. 09505800's new epoch starts at 22:45 on 10 November, and 07263883's old epoch holds until its headwater's last reading, 20:15 on 8 November. Each decision's note in `overrides` gives its evidence.",
+      evidence:
+        "USGS's current series for each gage against the readings stored for each epoch, to 0.1 mm, the step in gage height across the gap, and NGS's VERTCON 3.0 for the two altitudes in NGVD29, read on 21 November 2026.",
+      check: async (store, e) => {
+        const decided = Object.keys(overrides.epochs ?? {}).map((key) => key.split(" ")[0]!);
+        if (decided.sort().join() !== [...e.stations!].sort().join())
+          throw new Error(
+            `the decisions in overrides name ${decided.join(", ")}, not the entry's stations`,
+          );
+        for (const [key, decision] of Object.entries(overrides.epochs ?? {})) {
+          const id = key.split(" ")[0]!;
+          const { epochs } = await listed(store, id);
+          if (decision.reject && !epochs.some((x) => x.state === "rejected"))
+            throw new Error(`${id} has no rejected epoch`);
+          if (decision.since) {
+            const at = epochs.findIndex((x) => x.since === decision.since);
+            if (at < 1 || epochs[at - 1]!.until !== decision.since)
+              throw new Error(
+                `${id} has no epoch starting at ${decision.since} after one ending then`,
+              );
+          }
+        }
       },
     },
     {
