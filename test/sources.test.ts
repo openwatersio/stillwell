@@ -11,6 +11,7 @@ import * as kuestendaten from "../src/sources/pegelonline/kuestendaten.ts";
 import { sources } from "../src/sources/index.ts";
 import * as refmar from "../src/sources/refmar/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
+import rwsErrata from "../src/sources/rws/errata.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
 import { CONTRIBUTORS } from "../src/sources/uhslc/contributors.ts";
 import {
@@ -320,6 +321,86 @@ describe("rws", () => {
       rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" }),
       /extremes are in NAP, not MSL/,
     );
+    // Hourly means are all some weirs have: read as levels there, and after any reading at a time.
+    const mean = { ...nap, WaardeBewerkingsMethode: { Code: "GEMH" } };
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [
+            mean,
+            [
+              [times[0]!, 910],
+              [times[1]!, 912],
+            ],
+          ],
+          [nap, [[times[0]!, 911]]],
+        ),
+      ],
+    ]);
+    const years = [new Date("2002-01-01T00:00:00Z"), new Date("2003-01-01T00:00:00Z")] as const;
+    const at = (time: string) => time.replace("2023", "2002");
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [
+            mean,
+            [
+              [at(times[0]!), 910],
+              [at(times[1]!), 912],
+            ],
+          ],
+          [nap, [[at(times[0]!), 911]]],
+        ),
+      ],
+    ]);
+    assert.deepEqual(
+      (await rws.levels("dehaandrik.boven", ...years)).map((l) => l.level),
+      [9.11, 9.12],
+    );
+    // The window runs from 23:00 UTC on 31 December 1999 up to, not including, 1 January 2005.
+    const edge = (time: string, value = 910) => {
+      serve([[/OphalenWaarnemingen/, answer([mean, [[time, value]]])]]);
+      return rws.levels(
+        "dehaandrik.boven",
+        new Date("1999-12-01T00:00:00Z"),
+        new Date("2005-02-01T00:00:00Z"),
+      );
+    };
+    // A series of only missing-value sentinels inside the window holds no value, and isn't a failure.
+    assert.deepEqual(await edge("2002-01-01T00:00:00+01:00", 999_999_999), []);
+    assert.deepEqual(
+      (await edge("2000-01-01T00:00:00+01:00")).map((l) => l.level),
+      [9.1],
+    );
+    // A read's end is inclusive, so the mean at 2005-01-01T00:00Z is part of a read of 2004.
+    assert.deepEqual(
+      (await edge("2005-01-01T00:00:00+00:00")).map((l) => l.level),
+      [9.1],
+    );
+    await assert.rejects(edge("2005-01-01T00:01:00+00:00"), /unknown WaardeBewerkingsMethode GEMH/);
+    await assert.rejects(edge("1999-12-31T22:59:00+00:00"), /unknown WaardeBewerkingsMethode GEMH/);
+    await assert.rejects(
+      edge("2002-01-01T00:00:00+01:00", 999_999_999).then(() =>
+        edge("2023-06-01T00:00:00+00:00", 999_999_999),
+      ),
+      /unknown WaardeBewerkingsMethode GEMH/,
+    );
+    // Anywhere else, for the astronomical tide, and at other times, an hourly mean fails rather than vanish.
+    for (const [location, options] of [
+      ["goeree.lichteiland", { datum: "MSL" }],
+      ["dehaandrik.boven", { process: "astronomisch" as const }],
+    ] as const)
+      await assert.rejects(
+        rws.levels(location, ...years, options),
+        /unknown WaardeBewerkingsMethode GEMH/,
+      );
+    serve([[/OphalenWaarnemingen/, answer([mean, [[times[0]!, 910]]], [nap, [[times[0]!, 911]]])]]);
+    await assert.rejects(
+      rws.levels("dehaandrik.boven", ...range),
+      /unknown WaardeBewerkingsMethode GEMH/,
+    );
     // A way of deriving values the adapter doesn't know fails rather than vanish.
     serve([
       [
@@ -550,6 +631,16 @@ describe("rws", () => {
     await assert.rejects(
       rws.extremes("hoekvanholland", ...range),
       /unknown extreme type hoogwater 1/,
+    );
+  });
+});
+
+describe("rws hourly means", () => {
+  it("are read at the weirs the erratum lists", () => {
+    const entry = rwsErrata.errata.find((e) => e.id === "rws-hourly-means-weirs")!;
+    assert.deepEqual(
+      [...rws.HOURLY_MEANS].map((code) => `rws/${code}`).sort(),
+      [...entry.stations].sort(),
     );
   });
 });

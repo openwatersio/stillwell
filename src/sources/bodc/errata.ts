@@ -1,7 +1,7 @@
-import { dayAfter, flaggedSpan, type ErrataFile, type StoreReader } from "../../errata.ts";
+import { dayAfter, type ErrataFile, type StoreReader } from "../../errata.ts";
 import { POSITIONS } from "../../positions.ts";
 import { Flag } from "../../schema.ts";
-import { distanceKm, median } from "../../stats.ts";
+import { distanceKm } from "../../stats.ts";
 
 /** A station's stored levels, throwing when there are none. */
 async function levels(store: StoreReader, id: string, since: string, until = dayAfter(since, 1)) {
@@ -63,9 +63,9 @@ export default {
       error:
         "BODC's ERDDAP datasets for the UK National Tide Gauge Network hold less than its processed files. About one value in 32 is missing, so a 31-day month has 2,880 values, not 2,976. Whole months are missing. Most gauges' records end in December 2024, February 2026 or September 2026, though BODC's processed data page offers the network to August 2026.",
       response:
-        "The store keeps what ERDDAP serves and leaves the gaps. Monthly's refetch reads every station's last two years again, so months BODC adds later reach the store. GESLA's `-bodc` records hold BODC's processed files to 2024 or 2025 without these gaps.",
+        "The store keeps what ERDDAP serves and leaves the gaps. Monthly's refetch reads every station's last three calendar years again, so months BODC adds later reach the store. GESLA's `-bodc` records hold BODC's processed files to 2024 or 2025 without these gaps.",
       evidence:
-        "At Lowestoft (`LOW_ukcff_3942_001`) on 1 June 2024, ERDDAP has 93 of the day's 96 quarter hours. 07:30, 15:15 and 23:00 are missing; GESLA's copy has them (07:30 is 1.956 m). Over May 2024, ERDDAP has no Lowestoft values at all, while GESLA's copy has 2,976.\n\nAt Lerwick (`LER_ukcff_4109_001`), the months present have 2,880 values in 31-day months, 2,788 in 30-day ones and 2,602 in February. These months are missing: May to December 2022, October 2023 to February 2024, May 2024, July 2024, and April to September 2025.\n\nRecords end on 2024-12-31 at 16 gauges, 2026-02-28 at 9, 2026-09-30 at 15, 2024-12-07 at Mumbles and 2025-11-30 at Workington. Checked on 2026-11-09.",
+        "At Lowestoft (`LOW_ukcff_3942_001`) on 1 June 2024, ERDDAP has 93 of the day's 96 quarter hours. 07:30, 15:15 and 23:00 are missing; GESLA's copy has them (07:30 is 1.956 m). Over May 2024, ERDDAP has no Lowestoft values at all, while GESLA's copy has 2,976.\n\nAt Lerwick (`LER_ukcff_4109_001`), the months present have 2,880 values in 31-day months, 2,788 in 30-day ones and 2,602 in February. These months are missing: May to December 2022, October 2023 to February 2024, May 2024, July 2024, and April to September 2025. Holyhead has no values in March 2026.\n\nRecords end on 2024-12-31 at 16 gauges, 2026-02-28 at 9, 2026-09-30 at 15, 2024-12-07 at Mumbles and 2025-11-30 at Workington. Checked on 2026-11-09.",
       reported: "2026-11-09",
       report:
         "Sent to BODC on 2026-11-09 in ticket BODCREQ-11479, with [#107](https://github.com/openwatersio/stillwell/issues/107), [#109](https://github.com/openwatersio/stillwell/issues/109) and [#110](https://github.com/openwatersio/stillwell/issues/110) together. No answer yet.",
@@ -83,44 +83,13 @@ export default {
           throw new Error(
             `the store holds ${may.length} Lowestoft levels in May 2024, which ERDDAP lacks`,
           );
-      },
-    },
-    {
-      id: "bodc-ilfracombe-2023-offsets",
-      stations: ["bodc/ilf"],
-      since: "2023-09-30",
-      until: "2025-03-21",
-      handling: "flagged",
-      error:
-        "BODC's Ilfracombe levels sit 0.9 to 1.6 m off GESLA's CMEMS copy of the gauge on and off from 30 September 2023 to 20 March 2025.",
-      response:
-        "30 September 2023 to 20 March 2025 is flagged `suspect` whole, keeping BODC's own flag as `source_flag`. The store's QC already flags 82 to 93% of it.",
-      evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's CMEMS copy of the gauge (`gesla/ilfracombe-ilf-gbr-cmems`): the difference is −0.01 m before and −0.02 m after and −0.88 to −1.56 m over the spans.",
-      check: async (store, e) => {
-        await flaggedSpan(store, e);
-        const [since, until] = [e.since!, e.until!];
-        const cmems = new Map(
-          (await store.levels("gesla/ilfracombe-ilf-gbr-cmems", since, until)).map((o) => [
-            o.time,
-            o.level,
-          ]),
-        );
-        const days = Map.groupBy(
-          (await levels(store, e.stations![0]!, since, until)).filter((o) => cmems.has(o.time)),
-          (o) => Math.floor(o.time / 86_400_000),
-        );
-        if (!days.size) throw new Error("Ilfracombe and its CMEMS copy share no times in the span");
-        // A day's median difference, from at least four shared times so a day half missing can't pass for an offset.
-        const off = [...days.values()].filter(
-          (day) =>
-            day.length >= 4 &&
-            Math.abs(median(day.map((o) => o.level - cmems.get(o.time)!))) > 0.75,
-        );
-        if (!off.length)
+        const march = await store.levels("bodc/hol", "2026-03-01", "2026-04-01");
+        if (march.length)
           throw new Error(
-            `no day of the ${days.size} Ilfracombe shares with its CMEMS copy in the span sits more than 0.75 m off it`,
+            `the store holds ${march.length} Holyhead levels in March 2026, which ERDDAP lacks`,
           );
+        await levels(store, "bodc/hol", "2026-02-28");
+        await levels(store, "bodc/hol", "2026-04-01");
       },
     },
     {
@@ -130,33 +99,50 @@ export default {
       until: "2025-10-15",
       handling: "kept",
       error:
-        "BODC's ERDDAP gives St. Helier 0.000 m at 19:15 UTC on 14 October 2025, between 5.559 m at 19:00 and 6.77 m after a one-hour gap.",
+        "BODC's ERDDAP gives St. Helier 0.000 m at 19:15 UTC on 14 October 2025, between 5.559 m at 19:00 and 6.772 m after a one-hour gap.",
       response:
-        "The value is kept as served, with BODC's good flag. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark the rest of the day suspect too.",
+        "The value is kept as served, with BODC's good flag as `source_flag`. QC flags it `suspect` with the two values before it. Its residual-jump rule flags the 0.000 m, and its spike rule flags the 5.383 m at 18:45 and 5.559 m at 19:00, which it judges against the 0.000 m. No erratum span flags it, since spans are whole days and would mark the rest of the day suspect too.",
       evidence:
-        "In BODC's ERDDAP record of St. Helier, as the store holds it, checked in November 2026: 5.559 m at 19:00, 0.000 m at 19:15 with BODC's good flag, nothing until 20:30, then 6.77 m.",
+        "In BODC's ERDDAP record of St. Helier, as the store holds it, checked in November 2026: 5.383 m at 18:45, 5.559 m at 19:00, 0.000 m at 19:15 with BODC's good flag, nothing until 20:15, then 6.772 m. The store flags those three values `suspect`, and no others that day. Run on the year's 14,830 values with the QC rules the store uses, the residual-jump rule flags the 0.000 m, and with that rule off, the spike rule flags only the two before it.",
+      reported: null,
+      report: null,
       check: async (store, e) => {
         const day = e.since!;
         const rows = (await levels(store, e.stations![0]!, day)).filter(
-          (o) => o.time >= Date.parse(`${day}T19:00Z`),
+          (o) => o.time >= Date.parse(`${day}T18:45Z`),
         );
-        const [before, zero, after] = rows;
+        const [first, before, zero, after] = rows;
         if (
+          first?.time !== Date.parse(`${day}T18:45Z`) ||
+          Math.abs(first.level - 5.383) > 0.0005 ||
           before?.time !== Date.parse(`${day}T19:00Z`) ||
           Math.abs(before.level - 5.559) > 0.0005 ||
           zero?.time !== Date.parse(`${day}T19:15Z`) ||
           zero.level !== 0 ||
           !after ||
           after.time - zero.time < 3_600_000 ||
-          Math.abs(after.level - 6.77) > 0.005
+          Math.abs(after.level - 6.772) > 0.0005
         )
           throw new Error(
-            `St. Helier doesn't hold 5.559 m at 19:00, 0.000 m at 19:15 and 6.77 m after an hour's gap on ${day}`,
+            `St. Helier doesn't hold 5.383 m at 18:45, 5.559 m at 19:00, 0.000 m at 19:15 and 6.772 m after an hour's gap on ${day}`,
           );
-        if (zero.source_flag !== Flag.good || zero.flag !== Flag.good)
+        for (const o of [first, before, zero])
+          if (o.source_flag !== Flag.good)
+            throw new Error(
+              `St. Helier's ${o.level} m at ${new Date(o.time).toISOString()} has source flag ${o.source_flag}, not BODC's good`,
+            );
+        // QC flags these three and no other value that day.
+        const suspect = rows.filter((o) => o.flag >= Flag.suspect).map((o) => o.time);
+        const all = (await levels(store, e.stations![0]!, day)).filter(
+          (o) => o.flag >= Flag.suspect,
+        );
+        const expected = [first.time, before.time, zero.time];
+        if (all.map((o) => o.time).join() !== expected.join() || suspect.length !== 3)
           throw new Error(
-            `St. Helier's 0.000 m is flagged ${zero.flag}, source flag ${zero.source_flag}, not kept with BODC's good flag`,
+            `St. Helier's suspect levels on ${day} are at ${all.map((o) => new Date(o.time).toISOString()).join(", ") || "no time"}, not 18:45, 19:00 and 19:15`,
           );
+        if (after.time !== Date.parse(`${day}T20:15Z`))
+          throw new Error(`St. Helier's first level after the gap isn't at 20:15 UTC on ${day}`);
       },
     },
     {
@@ -189,5 +175,5 @@ export default {
       },
     },
   ],
-  retired: [],
+  retired: ["bodc-ilfracombe-2023-offsets"],
 } satisfies ErrataFile;

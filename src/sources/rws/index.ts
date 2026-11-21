@@ -122,7 +122,7 @@ interface Series {
     Eenheid?: { Code: string };
     Groepering?: { Code: string };
     Typering?: { Code: string };
-    /** How values were derived: `NVT` for each reading as measured, `GEM24H` for a daily mean. */
+    /** How values were derived: `NVT` for each reading as measured, `GEMH` for an hourly mean, `GEM24H` for a daily mean. */
     WaardeBewerkingsMethode?: { Code: string };
     /** The instrument, such as a float gauge or a pressure sensor. */
     MeetApparaat?: { Code: string };
@@ -331,6 +331,7 @@ export async function levels(
     for (const channel of readings(
       location,
       series.filter((s) => !s.AquoMetadata.Groepering?.Code),
+      process === "meting",
     )) {
       assertCentimeters(channel, datum);
       for (const m of channel.MetingenLijst) {
@@ -556,6 +557,20 @@ function* chunks(start: Date, end: Date): Generator<[Date, Date]> {
 /** Ways RWS derives values that aren't readings as measured, which are left out. */
 const MEANS = new Set(["GEM24H"]);
 
+/**
+ * The 11 weirs on the Overijsselse Vecht whose levels RWS serves as `GEMH` hourly means from 2000
+ * to 2004, which levels read (erratum `rws-hourly-means-weirs`). Anywhere else, or at other times,
+ * a `GEMH` series fails.
+ */
+// A request's end is inclusive, so a read of 2004 holds the mean stamped at 2005-01-01T00:00Z too.
+const MEANS_SINCE = Date.parse("1999-12-31T23:00:00Z");
+const MEANS_UNTIL = Date.parse("2005-01-01T00:00:00Z");
+export const HOURLY_MEANS = new Set(
+  "dehaandrik.beneden dehaandrik.boven hardenberg.beneden hardenberg.boven junne.beneden junne.boven marienberg.beneden marienberg.boven vechterweerd.boven vilsteren.beneden vilsteren.boven".split(
+    " ",
+  ),
+);
+
 /** Whether a measurement holds a value: a label, or a number that isn't a missing-value sentinel. */
 function isValue(m: Measurement): boolean {
   const v = m.Meetwaarde.Waarde_Numeriek;
@@ -582,15 +597,16 @@ const byValues = (series: Series[]) =>
  * values, all of one height: at Katsbinnen in 1999 a float gauge's year and 7
  * values from the next year's pressure sensor, at Maastricht Borgharen in 1988 a
  * daily mean (`GEM24H`) beside the 10-minute readings, and at Goeree Lichteiland in
- * 2023 two parts with the same metadata. A mean is left out, and any other way of
- * deriving values fails, rather than vanish. A series whose values span a day or
+ * 2023 two parts with the same metadata. A daily mean is left out, an hourly mean
+ * is read for levels at `HOURLY_MEANS` and ranks after every reading, and any other way
+ * of deriving values fails, rather than vanish. A series whose values span a day or
  * more ranks by its median step between values, the finest first, so a 10-minute
  * gauge's reading wins over a once-a-day staff gauge's; a shorter one ranks after
  * those, so a burst of a few values only fills times the others lack. Then more
  * values, then the instrument's code. Pushed in this order, `dedupe` keeps the
  * first series' value at a time two share.
  */
-function readings(location: string, series: Series[]): Series[] {
+function readings(location: string, series: Series[], hourly = false): Series[] {
   // A series with one value has no step.
   const step = (t: number[]) => {
     const steps = t
@@ -604,6 +620,17 @@ function readings(location: string, series: Series[]): Series[] {
   return series
     .filter((s) => {
       const how = s.AquoMetadata.WaardeBewerkingsMethode?.Code ?? "NVT";
+      if (
+        how === "GEMH" &&
+        hourly &&
+        HOURLY_MEANS.has(location) &&
+        s.MetingenLijst.length > 0 &&
+        s.MetingenLijst.every((m) => {
+          const t = Date.parse(m.Tijdstip);
+          return t >= MEANS_SINCE && t <= MEANS_UNTIL;
+        })
+      )
+        return true;
       if (how !== "NVT" && !MEANS.has(how))
         throw new Error(`RWS ${location}: unknown WaardeBewerkingsMethode ${how}`);
       return how === "NVT";
@@ -611,10 +638,12 @@ function readings(location: string, series: Series[]): Series[] {
     .map((s) => {
       const t = valueTimes(s);
       const long = t.length > 1 && t.at(-1)! - t[0]! >= 86_400_000;
-      return { s, long, step: long ? step(t) : Infinity, n: t.length, code: instrument(s) };
+      const mean = s.AquoMetadata.WaardeBewerkingsMethode?.Code === "GEMH";
+      return { s, mean, long, step: long ? step(t) : Infinity, n: t.length, code: instrument(s) };
     })
     .sort(
       (a, b) =>
+        Number(a.mean) - Number(b.mean) ||
         Number(b.long) - Number(a.long) ||
         a.step - b.step ||
         b.n - a.n ||
