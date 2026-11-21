@@ -1,4 +1,4 @@
-import { flaggedSpan, type ErrataFile } from "../../errata.ts";
+import { dayAfter, flaggedSpan, type ErrataFile } from "../../errata.ts";
 import { Flag } from "../../schema.ts";
 import { distanceKm, median } from "../../stats.ts";
 
@@ -89,6 +89,52 @@ export default {
           throw new Error(
             `Petten holds 0.00 m for an hour or more ${runs} times in the span, not about 33`,
           );
+      },
+    },
+    {
+      id: "rws-hourly-means-weirs",
+      stations: [
+        "rws/dehaandrik.beneden",
+        "rws/dehaandrik.boven",
+        "rws/hardenberg.beneden",
+        "rws/hardenberg.boven",
+        "rws/junne.beneden",
+        "rws/junne.boven",
+        "rws/marienberg.beneden",
+        "rws/marienberg.boven",
+        "rws/vechterweerd.boven",
+        "rws/vilsteren.beneden",
+        "rws/vilsteren.boven",
+      ],
+      since: "1999-12-31",
+      until: "2005-01-01",
+      handling: "kept",
+      error:
+        "From midnight on 1 January 2000 (local time) to 2004, RWS serves these weirs' levels only as hourly means (`WaardeBewerkingsMethode` `GEMH`), on the hour, from the float gauge that gave readings (`NVT`) in 1999. RWS doesn't say whether a mean is stamped at the start, middle or end of its hour.",
+      response:
+        "The means are stored as levels at the times RWS stamps them, flagged as the source flags them (`preliminary`), until the sampling metadata of [#527](https://github.com/openwatersio/stillwell/issues/527) says which values are means and where they are stamped.",
+      evidence:
+        "Read from RWS's answers, November 2026, for all 11 stations and all 6 years (66 station-years): every year from 2000 to 2004 is one `GEMH` series of 3,150 to 8,785 values from the float gauge (`other:Vlotterniveaumeter`), stamped on the hour, with source flag `Ongecontroleerd`, and 1999 holds that gauge's hourly readings (8,452 to 8,759 values) up to 31 December 23:00, then two `GEMH` values. The series continues across the change of label at midnight on 1 January 2000 at dehaandrik.boven (911, 911 cm at the last two readings, 912, 912 cm at the first two means); at the other 10 only the counts were read. In all 55 station-years of means, the hourly change of level has a median of 1 to 2 cm, a 90th percentile of 1 to 6 cm and a 99th percentile of 2 to 17 cm, so for most hours a mean stamped half an hour from where a reading would be differs from it by about 1 cm or less, and by up to about half of the 99th percentile in the steepest 1% of hours. The documentation we found doesn't say where a mean is stamped. The refetch of the whole record, 1800 to 2027, failed on a `GEMH` series only at these 11 stations and only in these years, so no other station or year holds one.",
+      reported: null,
+      report: null,
+      check: async (store, e) => {
+        // Hourly values on the hour, read on two days of each year of the span; a station that has a gap on all of them fails.
+        for (const station of e.stations!) {
+          let read = 0;
+          for (const day of ["2000", "2001", "2002", "2003", "2004"].flatMap((y) => [
+            `${y}-03-15`,
+            `${y}-09-15`,
+          ])) {
+            const rows = await store.levels(station, day, dayAfter(day, 1));
+            read += rows.length;
+            const off = rows.filter((o) => o.time % 3_600_000 !== 0);
+            if (off.length)
+              throw new Error(`${station} holds ${off.length} values off the hour on ${day}`);
+            if (rows.length > 24)
+              throw new Error(`${station} holds ${rows.length} values on ${day}, more than hourly`);
+          }
+          if (!read) throw new Error(`${station} holds no hourly mean on any day read`);
+        }
       },
     },
   ],
