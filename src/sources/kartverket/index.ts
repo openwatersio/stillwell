@@ -53,8 +53,8 @@ const MINUTE_MS = 60_000;
 const INTERVAL_MS = 10 * MINUTE_MS;
 const DAY_MS = 86_400_000;
 /**
- * The API carries no quality flag, and Kartverket revises recent values
- * without saying when; values this old count as final.
+ * The API carries no quality flag and states no revision window, so the store
+ * treats values this old as final.
  */
 const FINAL_MS = 365 * DAY_MS;
 
