@@ -28,6 +28,7 @@ describe("compare", () => {
     );
     assert.equal(c.verdict, "copy");
     assert.ok(Math.abs(c.offset_m - 5) < 1e-9);
+    assert.equal(c.days, 2);
   });
 
   it("finds a copy of hourly means stamped at the half hour", () => {
@@ -84,5 +85,19 @@ describe("compare", () => {
     const late = hourly((t) => value(t) + (t >= to - 12 * HOUR && t < to ? 0.05 : 0));
     assert.equal(compare(original, late, from, to, pieces).verdict, "own");
     assert.equal(compare(original, hourly(value), from, to, pieces).verdict, "copy");
+  });
+
+  it("reads an original whose reads overlap as one sorted record", () => {
+    const overlapping = [...original.slice(400), ...original.slice(0, 500)];
+    assert.equal(compare(overlapping, hourly(value), from, to).verdict, "copy");
+  });
+
+  it("counts a piece with too few values to judge alone, so a short stretch that differs shows", () => {
+    const pieces: [number, number][] = [
+      [from, from + 5 * HOUR],
+      [from + 5 * HOUR, to],
+    ];
+    const early = hourly((t) => value(t) + (t >= from && t < from + 5 * HOUR ? 0.02 : 0));
+    assert.equal(compare(original, early, from, to, pieces).verdict, "unclear");
   });
 });

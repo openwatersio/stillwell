@@ -55,7 +55,7 @@ export default {
       response:
         "6 March to 29 June 2001 is flagged `suspect`, keeping CO-OPS's own flag as `source_flag`.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Boston (`coops/8443970`), 13 km away: the difference is 1.09 to 1.12 m before and after and 2.73 m over the span; Block Island (`coops/8459681`) gives the same step. `npm run errata:copies` found the copy `gesla/boston_light-8444162-usa-noaa` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over all of the span (November 2026), so it carries the error too.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Boston (`coops/8443970`), 13 km away: the difference is 1.09 to 1.12 m before and after and 2.73 m over the span; Block Island (`coops/8459681`) gives the same step. GESLA's copy (`gesla/boston_light-8444162-usa-noaa`) holds values on only 2 of the span's 116 days, the same at all 23 times the two share.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
@@ -94,7 +94,7 @@ export default {
       response:
         "Values before 11 June 2002 are flagged `suspect`, keeping CO-OPS's own flag as `source_flag`.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Bergen Point (`coops/8519483`) and Atlantic City (`coops/8534720`): the differences are 0.28 and 0.25 m before the date and 4.15 and 4.09 m after. `npm run errata:copies` found the copy `gesla/burlington-8539094-usa-noaa` equal to the record inside the span to 0.0 cm RMS, with their datums lined up on the 7 days either side, over 150 of its 8,394 days, in 5 pieces spread over it, from the original record's first value (November 2026), so it carries the error too.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Bergen Point (`coops/8519483`) and Atlantic City (`coops/8534720`): the differences are 0.28 and 0.25 m before the date and 4.15 and 4.09 m after. GESLA's copy (`gesla/burlington-8539094-usa-noaa`) holds the same values at all 707 times the two share, on 31 of the 150 days read in five 30-day pieces spread from the record's start to the date, 8,394 days in all.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
