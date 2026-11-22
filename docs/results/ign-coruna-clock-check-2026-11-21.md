@@ -1,14 +1,14 @@
 # IGN Coruña clock check
 
-Each year of `ign/ACOR1`, 2000 to 2023, cross-correlated with the harmonic prediction from the TICON constants of three records of the gauge, by `npm run clock-check` at lags of up to 3 hours in 10-minute steps. A positive lag means IGN's stamps run late against the prediction. None of the 72 fits is flagged: every best lag is within 10 minutes and every K1 phase within 16 minutes.
+Each year of `ign/ACOR1`, 2000 to 2023, cross-correlated with the harmonic prediction from the TICON constants of three records at Coruña, by `npm run clock-check` at lags of up to 3 hours in 10-minute steps. A positive lag means IGN's stamps run late against the prediction. None of the 72 fits reached the CLI’s statistical warning threshold in that run: every best lag is within 10 minutes and every K1 phase within 16 minutes.
 
 | Record | Originator | Best lag 0 min | +10 min | −10 min | K1 phase, mean |
 | --- | --- | --: | --: | --: | --: |
-| `coruna-coru-esp-ieo` | IEO's Coruña gauge, 0.7 km from IGN's | 19 | 4 | 1 | +4.0 min |
+| `coruna-coru-esp-ieo` | IEO's Coruña gauge, about 0.44 km from IGN's | 19 | 4 | 1 | +4.0 min |
 | `la_coruna-830-esp-uhslc_fd` | UHSLC's La Coruña (fast delivery) | 19 | 4 | 1 | +3.6 min |
 | `coruna2tg-cor-esp-cmems` | CMEMS's Coruna2TG, named for IGN's ACOR1 | 19 | 2 | 3 | +0.1 min |
 
-The independent reference is IEO's gauge. UHSLC's record may come from IEO, and CMEMS's record is named "A Coruña ACOR1 TG tide gauge" after IGN's code, so it is IGN's own data and its agreement isn't independent evidence.
+The independent reference is IEO's gauge. UHSLC's qa830a.dmt names IEO as its contributor, and CMEMS's record is named "A Coruña ACOR1 TG tide gauge" after IGN's code, so it is IGN's own data and its agreement isn't independent evidence.
 
 Comparing hourly levels directly with the store's copy of the CMEMS record from November 2019 to 2023 (32,879 hours in both): r 0.9979 at zero lag, 0.878 with IGN an hour late and 0.871 an hour early. The copy sits 4.981 m above IGN's levels, near IGN's 4.998 m NMMA offset, with a standard deviation of 5.9 cm in the difference. The copy is hourly, so it can't resolve less than an hour.
 
@@ -89,8 +89,10 @@ Comparing hourly levels directly with the store's copy of the CMEMS record from 
 | 2023 | `la_coruna-830-esp-uhslc_fd` | 8,712 | 0.992 | 0 min | 0.992 | 1 min |
 | 2023 | `coruna2tg-cor-esp-cmems` | 8,712 | 0.991 | 0 min | 0.991 | -2 min |
 
-Each fit uses a whole year, so a change within a year would show only as a lower zero-lag correlation than a steady clock gives. The correlations are 0.987 to 0.995 in every year. IGN hasn't confirmed its clock convention, so the source's README and the `ign-coruna-clock` erratum say so.
+Each fit uses a whole year, so it does not by itself exclude a shift confined to part of a year. The correlations are 0.987 to 0.995 in every year. IGN hasn't confirmed its clock convention, so the source's README and the `ign-coruna-clock` erratum say so.
 
-## Stored flags
+## Stored flags and replay
 
-A local backfill of all 24 years through the registered adapter, then a requalify, stores 209,544 levels: 209,543 good and 1 suspect, with IGN's reviewed source flag 0 on every one.
+The 21 November local run stored 209,544 levels: 209,543 good and 1 suspect, with reviewed source flag 0 throughout. Those are historical snapshot counts, not the current policy. `ign-coruna-clock` retains the direct archive’s full clock flag; native CMEMS and GESLA have separately controlled timing windows. [The complete identity and clock validation](ign-coruna-identity-2026-11-22.md) records the current readbacks and detection limits.
+
+These annual fits predate the clock flags. The CLI now excludes suspect values and cannot replay them directly. The numeric monthly generator documented in the complete validation deliberately includes flagged values. Annual agreement does not clear shorter timing discrepancies.

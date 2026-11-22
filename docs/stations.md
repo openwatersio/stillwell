@@ -220,6 +220,8 @@ A station with no links is its own preferred series. Among series with a record 
 
 Readers outside this repo that read series paths directly, such as slackwater-database and crowd-depth, stop at epoch 1 unless they read `epochs`.
 
+The [tide record guide](../site/src/content/docs/docs/guides/stations.mdx#the-tide-record) describes prediction aliases and their explicit instrument-separation exception. Preferred series may be shorter than another member when the longer record is clock-suspect; query the member’s own ID to retain that history and its flags.
+
 ## Limits
 
 - **No reviewed diff of station changes.** The change report and guards stand in for PR review, and a station that moves or is renamed shows only in the report.

@@ -784,6 +784,116 @@ describe("copyPairs", () => {
   });
 });
 
+describe("Coruña gauge identity", () => {
+  it("enforces every separation even when all other copies are absent", () => {
+    const ids = new Set([
+      "ign/ACOR1",
+      "cmems/Coruna2TG",
+      "gesla/coruna2tg-cor-esp-cmems",
+      "cmems/CorunaTG",
+      "gesla/corunatg-cor-esp-cmems",
+      "gesla/coruna-coru-esp-ieo",
+      "uhslc/830",
+      "uhslc/830a",
+      "gesla/la_coruna-830-esp-uhslc_fd",
+      "gesla/la_coruna-830a-esp-uhslc_rq",
+    ]);
+    const decisions = APART.filter((d) => ids.has(d.a) && ids.has(d.b));
+    assert.equal(decisions.length, 31);
+    UNLINKS.push(...decisions);
+    try {
+      for (const { a, b } of decisions) {
+        const listed = [
+          station(a, { name: "Coruna", kind: "coastal", same_as: [b] }),
+          station(b, { name: "Coruna", kind: "coastal", same_as: [a] }),
+        ];
+        const result = linkGauges(listed, NOW, new Map(), agree([a, b])).stations;
+        assert.ok(
+          result.every((s) => s.same_as.length === 0 && s.preferred === s.id),
+          `${a} joined ${b}`,
+        );
+      }
+    } finally {
+      UNLINKS.splice(0);
+    }
+  });
+
+  it("links direct IGN and CMEMS records without the GESLA copy", () => {
+    LINKS.push(...DECISIONS);
+    assert.ok(PREFERRED["cmems/Coruna2TG"]);
+    PREFER["cmems/Coruna2TG"] = PREFERRED["cmems/Coruna2TG"]!;
+    try {
+      const result = linkGauges([station("ign/ACOR1"), station("cmems/Coruna2TG")]).stations;
+      assert.deepEqual(result[0]!.same_as, ["cmems/Coruna2TG"]);
+      assert.deepEqual(result[1]!.same_as, ["ign/ACOR1"]);
+      assert.ok(result.every((s) => s.preferred === "cmems/Coruna2TG"));
+    } finally {
+      LINKS.splice(0);
+      delete PREFER["cmems/Coruna2TG"];
+    }
+  });
+
+  it("keeps IGN, REDMAR and IEO records apart with or without the direct IGN series", () => {
+    const groups = [
+      ["ign/ACOR1", "cmems/Coruna2TG", "gesla/coruna2tg-cor-esp-cmems"],
+      ["cmems/CorunaTG", "gesla/corunatg-cor-esp-cmems"],
+      [
+        "gesla/coruna-coru-esp-ieo",
+        "uhslc/830",
+        "gesla/la_coruna-830-esp-uhslc_fd",
+        "gesla/la_coruna-830a-esp-uhslc_rq",
+      ],
+    ];
+    LINKS.push(...DECISIONS);
+    UNLINKS.push(...APART);
+    try {
+      for (const withIgn of [false, true]) {
+        const listed = groups
+          .flat()
+          .filter((id) => withIgn || id !== "ign/ACOR1")
+          .map((id) =>
+            station(id, {
+              name: "Coruna",
+              kind: "coastal",
+              lat: 43.36,
+              lon: -8.39,
+              first: "2000-01-01T00:00:00Z",
+              last: "2023-12-31T23:00:00Z",
+              commercial_use:
+                !id.startsWith("gesla/") || id.endsWith("-ieo") || id.includes("-uhslc_"),
+            }),
+          );
+        // Even indistinguishable tides cannot establish instrument identity.
+        const matches = agree(
+          ...listed.flatMap((a, i) =>
+            listed.slice(i + 1).map((b) => [a.id, b.id] as [string, string]),
+          ),
+        );
+        for (const order of [listed, [...listed].reverse()]) {
+          const result = linkGauges(order, NOW, new Map(), matches).stations;
+          for (const group of groups) {
+            const held = group.filter((id) => listed.some((s) => s.id === id));
+            for (const id of held) {
+              const row = result.find((s) => s.id === id)!;
+              assert.ok(
+                held.includes(row.preferred),
+                `${id} prefers another instrument: ${row.preferred}`,
+              );
+              assert.deepEqual(
+                [...row.same_as].sort(),
+                held.filter((other) => other !== id).sort(),
+              );
+            }
+          }
+        }
+      }
+    } finally {
+      LINKS.splice(0);
+      UNLINKS.splice(0);
+    }
+  });
+});
+
 describe("IGN originator identity", () => {
   it("requires explicit identity before joining same-port IGN and other agencies' copies", () => {
     const original = station("ign/ACOR1", { name: "Coruna", kind: "coastal" });

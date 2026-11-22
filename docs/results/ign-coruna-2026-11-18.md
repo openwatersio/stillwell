@@ -1,6 +1,6 @@
 # Flagged Coruña release, 18 November 2026
 
-This records the release as first approved, with every row flagged `suspect`. A [clock check on 21 November](ign-coruna-clock-check-2026-11-21.md) replaced that flag with the flags QC gives the values.
+This records the approved release with every row flagged `suspect`. The [21 November annual check](ign-coruna-clock-check-2026-11-21.md) does not establish the historical clock convention; the interval retains its clock flag.
 
 The maintainer approved one bounded release: `ign/ACOR1` reviewed hourly JM records for 2000–2023, with every row suspect for unconfirmed historical clock labels. This is not a release of the rest of IGN’s network, raw instruments or current-year data. The public source refuses other station IDs and admits only the 24 exact hourly JM filenames in this interval. Source-level withholding also keeps excluded stations out of lists, bounds and publication. No live polling or monthly refetch is enabled. Excluded coverage and agency questions remain in [issue #181](https://github.com/openwatersio/stillwell/issues/181).
 
@@ -41,3 +41,5 @@ The final live CLI validation used an isolated local store and `backfill ign all
 Round three completed with Opus and Sonnet. Neither found an admitted-ingest defect. The backfill end-year documentation was corrected and verified through the live CLI store; candidate-product errata were scoped to their documented station IDs. TICON’s pending status was checked against its licensing/identity semantics: excluded targets remain unmatched, never ready; cleared IGN commercial-use terms do not imply scientific admission. Comments, documentation and a regression make that distinction explicit. These documentation/metadata/test changes followed the final model review; no fourth round was run.
 
 Final verification after these metadata/docs/test edits: lint, typecheck and all 1,307 tests in 225 suites passed, zero failures/skips. The sandboxed attempt stalled at the existing loopback FTP test; the networking-enabled rerun completed. Actual CLI requalification changed zero rows, and a second all-row readback passed. CI for the pushed head is recorded in PR #257.
+
+The grouping and preference results in this dated validation describe the selected catalog and decisions used then. [The complete Coruña validation](ign-coruna-identity-2026-11-22.md) records the native CMEMS preference, its separate timing windows and the direct archive’s retained clock flag.

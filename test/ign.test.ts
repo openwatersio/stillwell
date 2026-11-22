@@ -73,12 +73,23 @@ describe("IGN", () => {
     );
   });
 
-  it("keeps the Coruña clock erratum as a note, flagging no span", () => {
+  it("flags the entire unconfirmed clock interval", () => {
     assert.deepEqual(ign.CORUNA_PERIOD, [Date.UTC(2000, 0, 1), Date.UTC(2024, 0, 1)]);
     const clock = errata.find((e) => e.id === "ign-coruna-clock")!;
-    assert.equal(clock.handling, "kept");
+    assert.equal(clock.handling, "flagged");
     assert.deepEqual([clock.since, clock.until], ["2000-01-01", "2024-01-01"]);
-    assert.deepEqual(spans({ id: "ign/ACOR1" }, errata), []);
+    assert.deepEqual(spans({ id: "ign/ACOR1" }, errata), [
+      [Date.UTC(2000, 0, 1), Date.UTC(2024, 0, 1)],
+    ]);
+  });
+
+  it("keeps native copy timing episodes separate from archive-label uncertainty", () => {
+    const ids = ["cmems/Coruna2TG", "gesla/coruna2tg-cor-esp-cmems"];
+    for (const id of ids)
+      assert.deepEqual(spans({ id }, errata), [
+        [Date.UTC(2020, 6, 1), Date.UTC(2020, 8, 1)],
+        [Date.UTC(2022, 5, 1), Date.UTC(2022, 9, 1)],
+      ]);
   });
 
   it("credits source-only metadata with the known product period without inventing stored bounds", () => {
@@ -128,7 +139,8 @@ describe("IGN", () => {
       new Date("2025-01-01Z"),
     );
     assert.equal(rows.length, 210384);
-    assert.ok(rows.every((r) => r.flag === Flag.good && r.source_flag === Flag.good));
+    assert.ok(rows.every((r) => r.source_flag === Flag.good));
+    assert.equal(rows.filter((r) => r.flag === Flag.suspect).length, rows.length);
     assert.equal(rows[0]!.time, Date.UTC(2000, 0, 1));
     assert.equal(rows.at(-1)!.time, Date.UTC(2023, 11, 31, 23));
     assert.ok(

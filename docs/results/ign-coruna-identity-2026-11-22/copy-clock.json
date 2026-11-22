@@ -1,0 +1,517 @@
+{
+  "method": "Every admitted hourly IGN observation in the complete 2019\u20132023 overlap, compared with each copy's stored observations using shared compare(); only bad values excluded. This comparison does not certify UTC or identical processing; the independent controls govern per-product flags.",
+  "receipts": [
+    {
+      "url": "https://stillwell.openwaters.io/stations/cmems.parquet",
+      "bytes": 51218,
+      "sha256": "632c176b2d6ebb8a35eb84ea9b7d231701ea4b59e4c64f55635bb4763be7db64"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/stations/years/cmems.parquet",
+      "bytes": 394006,
+      "sha256": "254491848436e5a49a410cd369695591b28e5b6b049aec52fbd01a031cf9a17b"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/stations/bounds/cmems.parquet",
+      "bytes": 13056,
+      "sha256": "1f5a04ea40940d44977a57b85090408cb3ba2065d8223e20953441dda13fbc2e"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/obs/cmems/Coruna2TG/2019.parquet",
+      "bytes": 7909,
+      "sha256": "0167fccce1ef1a71b903dace8b304fd0678892c200d4b4b587a57f35a9b6cf62"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/obs/cmems/Coruna2TG/2020.parquet",
+      "bytes": 39009,
+      "sha256": "b5e83d4e2f6e6d53c1ddd794fd097cfa63020525afa136ad69344eff989e744e"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/obs/cmems/Coruna2TG/2021.parquet",
+      "bytes": 45729,
+      "sha256": "7b09e9ff9b63705a298cd9497d414b9b23bb234ca04f471c2af065c9a928c972"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/obs/cmems/Coruna2TG/2022.parquet",
+      "bytes": 45781,
+      "sha256": "0d6e59e052510e1333c9f9e1a73f72ec2c32ff78d09fe135dc75368ee5cd43fe"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/obs/cmems/Coruna2TG/2023.parquet",
+      "bytes": 46313,
+      "sha256": "46cb77d09531299e672c6ecb14261451b0eacc04937fb2c6234070a34af174b9"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/stations/gesla.parquet",
+      "bytes": 565195,
+      "sha256": "58b86cef8df804921e34363998a72a25fcc98e11763b7f32bf55358133a16f8c"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/stations/years/gesla.parquet",
+      "bytes": 2794624,
+      "sha256": "7f8f9fdb24cad96932635053664bf73357805d75e9cacc3ac7b7abb2cdb1bbf7"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/stations/bounds/gesla.parquet",
+      "bytes": 139567,
+      "sha256": "c2d56593471594b0cc13e8a15a93af6ddde02bf1d1c12b3aa3965f6dd2639ab6"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/obs/gesla/coruna2tg-cor-esp-cmems/2019.parquet",
+      "bytes": 7909,
+      "sha256": "0167fccce1ef1a71b903dace8b304fd0678892c200d4b4b587a57f35a9b6cf62"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/obs/gesla/coruna2tg-cor-esp-cmems/2020.parquet",
+      "bytes": 39009,
+      "sha256": "b5e83d4e2f6e6d53c1ddd794fd097cfa63020525afa136ad69344eff989e744e"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/obs/gesla/coruna2tg-cor-esp-cmems/2021.parquet",
+      "bytes": 45729,
+      "sha256": "7b09e9ff9b63705a298cd9497d414b9b23bb234ca04f471c2af065c9a928c972"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/obs/gesla/coruna2tg-cor-esp-cmems/2022.parquet",
+      "bytes": 45781,
+      "sha256": "0d6e59e052510e1333c9f9e1a73f72ec2c32ff78d09fe135dc75368ee5cd43fe"
+    },
+    {
+      "url": "https://stillwell.openwaters.io/obs/gesla/coruna2tg-cor-esp-cmems/2023.parquet",
+      "bytes": 46313,
+      "sha256": "46cb77d09531299e672c6ecb14261451b0eacc04937fb2c6234070a34af174b9"
+    }
+  ],
+  "results": [
+    {
+      "id": "cmems/Coruna2TG",
+      "year": 2019,
+      "ignValues": 8760,
+      "copyValues": 1087,
+      "scores": [
+        {
+          "lag": -60,
+          "n": 1087,
+          "offset": -4.987,
+          "spread": 0.44445303308679923,
+          "within": 0.06071757129714812
+        },
+        {
+          "lag": -20,
+          "n": 1077,
+          "offset": -4.982333333333334,
+          "spread": 0.1508123653585225,
+          "within": 0.1829155060352832
+        },
+        {
+          "lag": 0,
+          "n": 1087,
+          "offset": -4.983,
+          "spread": 0.026009657819894585,
+          "within": 0.9420423183072677
+        },
+        {
+          "lag": 20,
+          "n": 1077,
+          "offset": -4.987333333333334,
+          "spread": 0.15031267216022326,
+          "within": 0.19127205199628597
+        },
+        {
+          "lag": 60,
+          "n": 1087,
+          "offset": -4.987,
+          "spread": 0.4438841803819733,
+          "within": 0.062557497700092
+        }
+      ]
+    },
+    {
+      "id": "cmems/Coruna2TG",
+      "year": 2020,
+      "ignValues": 8784,
+      "copyValues": 6934,
+      "scores": [
+        {
+          "lag": -60,
+          "n": 6933,
+          "offset": -4.975,
+          "spread": 0.47259030794486423,
+          "within": 0.05942593393913169
+        },
+        {
+          "lag": -20,
+          "n": 6907,
+          "offset": -4.981,
+          "spread": 0.1886301984538456,
+          "within": 0.17503981468075866
+        },
+        {
+          "lag": 0,
+          "n": 6934,
+          "offset": -4.985,
+          "spread": 0.09721177139245799,
+          "within": 0.9453417940582636
+        },
+        {
+          "lag": 20,
+          "n": 6907,
+          "offset": -4.9719999999999995,
+          "spread": 0.16451731434933567,
+          "within": 0.17808020848414652
+        },
+        {
+          "lag": 60,
+          "n": 6934,
+          "offset": -4.9590000000000005,
+          "spread": 0.4447647289509762,
+          "within": 0.06951254687049323
+        }
+      ]
+    },
+    {
+      "id": "cmems/Coruna2TG",
+      "year": 2021,
+      "ignValues": 8760,
+      "copyValues": 8249,
+      "scores": [
+        {
+          "lag": -60,
+          "n": 8248,
+          "offset": -4.977,
+          "spread": 0.45348603241504404,
+          "within": 0.05892337536372454
+        },
+        {
+          "lag": -20,
+          "n": 8227,
+          "offset": -4.984333333333333,
+          "spread": 0.15254167439502636,
+          "within": 0.17491187553178558
+        },
+        {
+          "lag": 0,
+          "n": 8249,
+          "offset": -4.987,
+          "spread": 0.01747992978262423,
+          "within": 0.9887259061704449
+        },
+        {
+          "lag": 20,
+          "n": 8227,
+          "offset": -4.99,
+          "spread": 0.15201484297919085,
+          "within": 0.18111097605445484
+        },
+        {
+          "lag": 60,
+          "n": 8248,
+          "offset": -4.9955,
+          "spread": 0.4527632733744867,
+          "within": 0.05843840931134821
+        }
+      ]
+    },
+    {
+      "id": "cmems/Coruna2TG",
+      "year": 2022,
+      "ignValues": 8727,
+      "copyValues": 8271,
+      "scores": [
+        {
+          "lag": -60,
+          "n": 8271,
+          "offset": -4.977,
+          "spread": 0.4717401177827352,
+          "within": 0.059243138677306253
+        },
+        {
+          "lag": -20,
+          "n": 8256,
+          "offset": -4.986666666666666,
+          "spread": 0.1777028405505344,
+          "within": 0.17453972868217055
+        },
+        {
+          "lag": 0,
+          "n": 8271,
+          "offset": -4.987,
+          "spread": 0.07123744313432594,
+          "within": 0.9349534518196106
+        },
+        {
+          "lag": 20,
+          "n": 8256,
+          "offset": -4.973,
+          "spread": 0.15396525043641074,
+          "within": 0.19137596899224807
+        },
+        {
+          "lag": 60,
+          "n": 8270,
+          "offset": -4.9905,
+          "spread": 0.44616267787317826,
+          "within": 0.0656590084643289
+        }
+      ]
+    },
+    {
+      "id": "cmems/Coruna2TG",
+      "year": 2023,
+      "ignValues": 8712,
+      "copyValues": 8386,
+      "scores": [
+        {
+          "lag": -60,
+          "n": 8337,
+          "offset": -4.981,
+          "spread": 0.44908968044470127,
+          "within": 0.05913398104833873
+        },
+        {
+          "lag": -20,
+          "n": 8333,
+          "offset": -4.985,
+          "spread": 0.1507977711109958,
+          "within": 0.18156726269050763
+        },
+        {
+          "lag": 0,
+          "n": 8338,
+          "offset": -4.988,
+          "spread": 0.01857389796935359,
+          "within": 0.9853681938114656
+        },
+        {
+          "lag": 20,
+          "n": 8333,
+          "offset": -4.991333333333333,
+          "spread": 0.15158179438271024,
+          "within": 0.17928717148685946
+        },
+        {
+          "lag": 60,
+          "n": 8338,
+          "offset": -4.997,
+          "spread": 0.4499759400300209,
+          "within": 0.06104581434396738
+        }
+      ]
+    },
+    {
+      "id": "gesla/coruna2tg-cor-esp-cmems",
+      "year": 2019,
+      "ignValues": 8760,
+      "copyValues": 1087,
+      "scores": [
+        {
+          "lag": -60,
+          "n": 1087,
+          "offset": -4.987,
+          "spread": 0.44445303308679923,
+          "within": 0.06071757129714812
+        },
+        {
+          "lag": -20,
+          "n": 1077,
+          "offset": -4.982333333333334,
+          "spread": 0.1508123653585225,
+          "within": 0.1829155060352832
+        },
+        {
+          "lag": 0,
+          "n": 1087,
+          "offset": -4.983,
+          "spread": 0.026009657819894585,
+          "within": 0.9420423183072677
+        },
+        {
+          "lag": 20,
+          "n": 1077,
+          "offset": -4.987333333333334,
+          "spread": 0.15031267216022326,
+          "within": 0.19127205199628597
+        },
+        {
+          "lag": 60,
+          "n": 1087,
+          "offset": -4.987,
+          "spread": 0.4438841803819733,
+          "within": 0.062557497700092
+        }
+      ]
+    },
+    {
+      "id": "gesla/coruna2tg-cor-esp-cmems",
+      "year": 2020,
+      "ignValues": 8784,
+      "copyValues": 6934,
+      "scores": [
+        {
+          "lag": -60,
+          "n": 6933,
+          "offset": -4.975,
+          "spread": 0.47259030794486423,
+          "within": 0.05942593393913169
+        },
+        {
+          "lag": -20,
+          "n": 6907,
+          "offset": -4.981,
+          "spread": 0.1886301984538456,
+          "within": 0.17503981468075866
+        },
+        {
+          "lag": 0,
+          "n": 6934,
+          "offset": -4.985,
+          "spread": 0.09721177139245799,
+          "within": 0.9453417940582636
+        },
+        {
+          "lag": 20,
+          "n": 6907,
+          "offset": -4.9719999999999995,
+          "spread": 0.16451731434933567,
+          "within": 0.17808020848414652
+        },
+        {
+          "lag": 60,
+          "n": 6934,
+          "offset": -4.9590000000000005,
+          "spread": 0.4447647289509762,
+          "within": 0.06951254687049323
+        }
+      ]
+    },
+    {
+      "id": "gesla/coruna2tg-cor-esp-cmems",
+      "year": 2021,
+      "ignValues": 8760,
+      "copyValues": 8249,
+      "scores": [
+        {
+          "lag": -60,
+          "n": 8248,
+          "offset": -4.977,
+          "spread": 0.45348603241504404,
+          "within": 0.05892337536372454
+        },
+        {
+          "lag": -20,
+          "n": 8227,
+          "offset": -4.984333333333333,
+          "spread": 0.15254167439502636,
+          "within": 0.17491187553178558
+        },
+        {
+          "lag": 0,
+          "n": 8249,
+          "offset": -4.987,
+          "spread": 0.01747992978262423,
+          "within": 0.9887259061704449
+        },
+        {
+          "lag": 20,
+          "n": 8227,
+          "offset": -4.99,
+          "spread": 0.15201484297919085,
+          "within": 0.18111097605445484
+        },
+        {
+          "lag": 60,
+          "n": 8248,
+          "offset": -4.9955,
+          "spread": 0.4527632733744867,
+          "within": 0.05843840931134821
+        }
+      ]
+    },
+    {
+      "id": "gesla/coruna2tg-cor-esp-cmems",
+      "year": 2022,
+      "ignValues": 8727,
+      "copyValues": 8271,
+      "scores": [
+        {
+          "lag": -60,
+          "n": 8271,
+          "offset": -4.977,
+          "spread": 0.4717401177827352,
+          "within": 0.059243138677306253
+        },
+        {
+          "lag": -20,
+          "n": 8256,
+          "offset": -4.986666666666666,
+          "spread": 0.1777028405505344,
+          "within": 0.17453972868217055
+        },
+        {
+          "lag": 0,
+          "n": 8271,
+          "offset": -4.987,
+          "spread": 0.07123744313432594,
+          "within": 0.9349534518196106
+        },
+        {
+          "lag": 20,
+          "n": 8256,
+          "offset": -4.973,
+          "spread": 0.15396525043641074,
+          "within": 0.19137596899224807
+        },
+        {
+          "lag": 60,
+          "n": 8270,
+          "offset": -4.9905,
+          "spread": 0.44616267787317826,
+          "within": 0.0656590084643289
+        }
+      ]
+    },
+    {
+      "id": "gesla/coruna2tg-cor-esp-cmems",
+      "year": 2023,
+      "ignValues": 8712,
+      "copyValues": 8386,
+      "scores": [
+        {
+          "lag": -60,
+          "n": 8337,
+          "offset": -4.981,
+          "spread": 0.44908968044470127,
+          "within": 0.05913398104833873
+        },
+        {
+          "lag": -20,
+          "n": 8333,
+          "offset": -4.985,
+          "spread": 0.1507977711109958,
+          "within": 0.18156726269050763
+        },
+        {
+          "lag": 0,
+          "n": 8338,
+          "offset": -4.988,
+          "spread": 0.01857389796935359,
+          "within": 0.9853681938114656
+        },
+        {
+          "lag": 20,
+          "n": 8333,
+          "offset": -4.991333333333333,
+          "spread": 0.15158179438271024,
+          "within": 0.17928717148685946
+        },
+        {
+          "lag": 60,
+          "n": 8338,
+          "offset": -4.997,
+          "spread": 0.4499759400300209,
+          "within": 0.06104581434396738
+        }
+      ]
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { checkCorunaQuality, verifyCorunaIdentities } from "../sources/ign/check.ts";
 import { createHash } from "node:crypto";
 import { errata } from "../sources/index.ts";
 import { errataReader } from "../store/errata-reader.ts";
@@ -110,11 +111,13 @@ export default {
           throw new Error(`${ID} holds ${total} levels, not the ${OBSERVATIONS} validated`);
       },
     },
-    { ingest: "publish" },
     { ingest: `requalify ign ACOR1 ${FIRST_YEAR} 2025` },
+    { ingest: "requalify cmems Coruna2TG 2019 2024" },
+    { ingest: "requalify gesla coruna2tg-cor-esp-cmems 2019 2024" },
+    { ingest: "publish" },
     {
       check:
-        "IGN's years file holds the 24 year files of ign/ACOR1, and at least 99% of its levels are good after requalifying",
+        "IGN's years file holds the 24 year files of ign/ACOR1, and every retained level has its suspect clock flag and reviewed source flag",
       async verify(store) {
         const rows = await readRows(yearsPath(store, "ign"));
         const files = rows.filter((r) => r.year !== null);
@@ -124,13 +127,7 @@ export default {
           throw new Error(
             `IGN's years file holds ${files.length} files, not ${YEARS.length} of ${ID}`,
           );
-        let good = 0;
-        let total = 0;
-        for (const [, observations] of await readAll(store)) {
-          total += observations.length;
-          good += observations.filter((o) => o.flag === Flag.good).length;
-        }
-        if (good < total * 0.99) throw new Error(`only ${good} of ${total} ${ID} levels are good`);
+        checkCorunaQuality((await readAll(store)).flatMap(([, observations]) => observations));
       },
     },
     {
@@ -167,10 +164,15 @@ export default {
       },
     },
     {
-      check: "every IGN erratum's check passes against the store",
+      check: "every IGN and native-copy clock erratum passes against the store",
       async verify(store) {
         const reader = errataReader(() => store, store);
-        for (const e of errata.filter((x) => x.source === "ign")) {
+        for (const e of errata.filter(
+          (x) =>
+            x.source === "ign" ||
+            x.id === "cmems-coruna-clock-2020" ||
+            x.id === "cmems-coruna-clock-2022",
+        )) {
           if (!e.check) throw new Error(`no check for ${e.id}`);
           try {
             await e.check(reader, e);
@@ -178,6 +180,16 @@ export default {
             throw new Error(`${e.id}: ${(error as Error).message}`);
           }
         }
+      },
+    },
+
+    {
+      check: "Coruña's IGN, REDMAR and IEO groups are separate and each prefers its own instrument",
+      async verify(store) {
+        const rows = await readRows(`${store}/stations.parquet`);
+        if (!rows.some((r) => r.id === "ign/ACOR1"))
+          throw new Error("Coruña identity check: no ign/ACOR1");
+        verifyCorunaIdentities(rows);
       },
     },
   ],

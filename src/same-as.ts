@@ -1,3 +1,5 @@
+import { CORUNA_GAUGES } from "./coruna-gauges.ts";
+export { CORUNA_GAUGES } from "./coruna-gauges.ts";
 import { differsByData, MATCH_KM, sameByData, shiftedByData, type DataMatch } from "./matches.ts";
 import type { Station } from "./schema.ts";
 import { isDropped } from "./sources/gesla/dropped.ts";
@@ -49,6 +51,12 @@ export interface Decision {
 
 /** Pairs that share a gauge the rules below miss. */
 export const LINKS: Decision[] = [
+  {
+    a: "cmems/Coruna2TG",
+    b: "ign/ACOR1",
+    note: "CMEMS names this record A Coruña ACOR1 TG tide gauge; it is IGN's ACOR1, PSMSL 763, at 43.3644, -8.3989. Link the direct records even when GESLA's copy is absent. See docs/results/ign-coruna-identity-2026-11-22.md.",
+  },
+
   ...[
     ["alicantetg-ali-esp-cmems", "ALAC1"],
     ["alicante2tg-ali-esp-cmems", "ALAC2"],
@@ -208,6 +216,18 @@ export const LINKS: Decision[] = [
 
 /** Pairs that don't share a gauge, though a rule links them. */
 export const UNLINKS: Decision[] = [
+  ...CORUNA_GAUGES.flatMap((group, i, groups) =>
+    groups.slice(i + 1).flatMap((other) =>
+      group.flatMap((a) =>
+        other.map((b) => ({
+          a,
+          b,
+          note: "Distinct Coruña gauges: IGN's ACOR1 is PSMSL 763 (La Coruña II), IEO's is 484 (La Coruña I), and Puertos del Estado's REDMAR gauge is 1808 (La Coruña III). CMEMS Coruna2TG names ACOR1; CorunaTG is Puertos del Estado's station at 43.357, -8.389 (JERICO D2.3, station inventory). UHSLC qa830a.dmt names Instituto Espanol de Oceanografia, originator 005; its FD series inherits the latest RQ contributor in src/sources/uhslc/index.ts. Their tides agree but their instruments differ; copies must not bridge these groups even when the direct source is absent. https://psmsl.org/data/obtaining/stations/763.php https://psmsl.org/data/obtaining/stations/484.php https://psmsl.org/data/obtaining/stations/1808.php https://www.jerico-ri.eu/download/filebase/jerico_fp7/deliverables/D2.3_version1_1.pdf https://uhslc.soest.hawaii.edu/rqds/atlantic/doc/qa830a.dmt; local readback and limits: docs/results/ign-coruna-identity-2026-11-22.md",
+        })),
+      ),
+    ),
+  ),
+
   {
     a: "gesla/crms0128-crms0128-usa-crms",
     b: "crms/CRMS0128-H01",
@@ -217,6 +237,8 @@ export const UNLINKS: Decision[] = [
 
 /** Stations chosen as their group's preferred series, with why. */
 export const PREFER: Record<string, string> = {
+  "cmems/Coruna2TG":
+    "The native UTC CMEMS product has independently checked coverage with its own two clock uncertainty windows (cmems-coruna-clock-2020 and cmems-coruna-clock-2022); direct IGN remains entirely suspect for unqualified historical labels (ign-coruna-clock). Revisit with the dated clock validation tracked in #181.",
   "uhslc/071":
     "LINZ's Wellington reference gauge, which LINZ's README for its tsunami gauge says to use for long-term analysis. Both sensors at the tsunami gauge (linz/WLGT) move against it by tenths of a metre, in turn (erratum `linz-wellington-drift`).",
 };

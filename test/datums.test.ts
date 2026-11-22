@@ -325,6 +325,55 @@ describe("withDatums", () => {
     assert.equal(s!.tide_station, "ticon/a-1-x-uhslc_fd");
   });
 
+  it("does not replace a gauge's prediction with a listed record of a distinct instrument", () => {
+    const own = station("gesla/coruna2tg-cor-esp-cmems", { same_as: ["ign/ACOR1"] });
+    const ign = station("ign/ACOR1", { same_as: [own.id] });
+    const other = station("gesla/la_coruna-830-esp-uhslc_fd");
+    const record = tide("ticon/coruna2tg-cor-esp-cmems", {
+      redundant: "ticon/la_coruna-830-esp-uhslc_fd",
+    });
+    const result = withDatums([own, ign, other], [record]).stations;
+    assert.equal(byId(result, own.id).tide_station, null);
+    assert.equal(byId(result, ign.id).tide_station, null);
+  });
+
+  it("refuses a committed prediction from a separated instrument", () => {
+    const own = station("gesla/coruna2tg-cor-esp-cmems", {
+      tide_station: "ticon/la_coruna-830-esp-uhslc_fd",
+    });
+    assert.equal(withDatums([own], []).stations[0]!.tide_station, null);
+  });
+
+  it("enforces separation between both groups' members", () => {
+    const own = station("gesla/own-alias", { same_as: ["ign/ACOR1"] });
+    const replacement = station("gesla/replacement-alias", { same_as: ["uhslc/830"] });
+    const record = tide("ticon/own-alias", { redundant: "ticon/replacement-alias" });
+    assert.equal(
+      byId(withDatums([own, replacement], [record]).stations, own.id).tide_station,
+      null,
+    );
+  });
+
+  it("refuses a separated prediction even when its replacement series is absent", () => {
+    const own = station("gesla/coruna2tg-cor-esp-cmems");
+    const record = tide("ticon/coruna2tg-cor-esp-cmems", {
+      redundant: "ticon/la_coruna-830-esp-uhslc_fd",
+    });
+    assert.equal(withDatums([own], [record]).stations[0]!.tide_station, null);
+  });
+
+  for (const linked of [false, true]) {
+    it(`keeps a duplicate prediction when the listed replacement is ${linked ? "linked" : "unlinked but not separated"}`, () => {
+      const other = station("gesla/a-1-x-uhslc_fd");
+      const own = station("gesla/a-1-x-uhslc_rq", { same_as: linked ? [other.id] : [] });
+      const record = tide("ticon/a-1-x-uhslc_rq", { redundant: "ticon/a-1-x-uhslc_fd" });
+      assert.equal(
+        byId(withDatums([own, other], [record]).stations, own.id).tide_station,
+        record.redundant,
+      );
+    });
+  }
+
   it("links a duplicate record's series to the station that replaces it", () => {
     const gesla = station("gesla/a-1-x-uhslc_rq", { same_as: ["uhslc/1"] });
     const uhslc = station("uhslc/1", { same_as: ["gesla/a-1-x-uhslc_rq"] });

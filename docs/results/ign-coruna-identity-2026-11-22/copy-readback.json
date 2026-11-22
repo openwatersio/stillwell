@@ -1,0 +1,124 @@
+{
+  "results": [
+    {
+      "id": "cmems/Coruna2TG",
+      "year": 2019,
+      "observations": 1087,
+      "numericAndSourceFlagsUnchanged": true,
+      "identicalToNativeCopy": null,
+      "clockWindowValues": 0,
+      "allWindowValuesSuspectOrWorse": true,
+      "ordinaryQcValues": 1087,
+      "url": "https://stillwell.openwaters.io/obs/cmems/Coruna2TG/2019.parquet",
+      "inputSha256": "0167fccce1ef1a71b903dace8b304fd0678892c200d4b4b587a57f35a9b6cf62"
+    },
+    {
+      "id": "cmems/Coruna2TG",
+      "year": 2020,
+      "observations": 6934,
+      "numericAndSourceFlagsUnchanged": true,
+      "identicalToNativeCopy": null,
+      "clockWindowValues": 1127,
+      "allWindowValuesSuspectOrWorse": true,
+      "ordinaryQcValues": 5807,
+      "url": "https://stillwell.openwaters.io/obs/cmems/Coruna2TG/2020.parquet",
+      "inputSha256": "b5e83d4e2f6e6d53c1ddd794fd097cfa63020525afa136ad69344eff989e744e"
+    },
+    {
+      "id": "cmems/Coruna2TG",
+      "year": 2021,
+      "observations": 8249,
+      "numericAndSourceFlagsUnchanged": true,
+      "identicalToNativeCopy": null,
+      "clockWindowValues": 0,
+      "allWindowValuesSuspectOrWorse": true,
+      "ordinaryQcValues": 8249,
+      "url": "https://stillwell.openwaters.io/obs/cmems/Coruna2TG/2021.parquet",
+      "inputSha256": "7b09e9ff9b63705a298cd9497d414b9b23bb234ca04f471c2af065c9a928c972"
+    },
+    {
+      "id": "cmems/Coruna2TG",
+      "year": 2022,
+      "observations": 8271,
+      "numericAndSourceFlagsUnchanged": true,
+      "identicalToNativeCopy": null,
+      "clockWindowValues": 2821,
+      "allWindowValuesSuspectOrWorse": true,
+      "ordinaryQcValues": 5450,
+      "url": "https://stillwell.openwaters.io/obs/cmems/Coruna2TG/2022.parquet",
+      "inputSha256": "0d6e59e052510e1333c9f9e1a73f72ec2c32ff78d09fe135dc75368ee5cd43fe"
+    },
+    {
+      "id": "cmems/Coruna2TG",
+      "year": 2023,
+      "observations": 8386,
+      "numericAndSourceFlagsUnchanged": true,
+      "identicalToNativeCopy": null,
+      "clockWindowValues": 0,
+      "allWindowValuesSuspectOrWorse": true,
+      "ordinaryQcValues": 8386,
+      "url": "https://stillwell.openwaters.io/obs/cmems/Coruna2TG/2023.parquet",
+      "inputSha256": "46cb77d09531299e672c6ecb14261451b0eacc04937fb2c6234070a34af174b9"
+    },
+    {
+      "id": "gesla/coruna2tg-cor-esp-cmems",
+      "year": 2019,
+      "observations": 1087,
+      "numericAndSourceFlagsUnchanged": true,
+      "identicalToNativeCopy": true,
+      "clockWindowValues": 0,
+      "allWindowValuesSuspectOrWorse": true,
+      "ordinaryQcValues": 1087,
+      "url": "https://stillwell.openwaters.io/obs/gesla/coruna2tg-cor-esp-cmems/2019.parquet",
+      "inputSha256": "0167fccce1ef1a71b903dace8b304fd0678892c200d4b4b587a57f35a9b6cf62"
+    },
+    {
+      "id": "gesla/coruna2tg-cor-esp-cmems",
+      "year": 2020,
+      "observations": 6934,
+      "numericAndSourceFlagsUnchanged": true,
+      "identicalToNativeCopy": true,
+      "clockWindowValues": 1127,
+      "allWindowValuesSuspectOrWorse": true,
+      "ordinaryQcValues": 5807,
+      "url": "https://stillwell.openwaters.io/obs/gesla/coruna2tg-cor-esp-cmems/2020.parquet",
+      "inputSha256": "b5e83d4e2f6e6d53c1ddd794fd097cfa63020525afa136ad69344eff989e744e"
+    },
+    {
+      "id": "gesla/coruna2tg-cor-esp-cmems",
+      "year": 2021,
+      "observations": 8249,
+      "numericAndSourceFlagsUnchanged": true,
+      "identicalToNativeCopy": true,
+      "clockWindowValues": 0,
+      "allWindowValuesSuspectOrWorse": true,
+      "ordinaryQcValues": 8249,
+      "url": "https://stillwell.openwaters.io/obs/gesla/coruna2tg-cor-esp-cmems/2021.parquet",
+      "inputSha256": "7b09e9ff9b63705a298cd9497d414b9b23bb234ca04f471c2af065c9a928c972"
+    },
+    {
+      "id": "gesla/coruna2tg-cor-esp-cmems",
+      "year": 2022,
+      "observations": 8271,
+      "numericAndSourceFlagsUnchanged": true,
+      "identicalToNativeCopy": true,
+      "clockWindowValues": 2821,
+      "allWindowValuesSuspectOrWorse": true,
+      "ordinaryQcValues": 5450,
+      "url": "https://stillwell.openwaters.io/obs/gesla/coruna2tg-cor-esp-cmems/2022.parquet",
+      "inputSha256": "0d6e59e052510e1333c9f9e1a73f72ec2c32ff78d09fe135dc75368ee5cd43fe"
+    },
+    {
+      "id": "gesla/coruna2tg-cor-esp-cmems",
+      "year": 2023,
+      "observations": 8386,
+      "numericAndSourceFlagsUnchanged": true,
+      "identicalToNativeCopy": true,
+      "clockWindowValues": 0,
+      "allWindowValuesSuspectOrWorse": true,
+      "ordinaryQcValues": 8386,
+      "url": "https://stillwell.openwaters.io/obs/gesla/coruna2tg-cor-esp-cmems/2023.parquet",
+      "inputSha256": "46cb77d09531299e672c6ecb14261451b0eacc04937fb2c6234070a34af174b9"
+    }
+  ]
+}

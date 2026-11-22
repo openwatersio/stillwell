@@ -1,5 +1,5 @@
+import { verifyCorunaIdentities, checkCorunaQuality } from "./check.ts";
 import { type ErrataFile, type StoreReader } from "../../errata.ts";
-import { Flag } from "../../schema.ts";
 
 /** Coruña's levels over the admitted interval, read once per check. */
 const held = (store: StoreReader) => store.levels("ign/ACOR1", "2000-01-01", "2024-01-01");
@@ -135,13 +135,13 @@ export default {
       stations: ["ign/ACOR1"],
       since: "2000-01-01",
       until: "2024-01-01",
-      handling: "kept",
+      handling: "flagged",
       error:
-        "IGN hasn't confirmed the time convention of its historical hourly labels. Its server README says reviewed processing corrects temporal phase, and neither it nor IGN's 17 November reply names UTC.",
+        "IGN has not confirmed the historical time convention. Monthly harmonic fits show sustained offsets in September 2000–January 2001, October 2003–November 2004, July 2005–October 2008 and October 2011–May 2012. Seven monthly harmonic fits reach +20 minutes: April 2006, January–February 2007 and February–May 2012. Independent observed comparisons show discrepancies beyond those months; the evidence does not identify complete fault boundaries or establish which reference is wrong in every comparison.",
       response:
-        "The labels are stored as UTC, with no shift, and the values keep the flags QC and IGN's reviewed source flag give them. The record agrees with other originators' records of the gauge in every year, so it is kept. The check fits 2020's levels to the CMEMS copy's, which are IGN's own, so it shows a break in the stored levels or their stamps, not an error IGN made in both.",
+        "Keep the entire admitted 2000–2023 interval suspect, storing the labels as UTC without a shift and preserving reviewed source flags. Annual agreement does not establish the historical convention or justify marking unverified months good. The native CMEMS product declares UTC and has its own processing; full independent controls identify separate discrepancies handled by cmems-coruna-clock-2020 and cmems-coruna-clock-2022, including the GESLA copy. It does not inherit this archive-format uncertainty blanket. The check also compares 2020 with IGN's CMEMS copy for processing consistency, not independent clock certification.",
       evidence:
-        "Each of the 24 years, 2000 to 2023, was cross-correlated with the TICON constants of IEO's Coruña gauge 0.7 km away, UHSLC's La Coruña and CMEMS's Coruna2TG, at lags of up to 3 hours: best lag 0 minutes in 57 of the 72 fits and ±10 minutes in the rest, K1 phase −9 to +16 minutes, zero-lag correlation 0.987 to 0.995. A whole-hour or seasonal shift would show as a lag of an hour or more. IEO's gauge is the independent reference: CMEMS's record is named ‘A Coruña ACOR1 TG tide gauge’ after IGN's code, so it is IGN's data, and UHSLC's may come from IEO. See docs/results/ign-coruna-clock-check-2026-11-21.md.",
+        "Each of the 24 years, 2000 to 2023, was cross-correlated with the TICON constants of IEO's Coruña gauge about 0.44 km away, UHSLC's La Coruña and CMEMS's Coruna2TG, at lags of up to 3 hours: best lag 0 minutes in 57 of the 72 fits and ±10 minutes in the rest, K1 phase −9 to +16 minutes, zero-lag correlation 0.987 to 0.995. The annual fits support excluding a persistent whole-hour shift; annual aggregation alone does not exclude a shift confined to part of a year. IEO's gauge is the independent reference: CMEMS's record is named ‘A Coruña ACOR1 TG tide gauge’ after IGN's code, so it is IGN's data, and UHSLC's qa830a.dmt names IEO as contributor, so those references are not independent of each other. All 288 months have harmonic fits; March–April 2007 and July/November 2013 fail day coverage. Independent IEO comparisons were attempted over 204 overlapping months, 2000–2016: 202 had pairs and 193 had at least 445; the full additional controls against UHSLC/830 and REDMAR cover every admitted year, with gaps explicit in independent-clock.json. See docs/results/ign-coruna-clock-check-2026-11-21.md and docs/results/ign-coruna-identity-2026-11-22.md.",
       check: async (store) => {
         await listed(store);
         // The CMEMS copy of the gauge, hourly from November 2019: its levels fit IGN's at zero lag, not an hour either way.
@@ -177,9 +177,7 @@ export default {
             `ign/ACOR1 fits the CMEMS copy at r ${now.toFixed(3)}, against ${early.toFixed(3)} an hour early and ${late.toFixed(3)} an hour late`,
           );
         const levels = await held(store);
-        const good = levels.filter((o) => o.flag === Flag.good).length;
-        if (good < levels.length * 0.99)
-          throw new Error(`only ${good} of ${levels.length} ign/ACOR1 levels are good`);
+        checkCorunaQuality(levels);
       },
     },
     {
@@ -189,14 +187,14 @@ export default {
       error:
         "The broader IGN archive has unresolved historical clocks, changing raw signs/scales, undocumented channels, malformed exports and unconfirmed daily/annual authority.",
       response:
-        "The registered source admits only ACOR1 hourly JM exports for 2000–2023. Every other series, product and period is excluded from the public adapter, with no live polling or monthly refetch. The candidate catalog and parsers are research utilities and do not widen registered source coverage. Extend admission only after the evidence and local/store readback for the added coverage are reviewed.",
+        "The registered source admits only ACOR1 hourly JM exports for 2000–2023. Every other series, product and period is excluded from the public adapter, with no live polling or monthly refetch. The candidate catalog and parsers are research utilities and do not widen registered source coverage. Admission also requires the documented Coruña instrument groups, preferences and prediction references to remain coherent. Extend admission only after the evidence and local/store readback for the added coverage are reviewed.",
       evidence:
         "Full census and 797-file annual syntax/tidal audit in docs/results/ign-validation-2026-11-17.md. Remaining agency and validation work is tracked by https://github.com/openwatersio/stillwell/issues/181; initial scope approved by the maintainer on 18 November 2026.",
       check: async (store) => {
         await listed(store);
-        const others = (await store.rows("stations.parquet")).filter(
-          (s) => s.source === "ign" && s.id !== "ign/ACOR1",
-        );
+        const rows = await store.rows("stations.parquet");
+        verifyCorunaIdentities(rows);
+        const others = rows.filter((s) => s.source === "ign" && s.id !== "ign/ACOR1");
         if (others.length)
           throw new Error(
             `the store lists other IGN stations: ${others.map((s) => s.id).join(", ")}`,

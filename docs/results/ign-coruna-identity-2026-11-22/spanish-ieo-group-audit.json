@@ -1,0 +1,123 @@
+[
+  {
+    "id": "gesla/algeciras-alge-esp-ieo",
+    "same_as": [],
+    "preferred": "gesla/algeciras-alge-esp-ieo"
+  },
+  {
+    "id": "gesla/arrecife-arre-esp-ieo",
+    "same_as": [
+      "cmems/ArrecifeTG",
+      "gesla/arrecife-205a-esp-uhslc_rq",
+      "gesla/arrecife-205b-esp-uhslc_rq",
+      "gesla/arrecife-205d-esp-uhslc_rq",
+      "gesla/arrecifetg-arr-esp-cmems",
+      "uhslc/205a",
+      "uhslc/205b",
+      "uhslc/205d"
+    ],
+    "preferred": "cmems/ArrecifeTG"
+  },
+  {
+    "id": "gesla/cadiz-cadi-esp-ieo",
+    "same_as": [
+      "cmems/CadizPtoAmericaTG"
+    ],
+    "preferred": "cmems/CadizPtoAmericaTG"
+  },
+  {
+    "id": "gesla/ceuta-ceta-esp-ieo",
+    "same_as": [
+      "cmems/IDSL-Ceuta",
+      "gesla/ceuta-207-esp-uhslc_fd",
+      "gesla/ceuta-207a-esp-uhslc_rq",
+      "gesla/idsl_ceuta-ids-esp-cmems",
+      "uhslc/207"
+    ],
+    "preferred": "uhslc/207"
+  },
+  {
+    "id": "gesla/coruna-coru-esp-ieo",
+    "same_as": [
+      "cmems/Coruna2TG",
+      "gesla/coruna2tg-cor-esp-cmems",
+      "gesla/la_coruna-830-esp-uhslc_fd",
+      "gesla/la_coruna-830a-esp-uhslc_rq",
+      "uhslc/830"
+    ],
+    "preferred": "uhslc/830"
+  },
+  {
+    "id": "gesla/cruz-cruz-esp-ieo",
+    "same_as": [
+      "cmems/LaPalmaTG",
+      "gesla/lapalmatg-lap-esp-cmems",
+      "gesla/scruz_d_palma-206a-esp-uhslc_rq",
+      "gesla/scruz_d_palma-206b-esp-uhslc_rq",
+      "gesla/scruz_d_palma-206d-esp-uhslc_rq",
+      "uhslc/206a",
+      "uhslc/206b",
+      "uhslc/206d"
+    ],
+    "preferred": "cmems/LaPalmaTG"
+  },
+  {
+    "id": "gesla/malaga-mala-esp-ieo",
+    "same_as": [
+      "cmems/MalagaTG",
+      "gesla/malagatg-mal-esp-cmems"
+    ],
+    "preferred": "cmems/MalagaTG"
+  },
+  {
+    "id": "gesla/palma-palm-esp-ieo",
+    "same_as": [
+      "cmems/PalmadeMallorcaTG",
+      "gesla/palmademallorcatg-pal-esp-cmems"
+    ],
+    "preferred": "cmems/PalmadeMallorcaTG"
+  },
+  {
+    "id": "gesla/pluz-pluz-esp-ieo",
+    "same_as": [
+      "cmems/LasPalmasTG",
+      "gesla/las_palmas-217-esp-uhslc_fd",
+      "gesla/las_palmas-217a-esp-uhslc_rq",
+      "gesla/las_palmas-217b-esp-uhslc_rq",
+      "gesla/las_palmas-217c-esp-uhslc_rq",
+      "gesla/las_palmas-217d-esp-uhslc_rq",
+      "gesla/laspalmastg-las-esp-cmems",
+      "uhslc/217",
+      "uhslc/217a",
+      "uhslc/217b",
+      "uhslc/217c"
+    ],
+    "preferred": "cmems/LasPalmasTG"
+  },
+  {
+    "id": "gesla/santander-sant-esp-ieo",
+    "same_as": [
+      "cmems/SantanderTG",
+      "gesla/santandertg-san-esp-cmems"
+    ],
+    "preferred": "cmems/SantanderTG"
+  },
+  {
+    "id": "gesla/tarifa-tari-esp-ieo",
+    "same_as": [
+      "cmems/TarifaTG",
+      "gesla/tarifatg-tar-esp-cmems"
+    ],
+    "preferred": "cmems/TarifaTG"
+  },
+  {
+    "id": "gesla/vigo-vigo-esp-ieo",
+    "same_as": [
+      "cmems/VigoTG",
+      "gesla/vigo-208a-esp-uhslc_rq",
+      "gesla/vigotg-vig-esp-cmems",
+      "uhslc/208a"
+    ],
+    "preferred": "cmems/VigoTG"
+  }
+]
