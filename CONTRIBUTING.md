@@ -47,7 +47,7 @@ workers/live/          the Cloudflare Worker and container that run the poller, 
 workers/api/           the Cloudflare Worker that caches and serves levels at api.openwaters.io
 docs/                  the contributing guides (docs/contributing/), the plan, the API design, the store's layout and the evaluations
 site/                  the site for people using the data: its docs and a page per source (Astro)
-.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled compact-daily.yml, monthly.yml (station lists, refetches, each source's own backfills, level matches for linking, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket, and a check of a sample of its files against their definitions), errata-check.yml (each erratum's check after every full Monthly run, with an issue for each that fails), site.yml (the site's build and its deploy to GitHub Pages) and canary.yml (a weekly live request per adapter)
+.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled compact-daily.yml, monthly.yml (station lists, refetches, each source's own backfills, level matches for linking, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket, and a check of a sample of its files against their definitions), errata-check.yml (each erratum's check after every full Monthly run, and the errata report of the failing ones and the cross-station findings nothing settles), site.yml (the site's build and its deploy to GitHub Pages) and canary.yml (a weekly live request per adapter)
 ```
 
 ## Getting started
@@ -93,6 +93,7 @@ Read the guide for the task at hand before starting it:
 - [Running ingest](docs/contributing/ingest.md): every `scripts/ingest.ts` command and its flags, and the environment variables that choose the store.
 - [Sources](docs/contributing/sources.md): adding a source, recording a source's errata, and withholding stations.
 - [Operations](docs/contributing/operations.md): the scheduled workflows that write to R2, live polling, migrations, and the weekly canary.
+- [Errata runbook](docs/contributing/errata-runbook.md): working the errata report after each Monthly run, for an agent on a schedule.
 - [Checks](docs/contributing/checks.md): the TICON inventory, the clock check, the cross-station checks, the HRoI evaluations, and the definitions of published files.
 - [Running the poller](docs/contributing/poller.md): the poller, and the levels API's tests.
 - [Site](site/README.md): building and deploying the site.
