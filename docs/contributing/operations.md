@@ -22,7 +22,7 @@ The workflow records progress in `migrations.json` in the store. A store with no
 
 - `drop`, `withhold`, `misplaced` and `delete-years` are steps like any other, but a migration with a `withhold` or `drop` step takes a `matches --prune` and a `links --prune` step after it, which take the stations' rows out of `stations/matches.parquet` and `stations/links.parquet`, as the Ingest workflow does. A step passes no `--accept-*` flag or `--dry-run`, since those accept whatever the source reports when the step runs, long after the review. A requalify with a `--budget`, as `analyze --requalify` always has, takes one of at least its timeout, so it never stops early and succeeds. `npm test` also parses each step as `scripts/ingest.ts` would and checks the words its command takes.
 - A failed step opens an issue titled "Migration <id> failed" and stops every migration not yet done, whatever its name. Dispatch the workflow with `retry` and the migration's name to run the step again, or with `skip` to mark the migration done without its remaining steps.
-- A migration runs once whenever it merges, whatever its name, even after migrations named later. Edit a migration only before it starts: one that has run doesn't run again, so add a new one instead.
+- A migration runs once whenever it merges, whatever its name, even after migrations named later. Edit a migration only before it starts, or to fix the step that failed, keeping the number and order of its steps, merged to `main` before the `retry`. One that has run doesn't run again, so otherwise add a new one.
 
 ## Costs
 
