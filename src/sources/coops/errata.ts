@@ -1,6 +1,27 @@
 import { flaggedSpan, type ErrataFile } from "../../errata.ts";
 import { Flag } from "../../schema.ts";
 
+// The day after the last day probed against the data API, which the evidence dates.
+const PROBED_UNTIL = "2026-11-23";
+
+// The years of each station's preliminary 6-minute periods that the data inventory lists and the data API answers nothing for.
+const UNSERVED_YEARS = {
+  "8720244": [2024, 2025],
+  "8722376": [2026],
+  "8725439": [2023, 2024],
+  "8726247": [2022, 2023, 2024],
+  "8729548": [2023, 2024],
+  "8730667": [2006, 2007],
+  "9458907": [2003],
+  "9462711": [2008],
+  "9752621": [2023, 2024, 2025, 2026],
+  "9754229": [2023, 2024, 2025, 2026],
+  "9755968": [2022, 2023, 2024, 2025, 2026],
+  "9757811": [2023, 2024, 2025, 2026],
+  "9758066": [2022, 2023, 2024, 2025, 2026],
+  "9759413": [2024, 2025, 2026],
+} as const satisfies Record<string, readonly number[]>;
+
 export default {
   errata: [
     {
@@ -21,6 +42,40 @@ export default {
         if (!rows.length) throw new Error(`the store holds no ${id} levels in November 1994`);
         if (rows.some((o) => o.flag === Flag.preliminary))
           throw new Error(`the store holds preliminary ${id} levels in November 1994`);
+      },
+    },
+    {
+      id: "coops-inventory-lists-unserved-water-levels",
+      stations: Object.keys(UNSERVED_YEARS).map((id) => `coops/${id}`),
+      handling: "avoided",
+      error:
+        'CO-OPS\'s data inventory lists preliminary 6-minute water-level periods at 14 stations that the data API serves nothing for (listed below). It answers "No data was found. This product may not be offered at this station at the requested time." for every one of those months. Twelve are stations whose only water-level periods are these: Mill Cove (8720244), South Fork, St. Lucie River (8722376), Tropical Homesites, Matlacha (8725439), Bradenton, Manatee River (8726247), Camp Pinchot (8729548), Alabama Point (8730667), and six in Puerto Rico, Isabel Segunda, Vieques (9752621), Yabucoa Harbor (9754229), Salinas, Bahia de Jobos (9755968), Arecibo (9757811), Guayanilla (9758066) and Aguadilla, Crashboat Beach (9759413), whose periods start between December 2022 and May 2024. The other two serve values in their other periods: Castle Bay (9458907) in 2001 and Surf Bay, Akutan Bay (9462711) in 2011, but not in the 2003 and 2008 periods.',
+      response:
+        "The store holds no values for these years, since there are none to hold, and a backfill that asks for them writes no levels. A backfill still asks for these months and gets nothing back; nothing is dropped or flagged.",
+      evidence:
+        "2026-11-22: each station's inventory against the data API, asking `water_level` with `datum=STND` for every calendar month of every listed period, 330 in all, none of which answered a value; and against the store, which holds no `obs` file for any of the 39 station-years. Verified hourly heights are another product and are not covered here.",
+      check: async (store, e) => {
+        // Values in the other periods of these two show the reader finds a station's values when it has them.
+        for (const [id, year] of [
+          ["coops/9458907", 2001],
+          ["coops/9462711", 2011],
+        ] as const)
+          if (!(await store.levels(id, `${year}-01-01`, `${year + 1}-01-01`)).length)
+            throw new Error(`the store holds no ${id} levels in ${year}`);
+        for (const id of e.stations!) {
+          if (!(await store.station(id))) throw new Error(`the store doesn't list ${id}`);
+          for (const year of UNSERVED_YEARS[
+            id.slice("coops/".length) as keyof typeof UNSERVED_YEARS
+          ]) {
+            const rows = await store.levels(
+              id,
+              `${year}-01-01`,
+              year + 1 > Number(PROBED_UNTIL.slice(0, 4)) ? PROBED_UNTIL : `${year + 1}-01-01`,
+            );
+            if (rows.length)
+              throw new Error(`the store holds ${rows.length} ${id} levels in ${year}`);
+          }
+        }
       },
     },
     {
