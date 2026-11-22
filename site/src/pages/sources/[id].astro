@@ -36,7 +36,10 @@ const headings = [
   { depth: 2, slug: "stations", text: "Stations" },
   { depth: 2, slug: "errata", text: "Errata" },
 ];
-const errata = (await json("errata.json")).filter((e) => e.source === s.id);
+// The source's own errata, and those whose stations include its copies of another source's records.
+const errata = (await json("errata.json")).filter(
+  (e) => e.source === s.id || (e.stations ?? []).some((id: string) => id.startsWith(`${s.id}/`)),
+);
 const year = (d?: Date) => d?.getUTCFullYear() ?? "–";
 const count = (n: number) => n.toLocaleString("en-US");
 // sources.json's `backfill`, absent before the first publish that writes it.

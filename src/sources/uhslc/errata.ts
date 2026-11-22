@@ -1,7 +1,7 @@
 import { dayAfter, flaggedSpan, type ErrataFile } from "../../errata.ts";
 import { POSITIONS } from "../../positions.ts";
-import { distanceKm } from "../../stats.ts";
-import { lateBy, middle, unflagged } from "./checks.ts";
+import { distanceKm, median } from "../../stats.ts";
+import { lateBy, middle, read, unflagged } from "./checks.ts";
 
 export default {
   errata: [
@@ -92,7 +92,7 @@ export default {
       response:
         "Kept as served. Moved 5 minutes earlier, the values would sit off the hour, where the store's hourly comparisons (level matches, link offsets) don't read them, and they may be 10-minute means rather than a clock error. Kartverket's own series of the gauge (`kartverket/VAW`) is the group's preferred series, and has no such lag.",
       evidence:
-        "November 2026. UHSLC's hourly Vardø values were compared with Kartverket's 10-minute series of the gauge (`kartverket/VAW`), interpolated to lags from −15 to +15 minutes, year by year from 1990. In every month from January 2007 to December 2018 they fit best 300 seconds earlier, to within 10 seconds, at a standard deviation of 15 to 17 mm against 34 to 39 mm at their own times. In 2004 to 2006 and from January 2019 they equal Kartverket's at their own times to 0 to 2 mm. Kartverket's mean over the 10 minutes before each label fits as well as the lag, and no centred window does, so the values may be 10-minute means labeled at their end; either way they stand for 5 minutes before their labels. Before 2004 UHSLC's values differ from Kartverket's by about 30 mm at every lag and aren't moved. GESLA's NHS and CMEMS copies of the gauge are on time. A harmonic fit of 2006 to 2020, which mixes the late years with on-time ones, put UHSLC 170 to 240 seconds behind Kartverket from K1 to M4, while UHSLC's Honningsvåg and Andenes agree with Kartverket within about 10 seconds.",
+        "November 2026. UHSLC's hourly Vardø values were compared with Kartverket's 10-minute series of the gauge (`kartverket/VAW`), interpolated to lags from −15 to +15 minutes, year by year from 1990. In every month from January 2007 to December 2018 they fit best 300 seconds earlier, to within 10 seconds, at a standard deviation of 15 to 17 mm against 34 to 39 mm at their own times. In 2004 to 2006 and from January 2019 they equal Kartverket's at their own times to 0 to 2 mm. Kartverket's mean over the 10 minutes before each label fits as well as the lag, and no centred window does, so the values may be 10-minute means labeled at their end; either way they stand for 5 minutes before their labels. Before 2004 UHSLC's values are rounded to decimeters, which differs from Kartverket's by about 30 mm at every lag (erratum `uhslc-vardo-1989-2003-decimeters`), and aren't moved. GESLA's NHS and CMEMS copies of the gauge are on time. A harmonic fit of 2006 to 2020, which mixes the late years with on-time ones, put UHSLC 170 to 240 seconds behind Kartverket from K1 to M4, while UHSLC's Honningsvåg and Andenes agree with Kartverket within about 10 seconds.",
       check: async (store, e) => {
         const id = e.stations![0]!;
         for (const [span, late] of [
@@ -103,6 +103,113 @@ export default {
           if (lag !== late)
             throw new Error(
               `Vardø (805) runs ${lag} minutes late against kartverket/VAW from ${span[0]}, not ${late}`,
+            );
+        }
+      },
+    },
+    {
+      id: "uhslc-vardo-1989-2003-decimeters",
+      stations: ["uhslc/805"],
+      since: "1989-11-01",
+      until: "2004-01-01",
+      handling: "kept",
+      error:
+        "UHSLC's Vardø values (805) from 1 November 1989 to the end of 2003 are whole decimeters, apart from short runs in single days (135 of the 117,361 values of 1990 to 2003), so each rounded value is up to 5 cm from the level the gauge read. Before November 1989 they are in centimeters and from 2004 in millimeters. The research-quality version (805a) and the FD series carry the same values.",
+      response:
+        "Kept as served. The values are not rounded again or marked; nothing in the store says which are the rounded ones except this entry. Kartverket's own series of the gauge (`kartverket/VAW`), in tenths of a centimeter, is the group's preferred series and covers the span from 1 November 1989.",
+      evidence:
+        "November 2026. Of the 117,361 values from 1990 to 2003, 117,226 are whole decimeters; the other 135 are runs of hours in single days such as 11 March 1991, in millimeters. In 1989 every value from 1 November is a whole decimeter, and the last that isn't is at 22:00 UTC on 30 September; UHSLC has none in October. UHSLC's documentation file for 805a gives a Scan-Matic gauge from 1 November 1989 and units of millimeters. Against Kartverket's 10-minute series at the same hours, the difference after removing its median has a standard deviation of 28.6 to 31 mm in every year from 1990 to 2003, at its own times and at no other lag, which is 100 mm / √12 = 28.9 mm, the spread of a rounding to 0.1 m. UHSLC's value equals Kartverket's rounded to 0.1 m after adding 866 mm in 98.6% of hours in 1990, 98.2% in 1998 and 95.8% in 2003. In 2004 to 2006 the difference has a standard deviation of 0 to 1 mm. The 5-minute lag of erratum `uhslc-vardo-2007-2018-five-minutes-late` starts in 2007, so the span is on time.",
+      // Whole decimeters in 1998 and finer values in 2005, against Kartverket's values rounded to 0.1 m.
+      check: async (store) => {
+        const whole = (rows: { level: number }[]) =>
+          rows.filter((o) => Math.abs(o.level * 10 - Math.round(o.level * 10)) < 1e-6).length /
+          rows.length;
+        const early = await read(store, "uhslc/805", "1998-03-01", "1998-04-01");
+        const late = await read(store, "uhslc/805", "2005-03-01", "2005-04-01");
+        if (whole(early) < 0.99)
+          throw new Error(
+            `only ${(100 * whole(early)).toFixed(1)}% of Vardø's March 1998 values are whole decimeters`,
+          );
+        if (whole(late) > 0.2)
+          throw new Error(
+            `${(100 * whole(late)).toFixed(1)}% of Vardø's March 2005 values are whole decimeters`,
+          );
+        const kartverket = new Map(
+          (await read(store, "kartverket/VAW", "1998-03-01", "1998-04-01")).map((o) => [
+            o.time,
+            o.level,
+          ]),
+        );
+        const pairs = early.filter((o) => kartverket.has(o.time));
+        const hits = pairs.filter(
+          (o) => Math.abs(Math.round((kartverket.get(o.time)! + 0.866) * 10) / 10 - o.level) < 1e-6,
+        ).length;
+        if (pairs.length < 500 || hits / pairs.length < 0.95)
+          throw new Error(
+            `${hits} of ${pairs.length} March 1998 values equal Kartverket's rounded to 0.1 m after adding 866 mm`,
+          );
+      },
+    },
+    {
+      id: "uhslc-tregde-1987-2003-decimeters",
+      stations: ["uhslc/804"],
+      since: "1987-12-11",
+      until: "2004-01-01",
+      handling: "kept",
+      error:
+        "UHSLC's Tregde values (804) from 11 December 1987 to the end of 2003 are whole decimeters, apart from short runs (20 of 134,733 values), so each rounded value is up to 5 cm from the level the gauge read. Before 1987 they are in centimeters and from 2004 in millimeters.",
+      response:
+        "Kept as served. Kartverket's own series of the gauge (`kartverket/TRG`) is in tenths of a centimeter.",
+      evidence:
+        "November 2026. Of the 134,733 values stored for 1987 to 2003, 134,713 are whole decimeters. The last value in a finer unit before the run is at 23:00 UTC on 31 December 1986, and UHSLC has none from then to 10 December 1987. In 2004 to 2012 about 1% are whole decimeters, by chance. Against `kartverket/TRG` in March 1998 the median difference is 494 mm. UHSLC's Andenes (800), Honningsvåg (801), Måløy (802) and Rørvik (803), the other Norwegian NHS records with a Kartverket counterpart, hold millimeters in 1991 and 1999. Zero steps against Kartverket weren't looked for at Tregde, Andenes, Måløy or Rørvik.",
+      // Whole decimeters in March 1998 and finer values in March 2005.
+      check: async (store) => {
+        const whole = (rows: { level: number }[]) =>
+          rows.filter((o) => Math.abs(o.level * 10 - Math.round(o.level * 10)) < 1e-6).length /
+          rows.length;
+        const early = whole(await read(store, "uhslc/804", "1998-03-01", "1998-04-01"));
+        const late = whole(await read(store, "uhslc/804", "2005-03-01", "2005-04-01"));
+        if (early < 0.99)
+          throw new Error(
+            `only ${(100 * early).toFixed(1)}% of Tregde's March 1998 values are whole decimeters`,
+          );
+        if (late > 0.2)
+          throw new Error(
+            `${(100 * late).toFixed(1)}% of Tregde's March 2005 values are whole decimeters`,
+          );
+      },
+    },
+    {
+      id: "uhslc-vardo-zero-steps",
+      stations: ["uhslc/805"],
+      since: "1989-11-01",
+      handling: "kept",
+      error:
+        "UHSLC's Vardø values (805, in the research-quality version and the FD series alike) sit at four different heights above Kartverket's chart datum: 866 mm from November 1989 to 31 December 2006, about 925 mm from 1 January 2007 to 31 December 2018, 886 mm from 1 January 2019 to 31 May 2021 and 907 mm from 1 June 2021, while the store keeps them in one datum epoch, ZERO, from 1947. The offset steps by +59, −39 and +21 mm, on the first day with values after each change. UHSLC's documentation gives the distance between its zero (TGZ) and chart datum as 907 mm.",
+      response:
+        "Kept as served, in one epoch. The store holds no offset from UHSLC's zero to chart datum, so UHSLC's Vardø and Kartverket's aren't linked, and a link would carry one offset across all four zeros. A level read across 2007, 2019 or 2021 carries the step. The station's `datums` (MSL and LAT, carried from other records of the gauge) are single values, so they fit at most one of the four zeros.",
+      evidence:
+        "November 2026. The median of UHSLC's value less Kartverket's at the same hours, by year from 1990, is 863 to 867 mm to 2006, 924 to 926 in 2007 to 2018 (at lag 0; 925 at 5 minutes earlier, with the lag of erratum `uhslc-vardo-2007-2018-five-minutes-late`), 886 in 2019 and 2020 and 907 from 2022. By day it is 866 mm on 31 December 2006 and 937 on 1 January 2007, 926 on 30 December 2018 and 889 on 1 January 2019 (UHSLC has no value on 31 December), and 886 on 31 May 2021 and 907 on 1 June. GESLA's NHS copy of the gauge (`vardo-vaw-nor-nhs`) equals Kartverket's to 0 mm in every year from 1990 to 2026, so the steps are in UHSLC's values and not Kartverket's. UHSLC's Honningsvåg (801) against Kartverket's (HVG) steps at other dates: the yearly median is 53 to 61 mm to 2014 (45 in 2013), −28 to −33 mm from 2015 to 2020 and 0 to −1 mm from 2021, so both gauges step in 2021. UHSLC's documentation file for 805a says that the 2007 to 2014 values were replaced in January 2020 after NHS corrected systematic errors, and the 2007 step is in the values it serves. Only the offset after 31 May 2021 has the size the documentation gives, and its wording (TGZ = Chart Datum + 907 mm) doesn't say which way it runs; UHSLC's values read 907 mm above Kartverket's.",
+      // The offset in a month of each span, at lag 0, within 6 mm of its value.
+      check: async (store) => {
+        for (const [span, expected] of [
+          [["1998-03-01", "1998-04-01"], 866],
+          [["2010-06-01", "2010-07-01"], 925],
+          [["2020-06-01", "2020-07-01"], 886],
+          [["2022-06-01", "2022-07-01"], 907],
+        ] as const) {
+          const kartverket = new Map(
+            (await read(store, "kartverket/VAW", span[0], span[1])).map((o) => [o.time, o.level]),
+          );
+          const d = (await read(store, "uhslc/805", span[0], span[1]))
+            .filter((o) => kartverket.has(o.time))
+            .map((o) => o.level - kartverket.get(o.time)!);
+          if (d.length < 500)
+            throw new Error(`Vardø shares ${d.length} hours with Kartverket from ${span[0]}`);
+          const mm = median(d) * 1000;
+          if (Math.abs(mm - expected) > 6)
+            throw new Error(
+              `Vardø (805) sits ${mm.toFixed(0)} mm above kartverket/VAW from ${span[0]}, not ${expected}`,
             );
         }
       },
@@ -131,16 +238,20 @@ export default {
     },
     {
       id: "uhslc-goteborg-2007-hour-early",
-      stations: ["uhslc/819"],
+      stations: [
+        "uhslc/819",
+        "gesla/goteborgorsh-819-swe-uhslc_fd",
+        "gesla/goteborgorsh-819a-swe-uhslc_rq",
+      ],
       since: "2007-07-23",
       until: "2008-01-01",
       handling: "flagged",
       error:
-        "UHSLC's hourly Göteborg-Torshamnen levels are stamped one hour early from 23 July to 31 December 2007.",
+        "UHSLC's hourly Göteborg-Torshamnen levels are stamped one hour early from 23 July to 31 December 2007. GESLA's copies of the fast-delivery and research-quality records carry the same values.",
       response:
-        "23 July to 31 December 2007 is flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
+        "23 July to 31 December 2007 is flagged `suspect`, keeping each record's own flag as `source_flag`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide's timing at Göteborg ran about 65 minutes early in those windows. Against SMHI's own record of the gauge (`smhi/2109`), UHSLC's values differ by 3.6 to 4.3 cm RMS a month, and by 0.0 cm once shifted 60 minutes; before 23 July and after 31 December they match unshifted. GESLA's copies carry the same values (erratum `gesla-goteborg-2007-hour-early`). GESLA's CMEMS record of the gauge differs from UHSLC's by the same amount over the span, as SMHI's does, so it's on the right clock.",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide's timing at Göteborg ran about 65 minutes early in those windows. Against SMHI's own record of the gauge (`smhi/2109`), UHSLC's values differ by 3.6 to 4.3 cm RMS a month, and by 0.0 cm once shifted 60 minutes; before 23 July and after 31 December they match unshifted. GESLA's copies of UHSLC's fast-delivery and research-quality records (`gesla/goteborgorsh-819-swe-uhslc_fd` and `gesla/goteborgorsh-819a-swe-uhslc_rq`) hold the same values at all 3,600 times each shares with UHSLC's, on 150 of the 150 days read in five 30-day pieces spread over the span's 162, and GESLA rates them usable. GESLA's CMEMS record of the gauge differs from UHSLC's by the same amount over the span, as SMHI's does, so it's on the right clock.",
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
@@ -153,16 +264,20 @@ export default {
     },
     {
       id: "uhslc-goteborg-2011-hour-early",
-      stations: ["uhslc/819"],
+      stations: [
+        "uhslc/819",
+        "gesla/goteborgorsh-819-swe-uhslc_fd",
+        "gesla/goteborgorsh-819a-swe-uhslc_rq",
+      ],
       since: "2011-02-01",
       until: "2011-07-01",
       handling: "flagged",
       error:
-        "UHSLC's hourly Göteborg-Torshamnen levels are stamped one hour early from 1 February to 30 June 2011.",
+        "UHSLC's hourly Göteborg-Torshamnen levels are stamped one hour early from 1 February to 30 June 2011. GESLA's copies of the fast-delivery and research-quality records carry the same values.",
       response:
-        "February to June 2011 is flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
+        "February to June 2011 is flagged `suspect`, keeping each record's own flag as `source_flag`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide's timing at Göteborg ran about 62 minutes early. Against SMHI's own record (`smhi/2109`) the values differ by 3.5 to 4.8 cm RMS a month, and by 0.0 to 0.2 cm once shifted 60 minutes; January and July onward match unshifted. GESLA's copies carry the same values (erratum `gesla-goteborg-2011-hour-early`). GESLA's CMEMS record of the gauge differs from UHSLC's by the same amount over the span, as SMHI's does, so it's on the right clock.",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide's timing at Göteborg ran about 62 minutes early. Against SMHI's own record (`smhi/2109`) the values differ by 3.5 to 4.8 cm RMS a month, and by 0.0 to 0.2 cm once shifted 60 minutes; January and July onward match unshifted. GESLA's copies of UHSLC's fast-delivery and research-quality records (`gesla/goteborgorsh-819-swe-uhslc_fd` and `gesla/goteborgorsh-819a-swe-uhslc_rq`) hold the same values at all 3,600 times each shares with UHSLC's, on all 150 days of the span. GESLA's CMEMS record of the gauge differs from UHSLC's by the same amount over the span, as SMHI's does, so it's on the right clock.",
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
@@ -175,16 +290,16 @@ export default {
     },
     {
       id: "uhslc-cuxhaven-2024-march",
-      stations: ["uhslc/825"],
+      stations: ["uhslc/825", "gesla/cuxhaven-825-deu-uhslc_fd"],
       since: "2024-02-29",
       until: "2024-04-01",
       handling: "flagged",
       error:
-        "UHSLC's hourly Cuxhaven levels from 29 February to 31 March 2024 don't match the gauge's other records, even allowing for a clock offset.",
+        "UHSLC's hourly Cuxhaven levels from 29 February to 31 March 2024 don't match the gauge's other records, even allowing for a clock offset. GESLA's copy of the fast-delivery record carries the same values.",
       response:
-        "29 February to 31 March 2024 is flagged `suspect`, keeping UHSLC's own flag as `source_flag`. These are fast-delivery values; check the span again when UHSLC's research-quality release replaces them.",
+        "29 February to 31 March 2024 is flagged `suspect`, keeping each record's own flag as `source_flag`. These are fast-delivery values; check the span again when UHSLC's research-quality release replaces them.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026. Against PEGELONLINE's Cuxhaven Steubenhöft (`pegelonline/5990020`) and GESLA's BfG and CMEMS records of the gauge, which agree with each other, UHSLC's March 2024 differs by 56 cm RMS, and still by 38 cm at its best lag of about 45 minutes; April to June and September to December 2024 match to within 0.4 cm. No other gauge in the German Bight matches the month (best r 0.94). GESLA's copy carries it too (erratum `gesla-cuxhaven-uhslc-2024-march`).",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026. Against PEGELONLINE's Cuxhaven Steubenhöft (`pegelonline/5990020`) and GESLA's BfG and CMEMS records of the gauge, which agree with each other, UHSLC's March 2024 differs by 56 cm RMS, and still by 38 cm at its best lag of about 45 minutes; April to June and September to December 2024 match to within 0.4 cm. No other gauge in the German Bight matches the month (best r 0.94). GESLA's copy of UHSLC's fast-delivery record (`gesla/cuxhaven-825-deu-uhslc_fd`) holds the same values at all 768 times the two share, on all 32 days of the span.",
       // Months that match PEGELONLINE's gauge do so to under a centimeter.
       check: async (store, e) => {
         const id = e.stations![0]!;
@@ -203,16 +318,16 @@ export default {
     },
     {
       id: "uhslc-cuxhaven-2024-summer",
-      stations: ["uhslc/825"],
+      stations: ["uhslc/825", "gesla/cuxhaven-825-deu-uhslc_fd"],
       since: "2024-07-01",
       until: "2024-09-01",
       handling: "flagged",
       error:
-        "UHSLC's hourly Cuxhaven levels for July and August 2024 don't match the gauge's other records, even allowing for a clock offset.",
+        "UHSLC's hourly Cuxhaven levels for July and August 2024 don't match the gauge's other records, even allowing for a clock offset. GESLA's copy of the fast-delivery record carries the same values.",
       response:
-        "July and August 2024 are flagged `suspect`, keeping UHSLC's own flag as `source_flag`. These are fast-delivery values; check the span again when UHSLC's research-quality release replaces them.",
+        "July and August 2024 are flagged `suspect`, keeping each record's own flag as `source_flag`. These are fast-delivery values; check the span again when UHSLC's research-quality release replaces them.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026. Against PEGELONLINE's Cuxhaven Steubenhöft (`pegelonline/5990020`) and GESLA's BfG and CMEMS records, UHSLC's July and August 2024 differ by 52 and 54 cm RMS, and still by 26 and 34 cm at their best lag of about 50 minutes; the tide-timing check puts them about 45 minutes late in the semidiurnal band and 60 in the diurnal. No other gauge in the German Bight matches (best r 0.94). GESLA's copy carries it too (erratum `gesla-cuxhaven-uhslc-2024-summer`).",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026. Against PEGELONLINE's Cuxhaven Steubenhöft (`pegelonline/5990020`) and GESLA's BfG and CMEMS records, UHSLC's July and August 2024 differ by 52 and 54 cm RMS, and still by 26 and 34 cm at their best lag of about 50 minutes; the tide-timing check puts them about 45 minutes late in the semidiurnal band and 60 in the diurnal. No other gauge in the German Bight matches (best r 0.94). GESLA's copy of UHSLC's fast-delivery record (`gesla/cuxhaven-825-deu-uhslc_fd`) holds the same values at all 1,488 times the two share, on all 62 days of the span.",
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
@@ -289,7 +404,7 @@ export default {
     },
     {
       id: "uhslc-inhambane-2012-datum",
-      stations: ["uhslc/900"],
+      stations: ["uhslc/900", "gesla/inhambane-900a-moz-uhslc_rq"],
       until: "2012-04-21",
       handling: "flagged",
       error:
@@ -297,7 +412,7 @@ export default {
       response:
         "Values before 21 April 2012 are flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's copies of UHSLC's fast-delivery and research-quality records: the series equals the fast-delivery copy before the date and the research-quality copy after it, and the fast-delivery copy sits 1.03 m from the series after it.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's copies of UHSLC's fast-delivery and research-quality records: the series equals the fast-delivery copy before the date and the research-quality copy (`gesla/inhambane-900a-moz-uhslc_rq`) after it, and the fast-delivery copy sits 1.03 m from the series after it. The research-quality copy holds the series' values before the date too, at all 2,042 times the two share, on 143 of the 150 days read in five 30-day pieces spread from the record's start to the date, 295 days in all.",
       check: async (store, e) => {
         const id = e.stations![0]!;
         // The record holds nothing from 15 April 2012 11:00 to the span's end.

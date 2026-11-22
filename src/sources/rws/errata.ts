@@ -59,16 +59,16 @@ export default {
     },
     {
       id: "rws-petten-meetraai3-2012-zero",
-      stations: ["rws/petten.meetraai3"],
+      stations: ["rws/petten.meetraai3", "gesla/petten_meetraai_03-pet-nld-rws"],
       since: "2012-10-22",
       until: "2013-05-16",
       handling: "flagged",
       error:
-        "From 22 October 2012 to the record's end on 15 May 2013, RWS's Petten meetraai 03 series holds exactly 0.00 m NAP for hours at a time through high and low water, a fill value rather than the sea.",
+        "From 22 October 2012 to the record's end on 15 May 2013, RWS's Petten meetraai 03 series holds exactly 0.00 m NAP for hours at a time through high and low water, a fill value rather than the sea. GESLA's copy of the series carries the same values.",
       response:
-        "22 October 2012 to 15 May 2013 is flagged `suspect`, keeping the source flag as `source_flag`. About 800 of the span's 19,000 values are the held fill, and the rest is sound tide, but the fill comes and goes within hours, so only the whole span covers it: QC of a tidal gauge flags 199 of the 797 held values.",
+        "22 October 2012 to 15 May 2013 is flagged `suspect`, keeping each record's own flag as `source_flag`. About 800 of the span's 19,000 values are the held fill, and the rest is sound tide, but the fill comes and goes within hours, so only the whole span covers it: QC of a tidal gauge flags 199 of the 797 held values.",
       evidence:
-        "Found from the station's analysis, November 2026: the held values counted as drains and judged it not tidal. 0.00 m NAP is about mid-tide at Petten, where the tide runs from about −1.0 to 0.8 m. From 22 October 2012 to 3 May 2013 the series jumps from the tide to exactly 0.00 m and holds it in 33 runs of an hour or more, 5 of them 6 hours or more, through high and low water. Before that, 0.00 m appears 60 to 125 times a year as the tide passes through it, rarely twice in a row. GESLA's copy carries the same values (erratum `gesla-petten-meetraai3-2012-zero`).",
+        "Found from the station's analysis, November 2026: the held values counted as drains and judged it not tidal. 0.00 m NAP is about mid-tide at Petten, where the tide runs from about −1.0 to 0.8 m. From 22 October 2012 to 3 May 2013 the series jumps from the tide to exactly 0.00 m and holds it in 33 runs of an hour or more, 5 of them 6 hours or more, through high and low water. Before that, 0.00 m appears 60 to 125 times a year as the tide passes through it, rarely twice in a row. GESLA's copy (`gesla/petten_meetraai_03-pet-nld-rws`) holds the same 778 values of 0.00 m in 2012 and 466 in 2013.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const rows = await store.levels(e.stations![0]!, e.since!, e.until!);
@@ -136,6 +136,20 @@ export default {
           if (!read) throw new Error(`${station} holds no hourly mean on any day read`);
         }
       },
+    },
+    {
+      id: "rws-eemshaven-waddenzee-2016-offset",
+      stations: ["rws/eemshaven.waddenzee", "gesla/eemshaven_waddenzee-eem-nld-rws"],
+      since: "2016-04-07",
+      until: "2016-05-12",
+      handling: "flagged",
+      error:
+        "RWS's Eemshaven Waddenzee levels sit 15 to 20 cm higher than usual against Delfzijl from 7 April to 11 May 2016. GESLA's copy of the RWS record carries the same values.",
+      response:
+        "7 April to 11 May 2016 is flagged `suspect`, keeping each record's own flag as `source_flag`.",
+      evidence:
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026, in GESLA's copy (`gesla/eemshaven_waddenzee-eem-nld-rws`): a step of +18 cm against three of three neighboring gauges on 8 April 2016 and back on 20 May. Daily means against GESLA's Delfzijl (`gesla/delfzijl-del-nld-rws`) are about −9 cm through March and from mid-May, +1 cm on 7 April, and +7 to +12 cm on most days from 14 April to 11 May, falling to −3 cm on 12 May. The step check compares 30-day medians, so its dates are a few days off; the span follows the daily means. RWS's own record (`rws/eemshaven.waddenzee`) holds the same values at all 5,040 times the two share, on all 35 days of the span, so the offset is RWS's.",
+      check: (store, e) => flaggedSpan(store, e),
     },
   ],
   retired: [],

@@ -16,6 +16,7 @@
     "ticon:inventory": "node scripts/ticon-inventory.ts",
     "errata": "node scripts/errata.ts",
     "errata:check": "node scripts/errata-check.ts",
+    "errata:copies": "node scripts/errata-copies.ts",
     "evaluate:bsh": "node scripts/evaluate-bsh.ts",
     "evaluate:rws": "node scripts/evaluate-rws.ts",
     "clock-check": "node scripts/clock-check.ts",

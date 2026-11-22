@@ -264,7 +264,7 @@ const STATION_COLUMNS: Column[] = [
     name: "errata",
     type: "VARCHAR[]",
     description:
-      "The IDs of the errors found in what the source publishes for this station, in `errata.json`.",
+      "The IDs of the errors found in what the source publishes for this station, or in the record it copies, in `errata.json`.",
   },
   {
     name: "status",
@@ -942,7 +942,7 @@ export const ERRATA_SCHEMA: JsonSchema = {
         type: nullable("array"),
         items: { type: "string" },
         description:
-          "The station IDs known to be affected; null for every station of the source. It can be partial or empty, and `error` says so.",
+          "The station IDs known to be affected, including other sources' copies of the record that carry the same error; null for every station of the source. It can be partial or empty, and `error` says so.",
       },
       since: {
         type: nullable("string"),

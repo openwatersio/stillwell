@@ -491,6 +491,31 @@ function applyDecisions(epochs: Epoch[], options: EpochOptions): EpochEvent | nu
       epoch.until = null;
       event = "confirmed";
     }
+    // The decision gives the instant the reference began, which leaves no reading between the two epochs.
+    if (decision.since !== undefined) {
+      const where = `${options.station}: since ${decision.since}`;
+      const at = Date.parse(decision.since);
+      if (Number.isNaN(at) || iso(at) !== decision.since)
+        throw new Error(`${where} isn't an instant like 2026-11-10T22:45:00Z`);
+      // The key names the start it replaces, so the entry has no other fields to read once the start moves.
+      if (
+        decision.to_current !== undefined ||
+        decision.confirm ||
+        decision.reject ||
+        decision.until
+      )
+        throw new Error(`${where} stands alone, with no to_current, confirm, reject or until`);
+      if (!before || epoch.since === null || (epoch.state !== "open" && epoch.state !== "closed"))
+        throw new Error(`${where} needs an open or closed epoch with a start and one before it`);
+      if (before.since !== null && at <= Date.parse(before.since))
+        throw new Error(`${where} isn't after the epoch before it starts`);
+      if (at >= Date.parse(epoch.since))
+        throw new Error(`${where} isn't before the epoch's own start, ${epoch.since}`);
+      // An epoch opened by a late-dated reference starts backfill at its reference's date, so that moves with it.
+      if (epoch.reference_since === epoch.since) epoch.reference_since = decision.since;
+      epoch.since = decision.since;
+      before.until = decision.since;
+    }
     // The decision says the reference before held through this day, and no longer.
     if (decision.until && before && epoch.state !== "rejected") {
       const end = iso(dayStartEarliest(decision.until, options.offsets) + DAY_MS);

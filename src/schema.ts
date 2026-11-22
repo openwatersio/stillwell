@@ -100,7 +100,7 @@ export interface Station {
    * `stations.parquet` is built, never by an adapter.
    */
   preferred?: string;
-  /** The IDs of the errata, from `src/sources/<source>/errata.ts`, that affect the station. Set as `stations.parquet` is built. */
+  /** The IDs of the errata that affect the station: its source's, from `src/sources/<source>/errata.ts`, and those listing it as a copy. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
   /** Whether ingest asks for this station's current values: the poller. */
@@ -186,14 +186,22 @@ export type StoredStation = Station & { epochs: Epoch[] };
 /**
  * A decision on one epoch, keyed in `Overrides.epochs` by
  * `epochKey`: confirm or reject a held one, reject one that never happened,
- * end the epoch before it earlier than the source said, or say how to convert
- * it when no shared reference does.
+ * end the epoch before it earlier than the source said, start it at an instant
+ * the values show, or say how to convert it when no shared reference does.
  */
 export interface EpochDecision {
   confirm?: boolean;
   reject?: boolean;
   /** YYYY-MM-DD: the last whole local day the previous epoch is known to hold. */
   until?: string;
+  /**
+   * An instant in UTC (`2026-11-10T22:45:00Z`) the values show the epoch's reference
+   * began, when the source dated the change late or not at all. The epoch before it
+   * holds until then, so no reading falls between them. Only moves a start earlier,
+   * and, since the decision is keyed by the start it replaces, applies once; it stands
+   * alone, with none of the other fields.
+   */
+  since?: string;
   to_current?: number;
   note: string;
 }

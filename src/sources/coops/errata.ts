@@ -47,7 +47,7 @@ export default {
     },
     {
       id: "coops-boston-light-2001-offset",
-      stations: ["coops/8444162"],
+      stations: ["coops/8444162", "gesla/boston_light-8444162-usa-noaa"],
       since: "2001-03-06",
       until: "2001-06-30",
       handling: "flagged",
@@ -55,7 +55,7 @@ export default {
       response:
         "6 March to 29 June 2001 is flagged `suspect`, keeping CO-OPS's own flag as `source_flag`.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Boston (`coops/8443970`), 13 km away: the difference is 1.09 to 1.12 m before and after and 2.73 m over the span; Block Island (`coops/8459681`) gives the same step.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Boston (`coops/8443970`), 13 km away: the difference is 1.09 to 1.12 m before and after and 2.73 m over the span; Block Island (`coops/8459681`) gives the same step. GESLA's copy (`gesla/boston_light-8444162-usa-noaa`) holds values on only 2 of the span's 116 days, the same at all 23 times the two share.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
@@ -86,7 +86,7 @@ export default {
     },
     {
       id: "coops-burlington-2002-datum",
-      stations: ["coops/8539094"],
+      stations: ["coops/8539094", "gesla/burlington-8539094-usa-noaa"],
       until: "2002-06-11",
       handling: "flagged",
       error:
@@ -94,7 +94,7 @@ export default {
       response:
         "Values before 11 June 2002 are flagged `suspect`, keeping CO-OPS's own flag as `source_flag`.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Bergen Point (`coops/8519483`) and Atlantic City (`coops/8534720`): the differences are 0.28 and 0.25 m before the date and 4.15 and 4.09 m after.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Bergen Point (`coops/8519483`) and Atlantic City (`coops/8534720`): the differences are 0.28 and 0.25 m before the date and 4.15 and 4.09 m after. GESLA's copy (`gesla/burlington-8539094-usa-noaa`) holds the same values at all 707 times the two share, on 31 of the 150 days read in five 30-day pieces spread from the record's start to the date, 8,394 days in all.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {

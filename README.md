@@ -75,9 +75,9 @@ The [contributing guide](CONTRIBUTING.md) covers running ingest, the checks, and
 
 ## License
 
-**Code**: [AGPL-3.0](LICENSE) © Open Waters (https://openwaters.io) and contributors with [CLA](CLA.md).
+**Code**: [AGPL-3.0](LICENSE) © Open Water Software, LLC (https://openwaters.io) and contributors with [CLA](CLA.md).
 
-**Data**: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) © Open Waters (https://openwaters.io), and:
+**Data**: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) © Open Water Software, LLC (https://openwaters.io), and:
 
 - Stations with `commercial_use` false keep their source's terms.
 - Show each station's `attribution` from [`stations.parquet`](https://stillwell.openwaters.io/stations.parquet) wherever its data is used, and its `datums_attribution` wherever you use its datum offsets.

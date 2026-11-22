@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import { citations, citedIn } from "../src/citations.ts";
 import {
+  covers,
   errataOf,
   parseErrata,
   published,
@@ -155,6 +156,37 @@ describe("parseErrata", () => {
     assert.throws(() => parseErrata("uhslc", { errata: [] }));
   });
 
+  it("refuses a copy of a source that isn't registered", () => {
+    const { errata, problems } = readErrata(
+      { uhslc: file([entry({ stations: ["uhslc/329", "gelsa/329"] })]) },
+      ["uhslc", "gesla"],
+    );
+    assert.deepEqual(errata, []);
+    assert.match(problems[0]!, /gelsa\/329/);
+  });
+
+  it("covers the source's own errata, those listing its copies, and those naming no station yet", () => {
+    const [copied, empty] = parseErrata(
+      "uhslc",
+      file([
+        entry({ stations: ["uhslc/329", "gesla/329"] }),
+        entry({ id: "uhslc-none-listed", stations: [] }),
+      ]),
+    ).errata;
+    assert.ok(covers(copied!, "uhslc") && covers(copied!, "gesla") && !covers(copied!, "cmems"));
+    assert.ok(covers(empty!, "uhslc") && !covers(empty!, "gesla"));
+  });
+
+  it("reads another source's copy beside the source's own station", () => {
+    const [e] = parseErrata(
+      "uhslc",
+      file([entry({ stations: ["uhslc/329", "gesla/hk-329"] })]),
+    ).errata;
+    assert.deepEqual(e!.stations, ["uhslc/329", "gesla/hk-329"]);
+    assert.throws(() => parseErrata("uhslc", file([entry({ stations: ["gesla/hk-329"] })])));
+    assert.throws(() => parseErrata("uhslc", file([entry({ stations: ["uhslc/329", "hk"] })])));
+  });
+
   it("keeps an erratum's check, and leaves it out of what's published", () => {
     const check = async () => true;
     const parsed = parseErrata("uhslc", file([entry({ check })])).errata;
@@ -300,6 +332,27 @@ describe("withErrata", () => {
     assert.ok(got.get("uhslc/1") instanceof Error);
   });
 
+  it("flags a copy another source's erratum lists", async () => {
+    const copied = parseErrata(
+      "uhslc",
+      file([entry({ handling: "flagged", stations: ["uhslc/329", "gesla/hk-329"] })]),
+    ).errata;
+    const gesla = { ...adapter, metadata: { id: "gesla" } } as unknown as Source;
+    const got = await withErrata(gesla, copied).observations!(
+      { id: "gesla/hk-329" } as Station,
+      new Date(0),
+      new Date(),
+    );
+    assert.deepEqual(
+      got.map((o) => o.flag),
+      [Flag.good, Flag.suspect, Flag.bad, Flag.good],
+    );
+    assert.equal(
+      withErrata({ ...gesla, metadata: { id: "cmems" } } as Source, copied).suspect,
+      gesla.suspect,
+    );
+  });
+
   it("leaves a source with nothing flagged as it is", () => {
     assert.equal(withErrata(adapter, parseErrata("uhslc", file([entry()])).errata), adapter);
   });
@@ -325,6 +378,13 @@ describe("published", () => {
     ]);
     assert.deepEqual(errataOf({ id: "uhslc/1", source: "uhslc" }, errata), ["uhslc-all"]);
     assert.deepEqual(errataOf({ id: "gesla/329", source: "gesla" }, errata), []);
+    const copied = parseErrata(
+      "uhslc",
+      file([entry({ stations: ["uhslc/329", "gesla/329"] })]),
+    ).errata;
+    assert.deepEqual(errataOf({ id: "gesla/329", source: "gesla" }, copied), [
+      "uhslc-hong-kong-hour-early",
+    ]);
   });
 
   it("finds citations in prose", () => {

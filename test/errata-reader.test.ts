@@ -75,6 +75,53 @@ describe("errataReader", () => {
     await assert.rejects(reader.station("coops"), /station ID/);
   });
 
+  it("reads a rejected epoch's files as the epoch before's, which wins a time they share", async () => {
+    const store = mkdtempSync(join(tmpdir(), "stillwell-errata-"));
+    await writeStationList(stationListPath(store, "usgs"), [
+      {
+        id: "usgs/1",
+        source: "usgs",
+        source_id: "1",
+        datum: "GAGE",
+        products: ["levels"],
+        status: "active",
+        live: false,
+        interval_s: 900,
+        kind: "river",
+        commercial_use: true,
+        epochs: [
+          { ...epoch(1, null, null), state: "open" },
+          { ...epoch(2, "2021-01-01T00:00:00Z", null), state: "rejected" },
+        ],
+      } as unknown as StoredStation,
+    ]);
+    const rows = (times: string[], level: number): Observation[] =>
+      times.map((t) => ({ time: at(t), level, flag: Flag.good }));
+    await writeObservations(
+      seriesPath(store, "levels", "usgs", "1", 2021, 1),
+      rows(["2021-01-01T03:00", "2021-01-01T06:00"], 1),
+      "GAGE",
+    );
+    await writeObservations(
+      seriesPath(store, "levels", "usgs", "1", 2021, 2),
+      rows(["2021-01-01T06:00", "2021-01-02T00:00"], 2),
+      "GAGE",
+    );
+    const read = await errataReader(() => store, store).levels(
+      "usgs/1",
+      "2021-01-01",
+      "2021-01-03",
+    );
+    assert.deepEqual(
+      read.map((o) => [new Date(o.time).toISOString().slice(0, 16), o.level, o.epoch]),
+      [
+        ["2021-01-01T03:00", 1, 1],
+        ["2021-01-01T06:00", 1, 1],
+        ["2021-01-02T00:00", 2, 2],
+      ],
+    );
+  });
+
   it("marks a store it can't read, and reads a missing file as empty", async () => {
     const store = mkdtempSync(join(tmpdir(), "stillwell-errata-"));
     mkdirSync(join(store, "stations"), { recursive: true });
