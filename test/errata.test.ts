@@ -289,6 +289,31 @@ describe("withErrata", () => {
     ]);
   });
 
+  it("shows the adapter's rule the values in the span as already suspect", async () => {
+    let seen: Observation[] = [];
+    const judging = {
+      ...adapter,
+      suspect: async (_s: Station, record: () => AsyncIterable<Observation[]>) => {
+        for await (const batch of record()) seen = seen.concat(batch);
+        return [];
+      },
+    } as unknown as Source;
+    await withErrata(judging, flagged).suspect!(station, async function* () {
+      yield rows;
+    });
+    assert.deepEqual(
+      seen.map((o) => [o.time, o.flag, o.source_flag]),
+      [
+        [rows[0]!.time, Flag.good, undefined],
+        [rows[1]!.time, Flag.suspect, Flag.suspect],
+        [rows[2]!.time, Flag.bad, Flag.bad],
+        [rows[3]!.time, Flag.good, undefined],
+      ],
+    );
+    // The record the caller holds isn't changed.
+    assert.equal(rows[1]!.flag, Flag.preliminary);
+  });
+
   it("keeps the span when the adapter can't judge the record, and passes other errors on", async () => {
     const refusing = {
       ...adapter,

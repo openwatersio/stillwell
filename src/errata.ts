@@ -380,8 +380,27 @@ export function withErrata(source: Source, errata: Erratum[]): Source {
     ...source,
     suspect: async (station, record) => {
       let adapter: [number, number][];
+      // The adapter judges the values outside the errata spans: an erratic span
+      // mustn't move a median the adapter's rule reads, such as GESLA's datum
+      // jumps, and flag the sound values around it. The values stay, so a
+      // rule that needs the record's ends still sees them.
+      const marked = spans(station, own);
+      const judged = marked.length
+        ? async function* () {
+            for await (const rows of record())
+              yield rows.map((o) =>
+                marked.some(([from, to]) => o.time >= from && o.time < to)
+                  ? {
+                      ...o,
+                      flag: Math.max(o.flag, Flag.suspect) as Flag,
+                      source_flag: Math.max(o.source_flag ?? o.flag, Flag.suspect) as Flag,
+                    }
+                  : o,
+              );
+          }
+        : record;
       try {
-        adapter = (await suspect?.(station, record)) ?? [];
+        adapter = (await suspect?.(station, judged)) ?? [];
       } catch (error) {
         // The errata spans hold whatever the adapter can't judge.
         if (error instanceof Unjudged)

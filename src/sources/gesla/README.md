@@ -15,6 +15,7 @@ Sea levels from [GESLA](https://gesla787883612.wordpress.com/) (Global Extreme S
 ## Known limits
 
 - **Datum jumps not judged again:** about 50 coastal records' copies in the store miss an end of their record by more than a year, because GESLA's stated span counts the rows its own file marks missing. When QC rules change, these keep the datum jumps found in GESLA's whole file, and the current QC can only make their flags worse.
+- **Datum jumps at fetch:** a backfill flags datum jumps from the whole file, with no erratum's span left out, so a record whose erratic readings an erratum covers can come back with the sound values around them suspect until a requalify, which leaves the erratum's span out of the medians, judges it again.
 - **4.0 records missing from 4.1:** 4.1 renames most of 4.0's RWS records and splits RWS's history into `rws_hist` records ending in 2018. Matching each of 4.0's 120 RWS file names that 4.1 lacks to 4.1's RWS records within 1 km that share a word of their name leaves these 4.0 years with no 4.1 record. Most are North Sea platforms. The `rws` source has A12, Ameland Westgat, Europlatform, K13a and Q1 from RWS itself. None of 4.0 is in the store.
 
 | 4.0 record                                  | Years with no 4.1 record | 4.1 records nearby                                                          |

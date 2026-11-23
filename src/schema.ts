@@ -388,6 +388,9 @@ export interface Source {
    * the caller holds, a year at a time, which can be only part of it, such as
    * the recent window; one that needs the whole record throws `Unjudged` when
    * it isn't, or when the store holds only part of it for good.
+   * `record` shows the values in the store's errata spans already
+   * `suspect`, in `flag` and `source_flag`, so a rule judges the rest and an
+   * erratic span can't move what it measures.
    * The adapter flags the same spans in what it fetches, keeping
    * `source_flag` the source's.
    */
