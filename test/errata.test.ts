@@ -7,12 +7,14 @@ import { citations, citedIn } from "../src/citations.ts";
 import {
   covers,
   errataOf,
+  flaggedSpan,
   parseErrata,
   published,
   readErrata,
   spans,
   withErrata,
   type Erratum,
+  type StoreReader,
 } from "../src/errata.ts";
 import { Flag, Unjudged, type Observation, type Source, type Station } from "../src/schema.ts";
 import { errata, errataFiles, errataProblems, sources, withinSpan } from "../src/sources/index.ts";
@@ -414,5 +416,48 @@ describe("published", () => {
 
   it("finds citations in prose", () => {
     assert.deepEqual(citations("see erratum `a-b` and Erratum\n`c-d`"), ["a-b", "c-d"]);
+  });
+});
+
+describe("flaggedSpan", () => {
+  // Every level suspect over a good source flag, on every day read, as a record whose rule flags the days around the span.
+  const flagged = (flag: number) =>
+    ({
+      levels: async (_id: string, since: string) => [
+        { time: DAY(since), level: 1, flag, source_flag: Flag.good, epoch: 1 },
+      ],
+    }) as unknown as StoreReader;
+  const e = { id: "x", stations: ["a/b"], since: "2020-01-01", until: "2020-01-10" };
+
+  it("fails on suspect levels the days either side of the span", async () => {
+    await assert.rejects(flaggedSpan(flagged(Flag.suspect), e), /outside the span, are suspect/);
+  });
+
+  it("leaves the day the span ends unjudged when asked, and still judges the day before the span", async () => {
+    // Suspect from the span's start through the day it ends, as a record whose rule flags what follows the span.
+    const through = {
+      levels: async (_id: string, since: string) => [
+        {
+          time: DAY(since),
+          level: 1,
+          flag: since >= "2020-01-01" ? Flag.suspect : Flag.good,
+          source_flag: Flag.good,
+          epoch: 1,
+        },
+      ],
+    } as unknown as StoreReader;
+    await assert.rejects(flaggedSpan(through, e), /levels on 2020-01-10, outside the span/);
+    await flaggedSpan(through, e, ["a/b"], { untilDay: false });
+    await assert.rejects(
+      flaggedSpan(flagged(Flag.suspect), e, ["a/b"], { untilDay: false }),
+      /levels on 2019-12-31, outside the span/,
+    );
+  });
+
+  it("still requires the span itself to be suspect", async () => {
+    await assert.rejects(
+      flaggedSpan(flagged(Flag.good), e, ["a/b"], { untilDay: false }),
+      /aren't suspect/,
+    );
   });
 });
