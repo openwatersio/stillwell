@@ -34,7 +34,7 @@ export default {
       response:
         "The record splits into datum epochs on 27 October 2026, and the store keeps the values as served. No gauge nearby measures the offset, so the epoch before has none and stays out of the combined series, readable on its own zero, until RWS answers.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the store lists as coastal, November 2026; the store holds no other record of the gauge or gauge nearby to compare, so this rests on the record's own medians. Monthly medians are −0.62 m in January and February 2026 and +0.12 to +0.15 m in October and November, with no values between. No other gauge in the store lies within 150 km.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the store lists as coastal; the store holds no other record of the gauge or gauge nearby to compare, so this rests on the record's own medians. Monthly medians are −0.62 m in January and February 2026 and +0.12 to +0.15 m in October and November, with no values between. No other gauge in the store lies within 150 km.",
       check: async (store, e) => {
         const [id, since] = [e.stations![0]!, e.since!];
         const station = await store.station(id);
@@ -66,28 +66,26 @@ export default {
       error:
         "From 22 October 2012 to the record's end on 15 May 2013, RWS's Petten meetraai 03 series holds exactly 0.00 m NAP for hours at a time through high and low water, a fill value rather than the sea. GESLA's copy of the series carries the same values.",
       response:
-        "22 October 2012 to 15 May 2013 is flagged `suspect`, keeping each record's own flag as `source_flag`. About 800 of the span's 19,000 values are the held fill, and the rest is sound tide, but the fill comes and goes within hours, so only the whole span covers it: QC of a tidal gauge flags 199 of the 797 held values.",
+        "22 October 2012 to 15 May 2013 is flagged `suspect`, keeping each record's own flag as `source_flag`. Of the span's 22,018 values, 1,116 are 0.00 m, 997 of them from 22 October to 13 November 2012 and from 15 April to 3 May 2013. The held values come and go among gaps and sound tide, so only the whole span covers them.",
       evidence:
-        "Found from the station's analysis, November 2026: the held values counted as drains and judged it not tidal. 0.00 m NAP is about mid-tide at Petten, where the tide runs from about −1.0 to 0.8 m. From 22 October 2012 to 3 May 2013 the series jumps from the tide to exactly 0.00 m and holds it in 33 runs of an hour or more, 5 of them 6 hours or more, through high and low water. Before that, 0.00 m appears 60 to 125 times a year as the tide passes through it, rarely twice in a row. GESLA's copy (`gesla/petten_meetraai_03-pet-nld-rws`) holds the same 778 values of 0.00 m in 2012 and 466 in 2013.",
+        "Found from the station's analysis: the held values counted as drains and judged it not tidal. 0.00 m NAP is about mid-tide at Petten, where the tide runs from about −1.3 to 1.2 m (the 1st and 99th percentiles of the levels from 1 January to 21 October 2012). Counted in the store's 2012 and 2013 levels files for `rws/petten.meetraai3`, which hold 10-minute values with gaps: 33 UTC days in the span hold 15 to 58 values of 0.00 m, between 22 October and 13 November 2012 and between 15 April and 3 May 2013, and the longest unbroken run is 32 values (5 hours 20 minutes), on 15 and 16 April 2013. From 14 November 2012 to 14 April 2013 the span holds 110 values of 0.00 m. From 2005 to 2011, 0.00 m appears 96 to 148 times a year as the tide passes through it, never more than 6 times a day. GESLA's copy (`gesla/petten_meetraai_03-pet-nld-rws`) holds the same 33 days, with 1,113 values of 0.00 m in the span and 19,051 values against RWS's 22,018.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const rows = await store.levels(e.stations![0]!, e.since!, e.until!);
         const not = rows.filter((o) => o.flag < Flag.suspect);
         if (not.length)
           throw new Error(`${not.length} Petten values in the span aren't flagged suspect`);
-        // Runs of 0.00 m lasting an hour or more.
-        let runs = 0;
-        let start: number | null = null;
-        for (const [i, o] of rows.entries()) {
-          if (o.level === 0) start ??= o.time;
-          else if (start !== null) {
-            if (rows[i - 1]!.time - start >= 3_600_000) runs++;
-            start = null;
+        // Days that hold 15 or more values of exactly 0.00 m.
+        const zeros = new Map<string, number>();
+        for (const o of rows)
+          if (o.level === 0) {
+            const day = new Date(o.time).toISOString().slice(0, 10);
+            zeros.set(day, (zeros.get(day) ?? 0) + 1);
           }
-        }
-        if (runs < 20)
+        const held = [...zeros.values()].filter((n) => n >= 15).length;
+        if (held < 25)
           throw new Error(
-            `Petten holds 0.00 m for an hour or more ${runs} times in the span, not about 33`,
+            `Petten holds 15 or more values of 0.00 m on ${held} days of the span, where 33 were found`,
           );
       },
     },
@@ -114,7 +112,7 @@ export default {
       response:
         "The means are stored as levels at the times RWS stamps them, flagged as the source flags them (`preliminary`), until the sampling metadata of [#527](https://github.com/openwatersio/stillwell/issues/527) says which values are means and where they are stamped.",
       evidence:
-        "Read from RWS's answers, November 2026, for all 11 stations and all 6 years (66 station-years): every year from 2000 to 2004 is one `GEMH` series of 3,150 to 8,785 values from the float gauge (`other:Vlotterniveaumeter`), stamped on the hour, with source flag `Ongecontroleerd`, and 1999 holds that gauge's hourly readings (8,452 to 8,759 values) up to 31 December 23:00, then two `GEMH` values. The series continues across the change of label at midnight on 1 January 2000 at dehaandrik.boven (911, 911 cm at the last two readings, 912, 912 cm at the first two means); at the other 10 only the counts were read. In all 55 station-years of means, the hourly change of level has a median of 1 to 2 cm, a 90th percentile of 1 to 6 cm and a 99th percentile of 2 to 17 cm, so for most hours a mean stamped half an hour from where a reading would be differs from it by about 1 cm or less, and by up to about half of the 99th percentile in the steepest 1% of hours. The documentation we found doesn't say where a mean is stamped. The refetch of the whole record, 1800 to 2027, failed on a `GEMH` series only at these 11 stations and only in these years, so no other station or year holds one.",
+        "Read from RWS's answers for all 11 stations and all 6 years (66 station-years): every year from 2000 to 2004 is one `GEMH` series of 3,150 to 8,785 values from the float gauge (`other:Vlotterniveaumeter`), stamped on the hour, with source flag `Ongecontroleerd`, and 1999 holds that gauge's hourly readings (8,452 to 8,759 values) up to 31 December 23:00, then two `GEMH` values. The series continues across the change of label at midnight on 1 January 2000 at dehaandrik.boven (911, 911 cm at the last two readings, 912, 912 cm at the first two means); at the other 10 only the counts were read. In all 55 station-years of means, the hourly change of level has a median of 1 to 2 cm, a 90th percentile of 1 to 6 cm and a 99th percentile of 2 to 17 cm, so for most hours a mean stamped half an hour from where a reading would be differs from it by about 1 cm or less, and by up to about half of the 99th percentile in the steepest 1% of hours. The documentation we found doesn't say where a mean is stamped. The refetch of the whole record, 1800 to 2027, failed on a `GEMH` series only at these 11 stations and only in these years, so no other station or year holds one.",
       reported: null,
       report: null,
       check: async (store, e) => {
@@ -148,7 +146,7 @@ export default {
       response:
         "7 April to 11 May 2016 is flagged `suspect`, keeping each record's own flag as `source_flag`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026, in GESLA's copy (`gesla/eemshaven_waddenzee-eem-nld-rws`): a step of +18 cm against three of three neighboring gauges on 8 April 2016 and back on 20 May. Daily means against GESLA's Delfzijl (`gesla/delfzijl-del-nld-rws`) are about −9 cm through March and from mid-May, +1 cm on 7 April, and +7 to +12 cm on most days from 14 April to 11 May, falling to −3 cm on 12 May. The step check compares 30-day medians, so its dates are a few days off; the span follows the daily means. RWS's own record (`rws/eemshaven.waddenzee`) holds the same values at all 5,040 times the two share, on all 35 days of the span, so the offset is RWS's.",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), in GESLA's copy (`gesla/eemshaven_waddenzee-eem-nld-rws`): a step of +18 cm against three of three neighboring gauges on 8 April 2016 and back on 20 May. Daily means against GESLA's Delfzijl (`gesla/delfzijl-del-nld-rws`) are about −9 cm through March and from mid-May, +1 cm on 7 April, and +7 to +12 cm on most days from 14 April to 11 May, falling to −3 cm on 12 May. The step check compares 30-day medians, so its dates are a few days off; the span follows the daily means. RWS's own record (`rws/eemshaven.waddenzee`) holds the same values at all 5,040 times the two share, on all 35 days of the span, so the offset is RWS's.",
       check: (store, e) => flaggedSpan(store, e),
     },
   ],
