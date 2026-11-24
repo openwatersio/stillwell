@@ -12,6 +12,7 @@ import {
 } from "../../schema.ts";
 import { describedDatums, type DatumNote } from "./described.ts";
 import { ZERO_SINCE } from "./zeros.ts";
+import { POSITIONS, servedAt } from "../../positions.ts";
 
 /**
  * US Army Corps of Engineers river stage, from the Corps Water Management
@@ -120,7 +121,9 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
   const committedSince = new Map<string, string>();
   const committedFrom = new Map<string, Record<string, DatumNote>>();
   const committedStart = new Map<string, string>();
+  const inactive = new Set<string>();
   for (const s of previous) {
+    if (s.status === "inactive") inactive.add(s.id);
     const { series, zero_since, datums_from, series_since } = s as Partial<UsaceStation>;
     if (series) committed.set(s.id, series);
     if (series_since) committedStart.set(s.id, series_since);
@@ -130,7 +133,7 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
   const out: UsaceStation[] = [];
   for (const office of OFFICES) {
     const { series, locations } = await catalogsOf(office);
-    out.push(...toStations(office, series, locations, committed));
+    out.push(...toStations(office, series, locations, committed, Date.now(), inactive));
   }
   for (const s of out) {
     // The later of the code's date and the one the list had, so neither can be
@@ -170,7 +173,8 @@ async function catalogsOf(
 
 /**
  * One station per location that has an observed series, from an office's
- * catalogs. `committed` maps station IDs to the series they already use.
+ * catalogs. `committed` maps station IDs to the series they already use, and
+ * `inactive` holds those already retired.
  */
 export function toStations(
   office: string,
@@ -178,6 +182,7 @@ export function toStations(
   locations: CatalogLocation[],
   committed: Map<string, string> = new Map(),
   now = Date.now(),
+  inactive: Set<string> = new Set(),
 ): UsaceStation[] {
   const byName = new Map(
     locations.map((l) => [
@@ -199,10 +204,23 @@ export function toStations(
     a < b ? -1 : a > b ? 1 : 0,
   )) {
     const location = byName.get(name);
-    if (!location || !placed(location)) continue;
+    if (!location) continue;
+    const id = idOf(office, name);
+    // A position `POSITIONS` moves is let through, for the refresh to move, while CWMS still serves the one it was written against.
+    if (!placed(location) && !servedAt(`usace/${id}`, positionOf(location))) {
+      // A listed, active station that loses its position would otherwise be retired by the next refresh.
+      if (
+        committed.get(`usace/${id}`)?.split(".")[0] === name &&
+        !inactive.has(`usace/${id}`) &&
+        !RETIRED.has(`usace/${id}`)
+      )
+        throw new Error(
+          `CWMS now places usace/${id} at ${location.latitude}, ${location.longitude}, which isn't in the contiguous US; ${settle(`usace/${id}`, location)}`,
+        );
+      continue;
+    }
     // Piezometers and observation wells read groundwater in a dam's foundation, not a water surface.
     if (GROUNDWATER.test(name)) continue;
-    const id = idOf(office, name);
     // A listed station's ID belongs to the location its series is at, so
     // it's never handed to another location that now maps to the same ID. If
     // that location is gone, the station goes unlisted, and so inactive.
@@ -235,13 +253,34 @@ export function toStations(
   return [...out.values()];
 }
 
+/**
+ * Listed stations whose location CWMS now places outside the contiguous US,
+ * which the refresh retires, rather than fail, once a person has decided they
+ * are gone. Their IDs, as `usace/<office>.<location>`.
+ */
+export const RETIRED = new Set<string>();
+
 const GROUNDWATER = /piezometer|-OW\d+[A-Z]?$/i;
+
+/** What settles a listed station whose location CWMS now places outside the contiguous US. */
+function settle(id: string, l: CatalogLocation): string {
+  const retire = "add it to RETIRED (src/sources/usace/index.ts) to let the refresh retire it";
+  if (typeof l.latitude !== "number" || typeof l.longitude !== "number")
+    return `it has no position, which a POSITIONS entry can't settle, so ${retire}`;
+  if (POSITIONS[id])
+    return `its POSITIONS entry (src/positions.ts) was written against another position, so update the entry's \`served\`, or ${retire}`;
+  return `add a POSITIONS entry (src/positions.ts) for where it is, or ${retire}`;
+}
+
+/** A location's coordinates, NaN where it has none, so no entry's `served` position matches. */
+function positionOf(l: CatalogLocation): { lat: number; lon: number } {
+  return { lat: l.latitude ?? NaN, lon: l.longitude ?? NaN };
+}
 
 /**
  * Whether a location's position is in the contiguous US, where all nine offices
- * are. Some locations sit at 0,0 or at a placeholder such as 9.09,9.09, and a
- * few have the longitude's sign dropped, which puts them in Asia (erratum
- * `usace-placeholder-positions`).
+ * are. A location with a placeholder position, none, or a longitude without
+ * its sign isn't (erratum `usace-placeholder-positions`).
  */
 function placed(l: CatalogLocation): boolean {
   const { latitude: lat, longitude: lon } = l;

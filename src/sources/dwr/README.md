@@ -12,8 +12,8 @@ Stage at tidal gauges in the Sacramento–San Joaquin Delta and Suisun Marsh, fr
 
 ## Known limits
 
-- **Positions:** WDL gives most positions in NAD83 or WGS84, but a few closed stations, such as Collinsville (B91110), in NAD27. The store doesn't convert them, so they sit about 100 m off.
-- **Fisherman's Cut:** CDEC's real-time copy of this gauge (FCT) reads 0.13 ft lower than DWR's, and no independent record shows which is right.
+- **Positions:** WDL lists its positions in NAD83 or WGS84 (`lldatum`), and three stations in NAD27: Collinsville (B91110), Old River near Byron (B95270) and Goodyear Slough at Lake Herman Road (E33510). `NAD27` in the adapter holds their NAD83(2011) positions, converted with NOAA's [NCAT](https://geodesy.noaa.gov/NCAT/) (NADCON 5.0), which move each about 94 m west and 9 m south. A station WDL lists in NAD27 at another position than the one converted fails the refresh, since publishing it as NAD83 would put it about 94 m off. WDL lists no datum for six stations: Sacramento River at Walnut Grove (B91651), whose position has six decimals, and five closed ones with no position.
+- **Fisherman's Cut:** CDEC's real-time copy of this gauge (FCT) differs from DWR's by steps that begin and end within a month (see the [CDEC README](../cdec/README.md)), and no independent record shows which of the two moved.
 - **Late values:** values a file gains more than a year after their time reach the store only through a manual backfill.
 
 ## Running ingest

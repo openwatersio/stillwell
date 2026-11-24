@@ -282,4 +282,12 @@ describe("marine-institute", () => {
     await mi.stations();
     assert.ok(fresh.length === 4 && fresh.every(Boolean));
   });
+
+  it("refetches the years before the default window, whole", async () => {
+    // 2023 to 2026 is the default window; the institute's checks of 2018 to 2022 can still come later.
+    assert.deepEqual(await mi.source.schedule!.refetch!(new Date("2026-12-09T00:00:00Z")), [
+      ["preliminary", "2023", "2026-12-01"],
+      ["all", "2018", "2023", "--refetch", "--with-inactive"],
+    ]);
+  });
 });
