@@ -90,7 +90,7 @@ Run `npm run errata` and put the drafts for errata not yet reported and question
 
 ## Decisions for a maintainer
 
-Before putting a decision to a maintainer, follow every lead first (see [Rigor](../../CONTRIBUTING.md#rigor)). Put a decision the agent can't make in its run report, and in the pull request as an open question where one is open, leaving that pull request as a draft. That includes a finding the data can't settle, an agency's answer that contradicts the data, a source's terms, and a change to a QC rule or to `cross-check` itself. A finding put to a maintainer stays in the report until it's settled; say so in the next run report rather than working it again, unless a lead that couldn't be followed before now can be.
+Before putting a decision to a maintainer, follow every lead first (see [Rigor](../../CONTRIBUTING.md#rigor)), and check [Decisions](decisions.md), which answers the common ones. Put an open decision the agent can't make, of the kinds [Decisions](decisions.md#what-a-maintainer-decides) lists, in its run report, and in the pull request as an open question where one is open, leaving that pull request as a draft. A finding put to a maintainer stays in the report until it's settled; say so in the next run report rather than working it again, unless a lead that couldn't be followed before now can be.
 
 ## The run report
 
