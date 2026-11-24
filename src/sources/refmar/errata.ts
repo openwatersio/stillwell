@@ -76,17 +76,18 @@ export default {
         "gesla/pointe_a_pitre-125-fra-refmar",
         "gesla/pointeapitretg_60minute-poi-fra-cmems",
       ],
-      since: "2020-01-01",
+      since: "2023-01-01",
       until: "2025-01-01",
       handling: "flagged",
       error:
-        "SHOM's Pointe-à-Pitre levels run 60 to 70 minutes late in 2023 against UHSLC's, CMEMS's and REFMAR's own TICON records, and hardly fit at all in 2020 and 2024, with no steady offset; 2025 fits again.",
-      response: "2020 to 2024 is flagged `suspect`, keeping SHOM's own flag as `source_flag`.",
+        "SHOM's Pointe-à-Pitre levels run late through 2023 and 2024: 30 to 40 minutes in January to June 2023, 90 in July to December, 60 to 70 across 2023 against UHSLC's, CMEMS's and REFMAR's own TICON records, and hardly fit at all in 2024, with no steady offset. 2020 to 2022 and 2025 fit.",
+      response:
+        "2023 and 2024 are flagged `suspect`, keeping SHOM's own flag as `source_flag`. The entry can end once `scripts/clock-check.ts`, with the entry taken out locally, finds 2023 and 2024 each within 10 minutes of the TICON records, as it does 2020 to 2022.",
       evidence:
-        "`scripts/clock-check.ts`, November 2026: within 10 minutes of UHSLC's record in 2015, 2018, 2021, 2022 and 2025; 60 to 70 minutes late in 2023 against UHSLC's, CMEMS's and REFMAR's own TICON records; r 0.36 in 2020 and 0.15 in 2024. CMEMS's record (`cmems/PointeAPitreTG`) and GESLA's copies of REFMAR's and CMEMS's (`gesla/pointe_a_pitre-125-fra-refmar` and `gesla/pointeapitretg_60minute-poi-fra-cmems`) hold REFMAR's values, within 0.4 cm RMS at the 2,650 to 2,656 times each shares with REFMAR's, on 111 of the 150 days read in five 30-day pieces spread over the span's 1,827.",
+        "`scripts/clock-check.ts`, fitting the predictions from the constants of the gauge's three TICON records (`pointe_a_pitre-125-fra-refmar`, `pointeapitretg_60minute-poi-fra-cmems`, `pointe_pitre-272a-fra-uhslc_rq`) to SHOM's levels: within 10 minutes in 2020 to 2022 (r 0.92 to 0.94); by month 10 or 20 minutes through 2022, 20 in June, October and December, which is the scatter of a one-month fit; within 10 minutes in 2025 and, against UHSLC's record, in 2015 and 2018; 30 minutes in January to March 2023, 40 in April to June and 90 in July to December, 60 to 70 minutes across 2023 against all three; r 0.15 in 2024, from 23,319 values, 6,336 of them from July to December; 170 minutes in January to March and 180 in July to December. CMEMS's record (`cmems/PointeAPitreTG`) and GESLA's copies of REFMAR's and CMEMS's (`gesla/pointe_a_pitre-125-fra-refmar` and `gesla/pointeapitretg_60minute-poi-fra-cmems`) hold REFMAR's values, within 0.3 cm RMS at the 1,406 to 1,440 times each shares with REFMAR's, on 59 or 60 of the 150 days read in five 30-day pieces spread over the span's 731.",
       reported: "2026-11-06",
       report:
-        "Sent to refmar@shom.fr on 2026-11-06, in French, with the yearly results above. No answer yet.",
+        "Sent to refmar@shom.fr on 2026-11-06, in French, with yearly clock-check results. Its 2020 result (r 0.36) was wrong: 2020 fits. No answer yet.",
       // The store holds no independent record of the gauge for 2023 (CMEMS's copy is SHOM's), so this reads only the flags.
       check: async (store, e) => {
         await flaggedSpan(store, e);
@@ -105,7 +106,7 @@ export default {
       response:
         "The adapter moves the raw series' values at Kerguelen labeled before 4 June 2013 an hour earlier. SHOM's validated hourly series (4), which covers a few months of the span such as November 2001 to March 2003, is on time and kept as served.",
       evidence:
-        "November 2026. For every month the raw series covers, SHOM's raw series equals its 1-minute series an hour earlier on every whole hour, and the store's values from it equal GESLA's copy of CMEMS's Kerguelen record (`gesla/kerguelentg_60minute-ker-fra-cmems`) an hour earlier to the millimeter (standard deviation 0.0 cm), while the months the validated series covers equal it at the same time. M2's phase in the store's values is 50 to 57° in 1993 to 2013, against 22 to 28° in UHSLC's record (`uhslc/180`), CMEMS's, GESLA's copy of REFMAR's from an earlier download, and REFMAR's own values before 1993 and from 2017. The store's level match of November 2026 found the gauge equal to UHSLC, GESLA and CMEMS only at an hour's offset, at 0.00 cm. Of SHOM's 173 gauges, only Kerguelen and Dumont d'Urville serve both raw series as hourly values on 1 June 2000 and 1 June 2010. Dumont d'Urville's differ by an hour on 1 June 2000 too, but its stored values, mostly SHOM's validated series, hold one M2 phase from 1996 to 2026, so it isn't moved.",
+        "For every month the raw series covers, SHOM's raw series equals its 1-minute series an hour earlier on every whole hour, and the store's values from it equal GESLA's copy of CMEMS's Kerguelen record (`gesla/kerguelentg_60minute-ker-fra-cmems`) an hour earlier to the millimeter (standard deviation 0.0 cm), while the months the validated series covers equal it at the same time. M2's phase in the store's values is 50 to 57° in 1993 to 2013, against 22 to 28° in UHSLC's record (`uhslc/180`), CMEMS's, GESLA's copy of REFMAR's from an earlier download, and REFMAR's own values before 1993 and from 2017. The store's level match found the gauge equal to UHSLC, GESLA and CMEMS only at an hour's offset, at 0.00 cm. Of SHOM's 173 gauges, only Kerguelen and Dumont d'Urville serve both raw series as hourly values on 1 June 2000 and 1 June 2010. Dumont d'Urville's differ by an hour on 1 June 2000 too, but its stored values, mostly SHOM's validated series, hold one M2 phase from 1996 to 2026, so it isn't moved.",
       // The raw series of June 2010 and the validated one of December 2001 both equal GESLA's copy of CMEMS's record at the same time.
       check: async (store, e) => {
         for (const month of ["2010-06", "2001-12"]) {
@@ -134,7 +135,7 @@ export default {
       response:
         "The record splits into datum epochs on 5 March 2020, and the epoch before converts to today's zero by adding 1.35 m. That epoch holds through 4 March, as the record's first values back, from 23:00 UTC on the 5th, are already on the new zero. The values stay as served.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against UHSLC's record of the gauge (`uhslc/017`), which has no step: REFMAR's sits 0.24 m above it every year from 2010 to 2015 and 1.59 m above it from 2020 on. UHSLC's record starts in September 2010; REFMAR's yearly medians from 1977 to 2017 stay between 0.68 and 0.91 m, and from 2020 read 2.2 m, so the years before 2010 are on the same zero as 2010 to 2015.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed by daily-mean differences against UHSLC's record of the gauge (`uhslc/017`), which has no step: REFMAR's sits 0.24 m above it every year from 2010 to 2015 and 1.59 m above it from 2020 on. UHSLC's record starts in September 2010; REFMAR's yearly medians from 1977 to 2017 stay between 0.68 and 0.91 m, and from 2020 read 2.2 m, so the years before 2010 are on the same zero as 2010 to 2015.",
       until: "2020-03-05",
       check: async (store, e) => {
         const id = e.stations![0]!;
@@ -170,7 +171,7 @@ export default {
       response:
         "The record splits into datum epochs on 12 September 2021 and 21 January 2025. 12 September 2021 to 20 January 2025 is flagged `suspect`, keeping the source's own flag as `source_flag`, and its epoch has no offset to today's zero because it drifts. The epoch before 2021 converts to today's zero by adding 0.13 m.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Saint-Malo (`refmar/410`), 13 km away: Cancale less Saint-Malo is 0.95 m before 12 September 2021, 3.80 m from 18 to 27 September, 3.23 to 3.28 m in the 90 days after, 2.48 m in the 90 days before 21 January 2025, and 1.04 to 1.11 m since. The values before 2021 are within 0.15 m of the current ones.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed by daily-mean differences against Saint-Malo (`refmar/410`), 13 km away: Cancale less Saint-Malo is 0.95 m before 12 September 2021, 3.80 m from 18 to 27 September, 3.23 to 3.28 m in the 90 days after, 2.48 m in the 90 days before 21 January 2025, and 1.04 to 1.11 m since. The values before 2021 are within 0.15 m of the current ones.",
       since: "2021-09-12",
       check: async (store, e) => {
         const id = e.stations![0]!;
@@ -207,7 +208,7 @@ export default {
       response:
         "The store keeps the values as served: the store holds no independent record of the gauge to show which zero is wrong, so nothing is flagged.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the store lists as coastal, November 2026; the store holds no other record of the gauge or gauge nearby to compare, so this rests on the record's own medians. Yearly medians are 0.33 to 0.50 m from 2011 to 2013 and 6.35 to 6.57 m from 2021 on. No other gauge in the store lies within 150 km; GESLA's copies hold the same values.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the store lists as coastal; the store holds no other record of the gauge or gauge nearby to compare, so this rests on the record's own medians. Yearly medians are 0.33 to 0.50 m from 2011 to 2013 and 6.35 to 6.57 m from 2021 on. No other gauge in the store lies within 150 km; GESLA's copies hold the same values.",
       since: "2021-10-10",
       check: async (store, e) => {
         const id = e.stations![0]!;
@@ -227,7 +228,7 @@ export default {
       response:
         "25 December 2007 to 13 May 2012 is flagged `suspect`, keeping SHOM's own flag as `source_flag`.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against UHSLC's record of the gauge (`uhslc/016`), 0.6 km away: the difference is 4.93 m to September 2010, 5.86 m to May 2012, and −0.30 m after.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed by daily-mean differences against UHSLC's record of the gauge (`uhslc/016`), 0.6 km away: the difference is 4.93 m to September 2010, 5.86 m to May 2012, and −0.30 m after.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         await offset(store, e.stations![0]!, "2011-06-15", "2013-06-15", 4);
@@ -244,7 +245,7 @@ export default {
       response:
         "13 September 2010 to 12 September 2011 is flagged `suspect`, keeping the source's own flag as `source_flag`. An erratum spans whole UTC days, so the 22 hours of 13 September before the step are flagged with them.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against SHOM's Papeete (`refmar/383`) and Vairao (`refmar/317`): the differences are 0.01 to 0.04 m before and after and 0.96 to 0.99 m over the span.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed by daily-mean differences against SHOM's Papeete (`refmar/383`) and Vairao (`refmar/317`): the differences are 0.01 to 0.04 m before and after and 0.96 to 0.99 m over the span.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const d = median(await paired(store, e.stations![0]!, "refmar/383", "2011-03-15"));
@@ -264,7 +265,7 @@ export default {
       response:
         "The record splits into a datum epoch at each change of zero, and the store keeps the values as served. The store holds no independent record of the gauge to measure the offsets, so the epochs before March 2023 have none and stay out of the combined series, readable on their own zeros; nothing is flagged. The last epoch starts on 10 March 2023, so the two values at 23:20 and 23:40 UTC on 9 March, already on the new zero, sit at the end of the epoch before; an erratum flags whole days, and flagging the 9th would mark 24 good values to catch two.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the store lists as coastal, November 2026; the store's only other record of the gauge, UHSLC's (`uhslc/189`), equals this one to the millimeter from 2008 to February 2023, so it is a copy rather than a check, and this rests on the record's own medians. Monthly medians are about 1.1 m in early 1996 and from December 1997 to February 2000, 5.9 to 6.1 m from March to October 1997 and from March 2000 to 2005, 5.0 to 5.3 m from 2006 to 2022, and 1.2 to 1.3 m from March 2023 on. GESLA's REFMAR copy holds the same values.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the store lists as coastal; the store's only other record of the gauge, UHSLC's (`uhslc/189`), equals this one to the millimeter from 2008 to February 2023, so it is a copy rather than a check, and this rests on the record's own medians. Monthly medians are about 1.1 m in early 1996 and from December 1997 to February 2000, 5.9 to 6.1 m from March to October 1997 and from March 2000 to 2005, 5.0 to 5.3 m from 2006 to 2022, and 1.2 to 1.3 m from March 2023 on. GESLA's REFMAR copy holds the same values.",
       check: async (store, e) => {
         const id = e.stations![0]!;
         const epochs = (await station(store, id)).epochs;
@@ -296,7 +297,7 @@ export default {
       response:
         "3 August to 5 September 2026 is flagged `suspect` whole, keeping the source's own flag as `source_flag`, since the drops come on nearly every day of it. The wrong values are SHOM's raw ones; once its validated values for the span replace them, this entry can be retired.",
       evidence:
-        "Compared, November 2026, with VIGIE HAROPA LH (`refmar/6366`), 1 km away on the same zero (ZI), which agrees with this gauge to a median of 0.085 m in June 2026. Over the span, 2,511 of 4,401 values are more than 0.3 m off it, reading −0.06 to 4.18 m, all of them SHOM's raw values, stored as preliminary. From 6 to 13 September none is more than 0.3 m off.",
+        "Compared with VIGIE HAROPA LH (`refmar/6366`), 1 km away on the same zero (ZI), which agrees with this gauge to a median of 0.085 m in June 2026. Over the span, 2,511 of 4,401 values are more than 0.3 m off it, reading −0.06 to 4.18 m, all of them SHOM's raw values, stored as preliminary. From 6 to 13 September none is more than 0.3 m off.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         await dropouts(store, e.stations![0]!, "2026-08-20");
@@ -313,7 +314,7 @@ export default {
       response:
         "14 to 17 September 2026 is flagged `suspect` whole, keeping the source's own flag as `source_flag`. The wrong values are SHOM's raw ones; once its validated values for the span replace them, this entry can be retired.",
       evidence:
-        "Compared, November 2026, with VIGIE HAROPA LH (`refmar/6366`), 1 km away on the same zero (ZI), which agrees with this gauge to a median of 0.085 m in June 2026. Over the span, 311 of 572 values are more than 0.3 m off it, all of them SHOM's raw values, stored as preliminary. After 01:40 on 17 September the two agree again.",
+        "Compared with VIGIE HAROPA LH (`refmar/6366`), 1 km away on the same zero (ZI), which agrees with this gauge to a median of 0.085 m in June 2026. Over the span, 311 of 572 values are more than 0.3 m off it, all of them SHOM's raw values, stored as preliminary. After 01:40 on 17 September the two agree again.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         await dropouts(store, e.stations![0]!, "2026-09-15");
