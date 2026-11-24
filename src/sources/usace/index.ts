@@ -12,7 +12,7 @@ import {
 } from "../../schema.ts";
 import { describedDatums, type DatumNote } from "./described.ts";
 import { ZERO_SINCE } from "./zeros.ts";
-import { POSITIONS } from "../../positions.ts";
+import { servedAt } from "../../positions.ts";
 
 /**
  * US Army Corps of Engineers river stage, from the Corps Water Management
@@ -121,7 +121,9 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
   const committedSince = new Map<string, string>();
   const committedFrom = new Map<string, Record<string, DatumNote>>();
   const committedStart = new Map<string, string>();
+  const inactive = new Set<string>();
   for (const s of previous) {
+    if (s.status === "inactive") inactive.add(s.id);
     const { series, zero_since, datums_from, series_since } = s as Partial<UsaceStation>;
     if (series) committed.set(s.id, series);
     if (series_since) committedStart.set(s.id, series_since);
@@ -131,7 +133,7 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
   const out: UsaceStation[] = [];
   for (const office of OFFICES) {
     const { series, locations } = await catalogsOf(office);
-    out.push(...toStations(office, series, locations, committed));
+    out.push(...toStations(office, series, locations, committed, Date.now(), inactive));
   }
   for (const s of out) {
     // The later of the code's date and the one the list had, so neither can be
@@ -171,7 +173,8 @@ async function catalogsOf(
 
 /**
  * One station per location that has an observed series, from an office's
- * catalogs. `committed` maps station IDs to the series they already use.
+ * catalogs. `committed` maps station IDs to the series they already use, and
+ * `inactive` holds those already retired.
  */
 export function toStations(
   office: string,
@@ -179,6 +182,7 @@ export function toStations(
   locations: CatalogLocation[],
   committed: Map<string, string> = new Map(),
   now = Date.now(),
+  inactive: Set<string> = new Set(),
 ): UsaceStation[] {
   const byName = new Map(
     locations.map((l) => [
@@ -202,10 +206,14 @@ export function toStations(
     const location = byName.get(name);
     if (!location) continue;
     const id = idOf(office, name);
-    // A position `POSITIONS` moves is let through, for the refresh to move.
-    if (!placed(location) && !POSITIONS[`usace/${id}`]) {
-      // A listed station that loses its position would otherwise be retired by the next refresh.
-      if (committed.has(`usace/${id}`) && !RETIRED.has(`usace/${id}`))
+    // A position `POSITIONS` moves is let through, for the refresh to move, while CWMS still serves the one it was written against.
+    if (!placed(location) && !servedAt(`usace/${id}`, positionOf(location))) {
+      // A listed, active station that loses its position would otherwise be retired by the next refresh.
+      if (
+        committed.get(`usace/${id}`)?.split(".")[0] === name &&
+        !inactive.has(`usace/${id}`) &&
+        !RETIRED.has(`usace/${id}`)
+      )
         throw new Error(
           `CWMS now places usace/${id} at ${location.latitude}, ${location.longitude}, which isn't in the contiguous US; settle it with a POSITIONS entry (src/positions.ts) for where it is, or with RETIRED (src/sources/usace/index.ts) to let the refresh retire it`,
         );
@@ -253,6 +261,11 @@ export function toStations(
 export const RETIRED = new Set<string>();
 
 const GROUNDWATER = /piezometer|-OW\d+[A-Z]?$/i;
+
+/** A location's coordinates, NaN where it has none, so no entry's `served` position matches. */
+function positionOf(l: CatalogLocation): { lat: number; lon: number } {
+  return { lat: l.latitude ?? NaN, lon: l.longitude ?? NaN };
+}
 
 /**
  * Whether a location's position is in the contiguous US, where all nine offices

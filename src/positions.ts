@@ -246,6 +246,12 @@ export const POSITIONS: Record<string, { served: Position; at: Position }> = {
 /** Farthest a source's position can move before its correction is out of date. */
 const SERVED_KM = 0.5;
 
+/** Whether `position` is where `POSITIONS` says `id`'s source serves it, so its entry still applies. */
+export function servedAt(id: string, position: Position): boolean {
+  const fix = POSITIONS[id];
+  return !!fix && km(position, fix.served) <= SERVED_KM;
+}
+
 /**
  * A source's stations with those `POSITIONS` names moved to where they are,
  * and each entry the source has moved its station away from.
@@ -257,7 +263,7 @@ export function correctPositions<T extends Position & { id: string }>(
   const corrected = stations.map((s) => {
     const fix = POSITIONS[s.id];
     if (!fix) return s;
-    if (!(km(s, fix.served) <= SERVED_KM)) {
+    if (!servedAt(s.id, s)) {
       stale.push(`${s.id} is now at ${s.lat}, ${s.lon}, not ${fix.served.lat}, ${fix.served.lon}`);
       return s;
     }

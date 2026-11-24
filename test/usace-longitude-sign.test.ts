@@ -30,6 +30,6 @@ describe("the USACE longitude-sign migration", () => {
   it("fails its check while the store lists none of them", async () => {
     const check = migration.steps.find((s) => "check" in s);
     assert.ok(check && "verify" in check);
-    await assert.rejects(async () => check.verify!(store));
+    await assert.rejects(async () => check.verify!(store), /doesn't list usace\/MVK.Pine_Bluff/);
   });
 });

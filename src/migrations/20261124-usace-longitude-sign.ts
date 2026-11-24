@@ -3,6 +3,8 @@ import { errataReader } from "../store/errata-reader.ts";
 import { readRows } from "../store/parquet.ts";
 import { listLevelFiles, fileKey } from "../store/years.ts";
 import { stationsPath } from "../store/paths.ts";
+import { POSITIONS } from "../positions.ts";
+import { distanceKm } from "../stats.ts";
 import type { Migration } from "../jobs/migrations.ts";
 
 const ID = "usace-longitude-sign";
@@ -30,6 +32,12 @@ export default {
         for (const id of STATIONS) {
           const row = listed.get(`usace/${id}`);
           if (!row) throw new Error(`usace/${id} isn't in stations.parquet`);
+          // The published list, which readers see, not only the source's list the erratum's check reads.
+          const at = POSITIONS[`usace/${id}`]!.at;
+          if (distanceKm({ lat: Number(row.lat), lon: Number(row.lon) }, at) > 0.1)
+            throw new Error(
+              `usace/${id} is published at ${row.lat}, ${row.lon}, not ${at.lat}, ${at.lon}`,
+            );
           if (row.first === null || row.last === null)
             throw new Error(`usace/${id} is listed with no levels`);
           if (!files.some((f) => f?.id === `usace/${id}`))

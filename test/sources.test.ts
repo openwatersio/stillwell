@@ -2850,6 +2850,36 @@ describe("usace", () => {
         now,
       );
     assert.throws(lost, /places usace\/LRC.Chicago_Lock-Pool at 0, 0.*POSITIONS.*RETIRED/);
+    // Only an active station the location owns stops the refresh, and a POSITIONS station only while CWMS serves its position.
+    const stageOf = (name: string) => `${name}.Stage.Inst.1Hour.0.USGS-raw`;
+    const listedAt = (
+      office: string,
+      name: string,
+      latitude: number,
+      longitude: number,
+      committed: [string, string][],
+      inactive: string[] = [],
+    ) =>
+      usace.toStations(
+        office,
+        [series(stageOf(name), "1Hour", "2021-03-19T16:00:00Z", "2026-09-14T03:00:00Z")],
+        [{ office, name, nation: "United States", latitude, longitude }],
+        new Map(committed),
+        now,
+        new Set(inactive),
+      );
+    const owned: [string, string][] = [
+      ["usace/LRC.Chicago_Lock-Pool", stageOf("Chicago Lock-Pool")],
+    ];
+    assert.deepEqual(
+      listedAt("LRC", "Chicago Lock-Pool", 0, 0, owned, ["usace/LRC.Chicago_Lock-Pool"]),
+      [],
+    );
+    assert.deepEqual(listedAt("LRC", "Chicago Lock Pool", 0, 0, owned), []);
+    assert.throws(
+      () => listedAt("MVK", "Pine Bluff", 0, 0, [["usace/MVK.Pine_Bluff", stageOf("Pine Bluff")]]),
+      /Pine_Bluff/,
+    );
     usace.RETIRED.add("usace/LRC.Chicago_Lock-Pool");
     try {
       assert.deepEqual(lost(), []);
