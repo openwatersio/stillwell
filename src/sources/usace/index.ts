@@ -239,9 +239,8 @@ const GROUNDWATER = /piezometer|-OW\d+[A-Z]?$/i;
 
 /**
  * Whether a location's position is in the contiguous US, where all nine offices
- * are. Some locations sit at 0,0 or at a placeholder such as 9.09,9.09, and a
- * few have the longitude's sign dropped, which puts them in Asia (erratum
- * `usace-placeholder-positions`).
+ * are. A location with a placeholder position, none, or a longitude without
+ * its sign isn't (erratum `usace-placeholder-positions`).
  */
 function placed(l: CatalogLocation): boolean {
   const { latitude: lat, longitude: lon } = l;

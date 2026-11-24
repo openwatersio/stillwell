@@ -2795,6 +2795,9 @@ describe("usace", () => {
     };
     assert.deepEqual(pool({ latitude: 41.89, ...published }), []);
     assert.deepEqual(pool({ longitude: -87.62, ...published }), []);
+    assert.deepEqual(pool({}), []);
+    assert.deepEqual(pool({ latitude: 9.09, longitude: 9.09 }), []);
+    assert.deepEqual(pool({ latitude: 34.29, longitude: 91.996 }), []);
     assert.deepEqual(pool({ "published-latitude": 0, "published-longitude": 0 }), []);
     assert.deepEqual(
       pool({

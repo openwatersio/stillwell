@@ -51,12 +51,13 @@ export default {
       stations: [],
       handling: "dropped",
       error:
-        "Some CWMS locations sit at 0,0 or at a placeholder such as 9.09,9.09 (Anoka), and a few have the longitude's sign dropped (Buck Creek, Pine Bluff), which puts them in Asia.",
-      response: "Locations outside the contiguous US are left out.",
+        "Some CWMS locations with an observed stage series sit at 0,0, at a placeholder such as 9.09,9.09 (Anoka) or −3.4 × 10³⁸, or have no position, and a few have the longitude's sign dropped (Buck Creek, Pine Bluff, Pleasant Hill), which puts them in Asia.",
+      response:
+        "A location with no position, or one outside the contiguous US, is left out of the station list.",
       evidence:
-        "CWMS location catalogs: locations at 0,0; Anoka at 9.09,9.09; Buck Creek and Pine Bluff with a positive longitude.",
+        "CWMS location and stage-series catalogs of the nine offices, read 2026-11-24 with the adapter's rules: a location that has an observed series (`observed()` in `src/sources/usace/index.ts`) and no position in the contiguous US, once `published-latitude` and `published-longitude` stand in for a location with neither coordinate. That is 157 locations.\n\n| Office | Locations | Position |\n| --- | --- | --- |\n| MVS | 72 | 0,0, such as `Baton Rouge-Mississippi`, `St Paul-Mississippi` and `Kansas City-Missouri`; they are MVS's own entries for other districts' gauges |\n| MVS | 1 | 9.09, 9.09, `Anoka-Mississippi` |\n| MVS | 1 | none, `Fayette-Moniteau Cr` |\n| LRL | 62 | none, such as `Alpine`, `Madison`, `Cairo` and `Muncie` |\n| LRL | 7 | 0,0: `Olmsted`, `Olmsted-HW`, `Olmsted-OLMI2`, `Olmsted-TW`, `Clifty Creek`, `FarmersTW` and `Shawneetown` |\n| LRL | 6 | −3.4028235 × 10³⁸: `Brownsville`, `BrownsvilleWtrT`, `CHSI2`, `MURI2`, `MammothCave` and `NMDM7` |\n| LRL | 1 | longitude without its sign, `BuckCreek` at 39.95, +83.75 |\n| LRH | 4 | none: `NewCumberlandLD-Pool`, `NewCumberlandLD-Tailwater`, `PikeIslandLD-Pool` and `PikeIslandLD-Tailwater` |\n| LRH | 1 | longitude without its sign, `PleasantHill-Outflow` at 40.62, +82.32 |\n| MVK | 1 | longitude without its sign, `Pine Bluff` at 34.29, +91.996 |\n| LRC | 1 | none, `Shawano` |\n\nMVM, MVN, LRP and LRN have none.",
       report:
-        "Not reported yet. The locations are mostly MVS's and LRL's; on 2026-11-07 the New Orleans District was asked who takes them.",
+        "Not sent: held until upstream reports go out. It goes to the adapter's default contact, since none of these offices' own is listed, asking who maintains MVS's, LRL's, LRH's, MVK's and LRC's locations and whether their positions can be filled in. The New Orleans District was asked on 2026-11-07 who takes them.",
       check: async (store) => {
         const usace = (await store.rows("stations.parquet")).filter((r) => r.source === "usace");
         if (!usace.length) throw new Error("the store lists no USACE stations");
@@ -143,7 +144,7 @@ export default {
       evidence:
         "| Station | CWMS | USGS gauge | Off by |\n| --- | --- | --- | --- |\n| `MVK.Olive_Branch`, Coldwater River at Olive Branch | 37.9075, −89.7533 | 07275900, 34.9075, −89.7533 | 334 km; latitude 3° off |\n| `MVK.Oxford`, Yocona River at Oxford | 32.2733, −89.5214 | 07274000, 34.2733, −89.5214 | 222 km; latitude 2° off |\n| `MVN.Bayou_Boeuf-Amelia` | 29.8691, −90.5950 | 073814675, 29.6683, −91.0997, railroad bridge at Amelia | 54 km |\n| `MVN.Chicot_Pass-Myette`, Chicot Pass near Myette Point | 30.0680, −91.4740, the same as `MVN.Chicot_Pass` near West Fork | 073815450, 29.8927, −91.4457 | 20 km |\n| `LRN.RoaringR_Hilham`, Roaring River near Hilham | 36.3409, −85.5902 | 03418000, 36.3409, −85.4264 | 15 km |\n| `LRN.WFBrownsCr_Glen`, West Fork Browns Creek at Glendale Lane | 36.2177, −86.8202 | 03431100, 36.0943, −86.7939 | 14 km |\n\nFound by matching every USACE station's river and place names against USGS and the other districts' catalogs on 2026-11-08. MVN's Baton Rouge, 113 km south, is [#64](https://github.com/openwatersio/stillwell/issues/64).",
       report:
-        "Not sent. It goes to MVK and MVN Water Management for their gauges, and to the Nashville District for LRN's.",
+        "Not sent: held until upstream reports go out. It goes to MVK and MVN Water Management for their gauges (MVN's is CEMVN-WATER-MANAGEMENT@usace.army.mil) and to the Nashville District for LRN's (lrn.water.management@usace.army.mil, from its Water Management contact page). It asks each to check the coordinates and correct them in CWMS, and says the store places the gauges at USGS's positions until then.",
       check: async (store, e) => {
         for (const id of e.stations!) await moved(store, id);
       },

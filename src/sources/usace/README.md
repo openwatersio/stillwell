@@ -18,7 +18,7 @@ Stage from the US Army Corps of Engineers' Corps Water Management System, read t
 
 - **Subsidence:** a NAVD88 adjustment holds as of the survey it comes from, but the gauges subside and are re-surveyed, and the store applies one value to the whole record since the last zero reset. At some gauges the description's adjustment differs from the one MVN applies in its own `rev-NAVD88` series (erratum `usace-lwrp-corrections-disagree`).
 - **Unmarked zero moves:** gauges that moved with no datum noted, as several in MVM did, and MVN's Head of Passes, a new gauge set to the old one's water surface, have no reset date, so their records can have steps.
-- **Bad stretches in prose:** some descriptions note bad values only in prose, such as Reserve's values from 1991-10-04 to 1993-01-14, which "are 1 foot too high". Those values keep CWMS's flags.
+- **Bad stretches in prose:** some descriptions note bad values only in prose, and those values keep CWMS's flags. Reserve's description says its values from 1991-10-04 to 1993-01-14 "are 1 foot too high", but its CWMS series begins in 1997, so the store holds none of them.
 - **Later screening:** screening an office does on values more than 120 days old reaches the store only once the cache is cleared.
 
 ## Running ingest
