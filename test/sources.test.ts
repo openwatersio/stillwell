@@ -2875,10 +2875,14 @@ describe("usace", () => {
       listedAt("LRC", "Chicago Lock-Pool", 0, 0, owned, ["usace/LRC.Chicago_Lock-Pool"]),
       [],
     );
-    assert.deepEqual(listedAt("LRC", "Chicago Lock Pool", 0, 0, owned), []);
+    assert.deepEqual(listedAt("LRC", "Chicago_Lock-Pool", 0, 0, owned), []);
     assert.throws(
       () => listedAt("MVK", "Pine Bluff", 0, 0, [["usace/MVK.Pine_Bluff", stageOf("Pine Bluff")]]),
-      /Pine_Bluff/,
+      /Pine_Bluff.*POSITIONS entry.*update the entry's `served`.*RETIRED/,
+    );
+    assert.throws(
+      () => listedAt("LRC", "Chicago Lock-Pool", undefined as never, undefined as never, owned),
+      /no position, which a POSITIONS entry can't settle.*RETIRED/,
     );
     usace.RETIRED.add("usace/LRC.Chicago_Lock-Pool");
     try {

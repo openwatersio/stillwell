@@ -12,7 +12,7 @@ import {
 } from "../../schema.ts";
 import { describedDatums, type DatumNote } from "./described.ts";
 import { ZERO_SINCE } from "./zeros.ts";
-import { servedAt } from "../../positions.ts";
+import { POSITIONS, servedAt } from "../../positions.ts";
 
 /**
  * US Army Corps of Engineers river stage, from the Corps Water Management
@@ -215,7 +215,7 @@ export function toStations(
         !RETIRED.has(`usace/${id}`)
       )
         throw new Error(
-          `CWMS now places usace/${id} at ${location.latitude}, ${location.longitude}, which isn't in the contiguous US; settle it with a POSITIONS entry (src/positions.ts) for where it is, or with RETIRED (src/sources/usace/index.ts) to let the refresh retire it`,
+          `CWMS now places usace/${id} at ${location.latitude}, ${location.longitude}, which isn't in the contiguous US; ${settle(`usace/${id}`, location)}`,
         );
       continue;
     }
@@ -261,6 +261,16 @@ export function toStations(
 export const RETIRED = new Set<string>();
 
 const GROUNDWATER = /piezometer|-OW\d+[A-Z]?$/i;
+
+/** What settles a listed station whose location CWMS now places outside the contiguous US. */
+function settle(id: string, l: CatalogLocation): string {
+  const retire = "add it to RETIRED (src/sources/usace/index.ts) to let the refresh retire it";
+  if (POSITIONS[id])
+    return `its POSITIONS entry (src/positions.ts) was written against another position, so update the entry's \`served\`, or ${retire}`;
+  if (typeof l.latitude !== "number" || typeof l.longitude !== "number")
+    return `it has no position, which a POSITIONS entry can't settle, so ${retire}`;
+  return `add a POSITIONS entry (src/positions.ts) for where it is, or ${retire}`;
+}
 
 /** A location's coordinates, NaN where it has none, so no entry's `served` position matches. */
 function positionOf(l: CatalogLocation): { lat: number; lon: number } {
