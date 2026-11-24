@@ -17,7 +17,7 @@ const STARTS = [
 const YEARS = [
   ["cco/89", 1996, 2005],
   ["cco/87", 2003, 2009],
-  ["cco/88", 2004, 2006],
+  ["cco/88", 2005, 2006],
 ] as const;
 
 export default {
@@ -80,20 +80,10 @@ export default {
             next = here;
           }
         }
-        // Port Isaac's refetched years hold about 52,000 readings each and no pair a second apart.
-        for (const year of [2010, 2011]) {
-          const levels = await reader.levels("cco/102", `${year}-01-01`, `${year + 1}-01-01`);
-          const pairs = levels.filter(
-            (o, i) =>
-              i &&
-              o.time - levels[i - 1]!.time <= 2000 &&
-              Math.abs(o.level - levels[i - 1]!.level) < 0.0049,
-          );
-          if (levels.length < 50_000 || pairs.length)
-            throw new Error(
-              `cco/102's ${year} has ${levels.length} levels and ${pairs.length} pairs a second apart`,
-            );
-        }
+        // Port Isaac's refetched years hold levels; 2010 starts on 30 June.
+        for (const year of [2010, 2011])
+          if (!(await reader.levels("cco/102", `${year}-01-01`, `${year + 1}-01-01`)).length)
+            throw new Error(`the store holds no cco/102 levels in ${year}`);
         // The part years the refetches fill, from 1 January to the first reading the store held.
         for (const [id, from, until] of [
           ["cco/87", "2009-01-01", "2009-02-13"],

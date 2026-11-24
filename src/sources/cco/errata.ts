@@ -62,7 +62,7 @@ export default {
       error:
         "For stretches of 2011 at West Bay Harbour, CCO sends each reading twice, stamped a second apart, as 11:20:02 and 11:20:03, with nearly the same level. West Bay Harbour has 6,513 such pairs, about 6,500 of them within 5 mm and about 6,150 within 2 mm, counted on the stored levels, which are single-precision. Lymington has 5 pairs a second apart between 2013 and 2017, 2 within 5 mm. Arun Platform has 11 pairs in 2012 and 2013 and Sandown Pier 1 in 2017, on the days the clocks changed, whose levels differ.",
       response:
-        "A reading within 2 seconds of the last one kept, with a level within 5 mm of it, is left out, so the first of each pair stays: about 6,500 readings. A pair whose levels differ by more is kept.",
+        "A reading within 2 seconds of the last one kept, with a level within 5 mm of it, is left out, so the first of each pair stays: about 6,500 readings. The rule applies at every site. A pair whose levels differ by more is kept.",
       evidence:
         "Every stored CCO reading, read on 2026-11-17, compared with the one before it at the same site: West Bay Harbour on 30 March 2011 has 11:20:02 and 11:20:03, 2.081 and 2.080 m, then 11:30:02 and 11:30:03, 2.099 m twice.",
       reported: "2026-11-17",
@@ -88,6 +88,29 @@ export default {
             );
         }
       },
+    },
+  ],
+  questions: [
+    {
+      id: "cco-qc-west-bay-penarth",
+      stations: ["cco/95", "cco/119"],
+      question:
+        "When will the quality-controlled annual files for West Bay Harbour and Penarth be loaded into the API? Both still hold the earlier readings, with placeholder values and no flags from before 2026.",
+      why: "The store re-reads those two gauges' history through the API once the files are loaded, which drops their placeholder values and brings in the flags, and lets `cco-duplicate-stamps` retire at West Bay Harbour.",
+      meanwhile:
+        "The store keeps the readings it holds, drops placeholder values and duplicate stamps as the adapter finds them, and leaves the other gauges' history as it is. The history re-read waits until the files are loaded.",
+      asked: null,
+      answer: null,
+    },
+    {
+      id: "cco-truncated-answer",
+      stations: ["cco/89"],
+      question:
+        "A request for Herne Bay's tides for the year ending 31 December 2003 (`duration=8760`) once came back cut off after about 10 MB, in the middle of a reading, with status 200. Two repeats returned the full 29.7 MB. Is a very large answer cut off when the server is busy, and is a shorter window safer?",
+      why: "The adapter reads a year at a time, as the observatory's page allows. A cut-off body fails to parse. If the observatory says to ask for less, the adapter shortens its windows.",
+      meanwhile: "A cut-off answer fails to parse and the run stops; a rerun reads the year again.",
+      asked: null,
+      answer: null,
     },
   ],
   retired: ["cco-empty-window-answers", "cco-west-bay-position"],
