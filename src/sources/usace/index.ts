@@ -265,10 +265,10 @@ const GROUNDWATER = /piezometer|-OW\d+[A-Z]?$/i;
 /** What settles a listed station whose location CWMS now places outside the contiguous US. */
 function settle(id: string, l: CatalogLocation): string {
   const retire = "add it to RETIRED (src/sources/usace/index.ts) to let the refresh retire it";
-  if (POSITIONS[id])
-    return `its POSITIONS entry (src/positions.ts) was written against another position, so update the entry's \`served\`, or ${retire}`;
   if (typeof l.latitude !== "number" || typeof l.longitude !== "number")
     return `it has no position, which a POSITIONS entry can't settle, so ${retire}`;
+  if (POSITIONS[id])
+    return `its POSITIONS entry (src/positions.ts) was written against another position, so update the entry's \`served\`, or ${retire}`;
   return `add a POSITIONS entry (src/positions.ts) for where it is, or ${retire}`;
 }
 
