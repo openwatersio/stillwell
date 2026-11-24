@@ -176,7 +176,7 @@ import type {
   SourceMetadata,
   Station,
 } from "../src/schema.ts";
-import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
+import { errata, errataProblems, questions, sourceOf, sources } from "../src/sources/index.ts";
 import { DROPS, dropFiles, removePrefixes, withhold, withheldReason } from "../src/withhold.ts";
 import { deleteYears } from "../src/delete-years.ts";
 import { misplaced } from "../src/store/misplaced.ts";
@@ -552,7 +552,7 @@ async function publish(store: string): Promise<void> {
   for (const { metadata } of held)
     if (published.has(metadata.id) || (await hasHistory(store, metadata.id)))
       expected.push(metadata.id);
-  const result = await publishStations(store, held, expected, errata);
+  const result = await publishStations(store, held, expected, errata, questions);
   if ("count" in result) {
     console.log(`${stationsPath(store)}: ${result.count} stations`);
     const { pairs, dropped, skipped, wide, shifted } = result.links;
@@ -584,9 +584,9 @@ async function publish(store: string): Promise<void> {
     for (const f of far) console.log(`  datums join dropped: ${f}`);
     for (const d of disagree) console.log(`  datums differ: ${d}`);
     for (const e of result.unknownErrata)
-      console.error(`  erratum lists a station not in the store: ${e}`);
+      console.error(`  erratum or question lists a station not in the store: ${e}`);
     for (const p of errataProblems) console.error(`  errata: ${p}; left out`);
-    // A typo in an erratum's stations tags nothing, and a bad errata file leaves
+    // A typo in an erratum's stations tags nothing, one in a question's names the wrong gauge to its agency, and a bad errata file leaves
     // its errata out, so fail the run to say so, after publishing: holding back
     // every source's list for it would cost more.
     if (result.unknownErrata.length || errataProblems.length) process.exitCode = 1;

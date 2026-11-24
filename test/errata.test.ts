@@ -6,9 +6,11 @@ import { describe, it } from "node:test";
 import { citations, citedIn } from "../src/citations.ts";
 import {
   covers,
+  draft,
   errataOf,
   flaggedSpan,
   parseErrata,
+  parseQuestions,
   published,
   readErrata,
   spans,
@@ -194,6 +196,171 @@ describe("parseErrata", () => {
     const parsed = parseErrata("uhslc", file([entry({ check })])).errata;
     assert.equal(parsed[0]!.check, check);
     assert.ok(!("check" in (published(parsed)[0] as object)));
+  });
+});
+
+const question = (fields: Record<string, unknown> = {}) => ({
+  id: "uhslc-hong-kong-datum",
+  stations: ["uhslc/329"],
+  question: "Which datum are Hong Kong's heights before 1986 on?",
+  why: "A datum epoch would open in 1986 if the zero moved.",
+  meanwhile: "The store keeps them on the station's datum.",
+  ...fields,
+});
+const withQuestions = (questions: object[], entries: object[] = [], retired: string[] = []) => ({
+  ...file(entries, retired),
+  questions,
+});
+
+describe("questions", () => {
+  it("are read beside the errata, with optional fields null", () => {
+    assert.deepEqual(parseQuestions("uhslc", withQuestions([question()])), [
+      {
+        id: "uhslc-hong-kong-datum",
+        source: "uhslc",
+        stations: ["uhslc/329"],
+        question: "Which datum are Hong Kong's heights before 1986 on?",
+        why: "A datum epoch would open in 1986 if the zero moved.",
+        meanwhile: "The store keeps them on the station's datum.",
+        asked: null,
+        answer: null,
+      },
+    ]);
+    assert.deepEqual(parseQuestions("uhslc", file([entry()])), []);
+    const [all] = parseQuestions(
+      "uhslc",
+      withQuestions([question({ stations: "every station", asked: "2026-11-01" })]),
+    );
+    assert.equal(all!.stations, null);
+    assert.equal(all!.asked, "2026-11-01");
+  });
+
+  it("refuse what a question can't be", () => {
+    const refused = (fields: Record<string, unknown>, retired: string[] = []) =>
+      assert.throws(() => parseQuestions("uhslc", withQuestions([question(fields)], [], retired)));
+    refused({ id: "gesla-hong-kong" });
+    refused({ stations: "all" });
+    refused({ stations: null });
+    // A question goes to the source's own agency, about its own stations.
+    refused({ stations: ["uhslc/329", "gesla/329"] });
+    refused({ stations: ["uhslc/"] });
+    // A whole station ID, so none can carry another source's onto the draft's next line.
+    refused({ stations: ["uhslc/329\ngesla/329"] });
+    refused({ stations: ["uhslc/.."] });
+    refused({ stations: [] });
+    refused({ stations: ["uhslc/329", "uhslc/329"] });
+    refused({ question: "" });
+    refused({ why: undefined });
+    refused({ meanwhile: 3 });
+    refused({ asked: "2026-02-30" });
+    refused({ answr: "Chart datum." });
+    refused({}, ["uhslc-hong-kong-datum"]);
+    assert.throws(() => parseQuestions("uhslc", { ...file([]), questions: {} }));
+    assert.throws(() => parseQuestions("uhslc", { ...file([]), questions: [null] }));
+  });
+
+  it("leave out an ID used twice, by a question or an erratum, or retired anywhere", () => {
+    assert.deepEqual(readErrata({ uhslc: withQuestions([question()]) }).problems, []);
+    const twice = readErrata({ uhslc: withQuestions([question(), question()]) });
+    assert.equal(twice.questions.length, 1);
+    assert.match(twice.problems.join(), /question ID uhslc-hong-kong-datum is used twice/);
+    const erratum = readErrata({
+      uhslc: withQuestions([question({ id: "uhslc-hong-kong-hour-early" })], [entry()]),
+    });
+    assert.equal(erratum.errata.length, 1);
+    assert.deepEqual(erratum.questions, []);
+    assert.match(erratum.problems.join(), /used twice/);
+    const retired = readErrata({
+      uhslc: withQuestions([question()]),
+      gesla: file([], ["uhslc-hong-kong-datum"]),
+    });
+    assert.deepEqual(retired.questions, []);
+    assert.match(retired.problems.join(), /question ID uhslc-hong-kong-datum is retired/);
+    // A bad question costs only its file's questions: the errata beside it still flag their spans.
+    const bad = readErrata({
+      uhslc: withQuestions(
+        [question(), question({ id: "uhslc-other", asked: "2026-02-30" })],
+        [entry({ handling: "flagged" })],
+      ),
+    });
+    assert.deepEqual(
+      bad.errata.map((e) => e.id),
+      ["uhslc-hong-kong-hour-early"],
+    );
+    assert.deepEqual(bad.questions, []);
+    assert.equal(bad.problems.length, 1);
+    // And a bad erratum costs only the errata.
+    const badErratum = readErrata({
+      uhslc: withQuestions([question()], [entry({ handling: "fixed" })]),
+    });
+    assert.deepEqual(badErratum.errata, []);
+    assert.equal(badErratum.questions.length, 1);
+  });
+});
+
+describe("draft", () => {
+  const metadata = { name: "UHSLC", contact: { email: "sealevel@example.org" } };
+  const read = (entries: object[], questions: object[]) => {
+    const data = withQuestions(questions, entries);
+    return draft(
+      "uhslc",
+      metadata,
+      parseErrata("uhslc", data).errata,
+      parseQuestions("uhslc", data),
+    );
+  };
+
+  it("puts unasked questions after the unreported errata, with only the source's stations", () => {
+    const { text, held } = read(
+      [entry({ stations: ["uhslc/329", "gesla/hk-329"], evidence: "Against TICON." })],
+      [question(), question({ id: "uhslc-whole", stations: "every station" })],
+    );
+    assert.deepEqual(held, []);
+    assert.equal(
+      text,
+      [
+        "## UHSLC\n\nTo: sealevel@example.org\n",
+        "### uhslc-hong-kong-hour-early\n\nUHSLC's Hong Kong heights are an hour early.\n\nStations: uhslc/329; values 2020-01-01 to before 2021-01-01.\n\nAgainst TICON.\n\nWhat we do meanwhile: Shifted an hour later.\n",
+        "### Questions\n",
+        "#### uhslc-hong-kong-datum\n\nWhich datum are Hong Kong's heights before 1986 on?\n\nStations: uhslc/329.\n\nWhat the answer would change: A datum epoch would open in 1986 if the zero moved.\n\nWhat we do meanwhile: The store keeps them on the station's datum.\n",
+        "#### uhslc-whole\n\nWhich datum are Hong Kong's heights before 1986 on?\n\nStations: the source as a whole.\n\nWhat the answer would change: A datum epoch would open in 1986 if the zero moved.\n\nWhat we do meanwhile: The store keeps them on the station's datum.\n",
+      ].join("\n"),
+    );
+  });
+
+  it("drafts a message for questions alone, and none with nothing to send", () => {
+    const { text } = read([], [question()]);
+    assert.match(text!, /^## UHSLC\n/);
+    assert.match(text!, /### Questions/);
+    assert.doesNotMatch(text!, /### uhslc-hong-kong-hour-early/);
+    assert.equal(read([entry()], []).text!.includes("Questions"), false);
+    assert.deepEqual(
+      read([entry({ reported: "2026-01-01" })], [question({ asked: "2026-01-01" })]),
+      { text: null, held: [] },
+    );
+  });
+
+  it("holds back a question with an answer but no date asked, saying why", () => {
+    const { text, held } = read(
+      [entry({ report: "Waiting on the cross-check." })],
+      [question({ answer: "Waiting on the next station refresh." })],
+    );
+    assert.equal(text, null);
+    assert.deepEqual(held, [
+      "uhslc-hong-kong-hour-early held: Waiting on the cross-check.",
+      "uhslc-hong-kong-datum held: Waiting on the next station refresh.",
+    ]);
+  });
+
+  it("leaves out another source's entries", () => {
+    const data = withQuestions([question()], [entry()]);
+    assert.deepEqual(
+      draft("gesla", metadata, parseErrata("uhslc", data).errata, parseQuestions("uhslc", data)),
+      {
+        text: null,
+        held: [],
+      },
+    );
   });
 });
 
