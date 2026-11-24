@@ -511,5 +511,25 @@ export default {
       },
     },
   ],
+  questions: [
+    {
+      id: "pegelonline-hpa-minutes",
+      stations: [
+        "pegelonline/5952020",
+        "pegelonline/5952025",
+        "pegelonline/5952030",
+        "pegelonline/5952050",
+        "pegelonline/5952060",
+        "pegelonline/5952065",
+      ],
+      question:
+        "Until 1 March 2025 at about 03:30 UTC, the 10-minute values of CMEMS's Hamburg St. Pauli series equal the 1-minute values of HPA's kuestendaten.de file for the gauge at the same minute. From 03:40 on that day, about a fifth of CMEMS's values equal the file's value from a different minute, and a few are 30 to 42 cm off. From 9 October 2026, the REST API's values for the gauge equal CMEMS's at every shared time. At all six HPA gauges, the REST API's values from October and November 2026 vary more from minute to minute than the file's values from March to June 2026. Does the REST API take its St. Pauli values from the same series as kuestendaten.de's file, and did anything change in how they are sampled, time-stamped or checked on 1 March 2025? Which of the two gives the gauge's reading for a stated minute? Does the file's status 240 mean its values have been checked?",
+      why: "If the file is HPA's checked series and the REST API's values come from other minutes, the store keeps preferring the file's history, and the St. Pauli errata name the WSV as the origin and cover the REST values since 9 October 2026 at the six gauges. If both are the same reading processed differently, the errata stay as they are and the README says so. The status 240 decides whether the file's values stay `preliminary`.",
+      meanwhile:
+        "The store holds the file's values through June 2026 and the REST API's from 9 October 2026, as served, with QC's flags, and documents the differences in erratum `cmems-st-pauli-wrong-minute` and `pegelonline-st-pauli-2026-11-09-dip`. HPA's file for the second half of 2026 will show whether the REST values come from other minutes.",
+      asked: null,
+      answer: null,
+    },
+  ],
   retired: [],
 } satisfies ErrataFile;
