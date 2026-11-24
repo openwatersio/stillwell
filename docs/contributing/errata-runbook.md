@@ -90,7 +90,7 @@ Run `npm run errata` and put the drafts for entries not yet reported in the pull
 
 ## Decisions for a maintainer
 
-Put a decision the agent can't make in its run report, and in the pull request as an open question where one is open, leaving that pull request as a draft. That includes a finding the data can't settle, an agency's answer that contradicts the data, a source's terms, and a change to a QC rule or to `cross-check` itself. A finding put to a maintainer stays in the report until it's settled; say so in the next run report rather than working it again.
+Before putting a decision to a maintainer, follow every lead first (see [Rigor](../../CONTRIBUTING.md#rigor)). Put a decision the agent can't make in its run report, and in the pull request as an open question where one is open, leaving that pull request as a draft. That includes a finding the data can't settle, an agency's answer that contradicts the data, a source's terms, and a change to a QC rule or to `cross-check` itself. A finding put to a maintainer stays in the report until it's settled; say so in the next run report rather than working it again, unless a lead that couldn't be followed before now can be.
 
 ## The run report
 
@@ -98,5 +98,5 @@ End each run with a short report:
 
 - Each item worked, with the pull request that addresses it or why it was left.
 - The copies added, and the rows left out with the reason.
-- The decisions waiting for a maintainer, and the drafts waiting to be sent.
+- The decisions waiting for a maintainer, with each lead left unfollowed and why, and the drafts waiting to be sent.
 - A "Stillwell issues" list: anything in the store's data, docs, access or performance that got in the way, such as a store that couldn't be read, a gap or a flag that looked wrong.
