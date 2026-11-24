@@ -105,7 +105,7 @@ export function isSurveyed(
   return typeof accuracy === "number" ? accuracy < 1 : code === "D" || code === "F";
 }
 
-/** Every `altitude_method_code` USGS gave in November 2026. */
+/** Every `altitude_method_code` USGS gives. */
 const METHODS = new Set([...SURVEYED, "M", "N", "J", "A", "R", "U"]);
 
 /**
@@ -257,6 +257,12 @@ export const GAGE_DATUMS: Record<
     vertical_datum: "NAVD88",
     datums: {},
     note: "San Carlos Reservoir at Coolidge Dam: gage height averages 2,448.5 ft against ground at 2,450 ft (USGS 3DEP), so the gage reads elevation and adding the 2,502 ft altitude counts it twice. Erratum `usgs-gage-reads-elevation`.",
+  },
+  "292859090004000": {
+    altitude: 0.0,
+    vertical_datum: "NAVD88",
+    datums: {},
+    note: "Barataria Waterway south of Lafitte: with the 0.0 ft altitude the water reads 1.10 to 1.40 m above four CRMS gauges in the same marsh, each in its own NAVD88, with 1.7 to 3.1 cm spread. Erratum `usgs-altitude-contradicts-crms`.",
   },
   "11312676": {
     altitude: 0.0,
@@ -461,8 +467,8 @@ export async function stations(previous: Station[] = []): Promise<UsgsStation[]>
 /**
  * Refuses a `monitoring-locations` reply that dropped or changed the fields
  * the offsets rest on, which would clear nearly every offset: more than 1 in
- * 30 sites with an altitude giving no method USGS used in November 2026
- * (about 1 in 130 then gave none), or more than 1 in 30 surveyed sites giving
+ * 30 sites with an altitude giving no method USGS used
+ * (about 1 in 130 give none), or more than 1 in 30 surveyed sites giving
  * no accuracy (none did). Up to 10 are allowed whatever the share, so a short
  * list with a gap or two isn't refused; a whole USGS reply holds about 13,500
  * altitudes, where the share decides.
@@ -871,7 +877,7 @@ function* years(start: Date, end: Date): Generator<[Date, Date]> {
 
 /**
  * USGS approves values months to years after they're measured (Olmsted's 2024
- * gage height was still provisional in November 2026), replacing provisional
+ * gage height stayed provisional for years), replacing provisional
  * ones, so only a page of values that are all approved is cached. An empty page
  * isn't either: values can arrive late, and an outage can answer with none.
  */

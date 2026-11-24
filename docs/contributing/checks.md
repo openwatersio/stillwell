@@ -16,6 +16,16 @@ npm run clock-check -- 2020 uhslc/329=hong_kong-329-hkg-uhslc_fd uhslc/057=honol
 
 Cross-correlates a year of each station's levels, or the dates given as `<start>/<end>` in place of the year for a source that keeps less (the EA's readings API keeps 30 days), fetched through its adapter with the station as the store's list has it (`STILLWELL_STORE`, default the public bucket, or the adapter's own list when the store has none), against the prediction from a TICON record's constants in a slackwater-database checkout (`TIDE_DATABASE`, default `../slackwater-database`), at lags of up to 3 hours in 10-minute steps, and prints a Markdown table of the best lag. It exits nonzero when a series fits best 30 minutes or more off, or has fewer than 30 days of values to check (or, for a range shorter than a month, values on fewer than all but one of its days, as for SMN's 5), which is how local time labeled UTC, or Hong Kong's early stamps, show up. A positive lag means the stamps run late. A TICON record fitted to the same series only shows a clock that changed since, so check against another originator's record for the same gauge where TICON has one. The semidiurnal tide repeats every 12.42 hours, so a 12-hour error, such as New Zealand or Fiji local time labeled UTC, looks like a lag of under half an hour there; the K1 column, from K1's phase in a fit of the year against TICON's, shows it, and fails the check at 3 hours or more. Values spanning under 183 days are too short to fit K1, so it shows `no K1`, and a lag of 20 minutes or more fails, since that's where a 12-hour error shows.
 
+## Pair check
+
+```bash
+npm run pair-check -- 2025 coops/8725520=sfwmd/VALI75
+```
+
+Compares two records of one gauge from different originators, which is the independent clock check wherever the store holds one: a TICON record fitted to the same series, or a copy of the source's own data in an aggregator's records, shows only that a clock hasn't changed. It reads a year of each station's `good` and `preliminary` levels, matches readings at the same minute shifted by lags of up to 3 hours in 10-minute steps, and prints the RMS of the difference at the best lag and at zero, with the mean difference. Where both stations name a datum (or the other's `datums` give one), it also prints how far the mean is from the offset between them, which checks the datum. A lag counts when its RMS is under three quarters of the zero-lag RMS and at least 0.5 cm lower, and the command then exits nonzero. Two records whose RMS is under 2 mm are one record twice, and say nothing about either clock. Nearby gauges on a tide can fit best at the tide's travel time, and river gauges at a lag that has nothing to do with a clock, so read a lag with the gauges' positions.
+
+Find the pairs in `stations/matches.parquet` (`a`, `b`, and the `rms_m` and `lag_h` of their hourly levels, the pair counting as one gauge under 3 cm RMS) and in each station's `same_as`. A pair counts as independent when the two records come from different agencies: an aggregator's record takes its originator from its institution, contributor or name suffix, and one that copies the source's own data doesn't count.
+
 ## Cross-station checks
 
 ```bash
