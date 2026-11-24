@@ -66,7 +66,7 @@ interface Gauge {
   /** Which monitoring project runs the gauge; none for a gauge BOM runs outside both. */
   project?: "ABSLMP" | "SPSLCMP";
   /**
-   * UHSLC's series of the gauge, which carry the same hourly values, by ID. BOM
+   * UHSLC's series of the gauge, by ID; they carry the same hourly values except where BOM's errata say otherwise. BOM
    * numbers its Australian Baseline Array gauges (956 to 959, 992 to 997) in its
    * own series, not UHSLC's, so they're named here rather than found by name.
    */

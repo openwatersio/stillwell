@@ -21,6 +21,7 @@ import {
   type StoredStation,
 } from "./schema.ts";
 import { possible } from "./span.ts";
+import { median } from "./stats.ts";
 
 /** What the store does about an erratum. */
 export const HANDLING = ["corrected", "flagged", "dropped", "refused", "avoided", "kept"] as const;
@@ -166,6 +167,34 @@ export async function flaggedSpan(
         );
     }
   }
+}
+
+/**
+ * The median of `other`'s level minus `station`'s at the hours both hold from
+ * `since` to before `until` (UTC days). Throws where they share under 300
+ * hours, so an empty read never passes.
+ */
+export async function medianGap(
+  store: StoreReader,
+  station: string,
+  other: string,
+  since: string,
+  until: string,
+): Promise<number> {
+  const [a, b] = await Promise.all([
+    store.levels(station, since, until),
+    store.levels(other, since, until),
+  ]);
+  const theirs = new Map(b.map((o) => [o.time, o.level]));
+  const mine = new Map(a.map((o) => [o.time, o.level]));
+  const gaps = [...mine].flatMap(([time, level]) =>
+    theirs.has(time) ? [theirs.get(time)! - level] : [],
+  );
+  if (gaps.length < 300)
+    throw new Error(
+      `${station} and ${other} share only ${gaps.length} hours from ${since} to ${until}`,
+    );
+  return median(gaps);
 }
 
 /**
