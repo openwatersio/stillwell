@@ -5391,13 +5391,13 @@ describe("refmar", () => {
     );
   });
 
-  it("flags Pointe-à-Pitre's values from 2020 to 2024 suspect", async () => {
+  it("flags Pointe-à-Pitre's values from 2023 to 2024 suspect", async () => {
     setTransport(async (url) => {
       const start = new URL(url).searchParams.get("dtStart")!;
-      if (start.startsWith("2019-12"))
-        return JSON.stringify({ data: [row(3, "2019/12/31 23:50:00")] });
-      if (start.startsWith("2020-01"))
-        return JSON.stringify({ data: [row(3, "2020/01/01 00:00:00")] });
+      if (start.startsWith("2022-12"))
+        return JSON.stringify({ data: [row(3, "2022/12/31 23:50:00")] });
+      if (start.startsWith("2023-01"))
+        return JSON.stringify({ data: [row(3, "2023/01/01 00:00:00")] });
       if (start.startsWith("2024-12"))
         return JSON.stringify({ data: [row(3, "2024/12/31 23:50:00")] });
       if (start.startsWith("2025-01"))
@@ -5414,28 +5414,28 @@ describe("refmar", () => {
       }) as unknown as Station;
     const flags = async (id: string, from: string, to: string) =>
       (await sources.refmar!.observations!(station(id), new Date(from), new Date(to))).map((v) => [
-        new Date(v.time).toISOString().slice(0, 4),
+        new Date(v.time).toISOString().slice(0, 10),
         v.flag,
       ]);
     const [, flagged] = await sources.refmar!.observations!(
       station("125"),
-      new Date("2019-12-01Z"),
-      new Date("2020-02-01Z"),
+      new Date("2022-12-01Z"),
+      new Date("2023-02-01Z"),
     );
     // SHOM's own flag stays as the source's.
     assert.equal(flagged!.source_flag, Flag.good);
-    assert.deepEqual(await flags("125", "2019-12-01Z", "2020-02-01Z"), [
-      ["2019", Flag.good],
-      ["2020", Flag.suspect],
+    assert.deepEqual(await flags("125", "2022-12-01Z", "2023-02-01Z"), [
+      ["2022-12-31", Flag.good],
+      ["2023-01-01", Flag.suspect],
     ]);
     assert.deepEqual(await flags("125", "2024-12-01Z", "2025-02-01Z"), [
-      ["2024", Flag.suspect],
-      ["2025", Flag.good],
+      ["2024-12-31", Flag.suspect],
+      ["2025-01-01", Flag.good],
     ]);
     // Other gauges keep SHOM's flag.
-    assert.deepEqual(await flags("126", "2019-12-01Z", "2020-02-01Z"), [
-      ["2019", Flag.good],
-      ["2020", Flag.good],
+    assert.deepEqual(await flags("126", "2022-12-01Z", "2023-02-01Z"), [
+      ["2022-12-31", Flag.good],
+      ["2023-01-01", Flag.good],
     ]);
   });
 
