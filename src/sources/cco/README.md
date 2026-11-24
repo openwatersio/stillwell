@@ -11,9 +11,7 @@ Tide levels every 10 minutes from the gauges of the National Network of Regional
 
 ## Known limits
 
-- **First days:** the store lacks up to a day at the start of Brighton's and Lymington's records (erratum `cco-empty-window-answers`).
 - **Older flags:** flags the observatory adds to years more than 12 months back reach the store only when those years are read again, so much of the archive stays `preliminary`.
-- **West Bay Harbour:** CMEMS's copy is 0.094 m lower than CCO's from mid-September 2024 to mid-November 2025, so one of the two has a step there, and no independent record shows which.
 - **Removed values:** where the check removes a reading's value, a refetch of that month drops the stored reading. A month with no values left keeps what the store held.
 
 ## Running ingest
@@ -24,12 +22,13 @@ Tide levels every 10 minutes from the gauges of the National Network of Regional
 
 ### Backfill
 
-A backfill is an Ingest run, started from Actions. On a store with no CCO list, dispatch Monthly with `sources: cco` first. The years before 2009 run by name, and Brighton's and Lymington's first years start the day after their first reading (erratum `cco-empty-window-answers`). A full backfill is about 11 million rows and takes about an hour:
+A backfill is an Ingest run, started from Actions. On a store with no CCO list, dispatch Monthly with `sources: cco` first. The archive starts in 1996 at Herne Bay, 2003 at Lymington and 2004 at Brighton, and a year before a gauge's first reading answers with no values, so each gauge's range starts at its first year. A full backfill is about 13 million rows and takes about an hour:
 
 ```bash
-node scripts/ingest.ts backfill cco 86,89,90,92,93,95,111 2005 2009 --skip-written --concurrency 1
-node scripts/ingest.ts backfill cco 88 2006-02-12 2009 --skip-written --concurrency 1
-node scripts/ingest.ts backfill cco 87 2009-02-13 2010 --skip-written --concurrency 1
+node scripts/ingest.ts backfill cco 89 1996 2009 --skip-written --concurrency 1
+node scripts/ingest.ts backfill cco 87 2003 2009 --skip-written --concurrency 1
+node scripts/ingest.ts backfill cco 88 2004 2009 --skip-written --concurrency 1
+node scripts/ingest.ts backfill cco 86,90,92,93,95,111 2005 2009 --skip-written --concurrency 1
 node scripts/ingest.ts backfill cco all 2009 2027 --skip-written --with-inactive --concurrency 1
 ```
 
