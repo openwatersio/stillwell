@@ -116,12 +116,16 @@ export const dayAfter = (day: string, n: number) =>
  * value stored before it was kept and already suspect has none; outside, such
  * a value doesn't count. A day with no levels, such as one in a gap or a
  * dropped span, isn't judged, and a station with none on all three fails.
- * `stations` defaults to every station the entry lists.
+ * `stations` defaults to every station the entry lists. Pass `outside: false`
+ * for a record whose values the day the span ends are suspect for a reason of
+ * their own, such as a datum jump GESLA's rule finds there; the day before the
+ * span is judged still.
  */
 export async function flaggedSpan(
   store: StoreReader,
   e: Pick<Erratum, "id" | "stations" | "since" | "until">,
   stations: string[] = e.stations ?? [],
+  { untilDay = true }: { untilDay?: boolean } = {},
 ): Promise<void> {
   if (!e.since && !e.until) throw new Error(`${e.id} has no span`);
   if (!stations.length) throw new Error(`${e.id} names no station to read`);
@@ -133,7 +137,9 @@ export async function flaggedSpan(
   const inside = [e.since, middle, e.until && dayAfter(e.until, -1)].filter(
     (d): d is string => !!d,
   );
-  const outside = [e.since && dayAfter(e.since, -1), e.until].filter((d): d is string => !!d);
+  const outside = [e.since && dayAfter(e.since, -1), untilDay ? e.until : null].filter(
+    (d): d is string => !!d,
+  );
   for (const station of stations) {
     let read = 0;
     for (const day of new Set(inside)) {

@@ -400,7 +400,15 @@ export default {
       evidence:
         "The 2021 to 2024 sensor 40 and 41 files, monthly medians, November 2026; the README's gauge history and calibration. GESLA's copy (`gesla/korotiti_bay-gbit-nzl-ttw`) holds the same values at all 2,795 times the two share, on 119 of the 150 days read in five 30-day pieces spread over the span's 1,137.",
       check: async (store, e) => {
-        await flaggedSpan(store, e);
+        await flaggedSpan(store, e, ["linz/GBIT"]);
+        // The new sensors' zero sits below the one before the span (`linz-korotiti-bay-step-2024`), so GESLA's datum-jump rule (`gesla-datum-jumps`) flags the copy's values from the day the span ends, which isn't judged as spill from the span.
+        const gesla = "gesla/korotiti_bay-gbit-nzl-ttw";
+        await flaggedSpan(store, e, [gesla], { untilDay: false });
+        const after = await store.levels(gesla, e.until!, dayAfter(e.until!, 1));
+        if (!after.length || after.some((o) => o.flag < Flag.suspect))
+          throw new Error(
+            `${gesla}'s levels on ${e.until} aren't all suspect, as the datum-jump rule flags them`,
+          );
         const s = await store.station("linz/GBIT");
         if (s?.datums && "CD" in s.datums)
           throw new Error("the store publishes GBIT's chart datum");
