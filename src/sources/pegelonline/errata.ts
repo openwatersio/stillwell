@@ -1,4 +1,5 @@
 import { dayAfter, flaggedSpan, impossibleDropped, type ErrataFile } from "../../errata.ts";
+import { Flag } from "../../schema.ts";
 import {
   differences,
   held,
@@ -382,6 +383,37 @@ export default {
           if (values.some((o) => o.time > from && o.time < to))
             throw new Error(`${station} holds values between 03:30 and 05:15 on ${day}`);
         }
+      },
+    },
+    {
+      id: "pegelonline-st-pauli-2026-11-09-dip",
+      stations: ["pegelonline/5952050", "cmems/StPauliTG"],
+      since: "2026-11-09",
+      until: "2026-11-10",
+      handling: "kept",
+      error:
+        "PEGELONLINE's REST API gives Hamburg St. Pauli 6.15 m above gauge zero at 04:10 UTC on 9 November 2026, 42 cm below the 6.59 and 6.55 m at 04:09 and 04:12, with 04:11 missing, on a tide falling about 1 cm a minute.",
+      response:
+        "The values are kept as served, and the spike rule flags the 6.15 m `suspect`. Errata spans are whole days, so flagging it here would mark about 1,400 good one-minute values suspect.",
+      evidence:
+        "In the store's 2026 file for the gauge, read on 24 November 2026. The CMEMS record, `cmems/StPauliTG`, holds the same level, 1.146 m above NHN, at 04:10, and CMEMS flags it `suspect` itself. It looks like the values taken from other minutes in erratum `cmems-st-pauli-wrong-minute`, which the WSV's live feed may produce; no HPA file covers these months to settle it.",
+      check: async (store, e) => {
+        const [station, day] = [e.stations![0]!, e.since!];
+        const values = await levels(store, station, day);
+        const at = (hhmm: string) =>
+          values.find((o) => o.time === Date.parse(`${day}T${hhmm}:00Z`));
+        // The spike rule needs neighbors on both sides to judge the value.
+        kept(values, station, `${day}T04:09Z`, 6.59);
+        kept(values, station, `${day}T04:12Z`, 6.55);
+        flaggedByQc(values, station, `${day}T04:10Z`, 6.15);
+        if (at("04:11")) throw new Error(`${station} holds a value at 04:11 on ${day}`);
+        const copy = (await levels(store, e.stations![1]!, day)).find(
+          (o) => o.time === Date.parse(`${day}T04:10:00Z`),
+        );
+        if (!copy || Math.abs(copy.level - 1.146) >= 0.005)
+          throw new Error(`${e.stations![1]} doesn't hold 1.146 m at 04:10 on ${day}`);
+        if (copy.flag < Flag.suspect)
+          throw new Error(`${e.stations![1]}'s 1.146 m at 04:10 on ${day} isn't flagged suspect`);
       },
     },
     {
