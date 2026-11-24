@@ -6,10 +6,10 @@ slackwater-database holds 4838 TICON records. 4838 are listed in its station fil
 
 | Status | Accepted | Accepted, in GESLA | All listed | Meaning |
 | --- | --- | --- | --- | --- |
-| ready | 1733 | 1540 | 3704 | An adapter exists and the record matched one of its stations |
+| ready | 1770 | 1577 | 3777 | An adapter exists and the record matched one of its stations |
 | planned | 0 | 0 | 0 | Cleared source, adapter in the plan |
 | to_match | 0 | 0 | 0 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
-| license | 182 | 182 | 302 | The source's terms need confirming first |
+| license | 145 | 145 | 229 | The source's terms need confirming first |
 | unmatched | 152 | 145 | 228 | An adapter exists, but no station matched, or two matched equally; check by hand |
 | restricted | 460 | 447 | 604 | The source forbids it; stays on TICON |
 
@@ -38,7 +38,7 @@ Accepted records only, in the order to build adapters: most records first.
 | ea | 46 | ready 46 | bodc, cmems |
 | dmi | 44 | ready 43, unmatched 1 | cmems, dmi |
 | sfwmd | 42 | ready 41, unmatched 1 | sfwmd |
-| ispra | 37 | license 37 | cmems, ispra |
+| ispra | 37 | ready 37 | cmems, ispra |
 | marine-institute | 31 | ready 19, unmatched 12 | cmems, mi_c, mi_r |
 | cdec | 24 | ready 17, unmatched 7 | cdwr |
 | unam | 22 | license 16, unmatched 1, restricted 5 | unam, unam_hist |
@@ -60,7 +60,7 @@ Accepted records only, in the order to build adapters: most records first.
 
 ## How records are matched
 
-- **Codes in the id.** TICON ids end in `<code>-<country>-<contributor>`. NOAA, USGS, REFMAR, Norwegian (`nhs`) and SMHI records carry the originator's station code, so they map to `coops`, `usgs` (with the leading zero TICON drops restored, to USGS's 8, 10 or 15 digits, or to 9 where USGS lists that site), `kartverket`, `refmar` and `smhi`. WSV and BfG records carry a PEGELONLINE number, used when a PEGELONLINE station with levels has it, retired or not.
+- **Codes in the id.** TICON ids end in `<code>-<country>-<contributor>`. ISPRA records name the gauge in the id, as GESLA's do, so they map to `ispra` by that name. NOAA, USGS, REFMAR, Norwegian (`nhs`) and SMHI records carry the originator's station code, so they map to `coops`, `usgs` (with the leading zero TICON drops restored, to USGS's 8, 10 or 15 digits, or to 9 where USGS lists that site), `kartverket`, `refmar` and `smhi`. WSV and BfG records carry a PEGELONLINE number, used when a PEGELONLINE station with levels has it, retired or not.
 - **Declared provenance.** UHSLC and JODC records use slackwater-database's [`sources/ticon/provenance.ts`](https://github.com/openwatersio/slackwater-database/blob/main/sources/ticon/provenance.ts), so a relay of a NOAA, Kartverket or JMA gauge goes to that originator, as slackwater-database already treats it. Other UHSLC records go to UHSLC itself, and other JODC records to JODC by the code in their id: the JHOD station numbers some declare aren't JODC's codes.
 - **Position.** RWS records, WSV and BfG records without a PEGELONLINE number, Marine Institute coastal (`mi_c`) records, and CMEMS records in countries whose feed has a list in the store (France's once REFMAR's is there) match a station with levels, retired or not: one within 50 m outright, else the best name match within 5 km (counting shared words, including ones like "buiten" that separate an outer harbor from an inner one, or a short name all of whose words the station's has, such as "Hov" in "Hov Havn I"), else the nearest within 1 km. Two equally good stations more than 100 m apart leave the record unmatched, unless the source's `same_as` names them as one gauge, as the EA does an mAOD series and the chart datum series it replaced; then the active one is matched, even where the retired one is within 50 m. Never by name alone, since RWS and CMEMS spell places differently. A CMEMS record linked to a station of its national feed (`LINKS` in [`src/same-as.ts`](../src/same-as.ts), or a link in the published `stations.parquet`, such as one by levels) matches that station wherever CMEMS places it, or stays `to_match` if it isn't a station with levels; the UK's match the EA first.
 - **Same station.** A record still unmatched takes the match of another record in its slackwater-database station file, since slackwater-database merges records only when they're the same gauge.
