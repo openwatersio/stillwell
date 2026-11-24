@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import { fetchText, setTransport } from "../src/http.ts";
 import { Flag } from "../src/schema.ts";
+import { tallying } from "../src/span.ts";
 import * as cco from "../src/sources/cco/index.ts";
 
 // The fixtures are responses recorded from the API on 2026-11-16, trimmed to a
@@ -180,6 +181,43 @@ describe("cco", () => {
       ],
     );
     assert.ok(out.every((o) => o.level === 1.5));
+  });
+
+  it("counts the fill values outside the span that it leaves out", async () => {
+    const reading = (n: number, value: string) => ({
+      properties: {
+        id: "90",
+        date: `20261114#00${String(n * 2).padStart(2, "0")}00`,
+        value,
+        QCflag: "1",
+      },
+    });
+    serve([
+      [
+        /tides\//,
+        JSON.stringify({
+          features: [
+            reading(0, "1.5"),
+            reading(1, "9999"),
+            reading(2, "-999.9999"),
+            reading(3, "99.999"),
+          ],
+        }),
+      ],
+    ]);
+    const { result, dropped } = await tallying(() =>
+      cco.levels("90", new Date("2026-11-14T00:00:00Z"), new Date("2026-11-14T02:00:00Z")),
+    );
+    assert.equal(result.length, 1);
+    // 99.999 is inside the span, so only its erratum leaves it out, uncounted.
+    assert.equal(dropped.count, 2);
+    assert.equal(dropped.above, 1);
+    assert.equal(dropped.below, 1);
+    // A reading outside the window, or one two requests brought, isn't counted again.
+    const clipped = await tallying(() =>
+      cco.levels("90", new Date("2026-11-14T00:02:00Z"), new Date("2026-11-14T00:04:00Z")),
+    );
+    assert.equal(clipped.dropped.count, 1);
   });
 
   it("sends one request at a time, however many sites are read at once", async () => {

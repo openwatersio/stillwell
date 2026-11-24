@@ -926,11 +926,7 @@ export function formatSummary(s: RunSummary, listed = 20): string {
     "| -: | -: | -: | -: | -: | -: |",
     `| ${s.stations} | ${s.updated} | ${s.stale.length} | ${s.failed.length} | ${s.values} | ${s.files} |`,
   ];
-  if (s.dropped?.count)
-    lines.push(
-      "",
-      `Left out ${s.dropped.describe()}.${s.title.startsWith("poll") ? "" : " Stored years that held some were rewritten, so run `compact <source> --rebuild-bounds` and `publish`."}`,
-    );
+  if (s.dropped?.count) lines.push("", `Left out ${s.dropped.describe()}.`);
   const phases = Object.entries(s.seconds ?? {});
   if (phases.length) {
     lines.push("", "| Phase | Seconds |", "| - | -: |");
