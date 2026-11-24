@@ -336,6 +336,34 @@ export default {
         }
       },
     },
+    {
+      id: "cmems-emden-2025-07-whole-centimeters",
+      stations: ["cmems/EmdenTG", "gesla/emdentg-emd-deu-cmems"],
+      since: "2025-07-01",
+      handling: "kept",
+      error:
+        "CMEMS's Emden levels are whole centimeters from 00:00 UTC on 1 July 2025; the 10-minute values before it have millimeters. The gauge itself reports whole centimeters.",
+      response:
+        "The store keeps CMEMS's values as served. The adapter reads each value as it is and doesn't round, so the whole centimeters come from CMEMS's files. GESLA's copy of the record holds the same values.",
+      evidence:
+        "Every one of `cmems/EmdenTG`'s levels from 2025-07-01 is a whole centimeter, and none before is, to 2025-06-30 23:50 UTC. Before July 2025, each level is PEGELONLINE's Emden Neue Seeschleuse level (`pegelonline/3970010`, whole centimeters in its own PNP datum) less 5.011 m, at all 21,768 times the two share; from July 2025 it is less 5.01 m at 60,755 of 65,724 shared times and less 5.02 m at 3,739 more, and the other 1,230 differ by other amounts, so CMEMS's values aren't PEGELONLINE's value for value. GESLA's copy (`gesla/emdentg-emd-deu-cmems`) holds `cmems/EmdenTG`'s value at all 47,996 times it has from 2025-07-01 to its end on 2026-05-31. PEGELONLINE's own values are whole centimeters throughout, so the change is in how CMEMS's source offsets the series, not in the gauge.",
+      check: async (store, e) => {
+        const whole = (o: { level: number }) =>
+          Math.abs(o.level * 100 - Math.round(o.level * 100)) < 1e-4;
+        for (const id of e.stations!)
+          for (const day of [e.since!, "2025-12-15", "2026-03-01"]) {
+            const rows = await levels(store, id, day);
+            const fine = rows.filter((o) => !whole(o));
+            if (fine.length)
+              throw new Error(
+                `${fine.length} of ${rows.length} ${id} levels on ${day} aren't whole centimeters`,
+              );
+          }
+        const before = await levels(store, e.stations![0]!, dayAfter(e.since!, -1));
+        if (before.every(whole))
+          throw new Error("Emden's levels on 2025-06-30 are whole centimeters, not millimeters");
+      },
+    },
   ],
   retired: [],
 } satisfies ErrataFile;
