@@ -345,11 +345,12 @@ export default {
       error:
         "CMEMS's West Bay Harbour record reads about 0.093 m lower than the Channel Coastal Observatory's (`cco/95`) from 24 September 2024 to 13:00 UTC on 5 November 2025, and equals it to 0.0 m before and after. GESLA's copy of the CMEMS record carries the same values.",
       response:
-        "24 September 2024 to 5 November 2025 is flagged `suspect`, keeping each record's own flag as `source_flag`. The Observatory's record, which has no step, is the one to use.",
+        "24 September 2024 to 5 November 2025 is flagged `suspect`, keeping each record's own flag as `source_flag`. Errata spans are whole days, so the 11 matching hours after the step ends on 5 November are flagged too. The Observatory's record, which has no step, is the one to use.",
       evidence:
-        "In the store, checked in November 2026: at the 58,227 times the two records share in that span they differ by a median of 0.093 m (CMEMS lower), and at every shared time before and after by 0.0 m. Weymouth, 25 km east and a different gauge, has CMEMS's West Bay Harbour 1.46 m below the Observatory's in August 2024 and 1.36 to 1.39 m in every month from October 2024 to October 2025, then 1.48 m in December 2025, while the Observatory's record keeps 1.46 to 1.49 m in all of them. The step is in the CMEMS record, not the Observatory's, which has no step at either end. The start falls in a gap in the CMEMS record from 20 to 24 September 2024; the end is within 10 minutes, at 13:10 UTC on 5 November 2025. Why CMEMS's values differ isn't known.",
+        "In the store, checked in November 2026: at the 58,227 times the two records share in that span they differ by a median of 0.093 m (CMEMS lower), and at every shared time before and after by 0.0 m. Against Weymouth, a different gauge 25 km east, CMEMS's West Bay Harbour reads 1.46 m above it in August 2024, 1.36 to 1.39 m above in every month from October 2024 to October 2025, and 1.48 m above in December 2025, while the Observatory's West Bay Harbour reads 1.46 to 1.49 m above it in all of them. The step is in the CMEMS record, not the Observatory's, which has no step at either end. The start falls in a gap in the CMEMS record from 20 to 24 September 2024; the last offset reading is at 13:00 UTC on 5 November 2025 and the first matching one at 13:10. Why CMEMS's values differ isn't known.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
+        for (const id of e.stations!) await allSuspect(store, id, e.since!, e.until!);
         // The step stays in the stored records; a refetch that removes it means the entry needs looking at again.
         const day = "2025-03-01";
         const cco = await levels(store, "cco/95", day);
