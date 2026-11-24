@@ -66,28 +66,26 @@ export default {
       error:
         "From 22 October 2012 to the record's end on 15 May 2013, RWS's Petten meetraai 03 series holds exactly 0.00 m NAP for hours at a time through high and low water, a fill value rather than the sea. GESLA's copy of the series carries the same values.",
       response:
-        "22 October 2012 to 15 May 2013 is flagged `suspect`, keeping each record's own flag as `source_flag`. Of the span's 22,018 values, 427 sit in the 50 runs of 0.00 m lasting an hour or more, and the rest is sound tide, but the fill comes and goes within hours, so only the whole span covers it.",
+        "22 October 2012 to 15 May 2013 is flagged `suspect`, keeping the source flag as `source_flag`. Of the span's 22,018 values, 1,116 are 0.00 m, 1,026 of them from 22 October to 13 November 2012 and from 1 April to 3 May 2013. The held values come and go among gaps and sound tide, so only the whole span covers them.",
       evidence:
-        "Found from the station's analysis: the held values counted as drains and judged it not tidal. 0.00 m NAP is about mid-tide at Petten, where the tide runs from about −1.3 to 1.2 m (the 1st and 99th percentiles of the levels from 1 January to 21 October 2012). Counted in the store's 2012 and 2013 levels files for `rws/petten.meetraai3`, which hold 10-minute values: from 22 October 2012 to 3 May 2013 the series jumps from the tide to exactly 0.00 m and holds it in 50 runs of an hour or more, 4 of them 6 hours or more, through high and low water. The span holds 1,116 values of 0.00 m, 427 of them in those runs. From 2005 to 2011, 0.00 m appears 96 to 148 times a year as the tide passes through it, and twice in a row 0 to 9 times a year. GESLA's copy (`gesla/petten_meetraai_03-pet-nld-rws`) holds 1,113 values of 0.00 m in the span, 451 of them in 48 runs of an hour or more, 8 of them 6 hours or more. It holds 19,051 values in the span against RWS's 22,018, so its runs break differently.",
+        "Found from the station's analysis: the held values counted as drains and judged it not tidal. 0.00 m NAP is about mid-tide at Petten, where the tide runs from about −1.3 to 1.2 m (the 1st and 99th percentiles of the levels from 1 January to 21 October 2012). Counted in the store's 2012 and 2013 levels files for `rws/petten.meetraai3`, which hold 10-minute values with gaps: 33 days in the span hold 15 to 58 values of 0.00 m, between 22 October and 13 November 2012 and between 15 April and 3 May 2013, and the longest unbroken run is 32 values (5 hours 20 minutes), on 15 and 16 April 2013. From 1 December 2012 to 31 March 2013 the span holds 81 values of 0.00 m. From 2005 to 2011, 0.00 m appears 96 to 148 times a year as the tide passes through it, never more than 6 times a day. GESLA's copy (`gesla/petten_meetraai_03-pet-nld-rws`) holds the same 33 days, with 1,113 values of 0.00 m in the span and 19,051 values against RWS's 22,018.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         const rows = await store.levels(e.stations![0]!, e.since!, e.until!);
         const not = rows.filter((o) => o.flag < Flag.suspect);
         if (not.length)
           throw new Error(`${not.length} Petten values in the span aren't flagged suspect`);
-        // Runs of 0.00 m lasting an hour or more.
-        let runs = 0;
-        let start: number | null = null;
-        for (const [i, o] of rows.entries()) {
-          if (o.level === 0) start ??= o.time;
-          else if (start !== null) {
-            if (rows[i - 1]!.time - start >= 3_600_000) runs++;
-            start = null;
+        // Days that hold 15 or more values of exactly 0.00 m.
+        const zeros = new Map<string, number>();
+        for (const o of rows)
+          if (o.level === 0) {
+            const day = new Date(o.time).toISOString().slice(0, 10);
+            zeros.set(day, (zeros.get(day) ?? 0) + 1);
           }
-        }
-        if (runs < 40)
+        const held = [...zeros.values()].filter((n) => n >= 15).length;
+        if (held < 25)
           throw new Error(
-            `Petten holds 0.00 m for an hour or more ${runs} times in the span, not about 50`,
+            `Petten holds 15 or more values of 0.00 m on ${held} days of the span, not about 33`,
           );
       },
     },
