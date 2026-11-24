@@ -37,6 +37,10 @@ export async function planFor(
     return runs;
   }
   if (job === "lists") return [];
-  // Each station from its earliest preliminary value, from January REFETCH_YEARS back, to this month.
+  return defaultRefetch(today);
+}
+
+/** Each station from its earliest preliminary value, from January REFETCH_YEARS back, to this month. */
+export function defaultRefetch(today: Date): string[][] {
   return [["preliminary", `${yearOf(today) - REFETCH_YEARS}`, firstOfMonth(today)]];
 }
