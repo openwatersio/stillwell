@@ -12,6 +12,7 @@ import {
 } from "../../schema.ts";
 import { describedDatums, type DatumNote } from "./described.ts";
 import { ZERO_SINCE } from "./zeros.ts";
+import { POSITIONS } from "../../positions.ts";
 
 /**
  * US Army Corps of Engineers river stage, from the Corps Water Management
@@ -201,11 +202,12 @@ export function toStations(
     const location = byName.get(name);
     if (!location) continue;
     const id = idOf(office, name);
-    if (!placed(location)) {
+    // A position `POSITIONS` moves is let through, for the refresh to move.
+    if (!placed(location) && !POSITIONS[`usace/${id}`]) {
       // A listed station that loses its position would otherwise be retired by the next refresh.
-      if (committed.has(`usace/${id}`))
+      if (committed.has(`usace/${id}`) && !RETIRED.has(`usace/${id}`))
         throw new Error(
-          `CWMS now places usace/${id} at ${location.latitude}, ${location.longitude}, which isn't in the contiguous US`,
+          `CWMS now places usace/${id} at ${location.latitude}, ${location.longitude}, which isn't in the contiguous US; settle it with a POSITIONS entry (src/positions.ts) for where it is, or with RETIRED (src/sources/usace/index.ts) to let the refresh retire it`,
         );
       continue;
     }
@@ -242,6 +244,13 @@ export function toStations(
   }
   return [...out.values()];
 }
+
+/**
+ * Listed stations whose location CWMS now places outside the contiguous US,
+ * which the refresh retires, rather than fail, once a person has decided they
+ * are gone. Their IDs, as `usace/<office>.<location>`.
+ */
+export const RETIRED = new Set<string>();
 
 const GROUNDWATER = /piezometer|-OW\d+[A-Z]?$/i;
 

@@ -210,6 +210,21 @@ export const POSITIONS: Record<string, { served: Position; at: Position }> = {
     served: { lat: 36.217654520392, lon: -86.820220686694 },
     at: { lat: 36.0942596, lon: -86.7938782 },
   },
+  // CWMS drops the longitude's sign at three locations, which puts them in Asia.
+  // USGS's gauges at the same places confirm the positions: erratum
+  // `usace-longitude-sign`.
+  "usace/MVK.Pine_Bluff": {
+    served: { lat: 34.29028, lon: 91.99556 },
+    at: { lat: 34.29027778, lon: -91.9955556 },
+  },
+  "usace/LRL.BuckCreek": {
+    served: { lat: 39.951388888889, lon: 83.754166666667 },
+    at: { lat: 39.951449, lon: -83.7540936 },
+  },
+  "usace/LRH.PleasantHill-Outflow": {
+    served: { lat: 40.620518, lon: 82.323769 },
+    at: { lat: 40.6203379, lon: -82.3243284 },
+  },
   // BODC's ERDDAP places Workington's gauge at St Ives in Cornwall, though its
   // levels match the EA's Workington readings exactly, and gives Immingham and
   // Newhaven -999. Each goes where the EA's list puts the same gauge: erratum
