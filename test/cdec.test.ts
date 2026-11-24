@@ -273,14 +273,122 @@ describe("cdec", () => {
       level: 1.274,
       flag: Flag.preliminary,
     });
-    // CDEC's 00:45 on the day daylight saving ends is dropped; its 01:00 hour is standard time.
+    // The level drops 1.25 ft from 00:30 to 00:45 on the day daylight saving ends, the hour the clock's
+    // switch skips, so 00:45 is standard time; the hour from 01:00 is standard time too.
     const times = levels.map((l) => iso(l.time));
     assert.ok(!times.includes("2025-11-02T07:45:00.000Z"));
     assert.ok(times.includes("2025-11-02T07:30:00.000Z"));
+    assert.ok(times.includes("2025-11-02T08:45:00.000Z"));
     assert.ok(times.includes("2025-11-02T09:00:00.000Z"));
     assert.ok(levels.every((l, i) => i === 0 || l.time > levels[i - 1]!.time));
-    // 193 rows, 1 November 00:00 to 3 November 00:00, less that 00:45 and the last, at the range end.
-    assert.equal(levels.length, 191);
+    // 193 rows, 1 November 00:00 to 3 November 00:00, less the last, at the range end.
+    assert.equal(levels.length, 192);
+  });
+
+  describe("the day daylight saving ends", () => {
+    /** CSV rows for 2 November 2025, 00:00 to 02:00, at the given feet by stamp. */
+    /** A reply covering the day to 01:45 (`reach`), its last level held to there unless it ends early. */
+    const day = (feet: Record<string, number>, reach = true) =>
+      [
+        "STATION_ID,DURATION,SENSOR_NUMBER,SENSOR_TYPE,DATE TIME,OBS DATE,VALUE,DATA_FLAG,UNITS",
+        ...Object.entries({
+          ...(reach
+            ? { "0130": Object.values(feet).at(-1)!, "0145": Object.values(feet).at(-1)! }
+            : {}),
+          ...feet,
+        })
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([hhmm, v]) => `MRZ,E,1,STAGE,20251102 ${hhmm},20251102 ${hhmm},${v}, ,FEET`),
+      ].join("\n");
+    const times = (csv: string) => cdec.parse(csv, "MRZ").map((l) => iso(l.time));
+    const flat = { "0000": 4, "0015": 4.1, "0030": 4.2, "0045": 4.3, "0100": 4.4, "0115": 4.5 };
+
+    it("reads the stamps after the jump as standard time, and the ones before as daylight time", () => {
+      // The skipped hour shows between 00:15 and 00:30.
+      const early = times(day({ ...flat, "0030": 2.5, "0045": 2.4, "0100": 2.3, "0115": 2.2 }));
+      assert.ok(early.includes("2025-11-02T07:15:00.000Z"));
+      assert.ok(early.includes("2025-11-02T08:30:00.000Z"));
+      assert.ok(early.includes("2025-11-02T08:45:00.000Z"));
+      assert.ok(!early.includes("2025-11-02T07:30:00.000Z"));
+      // Between 00:30 and 00:45.
+      const middle = times(day({ ...flat, "0045": 2.5, "0100": 2.4, "0115": 2.3 }));
+      assert.ok(middle.includes("2025-11-02T07:30:00.000Z"));
+      assert.ok(middle.includes("2025-11-02T08:45:00.000Z"));
+      assert.ok(!middle.includes("2025-11-02T07:45:00.000Z"));
+      // Between 00:45 and 01:00, where every 00:xx stamp is daylight time.
+      const late = times(day({ ...flat, "0100": 2.5, "0115": 2.4 }));
+      assert.ok(late.includes("2025-11-02T07:45:00.000Z"));
+      assert.ok(late.includes("2025-11-02T09:00:00.000Z"));
+      assert.ok(!late.includes("2025-11-02T08:45:00.000Z"));
+    });
+
+    it("drops the stamps the switch could fall on where no jump stands out", () => {
+      const got = times(day(flat));
+      assert.deepEqual(
+        got,
+        ["07:00", "07:15", "09:00", "09:15", "09:30", "09:45"].map(
+          (t) => `2025-11-02T${t}:00.000Z`,
+        ),
+      );
+      // Two jumps of alike size (a tide moving fast) don't say either.
+      const two = times(day({ "0000": 4, "0015": 3.5, "0030": 4.2, "0045": 3.6, "0100": 4.1 }));
+      assert.ok(
+        !two.includes("2025-11-02T07:30:00.000Z") && !two.includes("2025-11-02T08:45:00.000Z"),
+      );
+    });
+
+    it("leaves a placeholder out of the search for the jump", () => {
+      // The −7,999 ft at 01:30 is dropped through the registry, and doesn't hide the switch at 00:45.
+      const got = times(
+        day({ ...flat, "0045": 2.5, "0100": 2.4, "0115": 2.3, "0130": -7999, "0145": 2.2 }),
+      );
+      assert.ok(got.includes("2025-11-02T08:45:00.000Z"));
+      assert.ok(!got.includes("2025-11-02T07:45:00.000Z"));
+      // One at 00:30 leaves a 30-minute step, which decides nothing.
+      const gap = times(day({ ...flat, "0030": -7999, "0045": 2.5, "0100": 2.4, "0115": 2.3 }));
+      assert.ok(!gap.includes("2025-11-02T08:45:00.000Z"));
+    });
+
+    it("decides nothing where a stamp is missing or the reply covers part of the hour", () => {
+      const drops = (got: string[]) =>
+        !got.includes("2025-11-02T07:45:00.000Z") && !got.includes("2025-11-02T08:45:00.000Z");
+      // 00:30 is missing, so the 00:15 to 00:45 step spans two.
+      assert.ok(
+        drops(times(day({ "0000": 4, "0015": 4.1, "0045": 2.5, "0100": 2.4, "0115": 2.3 }))),
+      );
+      // A reply that ends before 01:00, as a live poll's can, or starts after 00:15.
+      assert.ok(
+        drops(times(day({ "0000": 4, "0015": 4.1, "0030": 4.2, "0045": 2.5, "0100": 2.4 }, false))),
+      );
+      assert.ok(drops(times(day({ "0030": 4.2, "0045": 2.5, "0100": 2.4, "0115": 2.3 }))));
+      // A repeated stamp counts once, the last.
+      const repeated = day({ ...flat, "0045": 2.5, "0100": 2.4, "0115": 2.3 }).replace(
+        "MRZ,E,1,STAGE,20251102 0030,20251102 0030,4.2, ,FEET",
+        "MRZ,E,1,STAGE,20251102 0030,20251102 0030,9, ,FEET\nMRZ,E,1,STAGE,20251102 0030,20251102 0030,4.2, ,FEET",
+      );
+      assert.ok(times(repeated).includes("2025-11-02T08:45:00.000Z"));
+    });
+
+    it("reads a jump of exactly 0.2 ft whichever the level", () => {
+      for (const base of [4, 2.1]) {
+        const got = times(
+          day({
+            "0000": base,
+            "0015": base,
+            "0030": base,
+            "0045": base + 0.2,
+            "0100": base + 0.2,
+            "0115": base + 0.2,
+          }),
+        );
+        assert.ok(got.includes("2025-11-02T08:45:00.000Z"), `at ${base} ft`);
+      }
+    });
+
+    it("leaves other days alone", () => {
+      const csv = day({ "0030": 4, "0045": 2 }, false).replaceAll("20251102", "20251101");
+      assert.equal(cdec.parse(csv, "MRZ").length, 2);
+    });
   });
 
   it("drops CDEC's −7,999 ft placeholder through the registry, not in the adapter", async () => {

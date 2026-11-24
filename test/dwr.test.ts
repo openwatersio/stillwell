@@ -49,6 +49,22 @@ describe("dwr", () => {
     mock.timers.reset();
   });
 
+  it("converts the NAD27 positions WDL lists, and refuses any other", () => {
+    assert.deepEqual(
+      dwr.inNad83("B95270", 37.890297, -121.569892, "NAD27"),
+      [37.890224, -121.570955],
+    );
+    assert.deepEqual(
+      dwr.inNad83("E33510", 38.07972222, -122.10444444, "NAD27"),
+      [38.079644, -122.105521],
+    );
+    // A cleared datum doesn't leave the NAD27 numbers as NAD83.
+    assert.deepEqual(dwr.inNad83("B91110", 38.07361111, -121.855, ""), [38.073533, -121.85607]);
+    assert.deepEqual(dwr.inNad83("B95050Q", 38.0656, -121.6479, "NAD83"), [38.0656, -121.6479]);
+    assert.throws(() => dwr.inNad83("B95270", 37.891, -121.5699, "NAD27"), /isn't converted/);
+    assert.throws(() => dwr.inNad83("B99999", 38, -121, "NAD 27"), /isn't converted/);
+  });
+
   it("lists TICON's stations with a raw level file, NAVD88 where there is one", async () => {
     serve([
       [/stations\.csv$/, () => fixture("dwr-stations.csv")],
@@ -88,6 +104,10 @@ describe("dwr", () => {
         ["dwr/B95325", "GZ", "StreamLevel", "active", "1998-10-01T08:00:00.000Z", null],
       ],
     );
+    // WDL lists Collinsville in NAD27; it's placed in NAD83, about 94 m west.
+    const collinsville = stations.find((s) => s.id === "dwr/B91110")!;
+    assert.equal(collinsville.lat, 38.073533);
+    assert.equal(collinsville.lon, -121.85607);
     const fc = stations.find((s) => s.id === "dwr/B95050Q")!;
     assert.equal(fc.name, "Fisherman's Cut");
     assert.equal(fc.lat, 38.0656);
