@@ -199,10 +199,18 @@ export function toStations(
     a < b ? -1 : a > b ? 1 : 0,
   )) {
     const location = byName.get(name);
-    if (!location || !placed(location)) continue;
+    if (!location) continue;
+    const id = idOf(office, name);
+    if (!placed(location)) {
+      // A listed station that loses its position would otherwise be retired by the next refresh.
+      if (committed.has(`usace/${id}`))
+        throw new Error(
+          `CWMS now places usace/${id} at ${location.latitude}, ${location.longitude}, which isn't in the contiguous US`,
+        );
+      continue;
+    }
     // Piezometers and observation wells read groundwater in a dam's foundation, not a water surface.
     if (GROUNDWATER.test(name)) continue;
-    const id = idOf(office, name);
     // A listed station's ID belongs to the location its series is at, so
     // it's never handed to another location that now maps to the same ID. If
     // that location is gone, the station goes unlisted, and so inactive.

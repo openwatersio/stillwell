@@ -2798,6 +2798,35 @@ describe("usace", () => {
     assert.deepEqual(pool({}), []);
     assert.deepEqual(pool({ latitude: 9.09, longitude: 9.09 }), []);
     assert.deepEqual(pool({ latitude: 34.29, longitude: 91.996 }), []);
+    // A listed station that loses its position stops the refresh rather than retire.
+    assert.throws(
+      () =>
+        usace.toStations(
+          "LRC",
+          [
+            series(
+              "Chicago Lock-Pool.Stage.Inst.1Hour.0.USGS-raw",
+              "1Hour",
+              "2021-03-19T16:00:00Z",
+              "2026-09-14T03:00:00Z",
+            ),
+          ],
+          [
+            {
+              office: "LRC",
+              name: "Chicago Lock-Pool",
+              nation: "United States",
+              latitude: 0,
+              longitude: 0,
+            },
+          ],
+          new Map([
+            ["usace/LRC.Chicago_Lock-Pool", "Chicago Lock-Pool.Stage.Inst.1Hour.0.USGS-raw"],
+          ]),
+          now,
+        ),
+      /places usace\/LRC.Chicago_Lock-Pool at 0, 0/,
+    );
     assert.deepEqual(pool({ "published-latitude": 0, "published-longitude": 0 }), []);
     assert.deepEqual(
       pool({
