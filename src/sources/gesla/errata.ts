@@ -1030,34 +1030,6 @@ export default {
       check: (store, e) => dropped(store, station(e), 2015, "gesla/arko-2545-swe-smhi"),
     },
     {
-      id: "gesla-st-pauli-wrong-minute",
-      stations: ["gesla/stpaulitg-stp-deu-cmems"],
-      since: "2025-03-01",
-      until: "2026-06-01",
-      handling: "kept",
-      error:
-        "From March 2025, GESLA 4.1's St. Pauli record (from CMEMS) has about 16% of its 10-minute values taken from a different minute than its timestamp says. Most are 1 or 2 cm off, but some are up to 42 cm off at mid-tide. GESLA flags all of them as correct and usable.",
-      response:
-        "The store keeps the values as GESLA serves them. The group's preferred station is `pegelonline/5952050`, which takes its history from HPA's own archive on kuestendaten.de, and that archive has the right values.",
-      evidence:
-        "I compared GESLA's record (`stpaulitg-stp-deu-cmems`, created 2026-07-19) with HPA's 1-minute file for gauge 5952050 from kuestendaten.de (downloaded 2026-11-09, shifted from UTC+1 to UTC).\n\n- From 1999-11-01 to 2025-02-28, every one of about 1.3 million shared 10-minute times differs by exactly 5.004 m, which is the gauge zero's offset to NHN. That holds for all 12,954 times in December 2024 to February 2025 too.\n- From 2025-03-01 03:40 to the end of the record on 2026-05-31, 12,838 of 65,622 shared times differ. Of those, 10,207 are off by 1 cm, 1,991 by 2 cm, 640 by 3 to 9 cm and 101 by more than 5 cm, up to 42 cm. Every month from March 2025 to May 2026 has between 759 and 931.\n- At 11,803 of the 12,838, GESLA's value equals HPA's value from a minute within 10 minutes of the stated time, most often 1 minute before or after. The large differences come from minutes 5 to 29 away, on the steep part of the tide. 5,495 are single points with both 10-minute neighbors matching HPA exactly.\n- HPA's series is smooth around these times. Its largest 1-minute step near the 101 large differences is 3 cm. Against Seemannshöft and Blankenese, two HPA gauges downstream, HPA's St. Pauli value is the one that fits the local difference between the gauges at 100 of the 101 large differences. The median departure is 1 cm for HPA and 6 cm for GESLA.\n- Example (UTC, meters above gauge zero): on 2025-05-14 06:10, HPA has 6.12 and GESLA 5.82. Seemannshöft has 6.04, and both copies have 6.29 at 06:00 and 5.98 at 06:20.\n\nThere's no third copy to compare with. PEGELONLINE's REST API keeps 31 days, and BSH's `508P` holds predictions only.",
-      // Kept as served: 2025-05-14 06:10 holds a value from another minute, 16 cm below the next on a falling tide (HPA has it 14 cm above).
-      check: async (store, e) => {
-        const rows = await levels(store, station(e), "2025-05-14", "2025-05-15");
-        const at = (hhmm: string) =>
-          rows.find((o) => o.time === Date.parse(`2025-05-14T${hhmm}:00Z`))?.level;
-        const [before, wrong, after] = [at("06:00"), at("06:10"), at("06:20")];
-        if (before === undefined || wrong === undefined || after === undefined)
-          throw new Error(
-            "the store holds no St. Pauli value at 06:00, 06:10 or 06:20 on 2025-05-14",
-          );
-        if (!(wrong < after - 0.1 && after < before))
-          throw new Error(
-            `St. Pauli reads ${before}, ${wrong} and ${after} m at 06:00, 06:10 and 06:20 on 2025-05-14, not GESLA's dip`,
-          );
-      },
-    },
-    {
       id: "gesla-usgs-nj-2003-daylight-time",
       stations: [
         "gesla/absecon_creek_at_absecon_nj-1410510-usa-usgs",
@@ -1531,6 +1503,7 @@ export default {
     },
   ],
   retired: [
+    "gesla-st-pauli-wrong-minute",
     "gesla-kilrush-2025-01-09-offset",
     "gesla-eemshaven-waddenzee-2016-offset",
     "gesla-buesum-cmems-spikes",
