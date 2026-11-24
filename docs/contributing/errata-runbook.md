@@ -7,7 +7,7 @@ An agent follows this runbook on a schedule, after each full Monthly run and the
 - Read the public store, the repository, workflow runs and their artifacts, and GitHub issues and pull requests.
 - Change errata files, the code that handles an erratum, [`src/cross-check-reviewed.ts`](../../src/cross-check-reviewed.ts), migrations and docs on a branch of its own, and open a pull request for each change. A pull request that writes to the store has a migration ([Migrations](operations.md#migrations)).
 - Run [openwaters-review](https://github.com/openwatersio/.github/tree/main/skills/openwaters-review) before each pull request is first pushed, and handle the review threads of GitHub Copilot on it.
-- Draft reports to agencies with `npm run errata`.
+- Draft reports and questions to agencies with `npm run errata`.
 
 ## What it never does
 
@@ -80,7 +80,7 @@ A copy of a record that `same_as` doesn't link isn't compared; check any the evi
 
 ## Reports to agencies
 
-Run `npm run errata` and put the drafts for entries not yet reported in the pull request's description, for a maintainer to approve and send.
+Run `npm run errata` and put the drafts for errata not yet reported and questions not yet asked in the pull request's description, for a maintainer to approve and send when it merges. Before sending, the maintainer drafts the message again with `npm run errata -- <source>` on `main`, so an entry another pull request's message already sent isn't sent twice. A question for an agency that isn't an error goes in the source's `questions` ([Source errata](sources.md#source-errata)), never in a message of its own, and no work waits on its answer: record what the store does meanwhile and carry on.
 
 ## Pull requests
 

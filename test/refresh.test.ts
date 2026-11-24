@@ -690,8 +690,16 @@ describe("publishStations", () => {
     ];
     // As publish passes only the store's own sources, a restricted one isn't among them.
     const other: Source = { ...sourceOf([]), metadata: { ...metadata, id: "other" } };
-    const result = await publishStations(store, [sourceOf([]), other], ["test"], errata);
-    assert.deepEqual("count" in result && result.unknownErrata, ["test-a test/gone"]);
+    // A question's stations are checked the same way, though questions aren't published.
+    const questions = [
+      { id: "test-q", stations: ["test/a", "test/typo"] },
+      { id: "test-all", stations: null },
+    ];
+    const result = await publishStations(store, [sourceOf([]), other], ["test"], errata, questions);
+    assert.deepEqual("count" in result && result.unknownErrata, [
+      "test-a test/gone",
+      "test-q test/typo",
+    ]);
     const db = await (await DuckDBInstance.create(":memory:")).connect();
     const rows = (
       await db.runAndReadAll(`SELECT id, errata FROM '${stationsPath(store)}' ORDER BY id`)
