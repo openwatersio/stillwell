@@ -30,7 +30,7 @@ Compaction folds them into the year files, and the site's level chart and source
 ## The cron
 
 - **Every minute** it asks the container's `/health`, which starts it if it isn't running. Cloudflare doesn't promise a container a run time, so one that stopped is back within a minute, and its first passes catch up 12 hours.
-- **At 30 past each hour** it opens an issue titled "Live polling is failing for <source>" for each source with live values or a pass in the last week but no clean pass in 2 hours, and "The live poller has stopped" when no pass has finished in 2 hours, and closes each once that's no longer so.
+- **At 30 past each hour** it opens an issue titled "Live polling is failing for <source>" for each source with live values or a pass in the last week but no clean pass in 2 hours, and "The live poller has stopped" when no pass has finished in 2 hours, and closes each once that's no longer so, carrying on past a GitHub call that fails or stalls for one of them.
 - **At 03:45 UTC** it deletes station-days older than 8 days and passes older than 30.
 
 ## Limits
