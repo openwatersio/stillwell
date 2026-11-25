@@ -101,3 +101,21 @@ test("the latest of the epochs that hold the year is the one read, and held ones
   assert.equal(found?.of, 2);
   assert.equal(latestEpoch(station, Date.UTC(2012, 0, 1), Date.UTC(2013, 0, 1))?.epoch.id, 1);
 });
+
+test("an epoch that starts before 1970 sorts before a later one", () => {
+  const station = {
+    epochs: [
+      { id: 2, datum: "X", since: "1965-06-01T00:00:00Z", until: null, state: "open", datums: {} },
+      {
+        id: 1,
+        datum: "X",
+        since: null,
+        until: "1965-06-01T00:00:00Z",
+        state: "closed",
+        datums: {},
+      },
+    ],
+  } as unknown as StoredStation;
+  const found = latestEpoch(station, Date.UTC(1965, 0, 1), Date.UTC(1966, 0, 1));
+  assert.equal(found?.epoch.id, 2);
+});

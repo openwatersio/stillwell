@@ -83,6 +83,7 @@ const LOCAL = new Set([
   "DL",
   "ZH",
   "ZI",
+  "SKN",
   "MSL",
   "MLLW",
   "MLW",
@@ -138,7 +139,10 @@ export function latestEpoch(
       (!e.until || Date.parse(e.until) > from),
   );
   const latest = epochs
-    .sort((a, b) => (Date.parse(a.since ?? "") || 0) - (Date.parse(b.since ?? "") || 0))
+    .sort(
+      (a, b) =>
+        (a.since ? Date.parse(a.since) : -Infinity) - (b.since ? Date.parse(b.since) : -Infinity),
+    )
     .at(-1);
   return latest ? { epoch: latest, of: epochs.length } : null;
 }
