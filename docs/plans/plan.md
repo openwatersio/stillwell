@@ -49,9 +49,11 @@ Recommended answers. The plan below assumes them; each can change without reshap
 5. **Bulk snapshots ship with the public API**, quarterly, with a Zenodo DOI, in two parts: the stations with `commercial_use` true, and the rest, leaving out any station with data, in any epoch, from a contributor that hasn't answered a permission request, or whose terms are unknown (`unscanned` or `unreviewed`), since a published deposit can't be withdrawn. The commercial part is CC BY 4.0, with `sources.json` in the deposit so each source's license and terms travel with it, and a link to each source's page on the site, which describes the source's own changes to its data; the rest's Zenodo license is "other", pointing to the README's license section, since each of its stations keeps its contributor's terms.
 6. **The API lives in this repo**: a Worker bound into the gateway as `WATER_LEVELS`, so adapters, schema and reader change together.
 7. **Decided: this repo fits harmonic constants and reduces tidal datums from its own series, and publishes them in the store. slackwater-database packages them** (Brandon, 2026-11-25). GESLA has TICON, constants fitted from its records and published as a dataset of their own; the store has its fits. The split:
-   - **The method is `@slackwater/engine`'s**: the constituent catalog, nodal corrections, the least-squares `fit()`, confidence intervals and constituent selection. Every consumer of the engine then predicts with the definitions a fit used.
-   - **This repo decides what a fit reads and whether it can be trusted.** Which values count as final, each source's revision window, which flagged spans stay out, the checks before fitting, the fit's window, its score on a held-out year, and the datums reduced from the same series are all facts about a source and its data, so they live with the adapters, errata and QC. A fit is published with its diagnostics whether or not anyone ships it.
-   - **slackwater-database decides what ships.** It reads the fit files, as it reads TICON's, and keeps the gate against TICON on the held-out scores, merges, the quality evaluation, its license vocabulary, constituent definitions in the database format, and the TCD export. It reads no observations.
+   - **The method is `@slackwater/engine`'s**: the constituent catalog, nodal corrections, the least-squares `fit()`, confidence intervals, the candidate list and constituent selection. This repo, the calibration and slackwater-database then fit the same candidates by the same rules.
+   - **A fit carries the definitions it was fitted under**: each constituent's speed, Doodson numbers, phase constant and nodal correction. That is the contract between a fit and whatever predicts from it. The engine's version is recorded as provenance, and nothing depends on it.
+   - **This repo decides what a fit reads and whether it can be trusted.** Which values count as final, each source's revision window, which flagged spans stay out, the checks before fitting, the fit's window, its score on a held-out year, and the datums reduced from the same series are all facts about a source and its data, so they live with the adapters, errata and QC.
+   - **This repo measures, and sets no threshold for publishing.** Every series with enough final record is fitted and published with its measurements, whether or not anyone ships it. How much tide a station needs before it is worth predicting has no single answer: agencies publish tables at some gauges where the tide explains under a fifth of the tidal band's variance and none at others.
+   - **slackwater-database decides what ships.** It reads the fit files, as it reads TICON's, and keeps its own gates on range and quality, the gate against TICON on the held-out scores, merges, the choice of chart datum, its license vocabulary, constituent definitions in the database format, and the TCD export. It reads no observations.
    - **Code another project imports goes in an MIT package**, in this repo or the engine's, as [CONTRIBUTING.md](../../CONTRIBUTING.md#license-and-cla) says. The fit files are data, under each station's own terms.
    - **A fit never checks the series it came from.** A clock or datum check needs a reference that doesn't share the series' clock: another originator's record of the gauge, a neighbor from another agency, or constants fitted elsewhere. Those checks run here, without slackwater-database's constants (phase 6).
 8. **Constants fitted from restricted observations can still ship** where the operator agrees, as VLIZ did for IOC-derived constituents. So restricted series feed the fits even though the API doesn't serve them, and such a fit goes in the public store only once its operator has agreed.
@@ -171,7 +173,12 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 
 Estimate: 14 days here, and 4 in slackwater-database.
 
-One pipeline fits every gauge that carries a tide, with a source's differences declared by its adapter. slackwater-database's [plan for constituents](https://github.com/openwatersio/slackwater-database/blob/main/docs/plans/stillwell-constituents.md) has the method and its references: the candidate list, the Rayleigh and SNR rules, Sa and Ssa, the held-out year and the calibration against agencies' own constants. Its `sources/stillwell` importer ([slackwater-database#450](https://github.com/openwatersio/slackwater-database/pull/450)) runs that method on SMHI and PEGELONLINE from outside the store, and is the code this phase starts from.
+One pipeline fits every gauge that carries a tide, with a source's differences declared by its adapter. slackwater-database's [plan for constituents](https://github.com/openwatersio/slackwater-database/blob/main/docs/plans/stillwell-constituents.md) has the method and its references: the candidate list, the Rayleigh and SNR rules, Sa and Ssa, the held-out year and the calibration against agencies' own constants. Its `sources/stillwell` importer ([slackwater-database#450](https://github.com/openwatersio/slackwater-database/pull/450)) runs that method on SMHI and PEGELONLINE from outside the store. That importer, the verification report ([slackwater-database#425](https://github.com/openwatersio/slackwater-database/pull/425)) and the calibration ([slackwater-database#426](https://github.com/openwatersio/slackwater-database/pull/426)) are the code this phase starts from.
+
+In `@slackwater/engine` and the database format, before a fit is published:
+
+- [ ] The candidate list in the engine, in priority order: Foreman's, then the names NOAA's 37 and TICON's 50 add. Foreman's H1 and H2 need catalog entries first.
+- [ ] Definitions that can express every correction an engine release can change ([slackwater-database#238](https://github.com/openwatersio/slackwater-database/issues/238)). M1's nodal correction is one the stored definitions can't carry, so data fitted with it needs a pinned engine. A fit's definitions are the contract only once that gap is closed.
 
 What a fit reads:
 
@@ -179,6 +186,7 @@ What a fit reads:
 - [ ] Each `kept` erratum says whether its values may enter a fit or a datum, so the decision sits with the erratum and not with each consumer.
 - [ ] One reader for fits in `src/fit/`: every epoch in the current datum, final values for constants and every measured value for datums, hourly instantaneous samples, and the version of each year file read. It reads the restricted store too.
 - [ ] The filter behind any source's hourly values, and where each value is stamped in its interval, as source metadata, so a fit can correct amplitude and phase for it.
+- [ ] A level comparison in `stations/matches.parquet` for every linked pair. A fit and a TICON record count as the same gauge only where their levels agree within 1 cm with no lag, and 142 linked pairs of PEGELONLINE and GESLA series, Brake's among them, have no comparison, so those fits can't be scored against or merged with TICON's records of the gauge.
 
 Checks before fitting, which stop a fit or cut its series:
 
@@ -188,17 +196,19 @@ Checks before fitting, which stop a fit or cut its series:
 
 The fit:
 
-- [ ] `src/fit/`: the whole window, up to 19 years before the held-out year, through the engine's `fit()` with robust weights, and the engine's selection over one candidate list, which [`src/harmonic.ts`](../../src/harmonic.ts)'s `STANDARD` and `SHALLOW` lists give way to. QC, the tidal judgment and the cross-check then read a station's fit where it has one.
+- [ ] `src/fit/`: the whole window, up to 19 years before the held-out year, through the engine's `fit()` with robust weights, and the engine's selection over the engine's candidate list, which [`src/harmonic.ts`](../../src/harmonic.ts)'s `STANDARD` and `SHALLOW` lists give way to. QC, the tidal judgment and the cross-check then read a station's fit where it has one.
 - [ ] Sa and Ssa from the whole window and from each year, kept only where the mean is at least twice its standard error, with the spread recorded either way.
-- [ ] Tidal datums from the same series over the fit's window and the held-out year, under the rules in slackwater-database's [`docs/datums.md`](https://github.com/openwatersio/slackwater-database/blob/main/docs/datums.md), which move here with the code. The fit names the series and the gauge zero they were reduced in.
-- [ ] Scores on the held-out year: tidal-band RMS, energy by band, and the time and height of high and low waters, with one extremum picker. The same code scores any other constants for the gauge on the same year, such as a linked TICON record's or the agency's own, and stores a digest of the constants it scored.
-- [ ] A gauge with too little tide, too short a record or a failed check gets a row that says why, and no constants.
+- [ ] Observed tidal datums from the same series over the fit's window and the held-out year, under the rules in slackwater-database's [`docs/datums.md`](https://github.com/openwatersio/slackwater-database/blob/main/docs/datums.md), which move here with the code. The fit names the series and the gauge zero they were reduced in. HAT and LAT come from a 19-year synthesis of the fit's constants, which anything holding the fit and its definitions can run. Which datum is a station's chart datum, by country and by sea, stays in slackwater-database.
+- [ ] Scores on the held-out year: tidal-band RMS, the share of the tidal band's variance the fit explains, energy by band, and the time and height of high and low waters, with one extremum picker.
+- [ ] The same code scores the constants slackwater-database holds for the gauge on the same year, from a pinned `@slackwater/database` release named in the fit. Those are slackwater-database's TICON records, which include its own refits of mislabeled clocks, not TICON as published. Each score stores a digest of the constants it scored, and a new release that changes a linked record's digest scores it again.
+- [ ] Every series with enough final record is fitted, and its row carries what a consumer needs to set its own threshold: mean range, variance explained, each constituent's SNR and the yearly scatter. On fits of 2021 to 2023 scored on 2024, the tide explains 92 to 95% of the tidal band's variance at NOAA's Gulf gauges, 31 to 38% in the Kattegat, 18% at Gedser, where DMI publishes tables, and 4 to 18% at German Baltic gauges, where BSH publishes none. A screen run here to save compute is named for its cost and never as a judgment that a gauge has no tide.
+- [ ] A record too short to fit, or one a check stopped, gets a row that says why, and no constants.
 
 What is published:
 
 - [ ] `fits/<source>.parquet` and `constituents/<source>.parquet`, defined in [`src/store/files.ts`](../../src/store/files.ts) with the other published files: the window, the year files and their versions, which values counted as final, the engine's version, each candidate's amplitude, phase, intervals, SNR and selection verdict, the definition each constituent was fitted under, the yearly scatter, the datums, and every held-out score. Each fit carries its station's license, commercial use and attribution.
 - [ ] A superseded fit stays readable by its version, as year files do, so a database release can name the fit it shipped.
-- [ ] A fit from a restricted series stays in the restricted store until its operator agrees to the constants being published (decision 8), as a field the source declares.
+- [ ] A fit from a restricted series stays in the restricted store until its operator agrees to the constants being published (decision 8), as a field the source declares. slackwater-database reads only the public store.
 - [ ] A page in the site's docs on reading the fits, and what each column means.
 - [ ] Calibration before any fit is published: 20 CO-OPS reference stations over NOAA's own analysis years against NOAA's published constants, the same against Kartverket's and JCG's, and RWS and PEGELONLINE against RWS's astronomical tide and BSH's tables. The report is checked in and rerun when the method changes.
 
@@ -209,8 +219,9 @@ Running:
 
 In slackwater-database:
 
-- [ ] `sources/stillwell` reads the fit files into station records, in place of fitting. Its reader of observations, its errata decisions and its settle cutoff go away, and a record's provenance names the fit and its version.
-- [ ] It keeps the gate: a fit replaces a TICON record of the same gauge when the published scores say it predicts the held-out year no worse, by `decideHeldOut`, and TICON stays where a score was taken against constants that have since changed.
+- [ ] `sources/stillwell` reads the fit files into station records, in place of fitting. Its reader of observations, its errata decisions and its settle cutoff go away.
+- [ ] Each record pins the version of the fit it was built from, and the monthly update arrives as a pull request to review, as the NOAA import's does.
+- [ ] It applies its own gates to the fit's measurements, such as its 2 cm range gate, and keeps the gate against TICON: a fit replaces a TICON record of the same gauge when the published scores say it predicts the held-out year no worse, by `decideHeldOut`, and TICON stays where a score was taken against constants that have since changed.
 - [ ] Convert contributor by contributor, in phase 2's order, with `report:merges` reviewing the result each time. A contributor whose records all convert drops out of the TICON import.
 - [ ] Link stations both ways: slackwater-database records gain the store series ID (subordinate stations take their reference gauge's), `@slackwater/database` exposes it, and the store's `tide_station` is filled from the same table.
 
@@ -308,7 +319,8 @@ As the architecture estimates: about $7 a month in year one on R2 and Workers, p
 ## Open questions
 
 - BSH's answer on the 1 August rule.
-- Which reference checks a gauge's clock where no other originator holds its record and no neighbor is close: an ocean tide model's constants at the gauge would share no gauge's clock, and the choice turns on which model's license allows it.
+- Which reference checks a gauge's clock where no other originator holds its record and no neighbor is close: an ocean tide model's constants at the gauge would share no gauge's clock, and the choice turns on which model's license allows it. EOT20 is the first to check; FES's and TPXO's terms are restrictive.
+- PEGELONLINE's revision window until [#526](https://github.com/openwatersio/stillwell/issues/526) settles it: whether its adapter declares a year settled once it ended 12 months before the run, on the evidence of erratum `pegelonline-cuxhaven-2025-revised`, or its fits wait.
 - Whether the API predicts from the store's own fits or only from `@slackwater/database` (decision 10), once a station has both.
 - STOFS-2D station count and file sizes.
 - PSMSL's reply on commercial redistribution (request sent 2026-11-01).
