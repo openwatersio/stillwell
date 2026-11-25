@@ -1,10 +1,43 @@
-import { dayAfter, flaggedSpan, type ErrataFile } from "../../errata.ts";
+import { dayAfter, flaggedSpan, medianGap, type ErrataFile } from "../../errata.ts";
 import { POSITIONS } from "../../positions.ts";
 import { distanceKm, median } from "../../stats.ts";
 import { lateBy, middle, read, unflagged } from "./checks.ts";
 
 export default {
   errata: [
+    {
+      id: "uhslc-christmas-island-2009-offset",
+      stations: ["uhslc/170", "gesla/christmas-170a-kir-uhslc_rq"],
+      since: "2009-08-05",
+      until: null,
+      handling: "kept",
+      error:
+        "UHSLC's Christmas Island series (170) and BOM's files of the gauge differ from 00:00 UTC on 5 August 2009 to the end of BOM's file, on 31 August 2011: UHSLC's values are 0.01 to 0.06 m lower in daily medians, and equal BOM's to 0.1 mm before. One of the two copies is on the wrong reference for these years, or the two are different sensors of the gauge, and the store can't tell which. UHSLC's documentation file for the research-quality version (`qa170a.dmt`) says the series from 2008 is assumed linked to the historic reference level. The span is open because the store has no BOM record after August 2011 to compare UHSLC's later years with. The entry's details are in erratum `bom-christmas-island-2009-offset`.",
+      response:
+        "UHSLC's series is kept as served and this entry flags nothing. The research-quality version GESLA carries (`gesla/christmas-170a-kir-uhslc_rq`) equals it to 1 mm in the span.",
+      evidence:
+        "November 2026, from the comparison in erratum `bom-christmas-island-2009-offset`. `gesla/christmas-170a-kir-uhslc_rq` equals `uhslc/170` to 1 mm at every hour of 2009 from 5 August (3,576 hours), 2010 (8,542) and 2011 (8,583), and differs from BOM's file by up to 0.09, 0.24 and 0.19 m in those years. GESLA's fast-delivery record of the gauge (`gesla/christmas-170-aus-uhslc_fd`) holds no values for 2009 to 2011. Which copy is right wasn't settled; question `uhslc-christmas-island-2009-reference` puts it to UHSLC.",
+      reported: null,
+      report: null,
+      check: async (store) => {
+        const gap = await medianGap(store, "uhslc/170", "bom/170", "2010-03-01", "2010-04-01");
+        if (gap < 0.042 || gap > 0.058)
+          throw new Error(
+            `BOM's Christmas Island is ${gap.toFixed(3)} m from UHSLC's in March 2010, not 0.042 to 0.058 m`,
+          );
+        const copy = await medianGap(
+          store,
+          "uhslc/170",
+          "gesla/christmas-170a-kir-uhslc_rq",
+          "2010-03-01",
+          "2010-04-01",
+        );
+        if (Math.abs(copy) > 0.002)
+          throw new Error(
+            `GESLA's research-quality record is ${copy.toFixed(3)} m from UHSLC's in March 2010`,
+          );
+      },
+    },
     {
       id: "uhslc-hong-kong-hour-early",
       stations: ["uhslc/329", "uhslc/329a"],
@@ -493,6 +526,19 @@ export default {
             `Gibraltar's (289) median steps ${step.toFixed(2)} m from 2000 to 2024, not about 1.5`,
           );
       },
+    },
+  ],
+  questions: [
+    {
+      id: "uhslc-christmas-island-2009-reference",
+      stations: ["uhslc/170"],
+      question:
+        "Christmas Island's hourly values in your series (170) and in the Bureau of Meteorology's FTP files are identical until 23:00 UTC on 4 August 2009. From 00:00 UTC on 5 August 2009 to the end of the Bureau's file on 31 August 2011, yours are 0.01 to 0.06 m lower in daily medians. Did you adjust the values from that day, or did the Bureau send them that way? Your documentation file says the series from 2008 is assumed linked to the historic reference level; has it since been tied to the gauge's benchmarks?",
+      why: "The answer says which copy is right, so the entry `uhslc-christmas-island-2009-offset` can flag the other series or retire.",
+      meanwhile:
+        "Both series are kept as served and neither is flagged; `preferred` is worked out from their lengths and flags as for any pair of copies.",
+      asked: null,
+      answer: null,
     },
   ],
   retired: [],

@@ -404,7 +404,10 @@ export async function stations(previous: Station[] = []): Promise<UsgsStation[]>
   if (!tidal.size) throw new Error("USGS listed no daily tidal statistics");
   for (const s of series)
     if (TIDAL_PARAMETERS.has(s.parameter_code)) tidal.add(s.monitoring_location_id);
-  const chosen = choose(series);
+  const chosen = choose(
+    series,
+    new Map(previous.map((p) => [p.id, (p as Partial<UsgsStation>).time_series_id])),
+  );
 
   const locations = new Map<string, Collection<ApiLocation>["features"][number]>();
   const fetchLocations = async (ids: string[]) => {
@@ -499,22 +502,32 @@ const LOCATION_BATCH = 200;
  * the primary series before others, the gage itself before a headwater or
  * tailwater sublocation, one reporting now before one that isn't, one that
  * reported in the last year before one that ended earlier (the latest first),
- * and then the earliest start.
+ * the earliest start, the series the station already holds (`stored`, by
+ * station ID, `usgs/<site>`), and then the lowest series ID, so series USGS
+ * lists alike (a headwater and a tailwater series that began together, or two
+ * duplicates) are chosen the same way whatever order its reply comes in, and
+ * never move a station off the series it has among tied ones.
  */
-export function choose(series: ApiSeries[]): Map<string, ApiSeries> {
+export function choose(
+  series: ApiSeries[],
+  stored: Map<string, string | undefined> = new Map(),
+): Map<string, ApiSeries> {
+  const now = Date.now();
   const order = PARAMETERS.map(([code]) => code);
-  const rank = (s: ApiSeries) => [
+  const rank = (s: ApiSeries): (number | string)[] => [
     // A preferred parameter that stopped more than a year ago doesn't keep a
     // site off the live feed when another of its series still reports.
-    recentYear(s) ? 0 : 1,
+    recentYear(s, now) ? 0 : 1,
     order.indexOf(s.parameter_code),
     s.primary === "Primary" ? 0 : 1,
     s.sublocation_identifier ? 1 : 0,
-    reporting(s) ? 0 : 1,
+    reporting(s, now) ? 0 : 1,
     // Within the last year counts as current, so an outage of weeks or months
     // doesn't hand the site to an older series and flag a change that isn't one.
-    recentYear(s) ? 0 : Date.now() - Date.parse(s.end ?? "1900-01-01"),
+    recentYear(s, now) ? 0 : now - Date.parse(s.end ?? "1900-01-01"),
     s.begin ? Date.parse(s.begin) : Infinity,
+    stored.get(`usgs/${s.monitoring_location_id.replace(/^USGS-/, "")}`) === s.id ? 0 : 1,
+    s.id,
   ];
   const chosen = new Map<string, ApiSeries>();
   for (const s of series) {
@@ -533,16 +546,16 @@ function eligible(s: ApiSeries): boolean {
 }
 
 /** A series that reported in the last year. */
-function recentYear(s: ApiSeries): boolean {
-  return s.end !== null && Date.parse(s.end) >= Date.now() - 365 * DAY_MS;
+function recentYear(s: ApiSeries, now = Date.now()): boolean {
+  return s.end !== null && Date.parse(s.end) >= now - 365 * DAY_MS;
 }
 
 /** A series that reported in the last week; it's on the live feed. */
-function reporting(s: Pick<ApiSeries, "end">): boolean {
-  return s.end !== null && Date.parse(s.end) > Date.now() - 7 * DAY_MS;
+function reporting(s: Pick<ApiSeries, "end">, now = Date.now()): boolean {
+  return s.end !== null && Date.parse(s.end) > now - 7 * DAY_MS;
 }
 
-function before(a: number[], b: number[]): boolean {
+function before(a: (number | string)[], b: (number | string)[]): boolean {
   for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i]! < b[i]!;
   return false;
 }

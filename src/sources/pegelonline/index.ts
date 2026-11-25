@@ -486,6 +486,8 @@ export const source: Source = {
   metadata,
   stations,
   observations,
+  // A gauge whose telemetry was down sends the missing days once it's back (README).
+  fillsLate: true,
   overrides: {
     epochs: {
       "pegelonline/3500031 2026-06-18T23:00:00Z": {

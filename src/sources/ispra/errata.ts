@@ -11,7 +11,7 @@ export default {
       response:
         "The loader asks only for the months the dump lists and skips one that returns 404, so a station's years are partial and the store's coverage is what the repository serves.",
       evidence:
-        "Every listed Venezia month requested with HEAD in November 2026: 100 return 200, from 201401 to 202204, and 66 return 404. Spot checks find Napoli's October 2023 and Trieste's January and February 2010, all listed, return 404 too.",
+        "Of the 5,138 months the dump lists, 2,714 are served and 2,424 return 404; every served month falls between January 2014 and April 2022. Venezia's 166 listed months, each requested, give 100 served and 66 that return 404. Napoli's October 2023 and Trieste's January and February 2010 are listed and return 404.",
       // Venezia's served months run January 2014 to April 2022; the listed months either side return 404.
       check: async (store) => {
         const held = async (since: string, until: string) =>
@@ -35,7 +35,7 @@ export default {
       response:
         "A row with a date and no time is read as 00:00 UTC on that date, which the row's place before 00:10 gives.",
       evidence:
-        "Monthly files read in November 2026: Bari and Ravenna, January 2015, each hold one such row, first after the header, and every other row has a time. Gaeta's January 2016 and Lampedusa's January 2015 files fail the strict parser on the same shape.",
+        "Of the 2,714 served files, 52 start with one such row, at all 36 gauges, and none holds another. Bari's and Ravenna's January 2015 files hold it first after the header, and every other row has a time.",
       check: async (store) => {
         const [first] = await store.levels("ispra/bari", "2015-01-01", "2015-01-02");
         if (
@@ -47,26 +47,31 @@ export default {
     },
     {
       id: "ispra-repeated-times",
-      stations: "every station",
+      stations: ["ispra/ginostra", "ispra/crotone", "ispra/carloforte"],
       handling: "dropped",
       error:
-        "Some files hold two levels for one time. Carloforte's March 2019 file, after a gap from 15:50 on 12 March to 08:50 on 13 March, has 09:40, 09:50 and 10:00 on the 13th twice each, 15.4 and 17.9, 16.4 and 20.4, 16 and 20.3 cm, so two series interleave.",
+        "Some files hold two levels for one time, as if two series were interleaved. Ginostra, Crotone and Carloforte hold 685 such times in 14 months: 528 at Ginostra in seven months of 2018 and 2019, 143 at Crotone in three months of 2018, and 14 at Carloforte in four months of 2018 and 2019. Carloforte's March 2019 file, after a gap from 15:50 on 12 March to 08:50 on 13 March, has 09:40, 09:50 and 10:00 on the 13th twice each, 15.4 and 17.9, 16.4 and 20.4, 16 and 20.3 cm.",
       response:
         "Neither level of a time that appears with two different levels is stored, since nothing says which is right. A time repeated with the same level is read once.",
       evidence:
-        "Carloforte's `carloforte_hydrometric_201903.csv`, read in November 2026: three repeated times, each with two levels, all within an hour on 13 March. Other stations' months are known only from a sample of six months of every gauge, in which it was the only one.",
+        "The adapter's parser read every one of the 2,714 monthly files the repository serves, 11.2 million rows. Fourteen hold a time with two levels: Ginostra June, July, October and November 2018 and April, May and June 2019, Crotone June, October and November 2018, and Carloforte June, July and August 2018 and March 2019. No other file holds one, and none holds a row the parser can't read.",
       check: async (store) => {
-        const times = new Set(
-          (await store.levels("ispra/carloforte", "2019-03-13", "2019-03-14")).map((o) => o.time),
-        );
-        const at = (hm: string) => Date.parse(`2019-03-13T${hm}:00Z`);
-        if (!times.has(at("09:30")) || !times.has(at("10:10")))
-          throw new Error(
-            "ispra/carloforte holds no levels either side of 13 March 2019's repeated times",
-          );
-        for (const hm of ["09:40", "09:50", "10:00"])
-          if (times.has(at(hm)))
-            throw new Error(`ispra/carloforte holds a level at ${hm} on 13 March 2019`);
+        // Each stretch's neighbors are held and its repeated times are not.
+        for (const [id, day, held, repeated] of [
+          ["ispra/carloforte", "2019-03-13", ["09:30", "10:10"], ["09:40", "09:50", "10:00"]],
+          ["ispra/crotone", "2018-06-08", ["08:40", "09:40"], ["08:50", "09:00", "09:30"]],
+          ["ispra/ginostra", "2018-06-14", ["08:10", "08:40"], ["08:20"]],
+        ] as const) {
+          const next = new Date(Date.parse(`${day}T00:00:00Z`) + 86_400_000)
+            .toISOString()
+            .slice(0, 10);
+          const times = new Set((await store.levels(id, day, next)).map((o) => o.time));
+          const at = (hm: string) => Date.parse(`${day}T${hm}:00Z`);
+          if (!held.every((hm) => times.has(at(hm))))
+            throw new Error(`${id} holds no levels either side of ${day}'s repeated times`);
+          for (const hm of repeated)
+            if (times.has(at(hm))) throw new Error(`${id} holds a level at ${hm} on ${day}`);
+        }
       },
     },
   ],

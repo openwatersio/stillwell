@@ -14,7 +14,7 @@ export default {
       evidence: "RWS's catalog lists both codes at 53.4916° N, 5.9412° E.",
       reported: "2026-11-08",
       report:
-        "Submitted through Rijkswaterstaat's web contact form on 2026-11-08. It asks whether the two codes are two sensors or a duplicate, since their levels differ by about 33 cm. No answer yet. Text in [#62](https://github.com/openwatersio/stillwell/issues/62).",
+        "Submitted through Rijkswaterstaat's web contact form on 2026-11-08. It asks whether the two codes are two sensors or a duplicate, since their levels differ by about 33 cm. Answered on 2026-11-25: Rijkswaterstaat says `ameland.westgat` is retired, the data now comes in under the other code (its reply spells it `amelanderwestgat`, probably a typo for `amelandwestgat`), and it is the same gauge, so joining the series is correct. The database fix is still to come. Text in [#62](https://github.com/openwatersio/stillwell/issues/62).",
       check: async (store, e) => {
         const [a, b] = await Promise.all(e.stations!.map((id) => store.station(id)));
         if (!a || !b) throw new Error("the store doesn't list both Ameland Westgat codes");

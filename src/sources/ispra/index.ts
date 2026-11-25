@@ -35,7 +35,7 @@ export const metadata: SourceMetadata = {
   contact: { url: "https://www.mareografico.it/" },
   terms:
     "ISPRA releases the values as they are, accepts no responsibility for errors or omissions, and says its own database prevails where the two differ.",
-  // ISPRA's open files are monthly archives that stop in 2023, and its live view has no API.
+  // ISPRA's open files are monthly archives that stop in 2022, and its live view has no API.
   hourly: false,
   // Every file is validation level L0, and ISPRA publishes no validated version.
   finalizes: false,
