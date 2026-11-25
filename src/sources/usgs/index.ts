@@ -499,11 +499,13 @@ const LOCATION_BATCH = 200;
  * the primary series before others, the gage itself before a headwater or
  * tailwater sublocation, one reporting now before one that isn't, one that
  * reported in the last year before one that ended earlier (the latest first),
- * and then the earliest start.
+ * the earliest start, and then the lowest series ID, so series USGS lists
+ * alike (a headwater and a tailwater series that began together, or two
+ * duplicates) are chosen the same way whatever order its reply comes in.
  */
 export function choose(series: ApiSeries[]): Map<string, ApiSeries> {
   const order = PARAMETERS.map(([code]) => code);
-  const rank = (s: ApiSeries) => [
+  const rank = (s: ApiSeries): (number | string)[] => [
     // A preferred parameter that stopped more than a year ago doesn't keep a
     // site off the live feed when another of its series still reports.
     recentYear(s) ? 0 : 1,
@@ -515,6 +517,7 @@ export function choose(series: ApiSeries[]): Map<string, ApiSeries> {
     // doesn't hand the site to an older series and flag a change that isn't one.
     recentYear(s) ? 0 : Date.now() - Date.parse(s.end ?? "1900-01-01"),
     s.begin ? Date.parse(s.begin) : Infinity,
+    s.id,
   ];
   const chosen = new Map<string, ApiSeries>();
   for (const s of series) {
@@ -542,7 +545,7 @@ function reporting(s: Pick<ApiSeries, "end">): boolean {
   return s.end !== null && Date.parse(s.end) > Date.now() - 7 * DAY_MS;
 }
 
-function before(a: number[], b: number[]): boolean {
+function before(a: (number | string)[], b: (number | string)[]): boolean {
   for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i]! < b[i]!;
   return false;
 }

@@ -84,45 +84,33 @@ export default {
       stations: ["usgs/09519800"],
       since: "2026-11-12",
       until: "2026-11-14",
-      handling: "kept",
+      handling: "corrected",
       error:
         "Gila River below Painted Rock Dam, Arizona, published 187 gage heights of 926 to 990 ft (282.24 to 301.75 m) between 18:20 UTC on 12 November 2026 and 11:20 on the 13th, at 5-minute steps among readings that look normal, as Provisional with no qualifier. The gage reads 0.3 to 3.7 m on every other day of the month. USGS now serves 10.4 ft at the 55 of those times that fall on its 15-minute steps, and no reading at the other 132.",
       response:
-        "The store keeps the readings as USGS published them, and QC flags each one bad, so they're outside the good levels. A refetch of 2026 replaces the 55 USGS still serves; the other 132 stay, flagged bad, since a refetch only rewrites the times it fetched.",
+        "A refetch of 2026 replaces every stored reading in a month it fetched, so the 187 readings are gone and the store holds the 15-minute readings USGS serves for the span, all of them ordinary levels.",
       evidence:
-        "The levels stored for the station on 11 to 14 November 2026, and USGS's current series for the station (gage height, `continuous`, series 897594e7) over the same times, read on 21 November 2026.",
+        "The levels stored for the station on 11 to 14 November 2026 before the refetch, and USGS's current series for the station (gage height, `continuous`, series 897594e7) over the same times, read on 21 and 25 November 2026.",
       check: async (store, e) => {
         const id = e.stations![0]!;
         const all = await store.levels(id, e.since!, e.until!);
         const high = all.filter((o) => o.level > 100);
-        // A count other than the one this entry describes means the store was refetched, or the readings changed.
-        if (high.length !== 187)
-          throw new Error(`the store holds ${high.length} ${id} levels above 100 m, not 187`);
-        const unflagged = high.filter((o) => o.flag < Flag.bad);
-        if (unflagged.length)
-          throw new Error(`${unflagged.length} of ${id}'s 187 levels above 100 m aren't bad`);
+        if (high.length)
+          throw new Error(
+            `the store holds ${high.length} ${id} levels above 100 m on 12 to 13 November`,
+          );
+        // USGS serves a reading every 15 minutes, 192 across the two days.
         const [first, last] = [
           Date.parse("2026-11-12T18:20:00Z"),
           Date.parse("2026-11-13T11:20:00Z"),
         ];
-        if (high.some((o) => o.time < first || o.time > last))
+        const inside = all.filter((o) => o.time >= first && o.time <= last);
+        if (inside.length < 60)
           throw new Error(
-            `${id} has levels above 100 m outside 18:20 on 12 to 11:20 on 13 November`,
+            `${id} holds ${inside.length} levels between 18:20 on 12 and 11:20 on 13 November, not about 69`,
           );
-        // Whole feet from 926 to 990, which is what USGS published.
-        const off = high.filter((o) => {
-          const feet = o.level / 0.3048;
-          return Math.abs(feet - Math.round(feet)) > 0.01 || feet < 925.5 || feet > 990.5;
-        });
-        if (off.length)
-          throw new Error(
-            `${off.length} of ${id}'s levels above 100 m aren't whole feet from 926 to 990`,
-          );
-        // The run sits among readings that look normal.
-        if (!all.some((o) => o.level < 10 && o.time > first && o.time < last))
-          throw new Error(
-            `${id} has no ordinary reading between 18:20 on 12 and 11:20 on 13 November`,
-          );
+        const off = inside.filter((o) => o.level > 10);
+        if (off.length) throw new Error(`${off.length} of ${id}'s levels in the span exceed 10 m`);
       },
     },
     {
