@@ -3,7 +3,7 @@ import { Flag, type Epoch, type Observation, type StoredStation } from "./schema
 import { FILES } from "./store/files.ts";
 import { isMissing, readObservationFile, readRows, writeTable } from "./store/parquet.ts";
 import { linksPath, seriesPath } from "./store/paths.ts";
-import { readYears } from "./store/years.ts";
+import { readYears, usableHours } from "./store/years.ts";
 import { km } from "./ticon.ts";
 
 /**
@@ -193,7 +193,7 @@ export async function measureLinks(
   for (const source of new Set(pairs.flatMap((p) => [p.a.source, p.b.source])))
     for (const r of (await readYears(store, source))?.values() ?? [])
       if (r.year === null) marked.add(r.id);
-      else if (r.hours) hours.set(`${r.id} ${r.epoch} ${r.year}`, r.hours);
+      else if (usableHours(r)) hours.set(`${r.id} ${r.epoch} ${r.year}`, usableHours(r));
   const fresh = new Map<string, LinkOffset>();
   const dropped = new Set<string>();
   let [next, failed] = [0, 0];

@@ -1,5 +1,6 @@
 import { firstOfMonth } from "../schedule.ts";
 import { getText } from "../../http.ts";
+import { inSpan } from "../../span.ts";
 import {
   Flag,
   stationDefaults,
@@ -199,6 +200,8 @@ export async function stations(_previous?: Station[], now = Date.now()): Promise
 export async function levels(sourceId: string, start: Date, end: Date): Promise<Observation[]> {
   if (!/^\d+$/.test(sourceId)) throw new Error(`CCO has no site ${sourceId}`);
   const out = new Map<number, Observation>();
+  // Fill values by time, so a reading both of two overlapping requests brought is one.
+  const fill = new Map<number, { level: number; flag: Flag }>();
   for (let cursor = end.getTime(); cursor > start.getTime();) {
     const hours = Math.min(MAX_HOURS, Math.ceil((cursor - start.getTime()) / HOUR_MS));
     const features = await tides(
@@ -224,13 +227,21 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
       if (typeof level !== "number" || !Number.isFinite(level))
         throw new Error(`CCO reading of site ${sourceId} has value ${p?.value}`);
       // Fill values (erratum `cco-fill-values`): 9999 and ±999.9999, which no tide reaches, and the exact ±99.999, −10 and −9.99999 that gauges send in their place.
-      if (Math.abs(level) >= 999 || FILL.has(level)) continue;
-      out.set(time, { time, level, flag: flagOf(p?.QCflag) });
+      const flag = flagOf(p?.QCflag);
+      if (Math.abs(level) >= 999 || FILL.has(level)) {
+        fill.set(time, { level, flag });
+        continue;
+      }
+      out.set(time, { time, level, flag });
     }
     // Each request starts one reading inside the last, so a reading at the edge the API leaves out of a window isn't lost; the Map drops the repeat.
     if (cursor - hours * HOUR_MS <= start.getTime()) break;
     cursor -= hours * HOUR_MS - 600_000;
   }
+  // `inSpan` counts the fill outside the span, such as 9999, in the run's tally of what a fetch left out,
+  // for the readings in [start, end) only.
+  for (const [time, { level, flag }] of fill)
+    if (time >= start.getTime() && time < end.getTime()) inSpan(level, time, flag);
   // The same reading twice, a second apart (erratum `cco-duplicate-stamps`): keep the first. This runs on every
   // reading the requests brought, so the pair's first stays whichever window asked for it, but for a window whose own edge falls between the two stamps.
   const kept: Observation[] = [];

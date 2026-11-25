@@ -1,6 +1,6 @@
 import { readErrata, withErrata, type ErrataFile } from "../errata.ts";
 import type { Observation, Source } from "../schema.ts";
-import { possible } from "../span.ts";
+import { Dropped, leaveOut, sweepDrops, tallying } from "../span.ts";
 import { source as bodc } from "./bodc/index.ts";
 import { source as bom } from "./bom/index.ts";
 import { source as bsh } from "./bsh/index.ts";
@@ -129,7 +129,7 @@ export const {
  * `pegelonline-fill-values`, and GESLA's and CMEMS's, whose adapters drop them too).
  */
 export function withinSpan(source: Source): Source {
-  const keep = (rows: Observation[]) => rows.filter((r) => possible(r.level));
+  const keep = (rows: Observation[]) => leaveOut(rows);
   const { observations, recent } = source;
   return {
     ...source,
@@ -137,13 +137,22 @@ export function withinSpan(source: Source): Source {
       observations: async (station, start, end) => keep(await observations(station, start, end)),
     }),
     ...(recent && {
-      recent: async (stations, start, end) =>
-        new Map(
-          [...(await recent(stations, start, end))].map(([id, rows]) => [
-            id,
-            rows instanceof Error ? rows : keep(rows),
-          ]),
-        ),
+      recent: async (stations, start, end) => {
+        const answer = await recent(stations, start, end);
+        const out = new Map<string, Observation[] | Error>();
+        const by = new Map<string, Dropped>();
+        for (const [id, rows] of answer) {
+          if (rows instanceof Error) out.set(id, rows);
+          else {
+            // Each station's own, so a poller can say which one sent only fill.
+            const { result, dropped } = await tallying(async () => keep(rows));
+            out.set(id, result);
+            if (dropped.count) by.set(id, dropped);
+          }
+        }
+        sweepDrops.set(out, by);
+        return out;
+      },
     }),
   };
 }

@@ -535,10 +535,11 @@ export function rank(
 ): number {
   const copy = (s: Station) => redistributed(s) || copies.has(s.id);
   const levels = (s: Station) => s.products.includes("levels");
-  // The bounds lag a first backfill until compaction, which the years file doesn't.
+  // The bounds lag a first backfill until compaction, which the years file doesn't. A station whose files hold only
+  // values flagged bad, as a year of fill is, holds no record.
   const stored = (s: Station) =>
     (Number.isFinite(Date.parse(s.first ?? "")) && Number.isFinite(Date.parse(s.last ?? ""))) ||
-    usable.has(s.id);
+    (usable.get(s.id) ?? 0) > 0;
   const reporting = (s: Station) =>
     s.status === "active" && s.last !== null && now.getTime() - Date.parse(s.last) < REPORTING_MS;
   const span = (s: Station) => {

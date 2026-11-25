@@ -89,7 +89,7 @@ const linked = new Map<string, Record<string, any>>(
 );
 const sources = [...new Set([...linked.values()].map((s) => s.source as string))].sort();
 
-// Years with a file, in any epoch. A row with no year marks a station whose rows a
+// Years with a file of values a reader can use, in any epoch: a year of nothing but fill, stored as `bad` rows, holds no record. A row with no year marks a station whose rows a
 // run is rewriting, so its years may be short.
 const years = new Map<string, Set<number>>();
 const marked = new Set<string>();
@@ -98,7 +98,7 @@ for (const source of new Set(["gesla", ...sources, ...BACKFILLING])) {
   let found: Record<string, any>[];
   try {
     found = await rows(
-      `SELECT DISTINCT id, year FROM read_parquet(${quote(yearsPath(STORE, source))}) WHERE year IS NULL OR hours > 0`,
+      `SELECT DISTINCT id, year FROM read_parquet(${quote(yearsPath(STORE, source))}) WHERE year IS NULL OR (hours > 0 AND coalesce(good, 0) + coalesce(interpolated, 0) + coalesce(preliminary, 0) + coalesce(suspect, 0) > 0)`,
     );
   } catch (error) {
     // A source's years file starts with its first `ingest years` run.

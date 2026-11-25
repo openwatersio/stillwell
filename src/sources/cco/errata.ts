@@ -1,4 +1,5 @@
 import type { ErrataFile, Erratum, StoreReader } from "../../errata.ts";
+import { Flag } from "../../schema.ts";
 
 /** A station's levels in the years from `since` to before `until`; throws when the store holds none. */
 async function levels(store: StoreReader, id: string, since: number, until = since + 1) {
@@ -28,7 +29,7 @@ export default {
       error:
         "CCO's levels hold fill values where a gauge sent nothing, with no flag: 999.9999 or −999.9999, and at some gauges exactly 99.999, −99.999, −10 or −9.99999. A year of Exmouth's has 16 readings of 999.9999 from 18:30 on 18 December 2019, Hastings Pier's 2019 has 2 on 19 June, and Swanage Pier's 2018 has 2 of −999.9999 on 23 April. Deal Pier has 3,249 readings of exactly ±99.999 between April 2012 and August 2020, Brighton 167 of −9.99999 between August 2018 and September 2020, and Arun Platform 1 on 10 February 2014. GESLA's records of CCO's gauges and CMEMS's copies of them hold such values too, and erratum `gesla-fill-values` and `cmems-fill-values` leave out only those outside the store's span. The store's span of −500 to 9,000 m admits 999.9999, 99.999 and −10, and its QC marks the rest doubtful or bad after the fact.",
       response:
-        "A level of 999 m or more in either direction, or exactly 99.999, −99.999, −10 or −9.99999, is left out as missing, as is 9999. No tide reaches those, and no gauge here reads exactly −10 or −9.99999.",
+        "A level of 999 m or more in either direction, or exactly 99.999, −99.999, −10 or −9.99999, is left out as missing, as is 9999. No tide reaches those, and no gauge here reads exactly −10 or −9.99999. A fetch counts the ones outside the store's span, and backfill writes a year of nothing else as its rows flagged `bad`.",
       evidence:
         "Every stored CCO reading, 13.1 million from 2005 to 2026, read on 2026-11-17: the sentinels above, found by the exact level. 999.9999 and −999.9999 were found in one year of readings at six sites, 2013 to 2020, read from the API on 2026-11-16: Deal Pier 2015, Arun Platform 2012, Brighton 2020, Swanage Pier 2018, Exmouth 2019 and Hastings Pier 2019. The other years of those, and the other sites, weren't scanned from the API.",
       reported: "2026-11-17",
@@ -46,7 +47,9 @@ export default {
         });
         for (const [id, since, until] of years) {
           const fill = (await levels(store, id, since, until)).filter(
-            (o) => Math.abs(o.level) >= 999 || FILL.some((f) => Math.abs(o.level - f) < 5e-5),
+            (o) =>
+              o.flag !== Flag.bad &&
+              (Math.abs(o.level) >= 999 || FILL.some((f) => Math.abs(o.level - f) < 5e-5)),
           );
           if (fill.length)
             throw new Error(
