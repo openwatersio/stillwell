@@ -42,6 +42,10 @@ export const metadata: SourceMetadata = {
   // Raw values only: neither the feed nor the download ever finalizes them.
   hourly: true,
   finalizes: false,
+  // PEGELONLINE states no revision window. It changed raw values months after measuring them
+  // (erratum `pegelonline-cuxhaven-2025-revised`: 13 May to 24 June 2025 moved 4 to 6 cm), so a
+  // year counts once it ended 12 months ago (#526).
+  settles_after_months: 12,
   // Central European time, standard or summer.
   utc_offsets: [1, 2],
   // The download shows no step at any gauge zero's validFrom it covers (README).

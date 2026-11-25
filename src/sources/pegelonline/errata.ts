@@ -19,6 +19,8 @@ export default {
       id: "pegelonline-download-api-differ",
       stations: ["pegelonline/5990020", "pegelonline/9530020"],
       handling: "kept",
+      // Settled years come from the raw-data download; the REST API's copy, which differs from it, covers only the months since.
+      fit: "keep",
       error:
         "At Cuxhaven Steubenhöft and Husum, PEGELONLINE's raw-data download and its REST API give different levels for the same minutes, by up to 6 and 8 cm, though both are labeled unchecked raw data on the same gauge zero.",
       response:
@@ -42,6 +44,8 @@ export default {
       id: "pegelonline-wachendorf-zero-date",
       stations: ["pegelonline/3500031"],
       handling: "kept",
+      // Only the date PEGELONLINE gives the zero is in doubt, not the levels.
+      fit: "keep",
       error:
         "PEGELONLINE dates Wachendorf's gauge zero, PNP at 12.77 m above NHN, from 2026-06-18, and doesn't say that the zero moved that day. The WSV says it was 13.77 m above NHN before.",
       response:
@@ -75,6 +79,8 @@ export default {
       since: "2025-05-13",
       until: "2025-06-25",
       handling: "kept",
+      // The store holds the revised values, the WSV's latest.
+      fit: "keep",
       error:
         "PEGELONLINE's download for Cuxhaven sits 4 to 6 cm above GESLA's copy from 13 May to 24 June 2025, so the WSV changed values it still labels raw and unchecked.",
       response:
@@ -297,6 +303,8 @@ export default {
       stations: ["pegelonline/9570070"],
       since: "2024-09-01",
       handling: "kept",
+      // Neither the level nor a datum can be trusted while the gauge sits low against its neighbors.
+      fit: "drop",
       error:
         "PEGELONLINE's List auf Sylt levels have sat 8 to 20 cm lower against Hörnum and Wittdün since September 2024 than before, with no change of gauge zero.",
       response:
@@ -347,6 +355,8 @@ export default {
       since: "2025-06-03",
       until: "2025-06-04",
       handling: "kept",
+      // A single implausible value.
+      fit: "drop",
       error:
         "PEGELONLINE gives Este Inneres Sperrwerk BP 3.20 m at 08:10 UTC on 3 June 2025, after 6.51 and 6.40 m at 08:08 and 08:09, followed by a gap.",
       response:
@@ -367,6 +377,8 @@ export default {
       since: "2026-11-10",
       until: "2026-11-11",
       handling: "kept",
+      // A zero reading between steady levels.
+      fit: "drop",
       error:
         "PEGELONLINE gives Eichhorst OP and Eichhorst UP 0 cm at 03:30 UTC on 10 November 2026, then nothing until 05:15, between steady levels of 389 and 107 cm.",
       response:
@@ -391,6 +403,8 @@ export default {
       since: "2026-11-09",
       until: "2026-11-10",
       handling: "kept",
+      // A one-minute dip on a steady fall.
+      fit: "drop",
       error:
         "PEGELONLINE's REST API gives Hamburg St. Pauli 6.15 m above gauge zero at 04:10 UTC on 9 November 2026, 42 cm below the 6.59 and 6.55 m at 04:09 and 04:12, with 04:11 missing, on a tide falling about 1 cm a minute.",
       response:

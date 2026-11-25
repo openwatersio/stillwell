@@ -301,6 +301,14 @@ export interface SourceMetadata {
    */
   finalizes: boolean;
   /**
+   * For a source that never finalizes: how many months after a calendar year
+   * ends the source has stopped revising that year's values, measured or
+   * stated by the source, so a harmonic fit can take them as final
+   * (`src/fit/series.ts`). Absent where it isn't known, and then the source's
+   * values never count as final.
+   */
+  settles_after_months?: number;
+  /**
    * Whether the adapter answers an outage with an error, never with no values,
    * so a year it returns nothing for has none. A `--skip-written` backfill
    * then records such years and skips them for 30 days (`src/empty-years.ts`).

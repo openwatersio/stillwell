@@ -461,6 +461,7 @@ export function sourceEntry(
       ...metadata.license,
       commercial_use: metadata.license.commercial_use && stations.every((st) => st.commercial_use),
     },
+    settles_after_months: metadata.settles_after_months ?? null,
     stations: stations.filter((st) => st.status === "active").length,
     backfill:
       since === undefined ? null : { since, complete, incomplete: judged.length - complete },

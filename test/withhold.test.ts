@@ -447,6 +447,7 @@ describe("publishStations with withheld stations", () => {
       evidence: null,
       reported: null,
       report: null,
+      fit: null,
     };
     const result = await publishStations(store, [gesla.source, uhslc.source], [], [erratum]);
     assert.deepEqual("count" in result && result.unknownErrata, [

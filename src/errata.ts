@@ -66,6 +66,13 @@ export interface Erratum {
   reported: string | null;
   /** Where the report went and what the agency answered. */
   report: string | null;
+  /**
+   * For a `kept` erratum, whether its values may enter a harmonic fit or a
+   * tidal datum: `keep` where the error leaves the levels usable, `drop` where
+   * it doesn't. Null until decided, and for any other handling; a fit whose
+   * window an undecided one touches waits for it (`src/fit/series.ts`).
+   */
+  fit: "drop" | "keep" | null;
   /** Reads the store back and throws where it doesn't hold what the entry says (`npm run errata:check`). */
   check?: Check;
 }
@@ -228,6 +235,7 @@ export interface ErrataFile {
     evidence?: string | null;
     reported?: string | null;
     report?: string | null;
+    fit?: "drop" | "keep";
     check: Check;
   }[];
   questions?: {
@@ -255,6 +263,7 @@ const FIELDS = new Set([
   "evidence",
   "reported",
   "report",
+  "fit",
   "check",
 ]);
 /** A question's fields, refused otherwise for the same reason. */
@@ -330,6 +339,11 @@ export function parseErrata(
     const handling = text("handling", true)!;
     if (!(HANDLING as readonly string[]).includes(handling))
       throw new Error(`${at}: handling ${handling} isn't one of ${HANDLING.join(", ")}`);
+    const fit = text("fit", false);
+    if (fit !== null && fit !== "drop" && fit !== "keep")
+      throw new Error(`${at}: "fit" is neither drop nor keep`);
+    if (fit !== null && handling !== "kept")
+      throw new Error(`${at}: "fit" is for a kept erratum, and this one is ${handling}`);
     return {
       id,
       source,
@@ -342,6 +356,7 @@ export function parseErrata(
       evidence: text("evidence", false),
       reported: day("reported"),
       report: text("report", false),
+      fit: fit as "drop" | "keep" | null,
       ...(raw.check ? { check: raw.check as Check } : {}),
     };
   });

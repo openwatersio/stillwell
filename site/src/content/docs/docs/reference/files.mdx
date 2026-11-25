@@ -27,6 +27,7 @@ Every file is under `https://stillwell.openwaters.io/`, readable over HTTPS with
 - [`stations/years/<source>.parquet`](/docs/reference/observations/#which-years-exist): every year file of observed levels, with its count of values by flag.
 - [`stations/<source>.parquet`](#source-station-lists): one source's own list of stations.
 - [`stations/analysis/<source>.parquet`](#station-analysis): what the store measures from each station's levels.
+- [`fits/<source>.parquet`](#harmonic-fits) and [`constituents/<source>.parquet`](#harmonic-fits): the harmonic constants the store fits to each station's levels, and how each fit scored.
 - `history/stations/<source>/<time>.parquet` and `.json`: each refresh's previous list of a source's stations, in the layout of its time, and a report of what the refresh changed.
 
 ## Reading one station
@@ -48,3 +49,19 @@ Every file is under `https://stillwell.openwaters.io/`, readable over HTTPS with
 `stations/analysis/<source>.parquet` has a row for each station whose levels the store has measured: whether they carry a tide, the step between values that `stations.parquet` uses as `interval_s` where the source gives none, and the measures behind them.
 
 <Schema resource="analysis" />
+
+## Harmonic fits
+
+`fits/<source>.parquet` has a row for each station the store has tried to fit harmonic constants for. A fit reads up to 19 years of final values stamped on a UTC hour, in the station's current datum, and is scored on the year after them, which it didn't read. The row gives the window, the scores and what the fit read, or the reason the station has no constants.
+
+A fit is a measurement, published whatever its size. No row says whether a gauge has enough tide to predict: `mean_range_m`, `variance_explained`, each constituent's `snr` and its yearly scatter are there for a reader to set a threshold with.
+
+<Schema resource="fits" />
+
+`constituents/<source>.parquet` has a row for each candidate constituent of each station with constants. The kept rows are the fit's constants. The others say why they were left out.
+
+Every fit starts from the same candidates in the same priority order: Foreman's 45 astronomical and 24 shallow-water constituents ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf)), then the constituents NOAA's 37 and TICON-4's 50 add. A candidate is kept when the record separates it from every stronger one by the Rayleigh criterion and its signal-to-noise ratio is at least 2. Sa and Ssa are kept when their mean over the yearly fits is at least twice its standard error.
+
+The constants are not tied to one prediction program. Each row gives its constituent's Doodson numbers and speed, phases are Greenwich lags with time in UTC, and `node_corrections` in the fit's row names the nodal corrections the amplitudes and phases were fitted under. A prediction has to apply the same corrections: constants fitted under one family predict slightly differently under another, and for a few constituents, such as M1, by much more.
+
+<Schema resource="constituents" />
