@@ -415,5 +415,9 @@ A check of CRMS on 2026-11-12 found 350 of its GESLA-only years in a later gauge
 | Source | Gauges | Not backfilled | Their years | Before first | In a gap | After last | Earliest year | Reach |
 | --- | --: | --: | --: | --: | --: | --: | --: | --- |
 ${gapRows.join("\n")}
+
+## Credit
+
+The record names, contributors and years come from ${adapters.gesla!.metadata.attribution}. ${adapters.gesla!.metadata.terms}
 `;
 }

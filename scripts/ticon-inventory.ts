@@ -281,11 +281,15 @@ ${bySource.map(([source, group]) => `| ${source} | ${group.length} | ${statusOf(
 - **Contributor.** The rest map by contributor to a planned source, with its license status from Open Waters' internal sources research. A record's own \`commercial_use\` is TICON's terms for its copy; the originator's series comes under the originator's terms.
 
 "Ready" means a station matched. German records' PEGELONLINE history reaches back to 2000 at most, and not at all at gauges without a download, so the rest comes from GESLA's copies (\`gesla\`). "Planned" and "license" ids are built from codes and not yet checked against the source's station list.
-
+${
+  credits.length
+    ? `
 ## Credit
 
 The record names, countries and dates come from TICON through slackwater-database, which asks for these credits:
 
 ${credits.map((c) => `- ${c}`).join("\n")}
-`;
+`
+    : ""
+}`;
 }
