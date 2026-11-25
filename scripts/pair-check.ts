@@ -1,8 +1,8 @@
 /**
  * Pair check: compares two records of one gauge from different originators,
  * which a TICON record fitted to the same series can't, over one year of the
- * store's levels (`good` and `preliminary` only, from the one datum epoch that
- * holds the year). It reads the second series at each of the first's times
+ * store's levels (`good` and `preliminary` only, from the latest datum epoch that
+ * holds part of the year, within that epoch's span). It reads the second series at each of the first's times
  * shifted by lags of up to 3 hours in 10-minute steps, interpolating between
  * readings 20 minutes apart or less, and prints for the best lag the RMS of the
  * difference once its mean is removed, next to the RMS at zero lag. A series
@@ -18,7 +18,7 @@
  * as in `clock-check`. A lag counts only where its RMS is under three quarters
  * of the zero-lag RMS and at least 0.5 cm less, and the command then exits
  * nonzero. A pair whose RMS is under 2 mm at zero lag is marked `same values`:
- * one record's values held twice say nothing about either clock. Records of two
+ * one record's values held twice say nothing about either clock (the mean is removed first, so a pair a constant apart is marked too, and its mean column says by how much). Records of two
  * nearby gauges can fit best at a lag from the tide's travel time, and river
  * gauges at one that's nothing to do with a clock, so judge a lag with the
  * gauges' positions. The store is `STILLWELL_STORE`, the public bucket by default.
@@ -26,22 +26,23 @@
 import { readStationList, readObservationsBetween } from "../src/store/parquet.ts";
 import { seriesPath, stationListPath } from "../src/store/paths.ts";
 import { Flag, type StoredStation } from "../src/schema.ts";
+import {
+  clockOff,
+  fit,
+  latestEpoch,
+  MIN_SHARED,
+  SAME_RMS_M,
+  sharedDatum,
+  type Reading,
+} from "../src/pair-check.ts";
 
 const STORE = (process.env.STILLWELL_STORE ?? "https://stillwell.openwaters.io").replace(/\/$/, "");
-const MINUTE_MS = 60_000;
-/** Lags tried, in minutes, every 10 up to 3 hours either way. */
-const LAGS = Array.from({ length: 37 }, (_, i) => (i - 18) * 10);
-/** Shared readings a lag needs to count. */
-const MIN_SHARED = 200;
-/** The furthest apart two readings can be and still give an interpolated one between them. */
-const MAX_GAP_MS = 20 * MINUTE_MS;
-/** The RMS under which two records hold the same values. */
-const SAME_RMS_M = 0.002;
 
 const [period, ...pairs] = process.argv.slice(2);
 if (!period || !/^\d{4}$/.test(period) || !pairs.length)
   throw new Error("Usage: node scripts/pair-check.ts <year> <source/id>=<source/id>...");
 const year = Number(period);
+const [FROM, TO] = [Date.UTC(year, 0, 1), Date.UTC(year + 1, 0, 1)];
 
 const lists = new Map<string, StoredStation[]>();
 async function station(id: string): Promise<StoredStation> {
@@ -65,95 +66,21 @@ async function retried<T>(read: () => Promise<T>): Promise<T> {
   }
 }
 
-interface Reading {
-  time: number;
-  level: number;
-}
-
-/** The epochs of `s` that hold part of the year, as the store keeps them: open or closed, not held or rejected. */
-function epochsOf(s: StoredStation, from: number, to: number) {
-  return (s.epochs ?? []).filter(
-    (e) =>
-      (e.state === "open" || e.state === "closed") &&
-      (!e.since || Date.parse(e.since) < to) &&
-      (!e.until || Date.parse(e.until) > from),
-  );
-}
-
+/** The station's good and preliminary levels in the year, from the latest epoch that holds part of it, within its span. */
 async function readings(s: StoredStation): Promise<Reading[]> {
-  const [from, to] = [Date.UTC(year, 0, 1), Date.UTC(year + 1, 0, 1)];
-  const rows: Reading[] = [];
-  for (const e of epochsOf(s, from, to)) {
-    const lo = Math.max(from, e.since ? Date.parse(e.since) : from);
-    const hi = Math.min(to, e.until ? Date.parse(e.until) : to);
-    const path = seriesPath(STORE, "levels", s.source, s.source_id, year, e.id);
-    for (const o of await readObservationsBetween(path, lo, hi))
-      if ((o.flag === Flag.good || o.flag === Flag.preliminary) && Number.isFinite(o.level))
-        rows.push({ time: o.time, level: o.level });
-  }
-  return rows.sort((a, b) => a.time - b.time);
-}
-
-/** The datum offsets of the one epoch that holds the year, or null where several do. */
-function yearDatums(s: StoredStation): { datum: string; datums: Record<string, number> } | null {
-  const epochs = epochsOf(s, Date.UTC(year, 0, 1), Date.UTC(year + 1, 0, 1));
-  const e = epochs.length === 1 ? epochs[0]! : null;
-  return e ? { datum: e.datum, datums: e.datums ?? {} } : null;
-}
-
-/** `b`'s level at `time`: a reading there, or one between readings 20 minutes apart or less. */
-function levelAt(b: Reading[], time: number): number | undefined {
-  let [lo, hi] = [0, b.length];
-  while (lo < hi) {
-    const mid = (lo + hi) >> 1;
-    if (b[mid]!.time < time) lo = mid + 1;
-    else hi = mid;
-  }
-  const next = b[lo];
-  if (next && next.time === time) return next.level;
-  const prev = b[lo - 1];
-  if (!prev || !next || next.time - prev.time > MAX_GAP_MS) return undefined;
-  return prev.level + ((next.level - prev.level) * (time - prev.time)) / (next.time - prev.time);
-}
-
-function fit(a: Reading[], b: Reading[]) {
-  const at = LAGS.flatMap((lag) => {
-    let [n, sum, squares] = [0, 0, 0];
-    // The second series at the first's time plus the lag: a positive lag is a late first clock.
-    for (const r of a) {
-      const v = levelAt(b, r.time - lag * MINUTE_MS);
-      if (v === undefined) continue;
-      n++;
-      sum += r.level - v;
-      squares += (r.level - v) ** 2;
-    }
-    if (n < MIN_SHARED) return [];
-    const mean = sum / n;
-    return [{ lag, n, mean, rms: Math.sqrt(Math.max(0, squares / n - mean * mean)) }];
-  });
-  const best = at.reduce<(typeof at)[number] | null>((x, y) => (!x || y.rms < x.rms ? y : x), null);
-  return { best, zero: at.find((x) => x.lag === 0), tried: at.length };
-}
-
-/** Datums that are each station's own zero, so two stations naming one share no reference. */
-const LOCAL_ZEROS = new Set(["ZERO", "GAGE", "GZ", "STND", "PNP", "CD", "DL", "ZH"]);
-
-/** The first datum both stations know, and the offset to add to a level of `x` to read it in `y`'s. */
-function sharedDatum(
-  x: NonNullable<ReturnType<typeof yearDatums>>,
-  y: NonNullable<ReturnType<typeof yearDatums>>,
-): { name: string; offset: number } | null {
-  const offsetTo = (d: typeof x, name: string) => (d.datum === name ? 0 : (d.datums[name] ?? null));
-  const names = new Set(
-    [x.datum, y.datum, ...Object.keys(x.datums), ...Object.keys(y.datums)].filter(
-      (name) => !LOCAL_ZEROS.has(name),
-    ),
-  );
-  for (const name of names) {
-    const [ox, oy] = [offsetTo(x, name), offsetTo(y, name)];
-    if (ox !== null && oy !== null) return { name, offset: oy - ox };
-  }
-  return null;
+  const latest = latestEpoch(s, FROM, TO);
+  if (!latest) return [];
+  const e = latest.epoch;
+  const lo = Math.max(FROM, e.since ? Date.parse(e.since) : FROM);
+  const hi = Math.min(TO, e.until ? Date.parse(e.until) : TO);
+  const path = seriesPath(STORE, "levels", s.source, s.source_id, year, e.id);
+  const rows = await readObservationsBetween(path, lo, hi);
+  return rows
+    .filter(
+      (o) => (o.flag === Flag.good || o.flag === Flag.preliminary) && Number.isFinite(o.level),
+    )
+    .map((o) => ({ time: o.time, level: o.level }))
+    .sort((a, b) => a.time - b.time);
 }
 
 console.log(
@@ -186,16 +113,23 @@ for (const pair of pairs) {
     continue;
   }
   const cm = (m: number) => (m * 100).toFixed(1);
-  const off = best.lag !== 0 && best.rms <= 0.75 * zero.rms && zero.rms - best.rms >= 0.005;
+  const off = clockOff(best, zero);
   flagged ||= off;
-  const [dx, dy] = [yearDatums(sx!), yearDatums(sy!)];
-  const shared = dx && dy ? sharedDatum(dx, dy) : null;
+  const [ex, ey] = [latestEpoch(sx!, FROM, TO)!, latestEpoch(sy!, FROM, TO)!];
+  const shared = sharedDatum(
+    { datum: ex.epoch.datum, datums: ex.epoch.datums ?? {} },
+    { datum: ey.epoch.datum, datums: ey.epoch.datums ?? {} },
+  );
   const datum = shared
-    ? `${shared.name}: ${cm(best.mean - shared.offset)} cm from ${cm(shared.offset)} cm`
+    ? `${shared.name}: ${cm(best.mean - shared.expected)} cm from ${cm(shared.expected)} cm`
     : "";
-  const note = zero.rms < SAME_RMS_M ? "same values" : "";
+  const notes = [
+    zero.rms < SAME_RMS_M ? "same values" : "",
+    ex.of > 1 ? `${x} epoch ${ex.epoch.id} of ${ex.of}` : "",
+    ey.of > 1 ? `${y} epoch ${ey.epoch.id} of ${ey.of}` : "",
+  ].filter(Boolean);
   console.log(
-    `| ${x} | ${y} | ${best.n} | ${tried} | ${off ? `**${best.lag}**` : best.lag} | ${cm(best.rms)} | ${cm(zero.rms)} | ${cm(best.mean)} | ${datum} | ${note} |`,
+    `| ${x} | ${y} | ${best.n} | ${tried} | ${off ? `**${best.lag}**` : best.lag} | ${cm(best.rms)} | ${cm(zero.rms)} | ${cm(best.mean)} | ${datum} | ${notes.join("; ")} |`,
   );
 }
 if (flagged) process.exitCode = 1;

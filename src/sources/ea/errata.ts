@@ -196,6 +196,7 @@ export default {
       reported: null,
       report: null,
       check: async (store, e) => {
+        await flaggedSpan(store, e);
         await allSuspect(store, e.stations![0]!, e.since!, e.until!);
         // The twin's difference on the stretch's last day, and on the day after, where the offset is back.
         for (const [day, expected, n] of [
