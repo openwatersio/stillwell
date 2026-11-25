@@ -50,7 +50,7 @@ Sea levels from [GESLA](https://gesla787883612.wordpress.com/) (Global Extreme S
 ## Running ingest
 
 - **Withheld records:** `withheld` names every UHSLC record that carries SANHO's notice (`refused` in [UHSLC's notice list](../uhslc/notices.ts)) and every record of a UHSLC station number the `uhslc` adapter withholds, and the adapter never lists or fetches them. UHSLC's Lüderitz series, `uhslc/702`, is withheld by hand (`ALSO_WITHHELD`). A refusal from one of GESLA's other contributors, such as BOM, would need a rule of its own. [Withheld stations](../../../docs/contributing/sources.md#withheld-stations) has how withheld records leave the store.
-- **Terms and coverage files:** [`contributors.ts`](contributors.ts) holds each contributor's terms. `npm run gesla:contributors` writes the table of terms by contributor, and `npm run gesla:coverage` the coverage report.
+- **Terms and coverage files:** [`contributors.ts`](contributors.ts) holds each contributor's terms. `npm run gesla:contributors` writes the table of terms by contributor, and `npm run gesla:coverage` the [coverage report](https://openwatersio.github.io/stillwell/reports/gesla-coverage/), which the site writes when it builds.
 - **Dropped records:** `isDropped` in [`dropped.ts`](dropped.ts) finds the records that hold another gauge's values, and the adapter refuses to fetch them, so `backfill all` skips them. `ingest drop gesla` deletes their stored files and backfilled years, except those of the ten CRMS records in `KEEP_FILES`, whose values match nothing else in the store.
 
 ### Reading the release

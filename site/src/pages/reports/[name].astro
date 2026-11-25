@@ -1,0 +1,34 @@
+---
+// A work-planning report: which sources and stations to add next. Not linked from the docs.
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { REPORTS, report } from "../../lib/reports";
+import { sitePath } from "../../lib/paths";
+
+export function getStaticPaths() {
+  return Object.keys(REPORTS).map((name) => ({ params: { name } }));
+}
+
+const { name } = Astro.params as { name: string };
+const { title, command } = REPORTS[name]!;
+const r = report(name);
+---
+
+<StarlightPage
+  frontmatter={{ title, description: `${title}, for planning which sources to add` }}
+  headings={r?.headings ?? []}
+>
+  {r ? (
+    <>
+      <p>
+        Written {r.written.toISOString().slice(0, 10)} ·{" "}
+        <a href={sitePath(`/reports/${name}.csv`)}>{name}.csv</a>
+      </p>
+      <Fragment set:html={r.html} />
+    </>
+  ) : (
+    <p>
+      This build didn't write the report. Run <code>{command}</code> from the repository's root
+      before building the site.
+    </p>
+  )}
+</StarlightPage>

@@ -504,16 +504,6 @@ describe("parseStationList", () => {
     assert.deepEqual(parseStationList(text, "usgs", true), ["usgs/02198820", "usgs/01410600"]);
   });
 
-  it("reads the committed TICON inventory", () => {
-    const ids = parseStationList(
-      readFileSync(new URL("../docs/ticon-inventory.csv", import.meta.url), "utf8"),
-      "usgs",
-      true,
-    );
-    assert.ok(ids.length > 400);
-    assert.ok(ids.every((id) => /^usgs\/\d+$/.test(id)));
-  });
-
   it("keeps an empty first field, so the columns after it stay in place", () => {
     const text = "ticon_id,name,originator_id\n,Name,usgs/02198820\n,,usgs/01410600";
     assert.deepEqual(parseStationList(text, "usgs", true), ["usgs/02198820", "usgs/01410600"]);

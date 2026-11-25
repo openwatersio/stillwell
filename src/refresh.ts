@@ -44,12 +44,7 @@ import { linkGauges, type LinkReport } from "./same-as.ts";
 import { linkShifts, readLinks } from "./links.ts";
 import { readMatches } from "./matches.ts";
 import { JSON_FILES, dataPackage } from "./store/files.ts";
-import {
-  offsetRows,
-  tideStations,
-  withDatums,
-  type DatumReport,
-} from "./datums.ts";
+import { offsetRows, tideStations, withDatums, type DatumReport } from "./datums.ts";
 import { isDropped } from "./sources/gesla/dropped.ts";
 import { backfillStatus } from "./backfilled.ts";
 import { usableShares, writeYears } from "./store/years.ts";

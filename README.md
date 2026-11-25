@@ -65,7 +65,7 @@ The [docs site](https://openwatersio.github.io/stillwell/docs/) has the file lay
 - [Using the data](https://openwatersio.github.io/stillwell/docs/): the store's files, columns and example queries.
 - [Station lists](docs/stations.md), for contributors: how the store keeps and refreshes each source's stations, opens datum epochs and links stations across sources. The [Stations](https://openwatersio.github.io/stillwell/docs/guides/stations/) and [Datums](https://openwatersio.github.io/stillwell/docs/guides/datums/) guides cover the same for readers.
 - [Quality control notes](docs/qc/README.md): an evaluation of the checks against published practice. The [Quality control](https://openwatersio.github.io/stillwell/docs/guides/quality-control/) guide describes the checks for readers.
-- [TICON inventory](docs/ticon-inventory.md): the store series for each TICON record's originator, where there is one.
+- [TICON inventory](https://openwatersio.github.io/stillwell/reports/ticon-inventory/): the store series for each TICON record's originator, where there is one. The site writes it, and the [GESLA coverage](https://openwatersio.github.io/stillwell/reports/gesla-coverage/) report, when it builds.
 - [Plans](docs/plans/plan.md): the roadmap and the API design.
 
 ## Contributing
