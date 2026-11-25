@@ -185,13 +185,24 @@ describe("the record", () => {
 
   it("stops at a failed step until it's retried, then runs it again, or until it's skipped", () => {
     const failed = fail(empty, "20261101-a", 0, "exit 1", NOW);
-    assert.deepEqual(next(all, failed), { stopped: "20261101-a failed: exit 1" });
+    assert.deepEqual(next(all, failed), {
+      stopped: "20261101-a failed: exit 1",
+      since: NOW.toISOString(),
+    });
     assert.equal((next(all, retry(failed, "20261101-a", NOW)) as { step: number }).step, 0);
     assert.equal(
       (next(all, skip(failed, all, "20261101-a", NOW)) as { id: string }).id,
       "20261102-b",
     );
     assert.throws(() => retry(empty, "20261101-a", NOW), /hasn't failed/);
+    // A re-run of the failed step's old attempt can't undo the skip, or record a step the row isn't at.
+    assert.throws(
+      () => done(skip(failed, all, "20261101-a", NOW), all, "20261101-a", 0, NOW),
+      /done/,
+    );
+    assert.throws(() => done(failed, all, "20261101-a", 1, NOW), /at step 0/);
+    assert.throws(() => done(empty, all, "20261101-a", 1, NOW), /not started/);
+    assert.equal(done(failed, all, "20261101-a", 0, NOW).migrations[0]!.state, "running");
     assert.throws(() => skip(failed, all, "20261130-typo", NOW), /no migration/);
   });
 
@@ -221,7 +232,10 @@ describe("the record", () => {
       ...all,
     ];
     const failed = fail(empty, "20261102-b", 0, "exit 1", NOW);
-    assert.deepEqual(next(late, failed), { stopped: "20261102-b failed: exit 1" });
+    assert.deepEqual(next(late, failed), {
+      stopped: "20261102-b failed: exit 1",
+      since: NOW.toISOString(),
+    });
   });
 
   it("stops every migration while a failed or unfinished one's file is gone", () => {
@@ -234,6 +248,8 @@ describe("the record", () => {
       ],
     };
     assert.match((next(all, partway) as { stopped: string }).stopped, /no such file/);
+    // The row's time is when it last ran, not when its file went, so the stop has no time.
+    assert.equal((next(all, renamed) as { since?: string }).since, undefined);
     // Skipping it clears the stop, though its file is gone.
     assert.equal(
       (next(all, skip(partway, all, "20261099-old-name", NOW)) as { id: string }).id,
