@@ -5,15 +5,16 @@ Hourly sea levels from the gauges that the Bureau of Meteorology's National Tida
 - **Stations:** each gauge is `bom/<number>`, the number in its file's name, `h<number>.dat`. The ABSLMP gauges numbered 956 to 959 and 992 to 997 carry BOM's own numbers, and the rest carry UHSLC's. Positions come from BOM's records of the gauges in GESLA, and UHSLC's for Alofi, since the files give them only to the minute.
 - **Not listed:** the archives also carry gauges BOM relays for their owners: Fremantle (Western Australia's Department of Transport), Brisbane Bar, Bundaberg and Townsville (Queensland's Department of Transport and Main Roads), Fort Denison (Manly Hydraulics Laboratory) and Booby Island. The ABSLMP's Thursday Island gauge has no file in the archives.
 - **Levels:** one an hour, in BOM's copy of UHSLC's hourly format. A year's file can end before December 31, as Thevenard's 2019 file ends in May, and is read as far as it goes.
-- **Times:** UTC, as the files' `TIMEZONE=GMT` says. Levels match UHSLC's fast-delivery series of the same gauges hour for hour, with no lag.
+- **Times:** UTC, as the files' `TIMEZONE=GMT` says. Levels match UHSLC's fast-delivery series of the same gauges hour for hour, with no lag, except where a known limit below says otherwise.
 - **Datum:** `TGZ`, each gauge's tide gauge zero. The files don't name their zero. `datums.AHD` comes from the list beside the files, `readme.txt` (2015), at the 11 gauges where it gives one value and the gauge's mean level sits 0.10 to 0.26 m above it. It is left out at Broome (erratum `bom-broome-ahd`), at Darwin, for which the list gives two values, at Port Stanvac, whose value the list marks uncertain, and at the gauges the list has no value for. No independent reference checks the list's values: BOM's station sheets on its website aren't reachable by script.
-- **Flags:** the files have none. A value from the year under way is `preliminary`, as are the two years before it until April, since BOM rebuilds a year's archive in the next year's first weeks and again a year later. Every other value is `good`, which here means final, not checked. That an archive is final after its rebuilds is an assumption.
+- **Flags:** the files have none. A value from the year under way is `preliminary`, as are the two years before it until April, since BOM rebuilds a year's archive in the next year's first weeks and again a year later. Every other value is `good`, which here means final, not checked, except where an erratum flags it. That an archive is final after its rebuilds is an assumption.
 - **Freshness:** BOM rewrites the current year's archive about monthly, weeks behind, so no station is polled hourly. BOM's real-time displays aren't served as files.
 
 ## Known limits
 
 - **Missing years:** BOM has no archives for 1997 to 2004. The archives for 2015 to 2018 hold only Alofi's file, so the other gauges have no values for those years. Suva starts in 2005, and Christmas Island covers only 2007 to 2011.
-- **Christmas Island:** UHSLC's copy is about 0.05 m lower than BOM's from August 2009, and no independent record shows which is right.
+- **Christmas Island:** UHSLC's copy differs from BOM's from August 2009 to the end of BOM's file, and no record in the store shows which is right ([`bom-christmas-island-2009-offset`](errata.ts)).
+- **Majuro:** BOM's files for 2005 to 2008 are flagged `suspect` ([`bom-majuro-2005-2008-values`](errata.ts)).
 
 ## Running ingest
 
