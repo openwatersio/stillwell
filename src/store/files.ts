@@ -756,7 +756,7 @@ export const FILES = {
         type: "VARCHAR",
         nullable: true,
         description:
-          "The family of nodal corrections the fit used: `iho`, `schureman` or `foreman`. A prediction from the constants has to use the same one.",
+          "The nodal corrections the fit used: `schureman`, for Schureman's (1958), as NOAA's analyses use. A prediction from the constants has to use the same one.",
       },
       {
         name: "engine",

@@ -14,6 +14,7 @@ import type { Sample } from "../types.ts";
 import { CANDIDATES } from "./candidates.ts";
 import {
   harmonicSamples,
+  NODE_CORRECTIONS,
   scoreHeldOut,
   SEASONAL,
   tidalResiduals,
@@ -62,8 +63,7 @@ export const MIN_FIT_DAYS = 183;
  * significant (Parker 2007, §3.7.2), near the 95% level as SNR ≥ 2 is.
  */
 export const SEASONAL_SIGNIFICANCE = 2;
-/** The family of nodal corrections every fit uses, which a prediction from its constants has to match. */
-export const NODE_CORRECTIONS = "iho";
+export { NODE_CORRECTIONS };
 
 const FIT_OPTIONS: FitOptions = { robust: true, nodeCorrections: NODE_CORRECTIONS };
 
@@ -207,7 +207,10 @@ export function meanRange(
   start: number,
   end: number,
 ): number | null {
-  const extremes = createTidePredictor(constituents, { offset: false }).getExtremesPrediction({
+  const extremes = createTidePredictor(constituents, {
+    offset: false,
+    nodeCorrections: NODE_CORRECTIONS,
+  }).getExtremesPrediction({
     start: new Date(start),
     end: new Date(end),
   });
@@ -300,6 +303,7 @@ export async function fitStation(
     const engineSamples = harmonicSamples(samples);
     const { selection } = selectConstituents(engineSamples, {
       candidates: candidates.map(({ name }) => ({ name })),
+      nodeCorrections: NODE_CORRECTIONS,
     });
     const chosen = selection.filter((s) => s.kept).map((s) => s.name);
     const fitted = engineFit(engineSamples, [...chosen, ...SEASONAL], {

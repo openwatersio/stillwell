@@ -35,7 +35,7 @@ const hours = (start: number, end: number) =>
   Array.from({ length: (end - start) / HOUR }, (_, i) => start + i * HOUR);
 
 const tideAt = (times: number[], constants = GENERATING) => {
-  const predictor = createTidePredictor(constants, { offset: false });
+  const predictor = createTidePredictor(constants, { offset: false, nodeCorrections: "schureman" });
   return times.map((time) => predictor.getWaterLevelAtTime({ time: new Date(time) }).level);
 };
 
@@ -166,7 +166,7 @@ describe("fitStation", () => {
     assert.equal(fit.since, "2019-01-01T00:00:00.000Z");
     assert.equal(fit.until, "2024-01-01T00:00:00.000Z");
     assert.equal(fit.hours, (Date.UTC(2024, 0, 1) - Date.UTC(2019, 0, 1)) / HOUR);
-    assert.equal(fit.node_corrections, "iho");
+    assert.equal(fit.node_corrections, "schureman");
     assert.ok(fit.version);
     assert.ok(fit.variance_explained! > 0.99, `${fit.variance_explained}`);
     assert.ok(fit.mean_range_m! > 1.5 && fit.mean_range_m! < 3, `${fit.mean_range_m}`);

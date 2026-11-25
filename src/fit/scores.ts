@@ -21,6 +21,16 @@ export function harmonicSamples(samples: readonly Sample[]): HarmonicSample[] {
  * can't carry an agency's curves or extremes.
  */
 
+/**
+ * The nodal corrections every fit and every prediction here uses: Schureman's
+ * (1958), as NOAA's analyses and predictions do. Constants mean what they
+ * were fitted to mean only under the same corrections, so the fit, the yearly
+ * fits and the scores share this one setting, and each fit's row names it.
+ * docs/fits.md has the comparison with IHO's and Foreman's.
+ */
+export const NODE_CORRECTIONS = "schureman";
+const PREDICT = { offset: false, nodeCorrections: NODE_CORRECTIONS } as const;
+
 const HOUR_MS = 3_600_000;
 const DAY_MS = 86_400_000;
 
@@ -54,7 +64,7 @@ export function tidalResiduals(
 ): Map<number, number> {
   const out = new Map<number, number>();
   if (!samples.length) return out;
-  const predictor = createTidePredictor(constituents, { offset: false });
+  const predictor = createTidePredictor(constituents, PREDICT);
   const first = Math.floor(samples.reduce((m, s) => Math.min(m, s.time), Infinity) / HOUR_MS);
   const sums: number[] = [];
   const counts: number[] = [];
@@ -295,7 +305,7 @@ export function predictAt(
   constituents: HarmonicConstituent[],
   samples: readonly Sample[],
 ): Sample[] {
-  const predictor = createTidePredictor(constituents, { offset: false });
+  const predictor = createTidePredictor(constituents, PREDICT);
   const predicted = samples.map(({ time }) => ({
     time,
     level: predictor.getWaterLevelAtTime({ time: new Date(time) }).level,

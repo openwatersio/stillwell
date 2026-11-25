@@ -37,7 +37,7 @@ const series = (
   constituents: { name: string; amplitude: number; phase: number }[],
   extra = (_h: number) => 0,
 ): Sample[] => {
-  const p = createTidePredictor(constituents, { offset: false });
+  const p = createTidePredictor(constituents, { offset: false, nodeCorrections: "schureman" });
   return Array.from({ length: hours }, (_, h) => ({
     time: START + h * HOUR,
     level: p.getWaterLevelAtTime({ time: new Date(START + h * HOUR) }).level + extra(h),
@@ -86,7 +86,7 @@ describe("bandRms", () => {
 describe("pickTurns", () => {
   it("finds the engine's high and low waters to the minute", () => {
     const turns = pickTurns(series(24 * 30, TIDE), 0.1);
-    const engine = createTidePredictor(TIDE, { offset: false })
+    const engine = createTidePredictor(TIDE, { offset: false, nodeCorrections: "schureman" })
       .getExtremesPrediction({
         start: new Date(START + HOUR),
         end: new Date(START + 24 * 29 * HOUR),

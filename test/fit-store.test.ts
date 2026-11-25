@@ -239,7 +239,7 @@ describe("fitStation", () => {
       { name: "M2", amplitude: 1, phase: 30 },
       { name: "K1", amplitude: 0.2, phase: 120 },
     ],
-    { offset: false },
+    { offset: false, nodeCorrections: "schureman" },
   );
   // A fixed sequence, so SNR is finite and every run fits the same values.
   let seed = 1;
