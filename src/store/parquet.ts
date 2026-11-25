@@ -393,16 +393,18 @@ export async function readHourly(path: string): Promise<Map<number, number> | nu
 /**
  * A series file's observations at times from `from` to before `to` (epoch ms),
  * filtered in the query, so a remote read fetches only the row groups that
- * hold them rather than the whole year.
+ * hold them rather than the whole year. With `onTheHour`, only values stamped
+ * on a UTC hour, which is what a harmonic fit samples.
  */
 export async function readObservationsBetween(
   path: string,
   from: number,
   to: number,
+  onTheHour = false,
 ): Promise<Observation[]> {
   // read_parquet globs, so a station ID with a glob character reads only its own file.
   const glob = /[*?[]/.test(path);
-  const span = `time >= make_timestamp(${Math.round(from) * 1000}) AND time < make_timestamp(${Math.round(to) * 1000})`;
+  const span = `time >= make_timestamp(${Math.round(from) * 1000}) AND time < make_timestamp(${Math.round(to) * 1000})${onTheHour ? " AND epoch_ms(time) % 3600000 = 0" : ""}`;
   const rows = await read(
     path,
     OBSERVATION_COLUMNS,

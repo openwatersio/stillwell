@@ -301,6 +301,15 @@ export interface SourceMetadata {
    */
   finalizes: boolean;
   /**
+   * For a source that never finalizes: how many months after a calendar year
+   * ends a harmonic fit takes that year's values as final
+   * (`src/fit/series.ts`): the source's own figure where it states one,
+   * otherwise one decided from its record of revisions, with the evidence
+   * beside it. Absent where none is known, and then the source's values never
+   * count as final.
+   */
+  settles_after_months?: number;
+  /**
    * Whether the adapter answers an outage with an error, never with no values,
    * so a year it returns nothing for has none. A `--skip-written` backfill
    * then records such years and skips them for 30 days (`src/empty-years.ts`).
@@ -380,6 +389,17 @@ export interface Source {
    * such as a whole day or a late reading.
    */
   keepsStored?: boolean;
+  /**
+   * Whether the source's recent values can arrive long after their times, as
+   * PEGELONLINE's do when a gauge that sent nothing for days sends them all
+   * at once. A few times a day (`gapsDue`), the poller then asks a station
+   * from the first gap in its last days, or from where its values stopped
+   * (`gapStart`), where it otherwise asks only the last hours. A fetch that
+   * reaches back so adds and replaces values, and deletes none. A source with a `recent`
+   * sweep isn't asked so, and a station with no `interval_s` only from where
+   * its values stopped.
+   */
+  fillsLate?: boolean;
   /**
    * Spans of a station's values that the store's own errata flag `suspect`,
    * beyond the spans its `errata.ts` names, which the registry adds, worked

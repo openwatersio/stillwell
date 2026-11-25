@@ -495,6 +495,33 @@ export default {
       },
     },
     {
+      id: "pegelonline-nienburg-2026-11-06",
+      stations: ["pegelonline/47900118"],
+      since: "2026-11-06",
+      until: "2026-11-08",
+      handling: "flagged",
+      error:
+        "From 18:15 UTC on 6 November to about 08:00 UTC on 7 November 2026 PEGELONLINE's REST API reads up to 5.58 m at Nienburg, 1 m above any other value of its year, where its raw-data download reads 3.65 to 3.70 m, as the days before and after do.",
+      response:
+        "6 and 7 November 2026 are flagged `suspect`, keeping the source flag as `source_flag`. The values are the REST API's.",
+      evidence:
+        "Found comparing the raw-data download with the store's values from the REST API, November 2026 ([#544](https://github.com/openwatersio/stillwell/issues/544)). The store rises from 3.67 m at 18:00 UTC to 4.05 m at 18:15 and 5.58 m at 18:30, holds above 5.4 m until 01:00, and falls back to 3.70 m by 08:00. 41 values are above 4.2 m, and QC flags 2 of the episode. Every other value of 2026 is between 3.65 and 4.59 m. The Weser gauges on either side stay inside their range of the day before throughout: Drakenburg (`pegelonline/47900107`, 6 km) reads 1.56 to 1.81 m, Liebenau (`pegelonline/47500200`, 8 km) 1.10 to 1.22 m, Stolzenau (`pegelonline/47500110`, 16 km) 3.02 to 3.08 m and Hoya (`pegelonline/47900129`, 18 km) 3.49 to 3.55 m. On 24 November the download read 3.65 to 3.70 m over those hours, and the REST API still served the values the store holds, so the two differ here as they do at Cuxhaven and Husum (erratum `pegelonline-download-api-differ`).",
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        // Both days of the episode: its rise on the 6th and its hold into the 7th.
+        for (const [day, least] of [
+          [e.since!, 15],
+          [dayAfter(e.since!, 1), 4],
+        ] as const) {
+          const high = (await levels(store, e.stations![0]!, day)).filter((o) => o.level > 5);
+          if (high.length < least)
+            throw new Error(
+              `Nienburg holds ${high.length} values above 5 m on ${day}, not the episode`,
+            );
+        }
+      },
+    },
+    {
       id: "pegelonline-fill-values",
       stations: ["pegelonline/9520050", "pegelonline/9520070"],
       since: "2019-01-01",
@@ -534,7 +561,7 @@ export default {
       id: "pegelonline-revision-log",
       stations: "every station",
       question:
-        "Does the WSV record when raw water-level values are changed after PEGELONLINE has published them, and can it tell us which stations and periods changed? We know of two cases. At Nienburg (47900118), the REST API gave about 5.55 m from 18:15 on 6 November 2026 to 10:00 on 7 November, and the download now gives 3.65 to 3.70 m for those times. At Cuxhaven Steubenhöft (5990020), the download for 13 May to 24 June 2025 sits 4 to 6 cm above GESLA's copy of the same series. How long after a value is first published can it still change: days, weeks, or years? Is there a change log, a validation date, or a way to ask for what changed since a date? A complete answer would also say whether the move of the REST API onto the download's data store, which the WSV described on 16 November 2026, changes any of this.",
+        "Does the WSV record when raw water-level values are changed after PEGELONLINE has published them, and can it tell us which stations and periods changed? We know of one case: at Cuxhaven Steubenhöft (5990020), the download for 13 May to 24 June 2025 sits 4 to 6 cm above GESLA's copy of the same series. At Nienburg (47900118), the REST API gives up to 5.58 m from 18:15 UTC on 6 November 2026 to about 08:00 UTC on 7 November, where the download gives 3.65 to 3.70 m (erratum `pegelonline-nienburg-2026-11-06`), and we can't tell whether the download's values were corrected or the two never agreed. How long after a value is first published can it still change: days, weeks, or years? Is there a change log, a validation date, or a way to ask for what changed since a date? A complete answer would also say whether the move of the REST API onto the download's data store, which the WSV described on 16 November 2026, changes any of this.",
       why: "The store has no signal for revised values and reads each one once. A change log or a stated limit on how long values can change sets how often the store fetches old months again and how far back, and lets it refetch only what changed instead of downloading each station's months to compare.",
       meanwhile:
         "The store holds each value as first read. The REST API's values for recent days stay in the store, and nothing fetches those months from the download again unless a backfill is run over them.",

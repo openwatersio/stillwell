@@ -52,6 +52,8 @@ for (const f of [FILES.extremes, FILES.predictions, FILES["predicted-extremes"]]
 for (const source of sources) {
   await check(`stations/${source}.parquet`, FILES.lists);
   await check(`stations/analysis/${source}.parquet`, FILES.analysis, true);
+  await check(`fits/${source}.parquet`, FILES.fits, true);
+  await check(`constituents/${source}.parquet`, FILES.constituents, true);
   // Yesterday's, which the poller has written whole.
   await check(
     recentDayPath("", source, recentDays(Date.now(), 2)[0]!).slice(1),
