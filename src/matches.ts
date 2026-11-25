@@ -1,5 +1,5 @@
 import { monthlyAgreement, SAME_GAUGE, type Hourly } from "./cross-check.ts";
-import { median } from "./stats.ts";
+import { distanceKm as km, median } from "./stats.ts";
 import type { StoredStation } from "./schema.ts";
 import { comparable, joinsNoGroup } from "./same-as.ts";
 import { FILES } from "./store/files.ts";
@@ -7,7 +7,6 @@ import { isMissing, readHourly, readRows, writeTable } from "./store/parquet.ts"
 import { matchesPath, seriesPath } from "./store/paths.ts";
 import { epochWindow } from "./store/recent.ts";
 import { readYears, usableHours } from "./store/years.ts";
-import { km } from "./ticon.ts";
 
 /**
  * Pairs of stations compared by their hourly levels, for `linkGauges` to link

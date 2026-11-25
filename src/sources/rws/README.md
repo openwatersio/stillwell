@@ -36,10 +36,10 @@ Backfill to 1990 asks for every product a station lists, a year per request, so 
    node scripts/ingest.ts backfill rws all 2026 2027
    ```
 
-2. The history, with the 161 stations matched to TICON records first. `--skip-written` picks up where the last run stopped. At the default 4 stations at once, that's about 3 runs for the TICON stations and about 6 for every station. A year RWS has nothing for writes no file, so each run asks for it again, at about a second a request, which comes to about 25 minutes of each run once most river stations' years before they opened have been asked:
+2. The history. `--skip-written` picks up where the last run stopped. At the default 4 stations at once, that's about 6 runs for every station. A year RWS has nothing for writes no file, so each run asks for it again, at about a second a request, which comes to about 25 minutes of each run once most river stations' years before they opened have been asked:
 
    ```bash
-   node scripts/ingest.ts backfill rws all 1990 2026 --skip-written --first docs/ticon-inventory.csv
+   node scripts/ingest.ts backfill rws all 1990 2026 --skip-written
    ```
 
 Each run holds the `store-rws` group for up to 6 hours. A job that finds the group taken waits, and the next run cancels it, so start each run between 01:00 and 18:30 UTC, so it ends before Compact daily at 00:40, and not on the 2nd, when Monthly refreshes the station list at 01:25.
