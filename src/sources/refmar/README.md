@@ -10,6 +10,7 @@ Observed sea levels at French tide gauges, in metropolitan France and overseas, 
 - **Times:** UTC. Every gauge's `fuseau_horaire` is 0, and the service documents its timestamps as UTC ("la date et l'heure de la donnée en UTC"). Brest, Nouméa, Papeete, Dzaoudzi, Fort-de-France and Marseille match UHSLC's records of the same gauges within 10 minutes, Nouméa (UTC+11) and Papeete (UTC−10) included. Pointe-à-Pitre's clock (erratum `refmar-pointe-a-pitre-clock`) and Kerguelen's raw series (erratum `refmar-kerguelen-raw-hour-late`) are exceptions.
 - **Flags:** a value's flag comes from its series. Validated values are `good` and raw values `preliminary`. SHOM replaces raw values with validated ones as it releases them.
 - **Freshness:** raw 10-minute values arrive about a day behind, and the poller keeps the live gauges' raw values. Validation runs about two weeks behind at Brest. A partner gauge with a year of record and no validated value, which SHOM doesn't validate, is read for validated values only in January.
+- **Independent checks:** the [pair check](../../../docs/contributing/checks.md#pair-check) on the one REFMAR gauge another agency also records, `refmar/383` against CO-OPS's 1732417 (and GESLA's copy), over 2002: best lag 0 at 1.2 cm RMS. The other REFMAR gauges have only copies, from CMEMS (SHOM as institution) and UHSLC, which show only that the clock hasn't changed since. The datums are unchecked (ZH against CO-OPS's station datum).
 
 ## Known limits
 
