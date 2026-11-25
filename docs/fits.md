@@ -62,49 +62,73 @@ Three families are in use:
 
 ### What was measured
 
-Two gauges, each fitted on 19 years under each family and scored on a held-out year: Kungsvik (`smhi/2130`, 59°N, mean range 0.27 m) and Cuxhaven (`pegelonline/5990020`, 54°N, mean range 2.8 m). Sa, Ssa and S1 were left out, since t_tide defines SA and S1 on lines that include the solar perigee.
+Five gauges, each fitted on 19 years under each family and scored on a held-out year, with the engine's fit and predictor for all three:
 
-**No family predicts better.** Tidal-band RMS of observed minus predicted levels on the held-out year, fitted and predicted under the same family:
+| Gauge                            | Latitude | Tide                        |
+| -------------------------------- | -------- | --------------------------- |
+| Kwajalein (`coops/1820000`)      | 8.7°N    | Semidiurnal, M2 0.47 m      |
+| Honolulu (`coops/1612340`)       | 21.3°N   | Mixed, M2 0.17 m, K1 0.15 m |
+| Pensacola (`coops/8729840`)      | 30.4°N   | Diurnal, K1 and O1 0.12 m   |
+| Cuxhaven (`pegelonline/5990020`) | 53.9°N   | Semidiurnal, M2 1.38 m      |
+| Kungsvik (`smhi/2130`)           | 59.0°N   | Semidiurnal, M2 0.12 m      |
 
-| Gauge    | Schureman | IHO       | Foreman   |
-| -------- | --------- | --------- | --------- |
-| Kungsvik | 59.03 mm  | 59.03 mm  | 58.97 mm  |
-| Cuxhaven | 180.73 mm | 180.64 mm | 181.23 mm |
+Sa, Ssa and S1 were left out, since t_tide defines SA and S1 on lines that include the solar perigee.
 
-The spread is under 0.4% of the score at either gauge. Each family's fit reproduces its own data, so the families differ in which amplitudes are published, and in how far a prediction moves when the constants are used under another family.
+**No family predicts best everywhere, and the differences are about 1% of the residual at most.** Tidal-band RMS of observed minus predicted levels on the held-out year, fitted and predicted under the same family:
+
+| Gauge     | Schureman | IHO       | Foreman   |
+| --------- | --------- | --------- | --------- |
+| Kwajalein | 24.66 mm  | 24.57 mm  | 24.57 mm  |
+| Honolulu  | 23.28 mm  | 23.18 mm  | 23.05 mm  |
+| Pensacola | 30.68 mm  | 30.65 mm  | 30.36 mm  |
+| Cuxhaven  | 180.73 mm | 180.64 mm | 181.23 mm |
+| Kungsvik  | 59.03 mm  | 59.03 mm  | 58.97 mm  |
+
+Whether a difference is more than one year's noise was tested by the difference of the two residual variances against twice its standard error, taken from 30-day blocks:
+
+| Gauge     | Schureman against IHO | Schureman against Foreman |
+| --------- | --------------------- | ------------------------- |
+| Kwajalein | within noise          | within noise              |
+| Honolulu  | IHO better            | Foreman better            |
+| Pensacola | within noise          | Foreman better            |
+| Cuxhaven  | IHO better            | Schureman better          |
+| Kungsvik  | within noise          | within noise              |
+
+Foreman's corrections fit the two gauges with a large diurnal tide measurably better than Schureman's, and Schureman's fit Cuxhaven measurably better than Foreman's. IHO's are measurably better than Schureman's at two gauges and never worse. The largest of these differences is 0.5 mm of RMS, at Cuxhaven, on a residual of 181 mm. What weather, seiches and river flow leave in the residual is a hundred times any difference between the families, or more.
 
 **Using the constants under another family.** RMS difference between the curve predicted under the fit's family and the curve the same constants give under another, over the held-out year:
 
-| Fitted under | Predicted under | Kungsvik | Cuxhaven |
-| ------------ | --------------- | -------- | -------- |
-| Schureman    | IHO             | 1.4 mm   | 1.6 mm   |
-| Schureman    | Foreman         | 7.2 mm   | 7.7 mm   |
-| IHO          | Foreman         | 8.1 mm   | 8.0 mm   |
-| Foreman      | Schureman       | 6.8 mm   | 7.3 mm   |
-| Foreman      | IHO             | 7.8 mm   | 7.6 mm   |
+| Fitted under | Predicted under | Kwajalein | Honolulu | Pensacola | Cuxhaven | Kungsvik |
+| ------------ | --------------- | --------- | -------- | --------- | -------- | -------- |
+| Schureman    | IHO             | 1.8 mm    | 1.3 mm   | 1.7 mm    | 1.6 mm   | 1.4 mm   |
+| Schureman    | Foreman         | 4.6 mm    | 3.1 mm   | 3.6 mm    | 7.7 mm   | 7.2 mm   |
+| IHO          | Foreman         | 4.8 mm    | 3.5 mm   | 4.2 mm    | 8.0 mm   | 8.1 mm   |
 
-Most of the difference from Foreman is in Mf and Mm, which Foreman's set gives no nodal modulation.
+At the two northern gauges most of the difference from Foreman is in Mf and Mm, which Foreman's set gives no nodal modulation.
 
-**The constants themselves.** Against Schureman's at Cuxhaven, IHO's O1 and Q1 are 0.8% smaller, Mf 3.9% smaller and J1 8.3% smaller, and M2 agrees within 0.04%. Foreman's Mf is 13% smaller and 2N2 4% smaller. The same differences appear in a synthetic series fitted under each family.
+**The constants themselves.** Against Schureman's, IHO's O1 and Q1 are 0.8% smaller, Mf 3.5 to 5% smaller and J1 8% smaller at every gauge, and M2 agrees within 0.04%. Foreman's differ most in Mf, by 2 to 13%, and in the M1 line, which t_tide calls NO1. The same differences appear in a synthetic series fitted under each family.
 
 ### Why Schureman
 
+Prediction skill doesn't settle the choice: each family is measurably best somewhere, by about 1% of the residual at most. These do:
+
 - **It is complete.** Schureman gives a closed form for every astronomical constituent in one public-domain manual. The IHO list gives series for eight, and treats the rest as unity or by rules for compound names.
 - **The IHO list isn't meant for this.** It says it "is not intended to be used to produce accurate tidal predictions" ([IHO TWCWG 2017](https://iho.int/uploads/user/Services%20and%20Standards/TWCWG/MISC/TWCWG_Constituent_list.pdf)).
-- **It sits between the other two.** Schureman's and IHO's constants give curves 1.4 to 1.6 mm apart, and of those two Schureman's are the closer to Foreman's, at 7.2 to 7.7 mm against 8.0 to 8.1 mm.
+- **It sits between the other two.** Schureman's and IHO's constants give curves 1.3 to 1.8 mm apart, and at every gauge Schureman's are closer to Foreman's than IHO's are.
 - **It doesn't depend on the gauge.** Foreman's third-degree satellites scale with latitude, and the factor is singular at the equator, where t_tide applies "a crude limiting" ([Pawlowicz, Beardsley and Lentz 2002](<https://doi.org/10.1016/S0098-3004(02)00013-4>), p. 932). One family for every gauge keeps fits comparable.
 - **It is what the largest publisher of constants uses.** NOAA's constants and predictions use Schureman's factors, and [Parker (2007)](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf) gives NOAA's reasons for node factors over satellite sums on p. 149.
 
 ### What it costs
 
 - **Comparison with TICON.** TICON's constants were fitted under IHO factors ([Piccioni et al. 2019](https://doi.org/10.1002/gdj3.72)), so a fit's O1 reads 0.8% above TICON's for the same tide, and its Mf 4% above. A comparison of constants across the two has to allow for the family.
-- **Use in t_tide or UTide.** Those predict under Foreman's set, and a Schureman fit used there differs by about 7 mm RMS at these gauges. A user who needs exact agreement refits the series under Foreman's set, which the store's levels allow.
+- **Diurnal gauges.** At Honolulu and Pensacola, Foreman's corrections leave 0.2 to 0.3 mm less RMS in the held-out residual than Schureman's, about 1% of it.
+- **Use in t_tide or UTide.** Those predict under Foreman's set, and a Schureman fit used there differs by 3 to 8 mm RMS at these gauges. A user who needs exact agreement refits the series under Foreman's set, which the store's levels allow.
 - **A limit every family shares.** All three assume the nodal modulation the equilibrium tide has. Observed modulation departs from it in shallow water ([Amin 1985](https://doi.org/10.1111/j.1365-246X.1985.tb05138.x); [Feng, Tsimplis and Woodworth 2015](https://doi.org/10.1002/2014JC010312)). A 19-year window averages the modulation out of the fitted amplitude, but a prediction for one year carries the assumption.
 - **M1 and L2.** M1 is several lines, defined and corrected differently in each family ([Woodworth 2019](https://os.copernicus.org/articles/15/431/2019/)), and L2 shares its frequency with 2MN2, whose node factor differs ([Parker 2007](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf), pp. 59–60). Their constants depend on the family more than any others.
 
 ### What is still to measure
 
-Both gauges are above 53°N. Foreman's latitude terms matter most near the equator, so a low-latitude gauge belongs in this comparison, as does a gauge with a large diurnal tide, where O1, K1 and M1 carry more of the signal.
+Five gauges and one held-out year each. A gauge on the equator, where Foreman's latitude factor is held at 5°, and a second year at each gauge would show how far these results carry.
 
 ## Scores
 
