@@ -121,7 +121,7 @@ export default {
       response:
         "Both series are kept as served and this entry flags neither. A reader of either copy reads levels that differ from the other's by 0.01 to 0.06 m in daily medians across these two years, and by up to 0.24 m at single hours.",
       evidence:
-        "November 2026. Hourly values of `bom/170` and `uhslc/170` compared hour by hour for 2008 to 2011: equal to 0.1 mm in every month of 2008 and to 4 August 2009, then apart from the first hour of 5 August by the amounts above. The difference isn't a shift of the clock: from September to November 2009 the mean absolute difference is 0.049 m at a lag of 0 hours (correlation 0.99917) and 0.12 and 0.14 m at lags of -1 and 1 hour. GESLA's record of BOM's gauge (`gesla/christmas_island-46290-aus-bom`) equals BOM's file at every hour from 5 August to the end of 2009, its last year (3,487 hours), and is 0.049 m above UHSLC's on average. UHSLC's documentation file for the research-quality version (`rqds/indian/doc/qa170a.dmt`) lists data replaced on days 201, 213, 215 and 216 of 2009, the last run ending at 05:00 UTC on 4 August, and says the series from 2008 is assumed linked to the historic reference level. Cocos Island (`bom/171`, equal to UHSLC's to 1 mm in all 225 months), the only other gauge within 1,000 km, can't settle it: its monthly difference from Christmas Island moves by more than 0.1 m between years in the same month. Of the other 28 gauges BOM and UHSLC share, none has a month in which the two copies' mean difference is more than 0.01 m from the gauge's median, except Majuro in 2005 to 2008 (erratum `bom-majuro-2005-2008-values`) and single months at Suva, Honiara, Port Vila and Esperance; Stony Point and Lorne have no UHSLC series; GESLA's records of them equal BOM's files except Stony Point's 2005 to 2014, which they sit 0.090 m above. Which copy is right wasn't settled and hasn't been put to BOM or UHSLC.",
+        "November 2026. Hourly values of `bom/170` and `uhslc/170` compared hour by hour for 2008 to 2011: equal to 0.1 mm in every month of 2008 and to 4 August 2009, then apart from the first hour of 5 August by the amounts above. The difference isn't a shift of the clock: from September to November 2009 the mean absolute difference is 0.049 m at a lag of 0 hours (correlation 0.99917) and 0.12 and 0.14 m at lags of -1 and 1 hour. GESLA's record of BOM's gauge (`gesla/christmas_island-46290-aus-bom`) equals BOM's file at every hour from 5 August to the end of 2009, its last year (3,487 hours), and is 0.049 m above UHSLC's on average. UHSLC's documentation file for the research-quality version (`rqds/indian/doc/qa170a.dmt`) lists data replaced on days 201, 213, 215 and 216 of 2009, the last run ending at 05:00 UTC on 4 August, and says the series from 2008 is assumed linked to the historic reference level. Cocos Island (`bom/171`, equal to UHSLC's to 1 mm in all 225 months), the only other gauge within 1,000 km, can't settle it: its monthly difference from Christmas Island moves by more than 0.1 m between years in the same month. Of the other 28 gauges BOM and UHSLC share, none has a month in which the two copies' mean difference is more than 0.01 m from the gauge's median, except Majuro in 2005 to 2008 (erratum `bom-majuro-2005-2008-values`) and single months at Suva, Honiara, Port Vila and Esperance; Stony Point and Lorne have no UHSLC series; GESLA's records of them equal BOM's files except Stony Point's 2005 to 2014, which they sit 0.090 m above. Which copy is right wasn't settled; question `bom-christmas-island-2009-reference` puts it to BOM.",
       reported: null,
       report: null,
       check: async (store, e) => {
@@ -177,6 +177,19 @@ export default {
             throw new Error(`the store holds only ${rows.length} ${id} levels in 1996`);
         }
       },
+    },
+  ],
+  questions: [
+    {
+      id: "bom-christmas-island-2009-reference",
+      stations: ["bom/170"],
+      question:
+        "Christmas Island's hourly values in your FTP files and in UHSLC's series are identical until 23:00 UTC on 4 August 2009. From 00:00 UTC on 5 August 2009 to the end of your file on 31 August 2011, UHSLC's are 0.01 to 0.06 m lower in daily medians. Which of the two is on the gauge's tide gauge zero, and did the gauge's zero or sensor change on 4 or 5 August 2009 (UHSLC's notes list replaced data on 3 and 4 August)? If your later values are on the same zero as these, where can we read them, since your FTP archives hold none for Christmas Island after 2011?",
+      why: "The answer says which copy is right, so the entry `bom-christmas-island-2009-offset` can flag the other series or retire, and says whether to open a datum epoch for the change.",
+      meanwhile:
+        "Both series are kept as served and neither is flagged; `preferred` is worked out from their lengths and flags as for any pair of copies.",
+      asked: null,
+      answer: null,
     },
   ],
   retired: [],

@@ -16,7 +16,7 @@ export default {
       response:
         "UHSLC's series is kept as served and this entry flags nothing. The research-quality version GESLA carries (`gesla/christmas-170a-kir-uhslc_rq`) equals it to 1 mm in the span.",
       evidence:
-        "November 2026, from the comparison in erratum `bom-christmas-island-2009-offset`. `gesla/christmas-170a-kir-uhslc_rq` equals `uhslc/170` to 1 mm at every hour of 2009 from 5 August (3,576 hours), 2010 (8,542) and 2011 (8,583), and differs from BOM's file by up to 0.09, 0.24 and 0.19 m in those years. GESLA's fast-delivery record of the gauge (`gesla/christmas-170-aus-uhslc_fd`) holds no values for 2009 to 2011. Which copy is right wasn't settled and hasn't been put to UHSLC.",
+        "November 2026, from the comparison in erratum `bom-christmas-island-2009-offset`. `gesla/christmas-170a-kir-uhslc_rq` equals `uhslc/170` to 1 mm at every hour of 2009 from 5 August (3,576 hours), 2010 (8,542) and 2011 (8,583), and differs from BOM's file by up to 0.09, 0.24 and 0.19 m in those years. GESLA's fast-delivery record of the gauge (`gesla/christmas-170-aus-uhslc_fd`) holds no values for 2009 to 2011. Which copy is right wasn't settled; question `uhslc-christmas-island-2009-reference` puts it to UHSLC.",
       reported: null,
       report: null,
       check: async (store) => {
@@ -526,6 +526,19 @@ export default {
             `Gibraltar's (289) median steps ${step.toFixed(2)} m from 2000 to 2024, not about 1.5`,
           );
       },
+    },
+  ],
+  questions: [
+    {
+      id: "uhslc-christmas-island-2009-reference",
+      stations: ["uhslc/170"],
+      question:
+        "Christmas Island's hourly values in your series (170) and in the Bureau of Meteorology's FTP files are identical until 23:00 UTC on 4 August 2009. From 00:00 UTC on 5 August 2009 to the end of the Bureau's file on 31 August 2011, yours are 0.01 to 0.06 m lower in daily medians. Did you adjust the values from that day, or did the Bureau send them that way? Your documentation file says the series from 2008 is assumed linked to the historic reference level; has it since been tied to the gauge's benchmarks?",
+      why: "The answer says which copy is right, so the entry `uhslc-christmas-island-2009-offset` can flag the other series or retire.",
+      meanwhile:
+        "Both series are kept as served and neither is flagged; `preferred` is worked out from their lengths and flags as for any pair of copies.",
+      asked: null,
+      answer: null,
     },
   ],
   retired: [],
