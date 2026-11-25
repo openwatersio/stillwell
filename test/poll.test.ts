@@ -9,7 +9,7 @@ import {
 } from "../src/schema.ts";
 import type { StationObservation } from "../src/store/parquet.ts";
 import type { ObservationStore } from "../src/realtime/live.ts";
-import { difference, intervalOf, pollSource } from "../src/realtime/poll.ts";
+import { difference, gapsDue, intervalOf, pollSource } from "../src/realtime/poll.ts";
 import { formatSummary } from "../src/store/recent.ts";
 import { withinSpan } from "../src/sources/index.ts";
 
@@ -363,5 +363,102 @@ describe("intervalOf", () => {
       metadata: { id: "test", poller: "hourly" } as Source["metadata"],
     };
     assert.equal(intervalOf(hourly, quick), 0);
+  });
+});
+
+describe("gapsDue", () => {
+  const SIX = 6 * HOUR;
+
+  it("gives a station one pass every six hours, however late a pass runs", () => {
+    for (const every of [60_000, 300_000, 301_000, 660_000, 50 * 60_000]) {
+      const turns: number[] = [];
+      for (let t = NOW; t < NOW + 48 * HOUR; t += every)
+        if (gapsDue("test/a", t - every, t)) turns.push(t);
+      assert.equal(turns.length, 8, `${turns.length} turns in two days at ${every} ms`);
+      for (let i = 1; i < turns.length; i++)
+        assert.ok(Math.abs(turns[i]! - turns[i - 1]! - SIX) <= every);
+    }
+  });
+
+  it("is due once after a stop longer than six hours", () => {
+    assert.equal(gapsDue("test/a", NOW - 7 * HOUR, NOW), true);
+    const next = NOW + 300_000;
+    // Unless that pass is past the next turn too.
+    const turn = Array.from({ length: 72 }, (_, i) => NOW + i * 300_000).find((t) =>
+      gapsDue("test/a", t, t + 300_000),
+    )!;
+    assert.equal(gapsDue("test/a", NOW, next), turn === NOW);
+  });
+
+  it("spreads a source's stations over the six hours", () => {
+    const first = Array.from({ length: 200 }, (_, i) => {
+      const id = `test/${1000 + i * 7}`;
+      let t = NOW;
+      while (!gapsDue(id, t - 300_000, t)) t += 300_000;
+      return t - NOW;
+    });
+    // No hour of the six takes more than a third of them.
+    for (let h = 0; h < 6; h++)
+      assert.ok(first.filter((t) => Math.floor(t / HOUR) === h).length < 67);
+  });
+});
+
+describe("pollSource for a source that fills values in late", () => {
+  const day = 24 * HOUR;
+  const a = station("a", { min_interval_s: 300 });
+  // A week of values every 10 minutes, and the day of them the source first lacked.
+  const all: Observation[] = [];
+  for (let t = NOW - 8 * day; t < NOW; t += 600_000) all.push(at(t, 1));
+  const outage = (o: Observation) => o.time >= NOW - 2 * day && o.time < NOW - day;
+  // A pass in the station's turn, five minutes after the last, and one outside it.
+  let turn = NOW;
+  while (!gapsDue(a.id, turn - 300_000, turn)) turn += 300_000;
+  const other = turn + 300_000;
+
+  /** A store holding everything but the outage, and a source that sends `sends`, recording where each fetch started. */
+  async function setup(sends: () => Observation[]) {
+    const asked: number[] = [];
+    const src: Source = {
+      ...source({}),
+      fillsLate: true,
+      observations: async (_, start) => {
+        asked.push(start.getTime());
+        return sends().filter((o) => o.time >= start.getTime());
+      },
+    };
+    const store = memory();
+    await store.write(
+      all
+        .filter((o) => !outage(o))
+        .map((o) => ({ ...o, received: o.time, station: a.id, epoch: 1 })),
+    );
+    const held = async () => (await store.read([a.id], turn - 7 * day)).length;
+    const poll = (now: number, last: number | null) =>
+      pollSource({ source: src, stations: [a], store, since: now - 12 * HOUR, now, last });
+    return { asked, held, poll };
+  }
+
+  it("takes the values a gap has since been filled with, on the station's turn", async () => {
+    const { asked, held, poll } = await setup(() => all);
+    const before = await held();
+    await poll(other, other - 300_000);
+    assert.equal(await held(), before);
+    await poll(turn, turn - 300_000);
+    assert.deepEqual(asked, [other - 12 * HOUR, NOW - 2 * day - 600_000]);
+    assert.equal(await held(), before + 144);
+  });
+
+  it("takes its turn on the first pass after one a late pass skipped", async () => {
+    const { asked, poll } = await setup(() => all);
+    await poll(turn + 11 * 60_000, turn - 300_000);
+    assert.equal(asked[0], NOW - 2 * day - 600_000);
+  });
+
+  it("deletes nothing when a fetch for a gap lacks values the window holds", async () => {
+    // The source sends the last hours only, as an answer cut short would be.
+    const { held, poll } = await setup(() => all.filter((o) => o.time >= NOW - HOUR));
+    const before = await held();
+    await poll(turn, turn - 300_000);
+    assert.equal(await held(), before);
   });
 });
