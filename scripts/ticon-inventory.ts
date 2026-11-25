@@ -20,6 +20,7 @@ import type { Station } from "../src/schema.ts";
 import { isDropped } from "../src/sources/gesla/dropped.ts";
 import { withoutWithheld } from "../src/refresh.ts";
 import { sources } from "../src/sources/index.ts";
+import { tideStations } from "../src/datums.ts";
 import {
   adoptSiblings,
   parseId,
@@ -61,6 +62,14 @@ const commit = execFileSync("git", ["-C", TIDE_DATABASE, "describe", "--tags", "
   encoding: "utf8",
 }).trim();
 const listed = await listedTicon();
+// The credits TICON's records owe, as the installed slackwater-database gives them.
+const credits = [
+  ...new Set(
+    (await tideStations()).filter((t) => t.id.startsWith("ticon/")).map((t) => t.attribution),
+  ),
+]
+  .filter(Boolean)
+  .sort();
 const records: TiconRecord[] = [];
 const dir = join(TIDE_DATABASE, "data/ticon");
 for (const file of (await readdir(dir)).filter((f) => f.endsWith(".json")).sort()) {
@@ -94,13 +103,17 @@ const STORE = (process.env.STILLWELL_STORE ?? "https://stillwell.openwaters.io")
 // refresh, leaves its records with the planned ids their codes give.
 const lists: Record<string, Station[]> = {};
 const unlisted: string[] = [];
+// The sources stations.parquet names, whose lists have been published, so a missing one is lost, not yet to come.
+const published = await readRows(`${STORE}/stations.parquet`);
+const publishedSources = new Set(published.map((row) => String(row.source)));
 for (const [source, adapter] of Object.entries(sources)) {
   if (!adapter.metadata.license.redistribution) continue;
   const list = await readStationList(stationListPath(STORE, source));
   // A list not refreshed since a station was withheld still has it.
   if (list) lists[source] = withoutWithheld(adapter, list);
   // GESLA's list gives every record's fallback copy, so it's always needed.
-  else if (source === "gesla") throw new Error(`No station list for ${source} in ${STORE}`);
+  else if (source === "gesla" || publishedSources.has(source))
+    throw new Error(`No station list for ${source} in ${STORE}, though it has been published`);
   else {
     console.warn(`No station list for ${source} in ${STORE} yet; its records stay planned`);
     unlisted.push(source);
@@ -110,7 +123,7 @@ for (const [source, adapter] of Object.entries(sources)) {
 // The links publish made, by levels among them, name a CMEMS record's gauge as `LINKS` does:
 // taken from stations.parquet, not the level matches, so the rules that refuse a link apply.
 const links: { a: string; b: string }[] = [...LINKS];
-for (const row of await readRows(`${STORE}/stations.parquet`)) {
+for (const row of published) {
   const same = (row.same_as as { items?: unknown[] } | null)?.items ?? [];
   for (const other of same) links.push({ a: String(row.id), b: String(other) });
 }
@@ -268,5 +281,11 @@ ${bySource.map(([source, group]) => `| ${source} | ${group.length} | ${statusOf(
 - **Contributor.** The rest map by contributor to a planned source, with its license status from Open Waters' internal sources research. A record's own \`commercial_use\` is TICON's terms for its copy; the originator's series comes under the originator's terms.
 
 "Ready" means a station matched. German records' PEGELONLINE history reaches back to 2000 at most, and not at all at gauges without a download, so the rest comes from GESLA's copies (\`gesla\`). "Planned" and "license" ids are built from codes and not yet checked against the source's station list.
+
+## Credit
+
+The record names, countries and dates come from TICON through slackwater-database, which asks for these credits:
+
+${credits.map((c) => `- ${c}`).join("\n")}
 `;
 }

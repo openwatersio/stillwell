@@ -17,10 +17,12 @@ export const REPORTS: Record<string, { title: string; command: string }> = {
 
 const file = (name: string, ext: string) => resolve(DIR, `${name}.${ext}`);
 
-/** The report's CSV, or undefined where this build didn't write it. */
+/** Whether this build wrote both of the report's files, so a run that stopped between them shows neither. */
+const written = (name: string) => existsSync(file(name, "md")) && existsSync(file(name, "csv"));
+
+/** The report's CSV, or undefined where this build didn't write the report. */
 export function reportCsv(name: string): string | undefined {
-  const path = file(name, "csv");
-  return existsSync(path) ? readFileSync(path, "utf8") : undefined;
+  return written(name) ? readFileSync(file(name, "csv"), "utf8") : undefined;
 }
 
 /**
@@ -30,11 +32,12 @@ export function reportCsv(name: string): string | undefined {
 export function report(
   name: string,
 ): { html: string; headings: Heading[]; written: Date } | undefined {
+  if (!written(name)) return undefined;
   const path = file(name, "md");
-  if (!existsSync(path)) return undefined;
   // html: false escapes any raw HTML in the text.
   const md = markdownit({ html: false, linkify: true });
   const headings: Heading[] = [];
+  const seen = new Map<string, number>();
   const link = md.renderer.rules.link_open;
   md.renderer.rules.link_open = (tokens, i, options, env, self) => {
     const href = tokens[i]!.attrGet("href");
@@ -47,8 +50,13 @@ export function report(
       .filter((t) => t.type === "text" || t.type === "code_inline")
       .map((t) => t.content)
       .join("");
-    tokens[i]!.attrSet("id", slug(text));
-    headings.push({ depth: Number(tokens[i]!.tag.slice(1)), slug: slug(text), text });
+    // A repeated heading gets a number, as GitHub numbers them, so each id is unique.
+    const base = slug(text);
+    const n = seen.get(base) ?? 0;
+    seen.set(base, n + 1);
+    const anchor = n ? `${base}-${n}` : base;
+    tokens[i]!.attrSet("id", anchor);
+    headings.push({ depth: Number(tokens[i]!.tag.slice(1)), slug: anchor, text });
     return self.renderToken(tokens, i, options);
   };
   const text = readFileSync(path, "utf8").replace(/^# .*\n/, "");

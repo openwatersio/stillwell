@@ -487,8 +487,6 @@ function nearest(
   return { source, id: best.station.id, status: "ready", distance_km: round(best.km), note };
 }
 
-export { km };
-
 function round(value: number): number {
   return Math.round(value * 100) / 100;
 }
