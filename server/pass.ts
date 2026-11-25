@@ -43,6 +43,8 @@ try {
   // A source with no list yet, until its Monthly refresh starts it, has nothing to poll; its list is read again hourly.
   if (!stations) console.error(`${id}: no station list yet; the Monthly refresh starts it`);
   groups = [...new Set(polled(source, stations ?? []).map((s) => intervalOf(source, s)))];
+  // Only a source that fills values in late takes turns by its last pass.
+  const last = source.fillsLate ? await store.lastPass(id).catch(() => null) : null;
   summary = await pollSource({
     source,
     stations: stations ?? [],
@@ -51,6 +53,7 @@ try {
     now,
     due: (s) => due === null || due.has(intervalOf(source, s)),
     accept: process.env.STILLWELL_ACCEPT_WITHHELD === "1",
+    last,
   });
 } catch (error) {
   // A pass that fails still leaves a row, so a source whose passes all fail shows in `polls`.

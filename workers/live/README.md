@@ -4,7 +4,15 @@ Runs the poller ([server/ingest.ts](../../server/ingest.ts)) in a Cloudflare Con
 
 ## The poller
 
-The container, `Poller`, is a `standard-1` instance (½ vCPU, 4 GiB) built from [Dockerfile](Dockerfile) with the repository as its context, running `server/ingest.ts`. It polls every public hourly source's live stations, each at its `min_interval_s`, hourly where it gives none, one pass at a time per source and two passes at once, each in a process of its own ([server/pass.ts](../../server/pass.ts)) that holds up to about 800 MB. A pass fetches 12 hours back, so a value a source sends late still arrives. Every pass that ends writes a row to `polls`, clean when it ran to the end, wasn't blocked, and some station it asked had new values.
+The container, `Poller`, is a `standard-1` instance (½ vCPU, 4 GiB) built from [Dockerfile](Dockerfile) with the repository as its context, running `server/ingest.ts`. It polls every public hourly source's live stations, each at its `min_interval_s`, hourly where it gives none, one pass at a time per source and two passes at once, each in a process of its own ([server/pass.ts](../../server/pass.ts)) that holds up to about 800 MB. A pass fetches 12 hours back, so a value a source sends late still arrives. For a source whose adapter sets `fillsLate`, days a gauge sends at once after an outage arrive too:
+
+- **Turns:** each station has a turn every 6 hours, at a time of its own ([`gapsDue`](../../src/realtime/poll.ts)), and the first pass after it fetches the station from the first gap between its values, or from its newest value when that is older than 12 hours ([`gapStart`](../../src/store/recent.ts)). A gap is a break longer than three of the station's intervals and half an hour.
+- **Reach:** the fetch starts no earlier than the start of the fourth UTC day before today, which leaves two nightly folds for a value to reach its year file. A gap the source fills after the station's last turn inside those days, up to 6 hours before they end, stays in the store.
+- **Deletes:** a fetch that reaches back adds and replaces values and deletes none.
+- **Load:** a pass so asks only a few stations for days of values. The first pass after the poller was down for more than 6 hours asks every station, where the last pass's time is known.
+- **Repeats:** a gap the source never fills, and the days before a new station's first value, are fetched again each turn until they are older than the reach. A pass that fails, or fails the station, uses up the turn it was past.
+
+Every pass that ends writes a row to `polls`, clean when it ran to the end, wasn't blocked, and some station it asked had new values.
 
 - **A source whose metadata sets `poller: "hourly"`**, as CCO does, whose key covers one read of each site an hour, has every station in one hourly group, and after a restart waits for the hour since its last recorded pass.
 - **A station in another datum** fails its pass, and the poller starts that source's Monthly refresh through the GitHub API, at most once a day.
@@ -29,7 +37,7 @@ Compaction folds them into the year files, and the site's level chart and source
 
 ## The cron
 
-- **Every minute** it asks the container's `/health`, which starts it if it isn't running. Cloudflare doesn't promise a container a run time, so one that stopped is back within a minute, and its first passes catch up 12 hours.
+- **Every minute** it asks the container's `/health`, which starts it if it isn't running. Cloudflare doesn't promise a container a run time, so one that stopped is back within a minute, and its first passes catch up 12 hours. A source that sets `fillsLate` catches up a longer stop on each station's next turn.
 - **At 30 past each hour** it opens an issue titled "Live polling is failing for <source>" for each source with live values or a pass in the last week but no clean pass in 2 hours, and "The live poller has stopped" when no pass has finished in 2 hours, and closes each once that's no longer so.
 - **At 03:45 UTC** it deletes station-days older than 8 days and passes older than 30.
 

@@ -381,6 +381,17 @@ export interface Source {
    */
   keepsStored?: boolean;
   /**
+   * Whether the source's recent values can arrive long after their times, as
+   * PEGELONLINE's do when a gauge that sent nothing for days sends them all
+   * at once. A few times a day (`gapsDue`), the poller then asks a station
+   * from the first gap in its last days, or from where its values stopped
+   * (`gapStart`), where it otherwise asks only the last hours. A fetch that
+   * reaches back so adds and replaces values, and deletes none. A source with a `recent`
+   * sweep isn't asked so, and a station with no `interval_s` only from where
+   * its values stopped.
+   */
+  fillsLate?: boolean;
+  /**
    * Spans of a station's values that the store's own errata flag `suspect`,
    * beyond the spans its `errata.ts` names, which the registry adds, worked
    * out from the source's levels and flags alone, so requalify flags
