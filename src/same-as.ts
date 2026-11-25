@@ -1,7 +1,8 @@
 import { differsByData, MATCH_KM, sameByData, shiftedByData, type DataMatch } from "./matches.ts";
 import type { Station } from "./schema.ts";
 import { isDropped } from "./sources/gesla/dropped.ts";
-import { km, nameScore } from "./ticon.ts";
+import { nameScore } from "./names.ts";
+import { distanceKm as km } from "./stats.ts";
 
 /**
  * Which series in the store share a gauge, and which of them to use. A link

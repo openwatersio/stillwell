@@ -5,14 +5,7 @@ import { join } from "node:path";
 import { describe, it } from "node:test";
 import { DuckDBInstance } from "@duckdb/node-api";
 import { writeOffsets, writeStations } from "../src/store/parquet.ts";
-import {
-  offsetRows,
-  originators,
-  ticonOriginators,
-  tideStations,
-  withDatums,
-  type TideStation,
-} from "../src/datums.ts";
+import { offsetRows, tideStations, withDatums, type TideStation } from "../src/datums.ts";
 import type { Epoch, StoredStation } from "../src/schema.ts";
 
 /** One open epoch in `datum`. */
@@ -260,32 +253,25 @@ describe("withDatums against operators' published levels", () => {
 });
 
 describe("withDatums", () => {
-  // TICON's RWS records are in NAP, and the inventory names their RWS series.
+  // A TICON record in its GESLA file's gauge zero gives that GESLA series its datums.
   const amaliahaven = (epochs?: Epoch[], period = { start: "2014-01-01", end: "2014-12-31" }) => {
-    const rws = station("rws/maasvlakte.amaliahaven", {
-      datum: "NAP",
-      ...(epochs ? { epochs } : {}),
-    });
+    const gesla = station("gesla/amaliahaven-amlahvn-nld-rws", epochs ? { epochs } : {});
     const record = tide("ticon/amaliahaven-amlahvn-nld-rws", {
       datums: { MSL: 0.028, LAT: -1.207 },
       datum_frame: "gauge",
       chart_datum: "LAT",
       datum_epoch: period,
     });
-    const csv = [
-      "ticon_id,originator_id,distance_km",
-      "amaliahaven-amlahvn-nld-rws,rws/maasvlakte.amaliahaven,0",
-    ].join("\n");
-    return withDatums([rws], [record], originators(csv)).stations[0]!;
+    return withDatums([gesla], [record]).stations[0]!;
   };
-  const oldNap = open("NAP", {
+  const closed = open("ZERO", {
     until: "2005-01-01T00:00:00.000Z",
     to_current: null,
     state: "closed",
   });
-  const newNap = open("NAP", { id: 2, since: "2005-01-01T00:00:00.000Z" });
+  const reopened = open("ZERO", { id: 2, since: "2005-01-01T00:00:00.000Z" });
 
-  it("takes a TICON RWS record's datums in NAP for the RWS series the inventory names", () => {
+  it("takes a TICON record's datums in its GESLA file's gauge zero", () => {
     const s = amaliahaven();
     assert.deepEqual(s.datums, { MSL: -0.028, LAT: 1.207 });
     assert.equal(s.chart_datum, "LAT");
@@ -293,11 +279,11 @@ describe("withDatums", () => {
   });
 
   it("uses datums reduced after an epoch that doesn't convert", () => {
-    assert.equal(amaliahaven([oldNap, newNap]).datums.MSL, -0.028);
+    assert.equal(amaliahaven([closed, reopened]).datums.MSL, -0.028);
   });
 
   it("leaves out datums reduced over an epoch that doesn't convert", () => {
-    const s = amaliahaven([oldNap, newNap], { start: "2000-09-01", end: "2018-08-31" });
+    const s = amaliahaven([closed, reopened], { start: "2000-09-01", end: "2018-08-31" });
     assert.deepEqual(s.datums, {});
     assert.equal(s.frame, "unknown");
   });
@@ -484,45 +470,43 @@ describe("withDatums with terms, epochs and frames", () => {
 });
 
 describe("withDatums with two records for a station", () => {
+  // Two records with one provider ID, so both join the same station.
+  const record = (id: string, msl: number, end: string, start = "2000-01-01") =>
+    tide(id, {
+      source: { id: "1" },
+      datums: { STND: 0, MSL: msl },
+      datum_epoch: { start, end },
+    });
+
   it("takes the record whose datums it can use, whichever comes first", () => {
-    const rws = station("rws/vlissingen", {
-      datum: "NAP",
+    const coops = station("coops/1", {
+      datum: "STND",
       epochs: [
-        open("NAP", { until: "2005-01-01T00:00:00.000Z", to_current: null, state: "closed" }),
-        open("NAP", { id: 2, since: "2005-01-01T00:00:00.000Z" }),
+        open("STND", { until: "2005-01-01T00:00:00.000Z", to_current: null, state: "closed" }),
+        open("STND", { id: 2, since: "2005-01-01T00:00:00.000Z" }),
       ],
     });
-    const hist = tide("ticon/vlissingen-vlissgn-nld-rws_hist", {
-      datums: { MSL: 0.02 },
-      datum_frame: "gauge",
-      datum_epoch: { start: "2000-09-01", end: "2018-08-31" },
-    });
-    const recent = tide("ticon/vlissingen-vlis-nld-rws", {
-      datums: { MSL: 0.03 },
-      datum_frame: "gauge",
-      datum_epoch: { start: "2023-01-01", end: "2025-12-31" },
-    });
-    const csv = [
-      "ticon_id,originator_id,distance_km",
-      "vlissingen-vlissgn-nld-rws_hist,rws/vlissingen,0",
-      "vlissingen-vlis-nld-rws,rws/vlissingen,0",
-      "vlissingen-x-nld-rws,rws/vlissingen,",
-    ].join("\n");
+    const hist = record("noaa/a", 0.02, "2018-08-31", "2000-09-01");
+    const recent = record("noaa/b", 0.03, "2025-12-31", "2023-01-01");
     for (const order of [
       [hist, recent],
       [recent, hist],
     ]) {
-      const [s] = withDatums([rws], order, originators(csv)).stations;
+      const [s] = withDatums([coops], order).stations;
       assert.equal(s!.datums.MSL, -0.03);
-      assert.equal(s!.tide_station, "ticon/vlissingen-vlis-nld-rws");
+      assert.equal(s!.tide_station, "noaa/b");
     }
-    // A row with no distance isn't a match.
-    assert.equal(originators(csv).has("vlissingen-x-nld-rws"), false);
   });
 
-  it("reads the committed inventory, and refuses one missing a column", async () => {
-    assert.ok((await ticonOriginators()).size > 0);
-    assert.throws(() => originators("ticon_id,station,distance_km\nx,y,0"), /originator_id/);
+  it("breaks a tie between usable records by the later reduction", () => {
+    const coops = station("coops/1", { datum: "STND" });
+    const older = record("noaa/a", 0.1, "2010-12-31");
+    const newer = record("noaa/b", 0.2, "2020-12-31");
+    for (const order of [
+      [older, newer],
+      [newer, older],
+    ])
+      assert.equal(withDatums([coops], order).stations[0]!.datums.MSL, -0.2);
   });
 
   it("credits every record whose values a station holds", () => {
@@ -544,29 +528,20 @@ describe("withDatums with two records for a station", () => {
   });
 });
 
-describe("withDatums through the TICON inventory", () => {
-  const csv = "ticon_id,originator_id,distance_km\nk13a-k13-nld-rws,rws/k13a.platform,0";
+describe("withDatums with a record that gives no reduction period", () => {
   const record = tide("ticon/k13a-k13-nld-rws", { datums: { MSL: 0.1 }, datum_frame: "gauge" });
-  const rws = station("rws/k13a.platform", { datum: "NAP" });
+  const gesla = station("gesla/k13a-k13-nld-rws");
 
-  it("joins nothing where the record's GESLA file says it's in another zero", () => {
-    const gesla = station("gesla/k13a-k13-nld-rws", {
-      datum_information: "Mean sea level",
-    } as Partial<StoredStation>);
-    const out = withDatums([rws, gesla], [record], originators(csv)).stations;
-    assert.deepEqual(byId(out, "rws/k13a.platform").datums, {});
-  });
-
-  it("takes a record with no reduction period only where every epoch converts", () => {
-    const closed = open("NAP", {
+  it("takes it only where every epoch converts", () => {
+    const closed = open("ZERO", {
       until: "2005-01-01T00:00:00.000Z",
       to_current: null,
       state: "closed",
     });
-    const later = open("NAP", { id: 2, since: "2005-01-01T00:00:00.000Z" });
-    assert.equal(withDatums([rws], [record], originators(csv)).stations[0]!.datums.MSL, -0.1);
-    const split = { ...rws, epochs: [closed, later] };
-    assert.deepEqual(withDatums([split], [record], originators(csv)).stations[0]!.datums, {});
+    const later = open("ZERO", { id: 2, since: "2005-01-01T00:00:00.000Z" });
+    assert.equal(withDatums([gesla], [record]).stations[0]!.datums.MSL, -0.1);
+    const split = { ...gesla, epochs: [closed, later] };
+    assert.deepEqual(withDatums([split], [record]).stations[0]!.datums, {});
   });
 });
 
@@ -595,13 +570,12 @@ describe("withDatums across a distance", () => {
 
 describe("withDatums with records it can't trust", () => {
   it("joins nothing to a GESLA file whose values are another gauge's", () => {
-    const smhi = station("smhi/2541", { datum: "RH2000" });
+    const gesla = station("gesla/uddevalla-2541-swe-smhi");
     const record = tide("ticon/uddevalla-2541-swe-smhi", {
       datums: { MSL: 0.1 },
       datum_frame: "gauge",
     });
-    const csv = "ticon_id,originator_id,distance_km\nuddevalla-2541-swe-smhi,smhi/2541,0.75";
-    const [s] = withDatums([smhi], [record], originators(csv)).stations;
+    const [s] = withDatums([gesla], [record]).stations;
     assert.deepEqual(s!.datums, {});
     assert.equal(s!.tide_station, null);
   });
@@ -622,24 +596,6 @@ describe("withDatums with records it can't trust", () => {
       datum_frame: "gauge",
     });
     assert.equal(withDatums([gesla], [record]).report.far.length, 1);
-  });
-
-  it("breaks a tie between usable records by the later reduction", () => {
-    const rws = station("rws/x", { datum: "NAP" });
-    const record = (id: string, end: string, msl: number) =>
-      tide(id, {
-        datums: { MSL: msl },
-        datum_frame: "gauge",
-        datum_epoch: { start: "2000-01-01", end },
-      });
-    const older = record("ticon/x-a-nld-rws", "2010-12-31", 0.1);
-    const newer = record("ticon/x-b-nld-rws", "2020-12-31", 0.2);
-    const csv = "ticon_id,originator_id,distance_km\nx-a-nld-rws,rws/x,0\nx-b-nld-rws,rws/x,0";
-    for (const order of [
-      [older, newer],
-      [newer, older],
-    ])
-      assert.equal(withDatums([rws], order, originators(csv)).stations[0]!.datums.MSL, -0.2);
   });
 });
 
