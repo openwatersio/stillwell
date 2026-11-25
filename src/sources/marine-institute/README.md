@@ -9,6 +9,7 @@ Sea levels every 5 minutes from the Irish National Tide Gauge Network, which the
 - **Times:** UTC. Levels fit CMEMS's records of Ballyglass and Sligo and UHSLC's fast-delivery record of Castletownbere within a few minutes.
 - **Datum:** `ODM`, Ordnance Datum Malin, the Irish geodetic datum, which every gauge reports. Most also report LAT, in `Water_Level_LAT`, but the second gauges at Galway, Howth and Union Hall don't. `datums.LAT` is the current LAT less OD Malin, rounded to the millimeter and read at the gauge's last value on each refresh, so it follows LAT's current definition (erratum `marine-institute-lat-2026`). Kinvara ("Kinvara - Unreferenced") gives values only in the OD Malin column, but the network says the gauge isn't tied to a benchmark, so its datum is `ZERO`.
 - **Freshness:** values reach ERDDAP in batches, 10 to 30 minutes after they're measured, and the store reads them hourly. Values the institute checks later reach the store through the monthly refetch.
+- **Independent checks:** the store holds no other originator's record of a Marine Institute gauge. CMEMS's and GESLA's Irish records are the institute's own values, and UHSLC's records from Queen's University Belfast and Dr. James Murphy's near the institute's gauges are other gauges, at 3.5 to 4.0 cm RMS, so the clock and datum are checked only against the institute's own copies, which shows that they haven't changed.
 
 ## Running ingest
 

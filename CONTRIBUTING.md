@@ -7,7 +7,7 @@ This repo fetches water levels from each source's own service and writes them as
 Researchers use this data to study sea level, tides and floods. A wrong value that looks right does more harm than a gap, because nobody knows to distrust it, so bad data is worse than no data. Every change follows the org-wide [rigor rules](https://github.com/openwatersio/.github/blob/main/docs/agents/rigor.md). Here they mean:
 
 - **Verify against the store.** Before review, read back a local run: the files, their years, their flags, a plot against a neighbor or a prediction. After merge, read back what the workflows wrote to R2, as a `check` step of the change's migration (see [Migrations](docs/contributing/operations.md#migrations)) or a step under `## After merge` in the pull request's description, or for a restricted source what a maintainer's run wrote to the restricted store. A change that writes to the store is done when both are. Dispatching a workflow that writes to R2 is a step only a maintainer may take.
-- **Independent references.** For levels that carry a tide, river gauges included, the reference is `clock-check` against another originator's TICON record where there is one (see [Clock check](docs/contributing/checks.md#clock-check)), which catches a clock that neighbors from the same agency would share. `cross-check` compares a gauge with its neighbors but leaves out stations whose `kind` is `river` or `lake`, so for those the comparison is with a neighboring gauge on the same water, or another agency's record of the same one, done by hand. The source's README cites its datums, units and time zone, and says so where no independent reference exists.
+- **Independent references.** For levels that carry a tide, river gauges included, the reference is `clock-check` against constants fitted to another originator's observations, a TICON record or another slackwater-database dataset's, where there is one (see [Clock check](docs/contributing/checks.md#clock-check)), which catches a clock that neighbors from the same agency would share. `pair-check` compares a gauge with another originator's record of the same gauge in the store (see [Pair check](docs/contributing/checks.md#pair-check)). `cross-check` compares a gauge with its neighbors but leaves out stations whose `kind` is `river` or `lake`, so for those the comparison is with a neighboring gauge on the same water, or another agency's record of the same one, with `pair-check` or by hand. The source's README cites its datums, units and time zone, and says so where no independent reference exists.
 - **The current year.** The history of a source that still publishes isn't complete without the current year. A backfill ending at the current year leaves it out, since end years are exclusive, so it gets a run of its own, split into shards where one run can't hold it (see [Running ingest](docs/contributing/ingest.md)).
 - **Flagged values.** A value whose clock, datum, unit, position or owner can't be confirmed is recorded in the source's `errata.ts`. A value can be kept with an erratum whose handling is `kept`, which tells users what's wrong with it, only where its own evidence supports keeping it.
 
@@ -35,7 +35,7 @@ src/migrations/        the store work each merged change needs, which the Migrat
 src/api/               the levels API's parameters, datum conversion and responses
 server/                the poller (ingest.ts), its passes (pass.ts) and its daily-file export (export.ts), which run in workers/live's container
 src/                   shared pieces: HTTP, anonymous FTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
-scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check, the cross-station checks and the HRoI evaluations
+scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check, the pair check, the cross-station checks and the HRoI evaluations
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows, Migrations included
 workers/live/          the Cloudflare Worker and container that run the poller, with the D1 database of live values
@@ -77,6 +77,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm run gesla:coverage`          | Rewrite the [GESLA coverage report](src/sources/gesla/coverage.md) and its CSV from the store: which GESLA records the store also has from their originator, and the years each side lacks.                                              |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into [`docs/results/`](docs/results/). The RWS one downloads about 50 years of data.                                                                                                                          |
 | `npm run clock-check -- <args>`   | [`scripts/clock-check.ts`](scripts/clock-check.ts): check a new series' clock against TICON, described in [Checks](docs/contributing/checks.md#clock-check).                                                                             |
+| `npm run pair-check -- <args>`    | [`scripts/pair-check.ts`](scripts/pair-check.ts): compare two originators' records of one gauge for clock and datum, described in [Checks](docs/contributing/checks.md#pair-check).                                                      |
 | `npm run cross-check -- <args>`   | [`scripts/cross-check.ts`](scripts/cross-check.ts): compare a region's gauges with each other and with their own tide, described in [Checks](docs/contributing/checks.md#cross-station-checks).                                          |
 
 CI also checks that [`package-lock.json`](package-lock.json) regenerates from [`package.json`](package.json) and that every package resolves from the npm registry.
@@ -89,7 +90,7 @@ Read the guide for the task at hand before starting it:
 - [Sources](docs/contributing/sources.md): adding a source, recording a source's errata, and withholding stations.
 - [Operations](docs/contributing/operations.md): the scheduled workflows that write to R2, live polling, migrations, and the weekly canary.
 - [Errata runbook](docs/contributing/errata-runbook.md): working the errata report after each Monthly run, for an agent on a schedule.
-- [Checks](docs/contributing/checks.md): the TICON inventory, the clock check, the cross-station checks, the HRoI evaluations, and the definitions of published files.
+- [Checks](docs/contributing/checks.md): the TICON inventory, the clock check, the pair check, the cross-station checks, the HRoI evaluations, and the definitions of published files.
 - [Running the poller](docs/contributing/poller.md): the poller, and the levels API's tests.
 - [Site](site/README.md): building and deploying the site.
 
