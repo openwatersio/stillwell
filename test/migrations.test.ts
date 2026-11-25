@@ -99,6 +99,14 @@ describe("migration problems", () => {
     );
   });
 
+  it("refuses --with-inactive on named stations, as ingest does", () => {
+    assert.match(
+      one({ ingest: "backfill coops 8574680 1990 1991 --refetch --with-inactive" })[0],
+      /--with-inactive goes with `all`/,
+    );
+    assert.deepEqual(one({ ingest: "backfill coops all 1990 1991 --refetch --with-inactive" }), []);
+  });
+
   it("finds every migration in src/migrations runnable", async () => {
     for (const [id, migration] of await loadMigrations())
       assert.deepEqual(problems(migration), [], id);
