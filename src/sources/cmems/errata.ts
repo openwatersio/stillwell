@@ -235,7 +235,7 @@ export default {
       error:
         "These 14 CMEMS series hold levels no gauge can read, outside the store's span of −500 to 9,000 m: 17,626 values in 63 station-years from 2013 to 2026. AWG, K14 and L9 use 999,999.06 m as a fill value. The series of England's regional coastal monitoring gauges (Arun Platform, Brighton, Deal Pier, Exmouth, Hastings Pier, Sandown Pier, Scarborough, Second Severn Crossing and Swanage Pier) hold hundreds of different values from about −1.05 × 10¹¹ m to 214,000 m, Marienleuchte −3,350 m in 2026 and Saint-Pierre-et-Miquelon up to 2.4 × 10¹² m.",
       response:
-        "The adapter leaves out a value outside the store's span (`SPAN_M` in src/span.ts) as missing, and requalify drops any the store holds, values CMEMS keeps (`keepsStored`) among them.",
+        "The adapter leaves out a value outside the store's span (`SPAN_M` in src/span.ts) as missing, counts them, and requalify drops any the store holds, values CMEMS keeps (`keepsStored`) among them. Backfill writes a year of nothing else as its rows flagged `bad`, and requalify and compaction keep such a file, with a warning.",
       evidence:
         "November 2026. A scan of the range of levels in every one of the store's GESLA and CMEMS year files (145,149 files) found 205 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span. GESLA's copies of the same gauges hold the same values (erratum `gesla-fill-values`). GESLA's records of Bayonne, Villefranque, Pont Seudre and Teignmouth also hold fill values in years CMEMS's own series no longer serve, and CMEMS's Ceuta series (`IDSL-Ceuta`) has no value outside the span. REFMAR's own Saint-Pierre-et-Miquelon series (`refmar/115`) holds levels of 0.2 to 2.9 m in 2024, with no value outside the span.",
       // Marienleuchte's 2026 is the one station-year the entry names.
@@ -332,6 +332,106 @@ export default {
           if (low.length !== 4)
             throw new Error(
               `the store holds ${low.length} ${id} levels below −3 m on ${e.since}, not 4`,
+            );
+        }
+      },
+    },
+    {
+      id: "cmems-emden-2025-07-whole-centimeters",
+      stations: ["cmems/EmdenTG", "gesla/emdentg-emd-deu-cmems"],
+      since: "2025-07-01",
+      handling: "kept",
+      error:
+        "CMEMS's Emden levels are whole centimeters from 00:00 UTC on 1 July 2025; the 10-minute values before it have millimeters. The gauge itself reports whole centimeters.",
+      response:
+        "The store keeps CMEMS's values as served. The adapter reads each value as it is and doesn't round, so the whole centimeters come from CMEMS's files. GESLA's copy of the record holds the same values.",
+      evidence:
+        "Every one of `cmems/EmdenTG`'s levels from 2025-07-01 is a whole centimeter, and none before is, to 2025-06-30 23:50 UTC. Before July 2025, each level is PEGELONLINE's Emden Neue Seeschleuse level (`pegelonline/3970010`, whole centimeters in its own PNP datum) less 5.011 m, at all 21,768 times the two share; from July 2025 it is less 5.01 m at 60,755 of 65,724 shared times and less 5.02 m at 3,739 more, and the other 1,230 differ by other amounts, so CMEMS's values aren't PEGELONLINE's value for value. GESLA's copy (`gesla/emdentg-emd-deu-cmems`) holds `cmems/EmdenTG`'s value at all 47,996 times it has from 2025-07-01 to its end on 2026-05-31. PEGELONLINE's own values are whole centimeters throughout, so the change is in how CMEMS's source offsets the series, not in the gauge.",
+      check: async (store, e) => {
+        const whole = (o: { level: number }) =>
+          Math.abs(o.level * 100 - Math.round(o.level * 100)) < 1e-4;
+        for (const id of e.stations!)
+          for (const day of [e.since!, "2025-12-15", "2026-03-01"]) {
+            const rows = await levels(store, id, day);
+            const fine = rows.filter((o) => !whole(o));
+            if (fine.length)
+              throw new Error(
+                `${fine.length} of ${rows.length} ${id} levels on ${day} aren't whole centimeters`,
+              );
+          }
+        const before = await levels(store, e.stations![0]!, dayAfter(e.since!, -1));
+        if (before.every(whole))
+          throw new Error("Emden's levels on 2025-06-30 are whole centimeters, not millimeters");
+      },
+    },
+    {
+      id: "cmems-st-pauli-wrong-minute",
+      stations: ["cmems/StPauliTG", "gesla/stpaulitg-stp-deu-cmems"],
+      since: "2025-03-01",
+      until: "2026-07-01",
+      handling: "kept",
+      error:
+        "From March 2025, CMEMS's St. Pauli record (`cmems/StPauliTG`) and GESLA 4.1's copy of it have about 20% of their 10-minute values taken from a different minute than their timestamp says. Most are 1 or 2 cm off, but some are up to 42 cm off at mid-tide. GESLA flags all of them as correct and usable, and CMEMS flags 8 of the 25 that are over 8 cm.",
+      response:
+        "The store keeps the values as GESLA and CMEMS serve them. The group's preferred station is `pegelonline/5952050`, which takes its history from HPA's own archive on kuestendaten.de, and that archive has the right values through June 2026. The span ends where HPA's file does: later months have no file to compare with, and the 9 November 2026 value is in erratum `pegelonline-st-pauli-2026-11-09-dip`.",
+      evidence:
+        "I compared GESLA's record (`stpaulitg-stp-deu-cmems`, created 2026-07-19) with HPA's 1-minute file for gauge 5952050 from kuestendaten.de (downloaded 2026-11-09, shifted from UTC+1 to UTC).\n\n- From 1999-11-01 to 2025-02-28, every one of about 1.3 million shared 10-minute times differs by exactly 5.004 m, which is the gauge zero's offset to NHN. That holds for all 12,954 times in December 2024 to February 2025 too.\n- From 2025-03-01 03:40 to the end of the record on 2026-05-31, 12,838 of 65,622 shared times differ in that download. Of those, 10,207 are off by 1 cm, 1,991 by 2 cm, 640 by 3 cm or more, 101 of them by more than 5 cm, up to 42 cm. The store's own files give 65,600 shared times and 71 over 5 cm, a difference of counting that isn't explained. Every month from March 2025 to May 2026 has between 759 and 931.\n- At 11,803 of the 12,838, GESLA's value equals HPA's value from a minute within 10 minutes of the stated time, most often 1 minute before or after. The large differences come from minutes 5 to 29 away, on the steep part of the tide. 5,495 are single points with both 10-minute neighbors matching HPA exactly.\n- HPA's series is smooth around these times. Its largest 1-minute step near the 101 large differences is 3 cm. Against Seemannshöft and Blankenese, two HPA gauges downstream, HPA's St. Pauli value is the one that fits the local difference between the gauges at 100 of the 101 large differences. The median departure is 1 cm for HPA and 6 cm for GESLA.\n- Example (UTC, meters above gauge zero): on 2025-05-14 06:10, HPA has 6.12 and GESLA 5.82. Seemannshöft has 6.04, and both copies have 6.29 at 06:00 and 5.98 at 06:20.\n- In the store's files, `cmems/StPauliTG` holds the same values as GESLA's at all 126,816 times the two share from 2024 to 31 May 2026, and carries on after GESLA's copy ends. Against the store's `pegelonline/5952050`, which holds HPA's file, 12,838 of 65,600 shared times from 2025-03-01 03:40 to 31 May 2026 differ, and 850 of 4,282 in June 2026, the last month of HPA's file. Of the 13,688, 71 differ by more than 5 cm in the 65,600, and 25 by more than 8 cm over the whole span, each 8 to 40 cm below the CMEMS record's own neighbors where HPA's file is smooth. CMEMS flags 8 of the 25, 30 to 42 cm off; the other 17 are 9 to 26 cm off and unflagged. Example: on 2026-06-05 00:20, HPA's file has 3.540 m above gauge zero (−1.464 m NHN) and CMEMS −1.554 m.\n- From 9 October to 23 November 2026 the store's `pegelonline/5952050` holds values from PEGELONLINE's REST API, which equal the CMEMS record at all 4,537 shared times, including a value 42 cm below its neighbors at 04:10 UTC on 9 November with 04:11 missing (erratum `pegelonline-st-pauli-2026-11-09-dip`). The wrong minutes may come from the WSV's live feed, not from CMEMS or GESLA. No HPA file covers those months, so that isn't confirmed.\n\nNo other record of the gauge covers March 2025 to June 2026, and none of later months has HPA's file to compare with. BSH's `508P` holds predictions only.",
+      // Kept as served: 2025-05-14 06:10 holds a value from another minute, 16 cm below the next on a falling tide (HPA has it 14 cm above).
+      check: async (store, e) => {
+        for (const id of e.stations!) {
+          const rows = await levels(store, id, "2025-05-14");
+          const at = (hhmm: string) =>
+            rows.find((o) => o.time === Date.parse(`2025-05-14T${hhmm}:00Z`))?.level;
+          const [before, wrong, after] = [at("06:00"), at("06:10"), at("06:20")];
+          if (before === undefined || wrong === undefined || after === undefined)
+            throw new Error(
+              `the store holds no ${id} value at 06:00, 06:10 or 06:20 on 2025-05-14`,
+            );
+          if (!(wrong < after - 0.1 && after < before))
+            throw new Error(
+              `${id} reads ${before}, ${wrong} and ${after} m at 06:00, 06:10 and 06:20 on 2025-05-14, not the dip`,
+            );
+        }
+        // HPA's file is in meters above gauge zero, 5.004 m below NHN, which CMEMS reports in.
+        const hpa = await levels(store, "pegelonline/5952050", "2026-06-05");
+        const cmems = await levels(store, "cmems/StPauliTG", "2026-06-05");
+        const time = Date.parse("2026-06-05T00:20:00Z");
+        const [h, c] = [hpa.find((o) => o.time === time), cmems.find((o) => o.time === time)];
+        if (!h || !c) throw new Error("the store holds no St. Pauli value at 00:20 on 2026-06-05");
+        if (!(h.level - 5.004 - c.level > 0.05))
+          throw new Error(
+            `CMEMS reads ${c.level} m at 00:20 on 2026-06-05 and HPA's file ${h.level - 5.004} m, not the 9 cm dip`,
+          );
+      },
+    },
+    {
+      id: "cmems-west-bay-harbour-offset",
+      stations: ["cmems/WestBayHarbourTG", "gesla/westbayharbourtg-wes-gbr-cmems"],
+      since: "2024-09-24",
+      until: "2025-11-06",
+      handling: "flagged",
+      error:
+        "CMEMS's West Bay Harbour record reads about 0.093 m lower than the Channel Coastal Observatory's (`cco/95`) from 24 September 2024 to 13:00 UTC on 5 November 2025, and equals it to 0.0 m before and after. GESLA's copy of the CMEMS record carries the same values.",
+      response:
+        "24 September 2024 to 5 November 2025 is flagged `suspect`, keeping each record's own flag as `source_flag`. Errata spans are whole days, so the 11 matching hours after the step ends on 5 November are flagged too. The Observatory's record, which has no step, is the one to use.",
+      evidence:
+        "In the store, checked in November 2026: at the 58,227 times the two records share in that span they differ by a median of 0.093 m (CMEMS lower), and at every shared time before and after by 0.0 m. Against Weymouth, a different gauge 25 km east, CMEMS's West Bay Harbour reads 1.46 m above it in August 2024, 1.36 to 1.39 m above in every month from October 2024 to October 2025, and 1.48 m above in December 2025, while the Observatory's West Bay Harbour reads 1.46 to 1.49 m above it in all of them. The step is in the CMEMS record, not the Observatory's, which has no step at either end. The start falls in a gap in the CMEMS record from 20 to 24 September 2024; the last offset reading is at 13:00 UTC on 5 November 2025 and the first matching one at 13:10. Why CMEMS's values differ isn't known.",
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        for (const id of e.stations!) await allSuspect(store, id, e.since!, e.until!);
+        // The step stays in the stored records; a refetch that removes it means the entry needs looking at again.
+        const day = "2025-03-01";
+        const cco = await levels(store, "cco/95", day);
+        const at = new Map(cco.map((o) => [o.time, o.level]));
+        for (const id of e.stations!) {
+          const own = await levels(store, id, day);
+          const diffs = own
+            .flatMap((o) => (at.has(o.time) ? [at.get(o.time)! - o.level] : []))
+            .sort((a, b) => a - b);
+          const median = diffs[Math.floor(diffs.length / 2)];
+          if (median === undefined || median < 0.08 || median > 0.11)
+            throw new Error(
+              `${id} is ${median?.toFixed(3)} m from cco/95 on ${day} at ${diffs.length} shared times, not about 0.093 m`,
             );
         }
       },

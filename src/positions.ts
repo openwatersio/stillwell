@@ -210,6 +210,21 @@ export const POSITIONS: Record<string, { served: Position; at: Position }> = {
     served: { lat: 36.217654520392, lon: -86.820220686694 },
     at: { lat: 36.0942596, lon: -86.7938782 },
   },
+  // CWMS drops the longitude's sign at three locations, which puts them in Asia.
+  // USGS's gauges at the same places confirm the positions: erratum
+  // `usace-longitude-sign`.
+  "usace/MVK.Pine_Bluff": {
+    served: { lat: 34.29028, lon: 91.99556 },
+    at: { lat: 34.29027778, lon: -91.9955556 },
+  },
+  "usace/LRL.BuckCreek": {
+    served: { lat: 39.951388888889, lon: 83.754166666667 },
+    at: { lat: 39.951449, lon: -83.7540936 },
+  },
+  "usace/LRH.PleasantHill-Outflow": {
+    served: { lat: 40.620518, lon: 82.323769 },
+    at: { lat: 40.6203379, lon: -82.3243284 },
+  },
   // BODC's ERDDAP places Workington's gauge at St Ives in Cornwall, though its
   // levels match the EA's Workington readings exactly, and gives Immingham and
   // Newhaven -999. Each goes where the EA's list puts the same gauge: erratum
@@ -231,6 +246,12 @@ export const POSITIONS: Record<string, { served: Position; at: Position }> = {
 /** Farthest a source's position can move before its correction is out of date. */
 const SERVED_KM = 0.5;
 
+/** Whether `position` is where `POSITIONS` says `id`'s source serves it, so its entry still applies. */
+export function servedAt(id: string, position: Position): boolean {
+  const fix = POSITIONS[id];
+  return !!fix && km(position, fix.served) <= SERVED_KM;
+}
+
 /**
  * A source's stations with those `POSITIONS` names moved to where they are,
  * and each entry the source has moved its station away from.
@@ -242,7 +263,7 @@ export function correctPositions<T extends Position & { id: string }>(
   const corrected = stations.map((s) => {
     const fix = POSITIONS[s.id];
     if (!fix) return s;
-    if (!(km(s, fix.served) <= SERVED_KM)) {
+    if (!servedAt(s.id, s)) {
       stale.push(`${s.id} is now at ${s.lat}, ${s.lon}, not ${fix.served.lat}, ${fix.served.lon}`);
       return s;
     }

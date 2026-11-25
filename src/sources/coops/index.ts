@@ -1,6 +1,6 @@
 import type { Period } from "../../datums.ts";
 import { Blocked, getJson, getText } from "../../http.ts";
-import { possible } from "../../span.ts";
+import { inSpan, possible } from "../../span.ts";
 import {
   Flag,
   stationDefaults,
@@ -354,9 +354,14 @@ export async function levels(
         for (const [a, b] of within365([from, until]))
           hourlyRows.push(...(await rowsOf("hourly_height", id, a, b)));
       }
-      hourly = hourlyRows.filter(
-        (r) => usable(r) && timeOf(r.t) >= from.getTime() && timeOf(r.t) < to.getTime(),
-      );
+      hourly = hourlyRows.filter((r) => {
+        // Dropped here, so a row for a level outside the span never reaches the loop below, which counts the rest.
+        if (!usable(r)) {
+          if (inRangeOf(r, from, to)) countImpossible(r, true);
+          return false;
+        }
+        return timeOf(r.t) >= from.getTime() && timeOf(r.t) < to.getTime();
+      });
       const covered = new Set(hourly.map((r) => Math.floor(timeOf(r.t) / HOUR_MS)));
       sixMinute = sixMinute.filter(
         (r) => r.q !== "p" || !usable(r) || !covered.has(Math.floor(timeOf(r.t) / HOUR_MS)),
@@ -370,7 +375,10 @@ export async function levels(
       [hourly, true],
     ] as const)
       for (const r of rows) {
-        if (!usable(r)) continue;
+        if (!usable(r)) {
+          countImpossible(r, isHourly);
+          continue;
+        }
         out.push({ time: timeOf(r.t), level: Number(r.v), flag: flagOf(r, isHourly) });
       }
   }
@@ -390,6 +398,7 @@ export async function extremes(
     if (!covers(from, to)) continue;
     for (const r of await rowsOf("high_low", id, from, to)) {
       // A level outside the store's span or a time that isn't a real date is left out, as in `levels`.
+      if (!usable(r)) countImpossible(r);
       if (!usable(r) || !r.ty) continue;
       out.push({
         time: timeOf(r.t),
@@ -679,12 +688,27 @@ function isoOf(t: string): string {
 /** A row with a level within `SPAN_M` and a time that is a real date, which `Date.parse` would roll over; for 6-minute values, hourly heights and high and low waters. */
 function usable(r: Row): boolean {
   if (typeof r.v !== "string" || r.v.trim() === "" || !possible(Number(r.v))) return false;
-  // The whole text is a time: the match takes a valid prefix of `12:00junk` otherwise.
+  return validTime(r);
+}
+
+/** Whether the row's whole time text is a real date; the match takes a valid prefix of `12:00junk` otherwise. */
+function validTime(r: Row): boolean {
   if (!/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?$/.test(r.t.trim())) return false;
   const time = timeOf(r.t);
   return (
     Number.isFinite(time) && new Date(time).toISOString().slice(0, 16) === isoOf(r.t).slice(0, 16)
   );
+}
+
+/** Counts a row left out for a level outside `SPAN_M`, if its time is a real date and its level isn't blank. */
+function countImpossible(r: Row, hourly = false): void {
+  if (typeof r.v !== "string" || r.v.trim() === "" || !validTime(r)) return;
+  inSpan(Number(r.v), timeOf(r.t), flagOf(r, hourly));
+}
+
+/** Whether the row's time is a real date in [from, to). */
+function inRangeOf(r: Row, from: Date, to: Date): boolean {
+  return validTime(r) && timeOf(r.t) >= from.getTime() && timeOf(r.t) < to.getTime();
 }
 
 function stamp(date: Date): string {

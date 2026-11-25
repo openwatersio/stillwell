@@ -1,6 +1,6 @@
 /**
  * Clock check: cross-correlates a year of a station's observed levels, fetched
- * through its adapter, against the prediction from a TICON record's constants
+ * through its adapter, against the prediction from a slackwater-database record's constants
  * in a slackwater-database checkout (TIDE_DATABASE, default
  * ../slackwater-database), and reports the lag that fits best. A lag near a
  * whole hour is a clock error, such as local time labeled UTC, to fix before
@@ -9,8 +9,15 @@
  * A range shorter than a month, for a source that keeps only days (SMN keeps
  * 5), needs values on all but one of its days rather than 30.
  *
- *   node scripts/clock-check.ts <year | start/end> <source/id>=<ticon record>...
+ *   node scripts/clock-check.ts <year | start/end> <source/id>=<record>...
  *   node scripts/clock-check.ts 2020 uhslc/329=hong_kong-329-hkg-uhslc_fd
+ *   node scripts/clock-check.ts 2020 dmi/30357=dmi/30357
+ *
+ * A record is a TICON record by name, or another dataset's by `<dataset>/<id>`
+ * (`dmi/30357`), which must hold harmonic constituents. What makes the check
+ * independent is where the constants came from: constants fitted to the series
+ * under test, or to a copy of it, only show a clock that has changed since,
+ * so prefer a record fitted to another originator's observations.
  *
  * A positive lag means the observations run late against the prediction: the
  * level stamped T was measured at T − lag.
@@ -31,11 +38,18 @@ const MINUTE_MS = 60_000;
 /** Lags tried, every 10 minutes up to 3 hours either way. */
 const LAGS = Array.from({ length: 37 }, (_, i) => (i - 18) * 10);
 
+/**
+ * A record's file under `data/`: a TICON record by its name, or another
+ * dataset's by `<dataset>/<id>`, such as `dmi/30357`, which holds constants
+ * fitted to that agency's own observations.
+ */
+function recordFile(record: string): string {
+  return `${record.includes("/") ? record : `ticon/${record}`}.json`;
+}
+
 const [period, ...pairs] = process.argv.slice(2);
 if (!period || !pairs.length)
-  throw new Error(
-    "Usage: node scripts/clock-check.ts <year | start/end> <source/id>=<ticon record>...",
-  );
+  throw new Error("Usage: node scripts/clock-check.ts <year | start/end> <source/id>=<record>...");
 useDiskCache();
 
 // A year, or a range of ISO dates for a source that keeps less than one.
@@ -43,14 +57,14 @@ const [from, to] = period.split("/");
 const start = new Date(to ? Date.parse(from!) : Date.UTC(Number(from), 0, 1));
 const end = new Date(to ? Date.parse(to) : Date.UTC(Number(from) + 1, 0, 1));
 if (!(start < end)) throw new Error(`Not a year or start/end: ${period}`);
-console.log("| Station | TICON record | Values | r at 0 | Best lag | r at best | K1 lag |");
+console.log("| Station | Record | Values | r at 0 | Best lag | r at best | K1 lag |");
 console.log("| --- | --- | --: | --: | --: | --: | --: |");
 let flagged = false;
 const lists = new Map<string, { id: string }[]>();
 for (const pair of pairs) {
   const [station, record] = pair.split("=");
   const [sourceId, id] = station?.split(/\/(.*)/) ?? [];
-  if (!sourceId || !id || !record) throw new Error(`Not <source/id>=<ticon record>: ${pair}`);
+  if (!sourceId || !id || !record) throw new Error(`Not <source/id>=<record>: ${pair}`);
   const source = sourceOf(sourceId);
   // The store's list (STILLWELL_STORE, default the public bucket) carries each
   // station's own fields; a source with no list there is listed by its adapter.
@@ -74,8 +88,10 @@ for (const pair of pairs) {
     continue;
   }
   const ticon = JSON.parse(
-    await readFile(join(TIDE_DATABASE, "data/ticon", `${record}.json`), "utf8"),
+    await readFile(join(TIDE_DATABASE, "data", recordFile(record)), "utf8"),
   ) as { harmonic_constituents: { name: string; amplitude: number; phase: number }[] };
+  if (!ticon.harmonic_constituents?.length)
+    throw new Error(`${record} holds no harmonic constituents to predict from`);
   const model = { constituents: ticon.harmonic_constituents, offset: 0, rms: 0 };
   const r = (lag: number) =>
     correlation(

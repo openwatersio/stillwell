@@ -57,7 +57,7 @@ export const LINKS: Decision[] = [
   {
     a: "bodc/ptb",
     b: "ea/E72624",
-    note: "The National Tide Gauge Network's Portbury gauge, which the EA names Avonmouth Portbury and places 2 km east; its other listing of the gauge, E72623, is 70 m from BODC's position. Both are in chart datum with a mean level about 7.4 m. BODC flags its whole record improbable, so its record counts as zero length in `rank` and the EA's series is preferred: since November 2026 the mAOD series E72639, which names E72624 as its twin and joins the group.",
+    note: "The National Tide Gauge Network's Portbury gauge, which the EA names Avonmouth Portbury and places 2 km east; its other listing of the gauge, E72623, is 70 m from BODC's position. Both are in chart datum with a mean level about 7.4 m. BODC flags its whole record improbable, so its record counts as zero length in `rank` and the EA's series is preferred, and so is the mAOD series E72639, which names E72624 as its twin and joins the group.",
   },
   {
     a: "gesla/rostocktg-ros-deu-cmems",
@@ -535,10 +535,11 @@ export function rank(
 ): number {
   const copy = (s: Station) => redistributed(s) || copies.has(s.id);
   const levels = (s: Station) => s.products.includes("levels");
-  // The bounds lag a first backfill until compaction, which the years file doesn't.
+  // The bounds lag a first backfill until compaction, which the years file doesn't. A station whose files hold only
+  // values flagged bad, as a year of fill is, holds no record.
   const stored = (s: Station) =>
     (Number.isFinite(Date.parse(s.first ?? "")) && Number.isFinite(Date.parse(s.last ?? ""))) ||
-    usable.has(s.id);
+    (usable.get(s.id) ?? 0) > 0;
   const reporting = (s: Station) =>
     s.status === "active" && s.last !== null && now.getTime() - Date.parse(s.last) < REPORTING_MS;
   const span = (s: Station) => {

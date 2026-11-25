@@ -2795,6 +2795,101 @@ describe("usace", () => {
     };
     assert.deepEqual(pool({ latitude: 41.89, ...published }), []);
     assert.deepEqual(pool({ longitude: -87.62, ...published }), []);
+    assert.deepEqual(pool({}), []);
+    assert.deepEqual(pool({ latitude: 9.09, longitude: 9.09 }), []);
+    assert.deepEqual(pool({ latitude: 34.29, longitude: 91.996 }), []);
+    // A position POSITIONS moves is listed, for the refresh to move: CWMS serves Pine Bluff's longitude without its sign.
+    const [pineBluff] = usace.toStations(
+      "MVK",
+      [
+        series(
+          "Pine Bluff.Stage.Inst.15Minutes.0.DCP-rev",
+          "15Minutes",
+          "2021-03-19T16:00:00Z",
+          "2026-09-14T03:00:00Z",
+        ),
+      ],
+      [
+        {
+          office: "MVK",
+          name: "Pine Bluff",
+          nation: "United States",
+          latitude: 34.29028,
+          longitude: 91.99556,
+        },
+      ],
+      new Map(),
+      now,
+    );
+    assert.deepEqual(
+      [pineBluff!.id, pineBluff!.lat, pineBluff!.lon],
+      ["usace/MVK.Pine_Bluff", 34.29028, 91.99556],
+    );
+    // A listed station that loses its position stops the refresh rather than retire, until a decision settles it.
+    const lost = () =>
+      usace.toStations(
+        "LRC",
+        [
+          series(
+            "Chicago Lock-Pool.Stage.Inst.1Hour.0.USGS-raw",
+            "1Hour",
+            "2021-03-19T16:00:00Z",
+            "2026-09-14T03:00:00Z",
+          ),
+        ],
+        [
+          {
+            office: "LRC",
+            name: "Chicago Lock-Pool",
+            nation: "United States",
+            latitude: 0,
+            longitude: 0,
+          },
+        ],
+        new Map([["usace/LRC.Chicago_Lock-Pool", "Chicago Lock-Pool.Stage.Inst.1Hour.0.USGS-raw"]]),
+        now,
+      );
+    assert.throws(lost, /places usace\/LRC.Chicago_Lock-Pool at 0, 0.*POSITIONS.*RETIRED/);
+    // Only an active station the location owns stops the refresh, and a POSITIONS station only while CWMS serves its position.
+    const stageOf = (name: string) => `${name}.Stage.Inst.1Hour.0.USGS-raw`;
+    const listedAt = (
+      office: string,
+      name: string,
+      latitude: number,
+      longitude: number,
+      committed: [string, string][],
+      inactive: string[] = [],
+    ) =>
+      usace.toStations(
+        office,
+        [series(stageOf(name), "1Hour", "2021-03-19T16:00:00Z", "2026-09-14T03:00:00Z")],
+        [{ office, name, nation: "United States", latitude, longitude }],
+        new Map(committed),
+        now,
+        new Set(inactive),
+      );
+    const owned: [string, string][] = [
+      ["usace/LRC.Chicago_Lock-Pool", stageOf("Chicago Lock-Pool")],
+    ];
+    assert.deepEqual(
+      listedAt("LRC", "Chicago Lock-Pool", 0, 0, owned, ["usace/LRC.Chicago_Lock-Pool"]),
+      [],
+    );
+    assert.deepEqual(listedAt("LRC", "Chicago_Lock-Pool", 0, 0, owned), []);
+    assert.throws(
+      () => listedAt("MVK", "Pine Bluff", 0, 0, [["usace/MVK.Pine_Bluff", stageOf("Pine Bluff")]]),
+      /Pine_Bluff.*POSITIONS entry.*update the entry's `served`.*RETIRED/,
+    );
+    assert.throws(
+      () => listedAt("LRC", "Chicago Lock-Pool", undefined as never, undefined as never, owned),
+      /no position, which a POSITIONS entry can't settle.*RETIRED/,
+    );
+    usace.RETIRED.add("usace/LRC.Chicago_Lock-Pool");
+    try {
+      assert.deepEqual(lost(), []);
+    } finally {
+      usace.RETIRED.delete("usace/LRC.Chicago_Lock-Pool");
+    }
     assert.deepEqual(pool({ "published-latitude": 0, "published-longitude": 0 }), []);
     assert.deepEqual(
       pool({
@@ -3939,6 +4034,64 @@ describe("usgs", () => {
       end: new Date(Date.now() - 90 * 86_400_000).toISOString(),
     }).properties;
     assert.equal(usgs.choose([paused, live]).get("USGS-01646500")!.parameter_code, "00065");
+  });
+
+  it("chooses the same series whatever order USGS lists series that rank alike", () => {
+    // 07263883: a headwater and a tailwater series that began at the same minute, both reported in the last year.
+    const headwater = series("07263883", "00065", {
+      id: "5f0ae99f116d4e37a460e54a18ca1590",
+      sublocation_identifier: "HEADWATER",
+      begin: "2018-11-30T14:45:00.000001",
+      end: new Date(Date.now() - 20 * 86_400_000).toISOString(),
+    }).properties;
+    const tailwater = series("07263883", "00065", {
+      id: "54c778a685654e7a9d7d7f5e6d43a1d4",
+      sublocation_identifier: "TAILWATER",
+      begin: "2018-11-30T14:45:00.000001",
+      end: new Date(Date.now() - 50 * 86_400_000).toISOString(),
+    }).properties;
+    for (const listed of [
+      [headwater, tailwater],
+      [tailwater, headwater],
+    ])
+      assert.equal(usgs.choose(listed).get("USGS-07263883")!.id, tailwater.id);
+    // 09510200: two primary series with the same dates.
+    const first = series("09510200", "00065", {
+      id: "36860ca78f0b4c428744b5befb3266d1",
+      begin: "2007-10-01T07:00:00.000001",
+    }).properties;
+    const second = series("09510200", "00065", {
+      id: "8b0c32f930a04d18b314ebefe0c895fa",
+      begin: "2007-10-01T07:00:00.000001",
+    }).properties;
+    for (const listed of [
+      [first, second],
+      [second, first],
+    ])
+      assert.equal(usgs.choose(listed).get("USGS-09510200")!.id, first.id);
+    // A station keeps the series it holds, whichever ID is lower.
+    const holds = new Map([["usgs/09510200", second.id]]);
+    for (const listed of [
+      [first, second],
+      [second, first],
+    ])
+      assert.equal(usgs.choose(listed, holds).get("USGS-09510200")!.id, second.id);
+  });
+
+  it("reads the clock once, so a clock that advances between two series' ranks doesn't split a tie", (t) => {
+    const stopped = (id: string) =>
+      series("09510200", "00065", {
+        id,
+        begin: "2010-01-01T00:00:00Z",
+        end: "2024-01-01T00:00:00Z",
+      }).properties;
+    let now = Date.parse("2026-11-25T00:00:00Z");
+    t.mock.method(Date, "now", () => now++);
+    for (const listed of [
+      [stopped("a"), stopped("b")],
+      [stopped("b"), stopped("a")],
+    ])
+      assert.equal(usgs.choose(listed).get("USGS-09510200")!.id, "a");
   });
 
   it("refuses a reply with more than 1 in 30 altitudes missing a method or accuracy, past 10", () => {
@@ -5296,13 +5449,13 @@ describe("refmar", () => {
     );
   });
 
-  it("flags Pointe-à-Pitre's values from 2020 to 2024 suspect", async () => {
+  it("flags Pointe-à-Pitre's values from 2023 to 2024 suspect", async () => {
     setTransport(async (url) => {
       const start = new URL(url).searchParams.get("dtStart")!;
-      if (start.startsWith("2019-12"))
-        return JSON.stringify({ data: [row(3, "2019/12/31 23:50:00")] });
-      if (start.startsWith("2020-01"))
-        return JSON.stringify({ data: [row(3, "2020/01/01 00:00:00")] });
+      if (start.startsWith("2022-12"))
+        return JSON.stringify({ data: [row(3, "2022/12/31 23:50:00")] });
+      if (start.startsWith("2023-01"))
+        return JSON.stringify({ data: [row(3, "2023/01/01 00:00:00")] });
       if (start.startsWith("2024-12"))
         return JSON.stringify({ data: [row(3, "2024/12/31 23:50:00")] });
       if (start.startsWith("2025-01"))
@@ -5319,28 +5472,28 @@ describe("refmar", () => {
       }) as unknown as Station;
     const flags = async (id: string, from: string, to: string) =>
       (await sources.refmar!.observations!(station(id), new Date(from), new Date(to))).map((v) => [
-        new Date(v.time).toISOString().slice(0, 4),
+        new Date(v.time).toISOString().slice(0, 10),
         v.flag,
       ]);
     const [, flagged] = await sources.refmar!.observations!(
       station("125"),
-      new Date("2019-12-01Z"),
-      new Date("2020-02-01Z"),
+      new Date("2022-12-01Z"),
+      new Date("2023-02-01Z"),
     );
     // SHOM's own flag stays as the source's.
     assert.equal(flagged!.source_flag, Flag.good);
-    assert.deepEqual(await flags("125", "2019-12-01Z", "2020-02-01Z"), [
-      ["2019", Flag.good],
-      ["2020", Flag.suspect],
+    assert.deepEqual(await flags("125", "2022-12-01Z", "2023-02-01Z"), [
+      ["2022-12-31", Flag.good],
+      ["2023-01-01", Flag.suspect],
     ]);
     assert.deepEqual(await flags("125", "2024-12-01Z", "2025-02-01Z"), [
-      ["2024", Flag.suspect],
-      ["2025", Flag.good],
+      ["2024-12-31", Flag.suspect],
+      ["2025-01-01", Flag.good],
     ]);
     // Other gauges keep SHOM's flag.
-    assert.deepEqual(await flags("126", "2019-12-01Z", "2020-02-01Z"), [
-      ["2019", Flag.good],
-      ["2020", Flag.good],
+    assert.deepEqual(await flags("126", "2022-12-01Z", "2023-02-01Z"), [
+      ["2022-12-31", Flag.good],
+      ["2023-01-01", Flag.good],
     ]);
   });
 

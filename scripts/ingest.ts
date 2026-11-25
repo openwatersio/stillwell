@@ -101,7 +101,9 @@ import {
   COMPACTED_SINCE,
   years,
   yearsToFetch,
+  type YearReport,
 } from "../src/backfill.ts";
+import { Dropped } from "../src/span.ts";
 import { emptyKey, keepsEmptyYears, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import {
   mergeBackfilled,
@@ -176,7 +178,7 @@ import type {
   SourceMetadata,
   Station,
 } from "../src/schema.ts";
-import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
+import { errata, errataProblems, questions, sourceOf, sources } from "../src/sources/index.ts";
 import { DROPS, dropFiles, removePrefixes, withhold, withheldReason } from "../src/withhold.ts";
 import { deleteYears } from "../src/delete-years.ts";
 import { misplaced } from "../src/store/misplaced.ts";
@@ -552,7 +554,7 @@ async function publish(store: string): Promise<void> {
   for (const { metadata } of held)
     if (published.has(metadata.id) || (await hasHistory(store, metadata.id)))
       expected.push(metadata.id);
-  const result = await publishStations(store, held, expected, errata);
+  const result = await publishStations(store, held, expected, errata, questions);
   if ("count" in result) {
     console.log(`${stationsPath(store)}: ${result.count} stations`);
     const { pairs, dropped, skipped, wide, shifted } = result.links;
@@ -584,9 +586,9 @@ async function publish(store: string): Promise<void> {
     for (const f of far) console.log(`  datums join dropped: ${f}`);
     for (const d of disagree) console.log(`  datums differ: ${d}`);
     for (const e of result.unknownErrata)
-      console.error(`  erratum lists a station not in the store: ${e}`);
+      console.error(`  erratum or question lists a station not in the store: ${e}`);
     for (const p of errataProblems) console.error(`  errata: ${p}; left out`);
-    // A typo in an erratum's stations tags nothing, and a bad errata file leaves
+    // A typo in an erratum's stations tags nothing, one in a question's names the wrong gauge to its agency, and a bad errata file leaves
     // its errata out, so fail the run to say so, after publishing: holding back
     // every source's list for it would cost more.
     if (result.unknownErrata.length || errataProblems.length) process.exitCode = 1;
@@ -711,6 +713,11 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     (error: Error) => void fail("backfilled years, recording none", error),
   );
   let emptyFound = false;
+  // What the run's fetches and the stored years it rewrote left out as outside `SPAN_M`.
+  const leftOut = new Dropped();
+  let leftOutYears = 0;
+  // Series years whose every level was outside it, written as rows flagged bad.
+  const badYears: string[] = [];
   let emptySkipped = 0;
   let emptyRecorded = 0;
   // Each station's earliest preliminary value, read again after its levels
@@ -874,6 +881,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
             const label = `${station.id} ${product} ${from.getUTCFullYear()}${epoch.id === current ? "" : ` (epoch ${epoch.id})`}`;
             if (ownEpoch) fetched.add(station.id);
             try {
+              const report: YearReport = { dropped: new Dropped(), allOutOfSpan: false };
               const rows = await backfillYear(
                 source,
                 station,
@@ -883,7 +891,21 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
                 epoch,
                 files!,
                 written,
+                report,
               );
+              // Counted whatever came of the year, so a source whose values all turned to fill shows as that.
+              if (report.dropped.count) {
+                leftOut.merge(report.dropped);
+                leftOutYears++;
+                const note = `left out ${report.dropped.describe()}`;
+                if (report.allOutOfSpan) {
+                  badYears.push(label);
+                  console.log(
+                    `${label}: every level the source sent was outside the span, so the year is ${rows} rows flagged bad; ${note}`,
+                  );
+                } else if (rows === "empty" || rows === undefined) console.log(`${label}: ${note}`);
+                else console.log(`${label}: ${rows} rows; ${note}`);
+              }
               // An empty answer for a year from 2026 on that has a file, perhaps compaction's
               // last weeks, may be an outage, so it doesn't vouch for the rest of the year.
               if (
@@ -904,7 +926,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
                   emptyFound = true;
                   emptyRecorded++;
                 }
-              } else if (rows !== undefined) console.log(`${label}: ${rows} rows`);
+              } else if (rows !== undefined && !report.dropped.count)
+                console.log(`${label}: ${rows} rows`);
             } catch (error) {
               // A failed year writes nothing, so its file keeps what it had.
               if (error instanceof Blocked) stopped ??= error;
@@ -962,10 +985,38 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   // A jump here, against the years written, is the sign of an outage answering with nothing.
   if (emptyRecorded)
     console.log(`${sourceId}: recorded ${emptyRecorded} years with no file that came back empty`);
+  await reportLeftOut(sourceId, leftOut, leftOutYears, badYears);
   console.log(`${sourceId}: ${failed.length} failed`);
   if (stopped) console.error(`${sourceId}: stopped: ${stopped.message}`);
   for (const f of failed) console.error(`  ${f}`);
   if (failed.length || stopped) process.exitCode = 1;
+}
+
+/**
+ * Print what a backfill left out as outside the store's span, and the years where that was every
+ * level, and add them to the workflow run's page. A source whose values all turned to fill
+ * shows here as bad values, not as a station gone quiet.
+ */
+async function reportLeftOut(
+  sourceId: string,
+  leftOut: Dropped,
+  years: number,
+  bad: string[],
+): Promise<void> {
+  if (!leftOut.count) return;
+  const lines = [
+    `${sourceId}: left out ${leftOut.describe()} in ${years} series years`,
+    ...(bad.length
+      ? [
+          `${sourceId}: ${bad.length} series years held no other level, so they are written as rows flagged bad:`,
+          ...bad.slice(0, 100).map((b) => `  ${b}`),
+          ...(bad.length > 100 ? [`  and ${bad.length - 100} more`] : []),
+        ]
+      : []),
+  ];
+  console.log(lines.join("\n"));
+  const page = process.env.GITHUB_STEP_SUMMARY;
+  if (page) await appendFile(page, ["```", ...lines, "```", ""].join("\n"));
 }
 
 /**
@@ -1166,7 +1217,10 @@ async function requalifyStations(
           if (files) s.updated++;
           s.files += files;
           s.values += changed;
-          if (dropped) s.dropped = (s.dropped ?? 0) + dropped;
+          if (dropped.count) {
+            (s.dropped ??= new Dropped()).merge(dropped);
+            console.log(`${station.id}: left out ${dropped.describe()}`);
+          }
           for (const w of warnings) (s.warned ??= []).push(`${station.id}: ${w}`);
         } catch (error) {
           s.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);

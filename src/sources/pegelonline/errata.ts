@@ -1,4 +1,5 @@
 import { dayAfter, flaggedSpan, impossibleDropped, type ErrataFile } from "../../errata.ts";
+import { Flag } from "../../schema.ts";
 import {
   differences,
   held,
@@ -385,6 +386,37 @@ export default {
       },
     },
     {
+      id: "pegelonline-st-pauli-2026-11-09-dip",
+      stations: ["pegelonline/5952050", "cmems/StPauliTG"],
+      since: "2026-11-09",
+      until: "2026-11-10",
+      handling: "kept",
+      error:
+        "PEGELONLINE's REST API gives Hamburg St. Pauli 6.15 m above gauge zero at 04:10 UTC on 9 November 2026, 42 cm below the 6.59 and 6.55 m at 04:09 and 04:12, with 04:11 missing, on a tide falling about 1 cm a minute.",
+      response:
+        "The values are kept as served, and the spike rule flags the 6.15 m `suspect`. Errata spans are whole days, so flagging it here would mark about 1,400 good one-minute values suspect.",
+      evidence:
+        "In the store's 2026 file for the gauge, read on 24 November 2026. The CMEMS record, `cmems/StPauliTG`, holds the same level, 1.146 m above NHN, at 04:10, and CMEMS flags it `suspect` itself. It looks like the values taken from other minutes in erratum `cmems-st-pauli-wrong-minute`, which the WSV's live feed may produce; no HPA file covers these months to settle it.",
+      check: async (store, e) => {
+        const [station, day] = [e.stations![0]!, e.since!];
+        const values = await levels(store, station, day);
+        const at = (hhmm: string) =>
+          values.find((o) => o.time === Date.parse(`${day}T${hhmm}:00Z`));
+        // The spike rule needs neighbors on both sides to judge the value.
+        kept(values, station, `${day}T04:09Z`, 6.59);
+        kept(values, station, `${day}T04:12Z`, 6.55);
+        flaggedByQc(values, station, `${day}T04:10Z`, 6.15);
+        if (at("04:11")) throw new Error(`${station} holds a value at 04:11 on ${day}`);
+        const copy = (await levels(store, e.stations![1]!, day)).find(
+          (o) => o.time === Date.parse(`${day}T04:10:00Z`),
+        );
+        if (!copy || Math.abs(copy.level - 1.146) >= 0.005)
+          throw new Error(`${e.stations![1]} doesn't hold 1.146 m at 04:10 on ${day}`);
+        if (copy.flag < Flag.suspect)
+          throw new Error(`${e.stations![1]}'s 1.146 m at 04:10 on ${day} isn't flagged suspect`);
+      },
+    },
+    {
       id: "pegelonline-wangerooge-west-2026-dropout",
       stations: ["pegelonline/9420040"],
       since: "2026-10-26",
@@ -463,6 +495,33 @@ export default {
       },
     },
     {
+      id: "pegelonline-nienburg-2026-11-06",
+      stations: ["pegelonline/47900118"],
+      since: "2026-11-06",
+      until: "2026-11-08",
+      handling: "flagged",
+      error:
+        "From 18:15 UTC on 6 November to about 08:00 UTC on 7 November 2026 PEGELONLINE's REST API reads up to 5.58 m at Nienburg, 1 m above any other value of its year, where its raw-data download reads 3.65 to 3.70 m, as the days before and after do.",
+      response:
+        "6 and 7 November 2026 are flagged `suspect`, keeping the source flag as `source_flag`. The values are the REST API's.",
+      evidence:
+        "Found comparing the raw-data download with the store's values from the REST API, November 2026 ([#544](https://github.com/openwatersio/stillwell/issues/544)). The store rises from 3.67 m at 18:00 UTC to 4.05 m at 18:15 and 5.58 m at 18:30, holds above 5.4 m until 01:00, and falls back to 3.70 m by 08:00. 41 values are above 4.2 m, and QC flags 2 of the episode. Every other value of 2026 is between 3.65 and 4.59 m. The Weser gauges on either side stay inside their range of the day before throughout: Drakenburg (`pegelonline/47900107`, 6 km) reads 1.56 to 1.81 m, Liebenau (`pegelonline/47500200`, 8 km) 1.10 to 1.22 m, Stolzenau (`pegelonline/47500110`, 16 km) 3.02 to 3.08 m and Hoya (`pegelonline/47900129`, 18 km) 3.49 to 3.55 m. On 24 November the download read 3.65 to 3.70 m over those hours, and the REST API still served the values the store holds, so the two differ here as they do at Cuxhaven and Husum (erratum `pegelonline-download-api-differ`).",
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        // Both days of the episode: its rise on the 6th and its hold into the 7th.
+        for (const [day, least] of [
+          [e.since!, 15],
+          [dayAfter(e.since!, 1), 4],
+        ] as const) {
+          const high = (await levels(store, e.stations![0]!, day)).filter((o) => o.level > 5);
+          if (high.length < least)
+            throw new Error(
+              `Nienburg holds ${high.length} values above 5 m on ${day}, not the episode`,
+            );
+        }
+      },
+    },
+    {
       id: "pegelonline-fill-values",
       stations: ["pegelonline/9520050", "pegelonline/9520070"],
       since: "2019-01-01",
@@ -470,13 +529,44 @@ export default {
       error:
         "These 2 PEGELONLINE gauges hold levels no gauge can read, outside the store's span of −500 to 9,000 m: 14 values from 2019 to 2022, from 10,635 to 25,689 m.",
       response:
-        "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. A year file of nothing else keeps its rows, flagged `bad`, with a warning.",
+        "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. Backfill writes a year of nothing else as its rows flagged `bad`, and requalify and compaction keep such a file, with a warning.",
       evidence:
         "November 2026. A scan of the range of levels in every year file of every source in the store (335,320 files) found 383 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span.",
       check: async (store) => {
         await impossibleDropped(store, "pegelonline/9520050", 2021);
         await impossibleDropped(store, "pegelonline/9520070", 2022);
       },
+    },
+  ],
+  questions: [
+    {
+      id: "pegelonline-hpa-minutes",
+      stations: [
+        "pegelonline/5952020",
+        "pegelonline/5952025",
+        "pegelonline/5952030",
+        "pegelonline/5952050",
+        "pegelonline/5952060",
+        "pegelonline/5952065",
+      ],
+      question:
+        "Until 1 March 2025 at about 03:30 UTC, the 10-minute values of CMEMS's Hamburg St. Pauli series equal the 1-minute values of HPA's kuestendaten.de file for the gauge at the same minute. From 03:40 on that day, about a fifth of CMEMS's values equal the file's value from a different minute, and a few are 30 to 42 cm off. From 9 October 2026, the REST API's values for the gauge equal CMEMS's at every shared time. At all six HPA gauges, the REST API's values from October and November 2026 vary more from minute to minute than the file's values from March to June 2026. Does the REST API take its St. Pauli values from the same series as kuestendaten.de's file, and did anything change in how they are sampled, time-stamped or checked on 1 March 2025? Which of the two gives the gauge's reading for a stated minute? Does the file's status 240 mean its values have been checked?",
+      why: "If the file is HPA's checked series and the REST API's values come from other minutes, the store keeps preferring the file's history, and the St. Pauli errata name the WSV as the origin and cover the REST values since 9 October 2026 at the six gauges. If both are the same reading processed differently, the errata stay as they are and the README says so. The status 240 decides whether the file's values stay `preliminary`.",
+      meanwhile:
+        "The store holds the file's values through June 2026 and the REST API's from 9 October 2026, as served, with QC's flags, and documents the differences in erratum `cmems-st-pauli-wrong-minute` and `pegelonline-st-pauli-2026-11-09-dip`. HPA's file for the second half of 2026 will show whether the REST values come from other minutes.",
+      asked: null,
+      answer: null,
+    },
+    {
+      id: "pegelonline-revision-log",
+      stations: "every station",
+      question:
+        "Does the WSV record when raw water-level values are changed after PEGELONLINE has published them, and can it tell us which stations and periods changed? We know of one case: at Cuxhaven Steubenhöft (5990020), the download for 13 May to 24 June 2025 sits 4 to 6 cm above GESLA's copy of the same series. At Nienburg (47900118), the REST API gives up to 5.58 m from 18:15 UTC on 6 November 2026 to about 08:00 UTC on 7 November, where the download gives 3.65 to 3.70 m (erratum `pegelonline-nienburg-2026-11-06`), and we can't tell whether the download's values were corrected or the two never agreed. How long after a value is first published can it still change: days, weeks, or years? Is there a change log, a validation date, or a way to ask for what changed since a date? A complete answer would also say whether the move of the REST API onto the download's data store, which the WSV described on 16 November 2026, changes any of this.",
+      why: "The store has no signal for revised values and reads each one once. A change log or a stated limit on how long values can change sets how often the store fetches old months again and how far back, and lets it refetch only what changed instead of downloading each station's months to compare.",
+      meanwhile:
+        "The store holds each value as first read. The REST API's values for recent days stay in the store, and nothing fetches those months from the download again unless a backfill is run over them.",
+      asked: null,
+      answer: null,
     },
   ],
   retired: [],

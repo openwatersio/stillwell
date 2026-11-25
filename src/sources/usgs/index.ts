@@ -105,7 +105,7 @@ export function isSurveyed(
   return typeof accuracy === "number" ? accuracy < 1 : code === "D" || code === "F";
 }
 
-/** Every `altitude_method_code` USGS gave in November 2026. */
+/** Every `altitude_method_code` USGS gives. */
 const METHODS = new Set([...SURVEYED, "M", "N", "J", "A", "R", "U"]);
 
 /**
@@ -258,6 +258,12 @@ export const GAGE_DATUMS: Record<
     datums: {},
     note: "San Carlos Reservoir at Coolidge Dam: gage height averages 2,448.5 ft against ground at 2,450 ft (USGS 3DEP), so the gage reads elevation and adding the 2,502 ft altitude counts it twice. Erratum `usgs-gage-reads-elevation`.",
   },
+  "292859090004000": {
+    altitude: 0.0,
+    vertical_datum: "NAVD88",
+    datums: {},
+    note: "Barataria Waterway south of Lafitte: with the 0.0 ft altitude the water reads 1.38 to 1.40 m above three CRMS gauges in the same marsh, each in its own NAVD88, with 1.7 to 3.1 cm spread. Erratum `usgs-altitude-contradicts-crms`.",
+  },
   "11312676": {
     altitude: 0.0,
     vertical_datum: "NAVD88",
@@ -398,7 +404,10 @@ export async function stations(previous: Station[] = []): Promise<UsgsStation[]>
   if (!tidal.size) throw new Error("USGS listed no daily tidal statistics");
   for (const s of series)
     if (TIDAL_PARAMETERS.has(s.parameter_code)) tidal.add(s.monitoring_location_id);
-  const chosen = choose(series);
+  const chosen = choose(
+    series,
+    new Map(previous.map((p) => [p.id, (p as Partial<UsgsStation>).time_series_id])),
+  );
 
   const locations = new Map<string, Collection<ApiLocation>["features"][number]>();
   const fetchLocations = async (ids: string[]) => {
@@ -461,8 +470,8 @@ export async function stations(previous: Station[] = []): Promise<UsgsStation[]>
 /**
  * Refuses a `monitoring-locations` reply that dropped or changed the fields
  * the offsets rest on, which would clear nearly every offset: more than 1 in
- * 30 sites with an altitude giving no method USGS used in November 2026
- * (about 1 in 130 then gave none), or more than 1 in 30 surveyed sites giving
+ * 30 sites with an altitude giving no method USGS used
+ * (about 1 in 130 give none), or more than 1 in 30 surveyed sites giving
  * no accuracy (none did). Up to 10 are allowed whatever the share, so a short
  * list with a gap or two isn't refused; a whole USGS reply holds about 13,500
  * altitudes, where the share decides.
@@ -493,22 +502,32 @@ const LOCATION_BATCH = 200;
  * the primary series before others, the gage itself before a headwater or
  * tailwater sublocation, one reporting now before one that isn't, one that
  * reported in the last year before one that ended earlier (the latest first),
- * and then the earliest start.
+ * the earliest start, the series the station already holds (`stored`, by
+ * station ID, `usgs/<site>`), and then the lowest series ID, so series USGS
+ * lists alike (a headwater and a tailwater series that began together, or two
+ * duplicates) are chosen the same way whatever order its reply comes in, and
+ * never move a station off the series it has among tied ones.
  */
-export function choose(series: ApiSeries[]): Map<string, ApiSeries> {
+export function choose(
+  series: ApiSeries[],
+  stored: Map<string, string | undefined> = new Map(),
+): Map<string, ApiSeries> {
+  const now = Date.now();
   const order = PARAMETERS.map(([code]) => code);
-  const rank = (s: ApiSeries) => [
+  const rank = (s: ApiSeries): (number | string)[] => [
     // A preferred parameter that stopped more than a year ago doesn't keep a
     // site off the live feed when another of its series still reports.
-    recentYear(s) ? 0 : 1,
+    recentYear(s, now) ? 0 : 1,
     order.indexOf(s.parameter_code),
     s.primary === "Primary" ? 0 : 1,
     s.sublocation_identifier ? 1 : 0,
-    reporting(s) ? 0 : 1,
+    reporting(s, now) ? 0 : 1,
     // Within the last year counts as current, so an outage of weeks or months
     // doesn't hand the site to an older series and flag a change that isn't one.
-    recentYear(s) ? 0 : Date.now() - Date.parse(s.end ?? "1900-01-01"),
+    recentYear(s, now) ? 0 : now - Date.parse(s.end ?? "1900-01-01"),
     s.begin ? Date.parse(s.begin) : Infinity,
+    stored.get(`usgs/${s.monitoring_location_id.replace(/^USGS-/, "")}`) === s.id ? 0 : 1,
+    s.id,
   ];
   const chosen = new Map<string, ApiSeries>();
   for (const s of series) {
@@ -527,16 +546,16 @@ function eligible(s: ApiSeries): boolean {
 }
 
 /** A series that reported in the last year. */
-function recentYear(s: ApiSeries): boolean {
-  return s.end !== null && Date.parse(s.end) >= Date.now() - 365 * DAY_MS;
+function recentYear(s: ApiSeries, now = Date.now()): boolean {
+  return s.end !== null && Date.parse(s.end) >= now - 365 * DAY_MS;
 }
 
 /** A series that reported in the last week; it's on the live feed. */
-function reporting(s: Pick<ApiSeries, "end">): boolean {
-  return s.end !== null && Date.parse(s.end) > Date.now() - 7 * DAY_MS;
+function reporting(s: Pick<ApiSeries, "end">, now = Date.now()): boolean {
+  return s.end !== null && Date.parse(s.end) > now - 7 * DAY_MS;
 }
 
-function before(a: number[], b: number[]): boolean {
+function before(a: (number | string)[], b: (number | string)[]): boolean {
   for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i]! < b[i]!;
   return false;
 }
@@ -871,7 +890,7 @@ function* years(start: Date, end: Date): Generator<[Date, Date]> {
 
 /**
  * USGS approves values months to years after they're measured (Olmsted's 2024
- * gage height was still provisional in November 2026), replacing provisional
+ * gage height stayed provisional for years), replacing provisional
  * ones, so only a page of values that are all approved is cached. An empty page
  * isn't either: values can arrive late, and an outage can answer with none.
  */

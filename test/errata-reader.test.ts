@@ -3,7 +3,13 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { flaggedSpan, impossibleDropped, utcDay, type StoreReader } from "../src/errata.ts";
+import {
+  flaggedSpan,
+  impossibleDropped,
+  medianGap,
+  utcDay,
+  type StoreReader,
+} from "../src/errata.ts";
 import { Flag, type Observation, type StoredStation } from "../src/schema.ts";
 import { errataReader, StoreReadError } from "../src/store/errata-reader.ts";
 import { writeObservations, writeStationList } from "../src/store/parquet.ts";
@@ -251,5 +257,35 @@ describe("impossibleDropped", () => {
       /not flagged bad/,
     );
     await assert.rejects(impossibleDropped(year([]), "cdec/DLC", 2020), /no cdec/);
+  });
+});
+
+describe("medianGap", () => {
+  // `n` hourly levels from 2020-01-01 for each station, the first `level`, the second that plus `by`.
+  const reader = (n: number, by: number): StoreReader => ({
+    async levels(id) {
+      return Array.from({ length: n }, (_, i) => ({
+        time: at("2020-01-01T00:00") + i * 3_600_000,
+        level: 1 + (id === "b" ? by : 0),
+        flag: Flag.good,
+        epoch: 1,
+      }));
+    },
+    station: async () => null,
+    rows: async () => [],
+  });
+
+  it("is the other station's level minus the first's", async () => {
+    assert.equal(
+      Math.round((await medianGap(reader(300, -0.05), "a", "b", "2020-01-01", "2020-02-01")) * 100),
+      -5,
+    );
+  });
+
+  it("refuses fewer than 300 shared hours", async () => {
+    await assert.rejects(
+      medianGap(reader(299, 0), "a", "b", "2020-01-01", "2020-02-01"),
+      /share only 299 hours/,
+    );
   });
 });

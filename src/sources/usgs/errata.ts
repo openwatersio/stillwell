@@ -1,5 +1,5 @@
 import { impossibleDropped, type ErrataFile, type StoreReader } from "../../errata.ts";
-import { Flag, type StoredStation } from "../../schema.ts";
+import type { StoredStation } from "../../schema.ts";
 import { median } from "../../stats.ts";
 import { overrides } from "./overrides.ts";
 
@@ -35,22 +35,23 @@ async function weekMedian(store: StoreReader, id: string): Promise<number> {
   return median(rows.map((o) => o.level));
 }
 
-/** The median of a's hourly median level, plus `addA`, less b's, plus `addB`, over the hours of `WEEK` both have. */
+/** The median of a's hourly median level, plus `addA`, less b's, plus `addB`, over the hours of `span`, `WEEK` by default, both have. */
 async function hourlyDifference(
   store: StoreReader,
   [a, addA]: [string, number],
   [b, addB]: [string, number],
+  span: readonly [string, string] = WEEK,
 ): Promise<number> {
   const hourly = async (id: string, add: number) =>
     new Map(
-      [...Map.groupBy(await store.levels(id, ...WEEK), (o) => Math.floor(o.time / HOUR_MS))].map(
+      [...Map.groupBy(await store.levels(id, ...span), (o) => Math.floor(o.time / HOUR_MS))].map(
         ([hour, rows]) => [hour, median(rows.map((o) => o.level)) + add],
       ),
     );
   const [x, y] = [await hourly(a, addA), await hourly(b, addB)];
   const differences = [...x].filter(([h]) => y.has(h)).map(([h, v]) => v - y.get(h)!);
   if (!differences.length)
-    throw new Error(`${a} and ${b} share no hours from ${WEEK[0]} to ${WEEK[1]}`);
+    throw new Error(`${a} and ${b} share no hours from ${span[0]} to ${span[1]}`);
   return median(differences);
 }
 
@@ -71,57 +72,11 @@ export default {
       error:
         "These 3 USGS series hold levels no gauge can read, outside the store's span of −500 to 9,000 m: 10 values in 2026, −99,999 ft (−30,479.695 m) and values from −3,032 to −34,253 m.",
       response:
-        "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. A year file of nothing else keeps its rows, flagged `bad`, with a warning.",
+        "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. Backfill writes a year of nothing else as its rows flagged `bad`, and requalify and compaction keep such a file, with a warning.",
       evidence:
         "November 2026. A scan of the range of levels in every year file of every source in the store (335,320 files) found 383 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span.",
       check: async (store, e) => {
         for (const id of e.stations!) await impossibleDropped(store, id, 2026);
-      },
-    },
-    {
-      id: "usgs-gila-painted-rock-high-readings",
-      stations: ["usgs/09519800"],
-      since: "2026-11-12",
-      until: "2026-11-14",
-      handling: "kept",
-      error:
-        "Gila River below Painted Rock Dam, Arizona, published 187 gage heights of 926 to 990 ft (282.24 to 301.75 m) between 18:20 UTC on 12 November 2026 and 11:20 on the 13th, at 5-minute steps among readings that look normal, as Provisional with no qualifier. The gage reads 0.3 to 3.7 m on every other day of the month. USGS now serves 10.4 ft at the 55 of those times that fall on its 15-minute steps, and no reading at the other 132.",
-      response:
-        "The store keeps the readings as USGS published them, and QC flags each one bad, so they're outside the good levels. A refetch of 2026 replaces the 55 USGS still serves; the other 132 stay, flagged bad, since a refetch only rewrites the times it fetched.",
-      evidence:
-        "The levels stored for the station on 11 to 14 November 2026, and USGS's current series for the station (gage height, `continuous`, series 897594e7) over the same times, read on 21 November 2026.",
-      check: async (store, e) => {
-        const id = e.stations![0]!;
-        const all = await store.levels(id, e.since!, e.until!);
-        const high = all.filter((o) => o.level > 100);
-        // A count other than the one this entry describes means the store was refetched, or the readings changed.
-        if (high.length !== 187)
-          throw new Error(`the store holds ${high.length} ${id} levels above 100 m, not 187`);
-        const unflagged = high.filter((o) => o.flag < Flag.bad);
-        if (unflagged.length)
-          throw new Error(`${unflagged.length} of ${id}'s 187 levels above 100 m aren't bad`);
-        const [first, last] = [
-          Date.parse("2026-11-12T18:20:00Z"),
-          Date.parse("2026-11-13T11:20:00Z"),
-        ];
-        if (high.some((o) => o.time < first || o.time > last))
-          throw new Error(
-            `${id} has levels above 100 m outside 18:20 on 12 to 11:20 on 13 November`,
-          );
-        // Whole feet from 926 to 990, which is what USGS published.
-        const off = high.filter((o) => {
-          const feet = o.level / 0.3048;
-          return Math.abs(feet - Math.round(feet)) > 0.01 || feet < 925.5 || feet > 990.5;
-        });
-        if (off.length)
-          throw new Error(
-            `${off.length} of ${id}'s levels above 100 m aren't whole feet from 926 to 990`,
-          );
-        // The run sits among readings that look normal.
-        if (!all.some((o) => o.level < 10 && o.time > first && o.time < last))
-          throw new Error(
-            `${id} has no ordinary reading between 18:20 on 12 and 11:20 on 13 November`,
-          );
       },
     },
     {
@@ -3188,6 +3143,36 @@ export default {
         }
       },
     },
+    {
+      id: "usgs-altitude-contradicts-crms",
+      stations: ["usgs/292859090004000"],
+      handling: "avoided",
+      error:
+        "Barataria Waterway south of Lafitte, Louisiana (292859090004000) is listed at 0.0 ft NAVD88, which puts its water 1.38 to 1.40 m above three CRMS gauges (CRMS0232-H01, CRMS0237-H01 and CRMS4690-H01) in the same marsh, each in its own NAVD88.",
+      response: "No offsets, by `GAGE_DATUMS`.",
+      evidence:
+        "Hourly levels of the site and each gauge over the latest year the store holds for both (2020 for CRMS0232 and CRMS4690, 2014 for CRMS0237, after CRMS's 2013 change of geoid), where the differences have 1.7 to 3.1 cm spread and means of 1.40, 1.39 and 1.38 m.",
+      check: async (store, e) => {
+        // Each gauge's latest year with the site's, from the pairs the evidence compares.
+        for (const [crms, year] of [
+          ["CRMS0232-H01", 2020],
+          ["CRMS0237-H01", 2014],
+          ["CRMS4690-H01", 2020],
+        ] as const) {
+          const above = await hourlyDifference(
+            store,
+            [e.stations![0]!, 0],
+            [`crms/${crms}`, 0],
+            [`${year}-01-01`, `${year + 1}-01-01`],
+          );
+          if (above < 1.3 || above > 1.5)
+            throw new Error(
+              `usgs/292859090004000 reads ${above.toFixed(3)} m above ${crms} in ${year}, not 1.38 to 1.40 m`,
+            );
+        }
+        await noOffsets(store, ...e.stations!);
+      },
+    },
   ],
-  retired: [],
+  retired: ["usgs-gila-painted-rock-high-readings"],
 } satisfies ErrataFile;
