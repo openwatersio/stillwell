@@ -762,14 +762,14 @@ export const FILES = {
         name: "engine",
         type: "VARCHAR",
         description:
-          "The software that fitted and its version, as provenance. Nothing about the constants depends on it.",
+          "The software that fitted and its version, as provenance. A prediction from the constants needs `node_corrections` and each constituent's Doodson numbers, and no particular software.",
       },
       {
         name: "held_out",
         type: "INTEGER",
         nullable: true,
         description:
-          "The UTC year the fit is scored on, which it didn't read: the latest year of final values in which the station has half its hours.",
+          "The UTC year the fit is scored on, which it didn't read: the latest year of final values in which half the station's hours can be scored, an hour counting when the 71 hours around it all have values.",
       },
       {
         name: "held_out_hours",
@@ -878,7 +878,7 @@ export const FILES = {
         name: "inputs",
         type: "VARCHAR",
         description:
-          "What the fit read, as JSON: `versions`, each year file's version by `<epoch> <year>`, as the years file gives it; `epochs`, the station's datum epochs with their `to_current`; and `errata`, each erratum touching the station in the years read, with its `fit` decision.",
+          "What the fit read, as JSON: `versions`, each year file's version by `<epoch> <year>`, as the years file gives it; `epochs`, the station's datum epochs with their `to_current`; `errata`, each erratum touching the station in the years read, with its `fit` decision; and `digest`, of everything the fit depends on, which changes when the station is due another fit.",
       },
     ],
     sort: ["id"],
@@ -891,6 +891,12 @@ export const FILES = {
       "One row per fitted station and candidate constituent, in the fit's priority order within a station: the constants of the candidates the fit kept, and why it left each of the others out. Each row defines its constituent by its Doodson numbers, so the constants can be used with any prediction software that applies the nodal corrections `fits/<source>.parquet` names.",
     columns: [
       { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
+      {
+        name: "version",
+        type: "VARCHAR",
+        description:
+          "The `version` of the row's fit in `fits/<source>.parquet`. The two files are written one after the other, so join them on `id` and `version`.",
+      },
       {
         name: "name",
         type: "VARCHAR",
@@ -924,7 +930,7 @@ export const FILES = {
         type: "VARCHAR",
         nullable: true,
         description:
-          "Why a candidate isn't kept: `rayleigh`, the record can't separate it from `conflict`; `snr`, its signal-to-noise ratio is under 2; `nyquist`, the sampling can't resolve it; `rankDeficient`, the fit can't tell it from stronger candidates; `seasonal`, Sa or Ssa whose mean over the yearly fits is under twice its standard error; `unknown`, the fitting engine doesn't define it. Null for a kept one.",
+          "Why a candidate isn't kept: `rayleigh`, the record can't separate it from `conflict`; `snr`, its signal-to-noise ratio is under 2; `nyquist`, the sampling can't resolve it; `rankDeficient`, the fit can't tell it from stronger candidates; `seasonal`, Sa or Ssa whose amplitude is under twice the standard error of its mean over the yearly fits; `unknown`, the fitting engine doesn't define it. Null for a kept one.",
       },
       {
         name: "conflict",
@@ -1120,8 +1126,8 @@ export const SOURCES_SCHEMA: JsonSchema = {
       "license",
       "attribution",
       "contact",
+      // `settles_after_months` isn't required, so a file published before it was kept still passes.
       "finalizes",
-      "settles_after_months",
       "stations",
       "backfill",
     ],
@@ -1176,7 +1182,7 @@ export const SOURCES_SCHEMA: JsonSchema = {
       settles_after_months: {
         type: nullable("integer"),
         description:
-          "For a source that never finalizes: how many months after a calendar year ends the source has stopped revising that year's values, so they can be read as final. Null for a source that finalizes, and where that isn't known.",
+          "For a source that never finalizes: how many months after a calendar year ends its values are read as final: the source's own figure where it states one, otherwise one decided from its record of revisions, with the evidence in the source's README. Null for a source that finalizes, and where none is known.",
       },
       stations: { type: "integer", description: "How many active stations the source has." },
       backfill: {
@@ -1228,7 +1234,6 @@ export const ERRATA_SCHEMA: JsonSchema = {
       "evidence",
       "reported",
       "report",
-      "fit",
       "url",
     ],
     properties: {
@@ -1280,7 +1285,7 @@ export const ERRATA_SCHEMA: JsonSchema = {
       fit: {
         type: nullable("string"),
         description:
-          "For a `kept` erratum, whether its values may enter a harmonic fit or a tidal datum: `keep` where the error leaves the levels usable, `drop` where it doesn't. Null for any other handling, and until decided: the store fits no window an undecided one touches.",
+          "For a `kept` erratum, whether its values may enter a harmonic fit: `keep` where the error leaves the levels usable, `drop` where it doesn't. Null for any other handling, and until decided: the store fits no window an undecided one touches.",
       },
       url: {
         type: "string",

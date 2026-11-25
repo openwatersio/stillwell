@@ -19,7 +19,21 @@ import {
   tidalResiduals,
   yearlyScatter,
 } from "./scores.ts";
-import { emptyInputs, readSeries, Unfit, type Inputs, type ReadContext } from "./series.ts";
+import {
+  Busy,
+  emptyInputs,
+  inputsDigest,
+  readSeries,
+  Unfit,
+  type Inputs,
+  type ReadContext,
+} from "./series.ts";
+
+/*
+ * The method and its scoring follow slackwater-database's fits of the same
+ * series (https://github.com/openwatersio/slackwater-database), MIT licensed,
+ * copyright Open Water Software, LLC.
+ */
 
 /**
  * One station's harmonic fit: constants from up to 19 years of final values on
@@ -120,6 +134,8 @@ export interface Fit {
 /** A row of `constituents/<source>.parquet`: one candidate of one fit. */
 export interface FittedCandidate {
   id: string;
+  /** The `version` of the fit the row belongs to. */
+  version: string;
   name: string;
   /** Place in the candidates' priority order, from 1. */
   rank: number;
@@ -203,6 +219,9 @@ export function meanRange(
   return high === null || low === null ? null : high - low;
 }
 
+/** A number that couldn't be computed, such as a mean over no turns or an interval from an empty spectrum, is null in the file. */
+const finite = (x: number | null) => (x !== null && Number.isFinite(x) ? x : null);
+
 const variance = (xs: number[]) => {
   const mean = xs.reduce((s, x) => s + x, 0) / xs.length;
   return xs.reduce((s, x) => s + (x - mean) ** 2, 0) / xs.length;
@@ -227,16 +246,18 @@ export function varianceExplained(
 
 /**
  * Fit one station. The held-out year is the latest, at or before the source's
- * last year of final values, in which the station has half its hours; the
- * window is the 19 years before it, or as many as the station has. Returns the
- * fit's row and a row for every candidate; a station that can't be fitted gets
- * a row that says why and no candidates.
+ * last year of final values, in which half the station's hours can be scored:
+ * an hour counts when the 71 hours around it all have values, as the Godin
+ * filter needs. The window is the 19 years before it, or as many as the
+ * station has. Returns the fit's row and a row for every candidate; a station
+ * that can't be fitted gets a row that says why and no candidates. Throws
+ * `Busy` while the station's year files are being written.
  */
 export async function fitStation(
   station: StoredStation,
   context: FitContext,
 ): Promise<{ fit: Fit; constituents: FittedCandidate[] }> {
-  const inputs = emptyInputs();
+  const inputs = { ...emptyInputs(), digest: inputsDigest(station, context) };
   const read = (period: { start: number; end: number }) =>
     readSeries(station, period, "final", { ...context, inputs });
   const none = (reason: string) => ({
@@ -255,19 +276,22 @@ export async function fitStation(
     for (let y = context.finalYear; y >= first; y--) {
       const span = year(y);
       const samples = await read(span);
-      if (samples.length >= (span.end - span.start) / HOUR_MS / 2) {
+      const hours = (span.end - span.start) / HOUR_MS;
+      if (samples.length >= hours / 2 && tidalResiduals([], samples).size >= hours / 2) {
         heldOut = y;
         heldSamples = samples;
         break;
       }
     }
-    if (heldOut === undefined) return none("no year with half its hours final");
+    if (heldOut === undefined)
+      return none("no year with half its hours final, on the hour and scoreable");
 
     const start = Math.max(year(first).start, year(heldOut - MAX_FIT_YEARS).start);
     const end = year(heldOut).start;
     const samples = await read({ start, end });
     const days = samples.length ? (samples.at(-1)!.time - samples[0]!.time) / DAY_MS : 0;
-    if (days < MIN_FIT_DAYS)
+    // The span and the count both, so a few values far apart aren't a record.
+    if (days < MIN_FIT_DAYS || samples.length < (MIN_FIT_DAYS * 24) / 2)
       return none(`under ${MIN_FIT_DAYS} days of final values before ${heldOut}`);
 
     // Sa and Ssa leave the selection and are judged by their yearly spread.
@@ -297,7 +321,14 @@ export async function fitStation(
       (c) => !seasonal.includes(c.name) || seasonalKept(c.name, c.amplitude),
     );
     const constants = kept.map(({ name, amplitude, phase }) => ({ name, amplitude, phase }));
+    // Constants that aren't numbers predict nothing, and would read as missing in the file.
+    if (constants.some((c) => !Number.isFinite(c.amplitude) || !Number.isFinite(c.phase)))
+      throw new Error(`${station.id}: the fit gave a constant that isn't a number`);
 
+    const version = createHash("sha256")
+      .update(JSON.stringify([start, end, NODE_CORRECTIONS, constants]))
+      .digest("hex")
+      .slice(0, 16);
     const verdicts = new Map(selection.map((s) => [s.name, s]));
     const byName = new Map(fitted.constituents.map((c) => [c.name, c]));
     const rows: FittedCandidate[] = CANDIDATES.map((candidate, index) => {
@@ -308,6 +339,7 @@ export async function fitStation(
       const scatter = yearly.constituents[candidate.name];
       return {
         id: station.id,
+        version,
         name: candidate.name,
         rank: index + 1,
         doodson: candidate.doodson,
@@ -321,23 +353,19 @@ export async function fitStation(
               : "rankDeficient"
             : (verdict?.reason ?? "rankDeficient"),
         conflict: verdict?.conflict ?? null,
-        amplitude_m: c?.amplitude ?? null,
-        phase_deg: c?.phase ?? null,
-        amplitude_ci_m: c?.amplitudeInterval ?? null,
-        phase_ci_deg: c?.phaseInterval ?? null,
-        snr: c?.snr ?? verdict?.snr ?? null,
-        yearly_amplitude_sd_m: scatter?.amplitude ?? null,
-        yearly_phase_sd_deg: scatter?.phase ?? null,
-        yearly_se_m: yearly.seasonal?.[candidate.name]?.se ?? null,
+        amplitude_m: finite(c?.amplitude ?? null),
+        phase_deg: finite(c?.phase ?? null),
+        amplitude_ci_m: finite(c?.amplitudeInterval ?? null),
+        phase_ci_deg: finite(c?.phaseInterval ?? null),
+        snr: finite(c?.snr ?? verdict?.snr ?? null),
+        yearly_amplitude_sd_m: finite(scatter?.amplitude ?? null),
+        yearly_phase_sd_deg: finite(scatter?.phase ?? null),
+        yearly_se_m: finite(yearly.seasonal?.[candidate.name]?.se ?? null),
       };
     });
 
     const span = year(heldOut);
     const score = scoreHeldOut(heldSamples, constants, {}).fit;
-    const version = createHash("sha256")
-      .update(JSON.stringify([start, end, NODE_CORRECTIONS, constants]))
-      .digest("hex")
-      .slice(0, 16);
     return {
       fit: {
         id: station.id,
@@ -347,25 +375,25 @@ export async function fitStation(
         since: iso(start),
         until: iso(end),
         hours: samples.length,
-        rms_m: fitted.rms,
+        rms_m: finite(fitted.rms),
         years: yearly.years,
         node_corrections: NODE_CORRECTIONS,
         engine: context.engine,
         held_out: heldOut,
         held_out_hours: score.hours,
-        held_out_rms_m: score.rms,
-        variance_explained: varianceExplained(constants, heldSamples),
-        d1_rms_m: score.bands.D1,
-        d2_rms_m: score.bands.D2,
-        d4_rms_m: score.bands.D4,
-        d6_rms_m: score.bands.D6,
+        held_out_rms_m: finite(score.rms),
+        variance_explained: finite(varianceExplained(constants, heldSamples)),
+        d1_rms_m: finite(score.bands.D1),
+        d2_rms_m: finite(score.bands.D2),
+        d4_rms_m: finite(score.bands.D4),
+        d6_rms_m: finite(score.bands.D6),
         turns: score.turns.matched,
         turns_missed: score.turns.unmatched,
-        turn_time_mean_min: score.turns.timeMean,
-        turn_time_rms_min: score.turns.timeRms,
-        turn_height_mean_m: score.turns.heightMean,
-        turn_height_rms_m: score.turns.heightRms,
-        mean_range_m: meanRange(constants, span.start, span.end),
+        turn_time_mean_min: finite(score.turns.timeMean),
+        turn_time_rms_min: finite(score.turns.timeRms),
+        turn_height_mean_m: finite(score.turns.heightMean),
+        turn_height_rms_m: finite(score.turns.heightRms),
+        mean_range_m: finite(meanRange(constants, span.start, span.end)),
         settled_before: inputs.settled_before,
         source_qc_start: inputs.source_qc_start,
         inputs: JSON.stringify(inputs),
@@ -373,7 +401,7 @@ export async function fitStation(
       constituents: rows,
     };
   } catch (error) {
-    if (error instanceof Unfit) return none(error.message);
+    if (error instanceof Unfit && !(error instanceof Busy)) return none(error.message);
     throw error;
   }
 }

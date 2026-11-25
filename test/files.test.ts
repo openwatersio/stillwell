@@ -125,6 +125,7 @@ const FIT: Fit = {
 };
 const CANDIDATE: FittedCandidate = {
   id: "test/a",
+  version: "0123456789abcdef",
   name: "M2",
   rank: 35,
   doodson: [2, 0, 0, 0, 0, 0, 0],

@@ -111,6 +111,8 @@ stations/empty/<source>.json                 years with no file a --skip-written
 stations/backfilled/<source>.json            each station's years, by epoch, that backfill got an answer for or compaction carried whole
 stations/requalify/<source>.json             stations a requalify --budget run didn't finish, with their years, which the next starts with
 stations/analysis/<source>.parquet           what analyze measures from each station's levels, such as whether they carry a tide
+fits/<source>.parquet                        each station's harmonic fit: its window, its scores and what it read
+constituents/<source>.parquet                each fit's candidate constituents, with their constants
 history/stations/<source>/<time>.parquet     the source's list as each refresh started, less withheld stations
 history/stations/<source>/<time>.json        what that refresh changed
 history/analysis/<source>/<time>.json        stations whose QC an analyze run changed, and how
@@ -150,7 +152,7 @@ Still water, a pooled river, a lake or a creek drained to its sill, gets two day
    - the store has no list for the source but does have its history. A list that went missing would otherwise read as an empty store, and every station would be rebuilt from scratch;
    - the store has no list or history for the source but does have its values, in series files or a recent window. A list started from the fetch would forget what the old one carried forward;
    - more stations opened an epoch than the source's limit, by default 5 stations or 2%, whichever is larger. That's likelier an adapter bug than gauge work. A person who has checked it reruns with `--accept-epochs` (the Monthly workflow's `accept_epochs`), so a real batch of changes doesn't hold up the source for good.
-7. Copy the previous list, without withheld stations, to history, then write the new list, and drop withheld stations' rows from the source's bounds, recent window, empty-years record, backfilled years, requalify list and analysis, with its history. A new source's first snapshot, its empty list, is written after its list, so a run cut short can't leave history with no list.
+7. Copy the previous list, without withheld stations, to history, then write the new list, and drop withheld stations' rows from the source's bounds, recent window, empty-years record, backfilled years, requalify list, analysis, with its history, and fits. A new source's first snapshot, its empty list, is written after its list, so a run cut short can't leave history with no list.
 8. Write the change report next to the snapshot, and add it to the job summary: stations added, retired, removed (withheld, with a line saying to run `ingest withhold <source>` while any still has series files) and changed field by field, epochs opened, held and rejected, and `POSITIONS` entries whose station the source moved.
 
 **Jobs.** The Monthly workflow refreshes each list in a job of its own, in the source's `store-<source>` group, which `backfill` and compaction of that source share, and the Ingest workflow refuses `stations`, so no two jobs write one list at once. A final job rebuilds `stations.parquet` with `publish`, in the `store` group, from whatever lists the store holds, so a source whose refresh failed or was cancelled keeps its last list there. Within a group, GitHub cancels a pending job when a newer one queues, so a refresh queued behind a long backfill is cancelled by the next run, shows as cancelled in the run, and is rerun from Actions. Local runs (`STILLWELL_STORE=data`) have no group.

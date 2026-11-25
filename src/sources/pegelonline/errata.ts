@@ -19,8 +19,6 @@ export default {
       id: "pegelonline-download-api-differ",
       stations: ["pegelonline/5990020", "pegelonline/9530020"],
       handling: "kept",
-      // Settled years come from the raw-data download; the REST API's copy, which differs from it, covers only the months since.
-      fit: "keep",
       error:
         "At Cuxhaven Steubenhöft and Husum, PEGELONLINE's raw-data download and its REST API give different levels for the same minutes, by up to 6 and 8 cm, though both are labeled unchecked raw data on the same gauge zero.",
       response:
@@ -44,8 +42,6 @@ export default {
       id: "pegelonline-wachendorf-zero-date",
       stations: ["pegelonline/3500031"],
       handling: "kept",
-      // Only the date PEGELONLINE gives the zero is in doubt, not the levels.
-      fit: "keep",
       error:
         "PEGELONLINE dates Wachendorf's gauge zero, PNP at 12.77 m above NHN, from 2026-06-18, and doesn't say that the zero moved that day. The WSV says it was 13.77 m above NHN before.",
       response:
@@ -79,8 +75,6 @@ export default {
       since: "2025-05-13",
       until: "2025-06-25",
       handling: "kept",
-      // The store holds the revised values, the WSV's latest.
-      fit: "keep",
       error:
         "PEGELONLINE's download for Cuxhaven sits 4 to 6 cm above GESLA's copy from 13 May to 24 June 2025, so the WSV changed values it still labels raw and unchecked.",
       response:

@@ -4,7 +4,7 @@ import { FILES } from "../store/files.ts";
 import { exists, readRows, writeTable } from "../store/parquet.ts";
 import { constituentsPath, fitsPath } from "../store/paths.ts";
 import { pool } from "../store/recent.ts";
-import { readYears, type YearRow } from "../store/years.ts";
+import { readYears } from "../store/years.ts";
 import {
   engineVersion,
   fitStation,
@@ -12,7 +12,7 @@ import {
   type FitContext,
   type FittedCandidate,
 } from "./fit.ts";
-import { emptyInputs, finalYear, Unfit, type Inputs } from "./series.ts";
+import { Busy, emptyInputs, finalYear, inputsDigest, Unfit, type Inputs } from "./series.ts";
 
 /**
  * A source's fits in the store: `fits/<source>.parquet`, a row per station,
@@ -80,6 +80,7 @@ export async function readConstituents(store: string, source: string): Promise<F
   if (!(await exists(path))) return [];
   return (await readRows(path)).map((r) => ({
     id: String(r.id),
+    version: String(r.version),
     name: String(r.name),
     rank: Number(r.rank),
     // DuckDB returns a list as a value holding its items.
@@ -99,7 +100,11 @@ export async function readConstituents(store: string, source: string): Promise<F
   }));
 }
 
-/** Both files, written together so every fit with constants has its candidate rows. */
+/**
+ * Both files. One can be written and the other not, when a run stops between
+ * them, so each candidate row carries its fit's `version`: a reader joins on
+ * it, and `due` fits a station again when its rows and its fit disagree.
+ */
 export async function writeFits(
   store: string,
   source: string,
@@ -111,25 +116,53 @@ export async function writeFits(
 }
 
 /**
- * Whether a station's fit should run again: it has none, its last try gave no
- * constants, another engine version fitted it, a year file it read has another
- * version or is gone, or the station has a year file after its held-out year
- * that the source's final year now reaches.
+ * Take stations' rows out of both files, as `withhold` and `drop` do for a
+ * station whose values leave the store, since its constants are made from
+ * them. Rewrites only a file that holds one, and returns the stations found.
+ */
+export async function dropFits(
+  store: string,
+  source: string,
+  gone: (id: string) => boolean,
+): Promise<string[]> {
+  const fits = await readFits(store, source);
+  const constituents = await readConstituents(store, source);
+  const found = new Set([...fits.keys(), ...constituents.map((c) => c.id)].filter(gone));
+  if (!found.size) return [];
+  // Candidates first, so no constants outlast the fit row that names them.
+  await writeFits(
+    store,
+    source,
+    [...fits.values()].filter((f) => !gone(f.id)),
+    constituents.filter((c) => !gone(c.id)),
+  );
+  return [...found].sort();
+}
+
+/**
+ * Whether a station's fit should run again: it has none, another engine
+ * version fitted it, anything it depends on has changed (`inputsDigest`: a
+ * year file, an epoch, an erratum's decision, the source's final year), or
+ * its candidate rows aren't the ones its row names. A station without
+ * constants is tried again only when one of those changes.
  */
 export function due(
   previous: Fit | undefined,
-  station: { id: string },
-  years: ReadonlyMap<string, YearRow>,
-  final: number,
+  digest: string,
   engine: string,
+  rows: readonly Pick<FittedCandidate, "version">[] = [],
 ): boolean {
-  if (!previous || previous.reason !== null || previous.engine !== engine) return true;
-  const { versions } = JSON.parse(previous.inputs) as Inputs;
-  for (const [key, version] of Object.entries(versions))
-    if (years.get(`${station.id} ${key}`)?.version !== version) return true;
-  return [...years.values()].some(
-    (r) => r.id === station.id && r.year !== null && r.year > previous.held_out! && r.year <= final,
-  );
+  if (!previous || previous.engine !== engine) return true;
+  let stored: string | undefined;
+  try {
+    stored = (JSON.parse(previous.inputs) as Inputs).digest;
+  } catch {
+    // Inputs that can't be read can't show the fit is current.
+  }
+  if (stored !== digest) return true;
+  return previous.version === null
+    ? rows.length > 0
+    : !rows.length || rows.some((r) => r.version !== previous.version);
 }
 
 export interface FitReport {
@@ -139,6 +172,8 @@ export interface FitReport {
   none: { id: string; reason: string }[];
   /** Stations whose fit threw, with the error. */
   failed: string[];
+  /** Stations whose year files are being written, left as they were for the next run. */
+  waiting: string[];
   /** Stations whose stored fit is current. */
   current: number;
 }
@@ -149,7 +184,10 @@ const BATCH = 25;
 /**
  * Fit `source`'s stations that are due, or every one with `all`, and write
  * both files after each batch. A station that leaves the list loses its rows.
- * A fit that throws keeps the station's stored rows and is reported.
+ * A fit that throws keeps the station's stored rows and is reported, as does
+ * a station whose year files are being written. While any station of a
+ * source that finalizes is being written, its final year can't be told, and
+ * the run stops before writing anything.
  */
 export async function fitSource(
   store: string,
@@ -159,7 +197,7 @@ export async function fitSource(
     now: Date;
     errata: Erratum[];
     all?: boolean;
-    /** Only these stations, by `id`. */
+    /** Only these stations, by `id`; none of them when empty, as an empty shard is. */
     only?: string[];
     concurrency?: number;
     log?: (line: string) => void;
@@ -170,7 +208,9 @@ export async function fitSource(
   if (!years)
     throw new Error(`${metadata.id} has no years file; run \`ingest years ${metadata.id}\` first`);
   const engine = engineVersion();
-  const report: FitReport = { fitted: [], none: [], failed: [], current: 0 };
+  // A list that comes back empty would take every station's rows with it.
+  if (!stations.length) throw new Error(`${metadata.id} lists no stations to fit`);
+  const report: FitReport = { fitted: [], none: [], failed: [], waiting: [], current: 0 };
   const listed = new Set(stations.map((s) => s.id));
   const fits = new Map([...(await readFits(store, metadata.id))].filter(([id]) => listed.has(id)));
   const constituents = new Map<string, FittedCandidate[]>();
@@ -181,39 +221,60 @@ export async function fitSource(
   }
   const save = () =>
     writeFits(store, metadata.id, [...fits.values()], [...constituents.values()].flat());
-  const chosen = stations.filter((s) => !options.only?.length || options.only.includes(s.id));
+  const chosen = stations.filter((s) => !options.only || options.only.includes(s.id));
 
-  let final: number;
+  const writing = new Set(
+    [...years.values()].filter((r) => r.epoch === null || r.year === null).map((r) => r.id),
+  );
+  const qcStarts = new Map(
+    stations.flatMap((s) =>
+      s.source_qc_start ? [[s.id, Date.parse(s.source_qc_start)] as const] : [],
+    ),
+  );
+  // Stations being written vote for no year, so the final year may be theirs to change, and a
+  // run on the wrong one would fit every station twice.
+  if (metadata.finalizes && writing.size)
+    throw new Error(
+      `${metadata.id}: ${writing.size} stations' year files are being written, so its final year can't be told; run again once they're done`,
+    );
+  let final: number | null;
+  let unfit = "";
   try {
-    final = finalYear(metadata, years, options.now);
+    final = finalYear(metadata, years, options.now, qcStarts);
   } catch (error) {
     if (!(error instanceof Unfit)) throw error;
+    final = null;
+    unfit = error.message;
+  }
+
+  const base = { store, metadata, years, errata: options.errata, now: options.now, engine };
+  const digestOf = (station: StoredStation) =>
+    inputsDigest(station, { metadata, years, errata: options.errata, finalYear: final });
+  const todo = chosen.filter((s) => {
+    if (writing.has(s.id)) {
+      report.waiting.push(s.id);
+      return false;
+    }
+    return options.all || due(fits.get(s.id), digestOf(s), engine, constituents.get(s.id));
+  });
+  report.current = chosen.length - todo.length - report.waiting.length;
+
+  if (final === null) {
     // No station of the source can be fitted, and each one's row says why.
-    for (const station of chosen) {
+    for (const station of todo) {
       fits.set(station.id, {
-        ...blank(station.id, options.now, engine),
-        reason: error.message,
+        ...blank(station.id, options.now, engine, digestOf(station)),
+        reason: unfit,
       });
       constituents.delete(station.id);
-      report.none.push({ id: station.id, reason: error.message });
+      report.none.push({ id: station.id, reason: unfit });
     }
     await save();
     return report;
   }
-
-  const context: FitContext = {
-    store,
-    metadata,
-    years,
-    errata: options.errata,
-    now: options.now,
-    finalYear: final,
-    engine,
-  };
-  const todo = chosen.filter((s) => options.all || due(fits.get(s.id), s, years, final, engine));
-  report.current = chosen.length - todo.length;
+  const context: FitContext = { ...base, finalYear: final };
   for (let i = 0; i < todo.length; i += BATCH) {
-    await pool(todo.slice(i, i + BATCH), options.concurrency ?? 2, async (station) => {
+    await pool(todo.slice(i, i + BATCH), options.concurrency ?? 1, async (station) => {
       try {
         const result = await fitStation(station, context);
         fits.set(station.id, result.fit);
@@ -227,6 +288,7 @@ export async function fitSource(
             : `  ${station.id}: ${result.fit.reason}`,
         );
       } catch (error) {
+        if (error instanceof Busy) return void report.waiting.push(station.id);
         report.failed.push(
           `${station.id}: ${error instanceof Error ? error.message : String(error)}`,
         );
@@ -238,7 +300,7 @@ export async function fitSource(
   return report;
 }
 
-const blank = (id: string, now: Date, engine: string): Fit => ({
+const blank = (id: string, now: Date, engine: string, digest: string): Fit => ({
   id,
   fitted: now.toISOString(),
   reason: null,
@@ -249,7 +311,7 @@ const blank = (id: string, now: Date, engine: string): Fit => ({
   engine,
   settled_before: null,
   source_qc_start: null,
-  inputs: JSON.stringify(emptyInputs()),
+  inputs: JSON.stringify({ ...emptyInputs(), digest }),
   ...(Object.fromEntries(FIT_NUMBERS.map((name) => [name, null])) as Pick<
     Fit,
     (typeof FIT_NUMBERS)[number]

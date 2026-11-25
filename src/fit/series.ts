@@ -1,6 +1,7 @@
+import { createHash } from "node:crypto";
 import { errataOf, utcDay, type Erratum } from "../errata.ts";
 import { Flag, type Epoch, type SourceMetadata, type StoredStation } from "../schema.ts";
-import { readObservationsBetween } from "../store/parquet.ts";
+import { listFiles, readObservationsBetween } from "../store/parquet.ts";
 import { seriesPath } from "../store/paths.ts";
 import type { YearRow } from "../store/years.ts";
 import type { Sample } from "../types.ts";
@@ -11,8 +12,11 @@ import type { Sample } from "../types.ts";
  * revise again, and nothing a `kept` erratum says to leave out.
  */
 
-/** Why a series can't be read for a fit yet. The fit's row carries the message. */
+/** Why a series can't be read for a fit. The fit's row carries the message. */
 export class Unfit extends Error {}
+
+/** A station whose year files are being written: its fit waits, and what the store holds for it stays. */
+export class Busy extends Unfit {}
 
 /**
  * Which values a read takes. `final` is what a fit takes: values the source
@@ -32,6 +36,8 @@ export interface Inputs {
   settled_before: string | null;
   /** The errata touching the station in the periods read, and what was done with each kept one. */
   errata: Record<string, Pick<Erratum, "handling" | "since" | "until" | "fit">>;
+  /** `inputsDigest` when the fit ran: the fit is due again when it changes. */
+  digest: string;
 }
 
 export const emptyInputs = (): Inputs => ({
@@ -40,7 +46,54 @@ export const emptyInputs = (): Inputs => ({
   source_qc_start: null,
   settled_before: null,
   errata: {},
+  digest: "",
 });
+
+/**
+ * The fit's method, counted up whenever a change to `src/fit/` could change a
+ * fit's constants or scores, so every stored fit comes due under the new one.
+ */
+export const METHOD = 1;
+
+/**
+ * A digest of everything a station's fit depends on: its
+ * year files up to the source's final year, with their versions, its epochs
+ * and their conversions, where its source's checks start, every erratum that
+ * names it with its `fit` decision, the source's rule for final values, and
+ * the method's version.
+ * A fit records it, and is due again when it changes.
+ */
+export function inputsDigest(
+  station: StoredStation,
+  context: Pick<ReadContext, "metadata" | "years" | "errata"> & { finalYear: number | null },
+): string {
+  const { metadata, years, finalYear: final } = context;
+  const files = [...years.values()]
+    .filter((r) => r.id === station.id && (r.year === null || final === null || r.year <= final))
+    .map((r) => [r.epoch, r.year, r.version ?? null])
+    .sort((a, b) => Number(a[0]) - Number(b[0]) || Number(a[1]) - Number(b[1]));
+  const touching = new Set(errataOf(station, context.errata));
+  return createHash("sha256")
+    .update(
+      JSON.stringify({
+        files,
+        final,
+        epochs: [...station.epochs]
+          .sort((a, b) => a.id - b.id)
+          .map(({ id, since, until, to_current, state }) => [id, since, until, to_current, state]),
+        source_qc_start: station.source_qc_start ?? null,
+        errata: context.errata
+          .filter((e) => touching.has(e.id))
+          .map((e) => [e.id, e.handling, e.since, e.until, e.fit])
+          .sort(),
+        finalizes: metadata.finalizes,
+        settles_after_months: metadata.settles_after_months ?? null,
+        method: METHOD,
+      }),
+    )
+    .digest("hex")
+    .slice(0, 16);
+}
 
 /**
  * For a source that never finalizes, the instant its values have settled
@@ -65,13 +118,15 @@ export function settledBefore(metadata: SourceMetadata, now: Date): Date | null 
  * gauges, so their fits are scored on the same year. For a source that never
  * finalizes, the year before `settledBefore`. Otherwise the latest year before
  * the current one in which most of its stations with values that year have no
- * preliminary ones, over all their epochs; a station marked as being written
- * votes for no year.
+ * preliminary ones the source will still check, over all their epochs: a year
+ * that ended by a station's `source_qc_start`, in `qcStarts` by station, is
+ * final as it stands. A station marked as being written votes for no year.
  */
 export function finalYear(
   metadata: SourceMetadata,
   years: ReadonlyMap<string, YearRow>,
   now: Date,
+  qcStarts: ReadonlyMap<string, number> = new Map(),
 ): number {
   const settled = settledBefore(metadata, now);
   if (settled) return settled.getUTCFullYear() - 1;
@@ -82,7 +137,11 @@ export function finalYear(
   for (const r of years.values()) {
     if (writing.has(r.id) || r.year === null || !r.flags) continue;
     const stations = preliminary.get(r.year) ?? new Map<string, boolean>();
-    stations.set(r.id, (stations.get(r.id) ?? false) || r.flags[Flag.preliminary]! > 0);
+    const checked = Date.UTC(r.year + 1, 0, 1) > (qcStarts.get(r.id) ?? -Infinity);
+    stations.set(
+      r.id,
+      (stations.get(r.id) ?? false) || (checked && r.flags[Flag.preliminary]! > 0),
+    );
     preliminary.set(r.year, stations);
   }
   const final = [...preliminary]
@@ -125,9 +184,10 @@ export interface ReadContext {
  * inside its span and moved by its `to_current`; an epoch that can't be
  * converted is left out, and where a rejected epoch and another share a time
  * the other wins. Throws `Unfit` where a `kept` erratum in the period has no
- * `fit` decision, where the station's year files are being written, and, for
- * `final` values of a source that never finalizes, where the period ends
- * after its values have settled.
+ * `fit` decision, where the station's year files are being written (`Busy`),
+ * and, for `final` values of a source that never finalizes, where the period
+ * ends after its values have settled. Throws an ordinary error where a year
+ * file the years file counts is missing, so no fit records a file it didn't read.
  */
 export async function readSeries(
   station: StoredStation,
@@ -142,9 +202,22 @@ export async function readSeries(
       `${station.id}: values from ${settled.toISOString().slice(0, 10)} haven't settled`,
     );
   if (years.has(`${station.id} null null`))
-    throw new Unfit(`${station.id}: its year files are being written`);
+    throw new Busy(`${station.id}: its year files are being written`);
 
-  const touching = errataIn(context.errata, station, period);
+  // Only errata in years the station has a file for: one that names every
+  // station of a source says nothing about a gauge with no values in its span.
+  const held = [...years.values()]
+    .filter((r) => r.id === station.id && r.year !== null)
+    .map((r) => ({ start: Date.UTC(r.year!, 0, 1), end: Date.UTC(r.year! + 1, 0, 1) }));
+  const touching = errataIn(context.errata, station, period).filter((e) =>
+    held.some(
+      (y) =>
+        y.start < period.end &&
+        y.end > period.start &&
+        (e.since === null || utcDay(e.since) < y.end) &&
+        (e.until === null || utcDay(e.until) > y.start),
+    ),
+  );
   const undecided = touching.filter((e) => e.handling === "kept" && !e.fit);
   if (undecided.length)
     throw new Unfit(
@@ -179,7 +252,12 @@ export async function readSeries(
       if (version === undefined) continue;
       inputs.versions[`${epoch.id} ${year}`] = version;
       const path = seriesPath(store, "levels", station.source, station.source_id, year, epoch.id);
-      for (const o of await readObservationsBetween(path, start, end, true)) {
+      const rows = await readObservationsBetween(path, start, end, true);
+      // A missing file reads as no rows, as a year with none on the hour does.
+      // A listing globs, so a station ID with a glob character counts only its own file.
+      if (!rows.length && !(await listFiles(path)).includes(path))
+        throw new Error(`${station.id}: ${path} is in the years file and missing from the store`);
+      for (const o of rows) {
         if (!takes(o.flag, o.time) || !Number.isFinite(o.level)) continue;
         if (rejected && byTime.has(o.time)) continue;
         // Levels are stored as 32-bit floats; round off the widening noise below 0.1 mm.

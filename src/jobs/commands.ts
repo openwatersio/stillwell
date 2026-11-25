@@ -16,7 +16,6 @@ const ARITY: Record<string, number> = {
   "delete-years": 4,
   years: 1,
   analyze: 1,
-  fit: 1,
   stations: 1,
 };
 

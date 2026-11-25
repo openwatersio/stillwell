@@ -1276,17 +1276,16 @@ async function fitStations(sourceId: string, ids?: string): Promise<void> {
       : undefined;
   const unknown = (ids ? only! : []).filter((id) => !list.some((s) => s.id === id));
   if (unknown.length) throw new Error(`${sourceId} lists no ${unknown.join(", ")}`);
-  setConnections(positive("concurrency"));
+  // One station at a time: a fit is computation on one core, so more would only hold more series in memory.
   const report = await fitSource(store, source, list, {
     now: new Date(),
     errata,
     all: values.all,
     ...(only ? { only } : {}),
-    concurrency: positive("concurrency"),
     log: (line) => console.log(line),
   });
   const lines = [
-    `fit ${sourceId}: ${report.fitted.length} fitted, ${report.none.length} without constants, ${report.current} current, ${report.failed.length} failed`,
+    `fit ${sourceId}: ${report.fitted.length} fitted, ${report.none.length} without constants, ${report.current} current, ${report.waiting.length} being written, ${report.failed.length} failed`,
     ...report.failed.map((f) => `  failed ${f}`),
   ];
   for (const line of lines) console.log(line);

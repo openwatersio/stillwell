@@ -16,6 +16,7 @@ Observed water levels at about 690 German federal gauges on the coast, rivers an
 
 ## Known limits
 
+- **When values count as final:** PEGELONLINE marks no value final and states no revision window. A harmonic fit reads a year once it ended 12 months ago (`settles_after_months`), a figure decided here from the one revision the store has seen: the WSV moved Cuxhaven's values of 13 May to 24 June 2025 by 4 to 6 cm months after measuring them (erratum `pegelonline-cuxhaven-2025-revised`). That sets no upper bound, so a later revision can reach a year a fit has read. The store learns of one only when a backfill with `--refetch` reads the year again, and the next `fit` of the source then fits the station again ([#526](https://github.com/openwatersio/stillwell/issues/526)).
 - **HPA gaps:** each kuestendaten.de file ends at 23:00 UTC on its last day, so the store lacks that month's last hour at the HPA gauges until the next file restores it. Values between the last file's end and the start of the poller wait for the next update too.
 - **Download date:** kuestendaten.de's terms (DL-DE/Zero-2.0) suggest a source note naming the series, the WSV, www.kuestendaten.de and the download date. The store doesn't record when it downloaded each file.
 

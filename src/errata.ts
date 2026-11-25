@@ -67,8 +67,7 @@ export interface Erratum {
   /** Where the report went and what the agency answered. */
   report: string | null;
   /**
-   * For a `kept` erratum, whether its values may enter a harmonic fit or a
-   * tidal datum: `keep` where the error leaves the levels usable, `drop` where
+   * For a `kept` erratum, whether its values may enter a harmonic fit: `keep` where the error leaves the levels usable, `drop` where
    * it doesn't. Null until decided, and for any other handling; a fit whose
    * window an undecided one touches waits for it (`src/fit/series.ts`).
    */
