@@ -2795,6 +2795,101 @@ describe("usace", () => {
     };
     assert.deepEqual(pool({ latitude: 41.89, ...published }), []);
     assert.deepEqual(pool({ longitude: -87.62, ...published }), []);
+    assert.deepEqual(pool({}), []);
+    assert.deepEqual(pool({ latitude: 9.09, longitude: 9.09 }), []);
+    assert.deepEqual(pool({ latitude: 34.29, longitude: 91.996 }), []);
+    // A position POSITIONS moves is listed, for the refresh to move: CWMS serves Pine Bluff's longitude without its sign.
+    const [pineBluff] = usace.toStations(
+      "MVK",
+      [
+        series(
+          "Pine Bluff.Stage.Inst.15Minutes.0.DCP-rev",
+          "15Minutes",
+          "2021-03-19T16:00:00Z",
+          "2026-09-14T03:00:00Z",
+        ),
+      ],
+      [
+        {
+          office: "MVK",
+          name: "Pine Bluff",
+          nation: "United States",
+          latitude: 34.29028,
+          longitude: 91.99556,
+        },
+      ],
+      new Map(),
+      now,
+    );
+    assert.deepEqual(
+      [pineBluff!.id, pineBluff!.lat, pineBluff!.lon],
+      ["usace/MVK.Pine_Bluff", 34.29028, 91.99556],
+    );
+    // A listed station that loses its position stops the refresh rather than retire, until a decision settles it.
+    const lost = () =>
+      usace.toStations(
+        "LRC",
+        [
+          series(
+            "Chicago Lock-Pool.Stage.Inst.1Hour.0.USGS-raw",
+            "1Hour",
+            "2021-03-19T16:00:00Z",
+            "2026-09-14T03:00:00Z",
+          ),
+        ],
+        [
+          {
+            office: "LRC",
+            name: "Chicago Lock-Pool",
+            nation: "United States",
+            latitude: 0,
+            longitude: 0,
+          },
+        ],
+        new Map([["usace/LRC.Chicago_Lock-Pool", "Chicago Lock-Pool.Stage.Inst.1Hour.0.USGS-raw"]]),
+        now,
+      );
+    assert.throws(lost, /places usace\/LRC.Chicago_Lock-Pool at 0, 0.*POSITIONS.*RETIRED/);
+    // Only an active station the location owns stops the refresh, and a POSITIONS station only while CWMS serves its position.
+    const stageOf = (name: string) => `${name}.Stage.Inst.1Hour.0.USGS-raw`;
+    const listedAt = (
+      office: string,
+      name: string,
+      latitude: number,
+      longitude: number,
+      committed: [string, string][],
+      inactive: string[] = [],
+    ) =>
+      usace.toStations(
+        office,
+        [series(stageOf(name), "1Hour", "2021-03-19T16:00:00Z", "2026-09-14T03:00:00Z")],
+        [{ office, name, nation: "United States", latitude, longitude }],
+        new Map(committed),
+        now,
+        new Set(inactive),
+      );
+    const owned: [string, string][] = [
+      ["usace/LRC.Chicago_Lock-Pool", stageOf("Chicago Lock-Pool")],
+    ];
+    assert.deepEqual(
+      listedAt("LRC", "Chicago Lock-Pool", 0, 0, owned, ["usace/LRC.Chicago_Lock-Pool"]),
+      [],
+    );
+    assert.deepEqual(listedAt("LRC", "Chicago_Lock-Pool", 0, 0, owned), []);
+    assert.throws(
+      () => listedAt("MVK", "Pine Bluff", 0, 0, [["usace/MVK.Pine_Bluff", stageOf("Pine Bluff")]]),
+      /Pine_Bluff.*POSITIONS entry.*update the entry's `served`.*RETIRED/,
+    );
+    assert.throws(
+      () => listedAt("LRC", "Chicago Lock-Pool", undefined as never, undefined as never, owned),
+      /no position, which a POSITIONS entry can't settle.*RETIRED/,
+    );
+    usace.RETIRED.add("usace/LRC.Chicago_Lock-Pool");
+    try {
+      assert.deepEqual(lost(), []);
+    } finally {
+      usace.RETIRED.delete("usace/LRC.Chicago_Lock-Pool");
+    }
     assert.deepEqual(pool({ "published-latitude": 0, "published-longitude": 0 }), []);
     assert.deepEqual(
       pool({
@@ -5296,13 +5391,13 @@ describe("refmar", () => {
     );
   });
 
-  it("flags Pointe-à-Pitre's values from 2020 to 2024 suspect", async () => {
+  it("flags Pointe-à-Pitre's values from 2023 to 2024 suspect", async () => {
     setTransport(async (url) => {
       const start = new URL(url).searchParams.get("dtStart")!;
-      if (start.startsWith("2019-12"))
-        return JSON.stringify({ data: [row(3, "2019/12/31 23:50:00")] });
-      if (start.startsWith("2020-01"))
-        return JSON.stringify({ data: [row(3, "2020/01/01 00:00:00")] });
+      if (start.startsWith("2022-12"))
+        return JSON.stringify({ data: [row(3, "2022/12/31 23:50:00")] });
+      if (start.startsWith("2023-01"))
+        return JSON.stringify({ data: [row(3, "2023/01/01 00:00:00")] });
       if (start.startsWith("2024-12"))
         return JSON.stringify({ data: [row(3, "2024/12/31 23:50:00")] });
       if (start.startsWith("2025-01"))
@@ -5319,28 +5414,28 @@ describe("refmar", () => {
       }) as unknown as Station;
     const flags = async (id: string, from: string, to: string) =>
       (await sources.refmar!.observations!(station(id), new Date(from), new Date(to))).map((v) => [
-        new Date(v.time).toISOString().slice(0, 4),
+        new Date(v.time).toISOString().slice(0, 10),
         v.flag,
       ]);
     const [, flagged] = await sources.refmar!.observations!(
       station("125"),
-      new Date("2019-12-01Z"),
-      new Date("2020-02-01Z"),
+      new Date("2022-12-01Z"),
+      new Date("2023-02-01Z"),
     );
     // SHOM's own flag stays as the source's.
     assert.equal(flagged!.source_flag, Flag.good);
-    assert.deepEqual(await flags("125", "2019-12-01Z", "2020-02-01Z"), [
-      ["2019", Flag.good],
-      ["2020", Flag.suspect],
+    assert.deepEqual(await flags("125", "2022-12-01Z", "2023-02-01Z"), [
+      ["2022-12-31", Flag.good],
+      ["2023-01-01", Flag.suspect],
     ]);
     assert.deepEqual(await flags("125", "2024-12-01Z", "2025-02-01Z"), [
-      ["2024", Flag.suspect],
-      ["2025", Flag.good],
+      ["2024-12-31", Flag.suspect],
+      ["2025-01-01", Flag.good],
     ]);
     // Other gauges keep SHOM's flag.
-    assert.deepEqual(await flags("126", "2019-12-01Z", "2020-02-01Z"), [
-      ["2019", Flag.good],
-      ["2020", Flag.good],
+    assert.deepEqual(await flags("126", "2022-12-01Z", "2023-02-01Z"), [
+      ["2022-12-31", Flag.good],
+      ["2023-01-01", Flag.good],
     ]);
   });
 
