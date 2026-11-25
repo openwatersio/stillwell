@@ -253,8 +253,8 @@ export function originatorSeries(
         status: "unmatched",
         note: "JODC relay of a JMA gauge with no JMA code declared",
       };
-    // JODC's terms ask for permission to republish, so its records stay on
-    // TICON for commercial use until it's given (#47).
+    // JODC's terms ask for permission to republish (#47), so its records stay
+    // on TICON for commercial use.
     const match = byCode(record, "jodc", code.toUpperCase(), "license", lists);
     return match.status === "ready"
       ? { ...match, status: "restricted", note: "JODC's terms ask for permission to republish" }

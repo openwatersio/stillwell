@@ -11,10 +11,10 @@ export default {
       response:
         "The adapter refuses a file that names another station, so the store has no values for B95580 until WDL fixes it. A refresh lists B95580 only while its file is usable. The public store listed it before the adapter checked headers, so it stays there with no data, and is inactive from the first refresh with the check. `stations` stays empty, since a store started since then has no such station.",
       evidence:
-        "The file's header names B95500, with variable code 821 and no notes, where B95580's own number belongs. Of all 71 WDL files the adapter reads, it's the only one. Found while backfilling California DWR; see [#55](https://github.com/openwatersio/stillwell/pull/55).",
+        "The file's header names B95500, with variable code 821 and no notes, where B95580's own number belongs. Of the WDL files the adapter reads, it's the only one. Found while backfilling California DWR; see [#55](https://github.com/openwatersio/stillwell/pull/55).",
       reported: "2026-11-07",
       report:
-        "Sent to wdlweb@water.ca.gov on 2026-11-07. Asked again on 2026-11-21, in the email about the stale files (#461), whether the file is meant to hold B95500. No answer yet.",
+        "Sent to wdlweb@water.ca.gov with the header, which also asked whether the file is meant to hold B95500.",
       // Another WDL station's levels show the read isn't empty for another reason.
       check: async (store) => {
         if (!(await store.levels("dwr/B95060", "2025-01-01", "2026-01-01")).length)

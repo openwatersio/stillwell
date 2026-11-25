@@ -143,7 +143,8 @@ export interface Record {
 export type Next =
   | { id: string; step: number; kind: "ingest"; args: string[]; lane: string; timeout: number }
   | { id: string; step: number; kind: "check"; lane: "check"; timeout: number }
-  | { stopped: string }
+  /** `since` is when a failed step failed. A stop of any other kind has no time on record. */
+  | { stopped: string; since?: string }
   | null;
 
 /**
@@ -163,7 +164,10 @@ export function next(migrations: [string, Migration][], record: Record): Next {
     };
   const known = migrations.filter(([id]) => rows.has(id));
   const failed = known.find(([id]) => rows.get(id)!.state === "failed");
-  if (failed) return { stopped: `${failed[0]} failed: ${rows.get(failed[0])!.error}` };
+  if (failed) {
+    const row = rows.get(failed[0])!;
+    return { stopped: `${failed[0]} failed: ${row.error}`, since: row.updated };
+  }
   const running = known.find(([id]) => rows.get(id)!.state === "running");
   const [id, migration] = running ?? migrations.find(([id]) => !rows.has(id)) ?? [];
   if (!id || !migration) return null;
@@ -219,6 +223,13 @@ export function done(
 ): Record {
   const migration = migrations.find(([m]) => m === id)?.[1];
   if (!migration) throw new Error(`no migration ${id}`);
+  // A step recorded twice, or from an old workflow attempt, can't move a row on from a later step or a finish, such as
+  // a skip. A row failed at this step can still be recorded done. The workflow runs no job on a re-run.
+  const row = record.migrations.find((r) => r.id === id);
+  if (row ? row.state === "done" || row.step !== step : step !== 0)
+    throw new Error(
+      `can't record step ${step} of ${id}: the record has it ${row ? `${row.state} at step ${row.step}` : "not started"}`,
+    );
   const last = step + 1 >= migration.steps.length;
   return put(record, {
     id,

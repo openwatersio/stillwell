@@ -76,7 +76,7 @@ export function errataReport(
     out.push(
       "## Problems in the errata files",
       "",
-      "A file with a problem is left out whole, so its errata weren't checked.",
+      "A file whose errata break the rules loses all its errata, which weren't checked; one whose questions do loses only its questions; an ID used twice or retired loses that entry.",
       "",
       ...checks.problems.map((p) => `- ${cell(p)}`),
       "",
