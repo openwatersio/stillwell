@@ -66,6 +66,9 @@ export function commandProblems(args: string[], timeout: number): string[] {
   else {
     if (rest.length !== ARITY[command])
       out.push(`${text}: ${command} takes ${ARITY[command]} arguments, not ${rest.length}`);
+    // As scripts/ingest.ts refuses it, `--with-inactive` widens `all` and means nothing for named stations.
+    if (command === "backfill" && args.includes("--with-inactive") && rest[1] !== "all")
+      out.push(`${text}: --with-inactive goes with \`all\``);
     // Publishing writes stations.parquet and the offsets, which only the `store` group may write.
     if (command === "stations" && !args.includes("--no-publish"))
       out.push(`${text}: stations runs as a step only with --no-publish`);
