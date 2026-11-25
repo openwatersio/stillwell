@@ -24,6 +24,7 @@ Everything else. Below are the answers to the questions that come up most.
 
 - **Don't write to an agency yourself, and don't ask whether to.** An error goes in the source's errata, and a question in its `questions`, and `npm run errata` drafts one message per source, to the source's `metadata.contact` ([Source errata](sources.md#source-errata)). Put the draft in your pull request's description. A maintainer sends it when the pull request merges.
 - **Don't wait for the answer.** Do what the evidence in hand supports now, choosing the handling that's easiest to undo, such as flagging over dropping. The erratum's `response` or the question's `meanwhile` says what the store does now, and the question's `why` says what the answer would change.
+- **A report already sent turns out wrong?** Correct it in the source's next message: set the erratum's `reported` and `report` back to null so `npm run errata` drafts it again, say in its `evidence` what the earlier report got wrong, and open the draft with a line saying which report it corrects. Correcting a figure we sent isn't an open decision.
 - **A missing or wrong contact** is a fix to the source's `metadata.contact`, from the agency's own published contact page, cited in a comment beside it ([Adding a source](sources.md#adding-a-source)).
 
 ### Handling an error in the data
