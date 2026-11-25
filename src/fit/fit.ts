@@ -100,7 +100,9 @@ export interface Fit {
   until: string | null;
   /** Hourly values fitted. */
   hours: number | null;
-  /** RMS residual of the fit over its window. */
+  /** The window's mean level, in the station's current datum: what a prediction from the constants is added to. */
+  z0_m: number | null;
+  /** RMS residual of the fit over its window, under the fit's robust weights. */
   rms_m: number | null;
   /** Calendar years of the window fitted on their own for the yearly scatter. */
   years: number | null;
@@ -177,6 +179,7 @@ const noFit = (id: string, context: FitContext, inputs: Inputs, reason: string):
   since: null,
   until: null,
   hours: null,
+  z0_m: null,
   rms_m: null,
   years: null,
   node_corrections: null,
@@ -297,7 +300,8 @@ export async function fitStation(
     if (days < MIN_FIT_DAYS || samples.length < (MIN_FIT_DAYS * 24) / 2)
       return none(`under ${MIN_FIT_DAYS} days of final values before ${heldOut}`);
 
-    // Sa and Ssa leave the selection and are judged by their yearly spread.
+    // Sa and Ssa leave the selection and are judged by their yearly spread. Selection tests each
+    // candidate in a plain fit; the robust weights enter with the fit of those it keeps.
     const seasonal: readonly string[] = SEASONAL;
     const candidates = CANDIDATES.filter((c) => !seasonal.includes(c.name));
     const engineSamples = harmonicSamples(samples);
@@ -314,7 +318,10 @@ export async function fitStation(
     // Largest first, so a pair a year can't separate keeps its larger member.
     const yearly = yearlyScatter(
       samples,
-      [...fitted.constituents].sort((a, b) => b.amplitude - a.amplitude).map((c) => c.name),
+      [...fitted.constituents]
+        .filter((c) => !seasonal.includes(c.name))
+        .sort((a, b) => b.amplitude - a.amplitude)
+        .map((c) => c.name),
       { ...FIT_OPTIONS, seasonal: true },
     );
     const seasonalKept = (name: string, amplitude: number) => {
@@ -379,6 +386,7 @@ export async function fitStation(
         since: iso(start),
         until: iso(end),
         hours: samples.length,
+        z0_m: finite(fitted.offset),
         rms_m: finite(fitted.rms),
         years: yearly.years,
         node_corrections: NODE_CORRECTIONS,

@@ -8,7 +8,7 @@ A fit is a measurement. It is published whatever its size, with what a reader ne
 
 - **Final values.** A fit reads values the source won't revise again: verified values, and preliminary ones from before the station's `source_qc_start`, which the source will never check. A source that never marks values final declares how long after a year ends its values are read as final (`settles_after_months`), with its evidence in its README.
 - **Flags decide.** A fit reads what the store's flags allow. A value is `kept` under an erratum only where its own evidence supports keeping it, and a value no reader should use is `flagged`, which marks it suspect. The fit records every erratum touching the years it read.
-- **Instantaneous values on the hour.** Hourly sampling resolves every constituent below twelve cycles a day and keeps a 19-year fit to about 166,000 values. Hourly means are not used: a one-hour mean scales a constituent by sinc(f · 1 h), which is 0.989 for M2, 0.958 for M4 and 0.907 for M6.
+- **Values stamped on the hour, read as instantaneous.** Hourly sampling resolves every constituent below twelve cycles a day and keeps a 19-year fit to about 166,000 values. A fit can't tell an instant from a mean. Where a source's hourly values are means, its amplitudes come out low: a one-hour mean scales a constituent by sinc(f · 1 h), which is 0.989 for M2, 0.958 for M4 and 0.907 for M6. Such a series has an erratum or a note in its source's README, and its fit isn't corrected for it.
 - **One datum.** Every datum epoch's levels are moved into the station's current datum by the epoch's `to_current`, and an epoch that can't be converted is left out.
 
 ## Window
@@ -31,18 +31,18 @@ NOAA evaluates the factors once a year, at mid-year, for convenience ([Parker 20
 
 Every fit starts from the same candidates in the same priority order, defined in [`src/fit/candidates.ts`](../src/fit/candidates.ts) by their Doodson numbers:
 
-1. Foreman's standard set of 45 astronomical and 24 shallow-water constituents, in his order of selection, which follows decreasing amplitude in the tidal potential ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf), p. 16 and pp. 18–19).
+1. Foreman's standard set of 45 astronomical and 24 shallow-water constituents, in his order of selection, which follows decreasing amplitude in the tidal potential ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf), p. 16 and pp. 18–19). Of the 69, the mean (Z0) is fitted as `z0_m`, H1 and H2 enter under the IHO names of the same lines, MA2 and MB2, and OQ2 is left out, which leaves 65 under his names.
 2. The constituents NOAA's standard 37 add.
 3. The constituents TICON-4's 50 add ([TICON-4 manual](https://doi.org/10.17882/109129)).
 
-Starting from one list makes fits comparable between gauges, and including NOAA's and TICON's names lets a fit be compared with either name for name. Foreman's H1 and H2 enter under the IHO names of the same lines, MA2 and MB2.
+Starting from one list makes fits comparable between gauges, and including NOAA's and TICON's names lets a fit be compared with either name for name.
 
 A candidate is kept when it passes two tests:
 
 - **Rayleigh criterion.** The record separates it from every stronger candidate already kept by at least one cycle ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf), §2.1.2, p. 17). Where a record can't separate two candidates, the one earlier in the list stays.
-- **Signal to noise.** Its amplitude squared is at least twice its variance, UTide's default for including a constituent ([Codiga 2011](https://www.po.gso.uri.edu/~codiga/utide/2011Codiga-UTide-Report.pdf), pp. 35–36 and 40).
+- **Signal to noise.** In a fit without robust weights, its amplitude squared is at least twice its variance, UTide's default for including a constituent ([Codiga 2011](https://www.po.gso.uri.edu/~codiga/utide/2011Codiga-UTide-Report.pdf), pp. 35–36 and 40).
 
-Every candidate has a row in `constituents/<source>.parquet`, kept or not, with the reason and, for a Rayleigh rejection, the constituent it conflicts with. A reader who wants a stricter or looser set has what is needed to choose one.
+The kept candidates are then fitted together with robust weights, and their published signal-to-noise ratio is from that fit. Every candidate has a row in `constituents/<source>.parquet`, kept or not, with the reason and, for a Rayleigh rejection, the constituent it conflicts with. A reader who wants a stricter or looser set has what is needed to choose one.
 
 **Sa and Ssa** are judged differently, because they are mostly weather, steric change and river flow and vary from year to year ([Parker 2007](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf), §3.7.1, p. 119). They are fitted over the whole window, and each year is also fitted by itself. They are kept when the whole-window amplitude is at least twice the standard error of the mean of the yearly fits. The yearly standard error is published either way.
 
@@ -119,4 +119,4 @@ One year decides each score, so an unusual year can move it.
 
 ## What the IHO asks a publisher to state
 
-IHO Resolution 2/1977 asks for the station's position, the source, dates, time zone and duration of the data analyzed, the datum connection, amplitudes in meters and Greenwich phase lags in degrees, and the organization responsible. [Resolution 1/2019](https://iho.int/uploads/user/Services%20and%20Standards/TWCWG/TWCWG5/TWCWG5_2020_3.2.1_EN_IHO_Reslution_1-2019_v1.0.pdf) adds the dates of the series analyzed and the name of the analysis program. Neither asks for the nodal corrections. The fit files carry all of these, and the nodal corrections as well.
+IHO Resolution 2/1977 asks for the station's position, the source, dates, time zone and duration of the data analyzed, the datum connection, amplitudes in meters and Greenwich phase lags in degrees, and the organization responsible. The fit gives the mean level its constants ride on (`z0_m`) in the station's datum, and `stations.parquet` gives that datum's offsets to others. [Resolution 1/2019](https://iho.int/uploads/user/Services%20and%20Standards/TWCWG/TWCWG5/TWCWG5_2020_3.2.1_EN_IHO_Reslution_1-2019_v1.0.pdf) adds the dates of the series analyzed and the name of the analysis program. Neither asks for the nodal corrections, which the fit files also give.

@@ -20,6 +20,8 @@ import { Flag, type Source, type SourceMetadata, type StoredStation } from "../s
 import { readYearStats, writeObservations } from "../src/store/parquet.ts";
 import { seriesPath } from "../src/store/paths.ts";
 import { writeYears, type YearRow } from "../src/store/years.ts";
+import { fitInWorker, workerCount } from "../src/fit/workers.ts";
+import { Busy } from "../src/fit/series.ts";
 
 const NOW = new Date("2026-11-25T00:00:00Z");
 const ENGINE = engineVersion();
@@ -271,9 +273,106 @@ describe("fitStation", () => {
     });
     assert.equal(result.reason, null);
     assert.equal(result.held_out, 2023);
+    // The mean level a prediction is added to: the series has none, so it is near zero.
+    assert.ok(Math.abs(result.z0_m!) < 0.01);
     assert.ok(result.held_out_hours! > 8000);
     for (const value of [result.held_out_rms_m, result.d2_rms_m, result.turn_time_rms_min])
       assert.ok(Number.isFinite(value));
+  });
+});
+
+describe("a worker thread with files to read", () => {
+  const store = mkdtempSync(join(tmpdir(), "stillwell-fit-worker-"));
+  after(() => rmSync(store, { recursive: true, force: true }));
+
+  it("reads a station's files and fits it as the main thread does", async () => {
+    const predictor = createTidePredictor(
+      [
+        { name: "M2", amplitude: 1, phase: 30 },
+        { name: "K1", amplitude: 0.2, phase: 120 },
+      ],
+      { offset: false, nodeCorrections: "schureman" },
+    );
+    const rows: YearRow[] = [];
+    for (const year of [2022, 2023, 2024]) {
+      const observations = [];
+      for (let t = Date.UTC(year, 0, 1), i = 0; t < Date.UTC(year + 1, 0, 1); t += HOUR, i++)
+        observations.push({
+          time: t,
+          // A fixed ripple, so the fit has noise to measure.
+          level:
+            2 +
+            predictor.getWaterLevelAtTime({ time: new Date(t) }).level +
+            ((i * 7919) % 13) / 1000,
+          flag: Flag.good,
+        });
+      const path = seriesPath(store, "levels", "test", "a", year);
+      await writeObservations(path, observations, "NAVD88");
+      rows.push({ id: "test/a", epoch: 1, year, ...(await readYearStats([path])).get(path)! });
+    }
+    const context = {
+      store,
+      metadata: FINALIZES,
+      years: yearsOf(rows),
+      errata: [],
+      now: NOW,
+      finalYear: 2024,
+      engine: ENGINE,
+    };
+    const [here, there] = await Promise.all([
+      fitStation(station("a"), context),
+      fitInWorker(station("a"), context),
+    ]);
+    assert.equal(there.fit.reason, null);
+    assert.equal(there.fit.held_out, 2024);
+    assert.ok(Math.abs(there.fit.z0_m! - 2.006) < 0.01);
+    assert.ok(there.constituents.find((c) => c.name === "M2")!.kept);
+    assert.deepEqual(there, here);
+  });
+});
+
+describe("a worker thread", () => {
+  const context = {
+    store: "nowhere",
+    metadata: FINALIZES,
+    // A check is a function, which a message to a worker can't carry.
+    errata: [{ ...erratum(), check: async () => {} }],
+    now: NOW,
+    finalYear: 2024,
+    engine: ENGINE,
+  };
+
+  it("fits a station as the main thread would", async () => {
+    const years = yearsOf([row(2024, "b", "test/other")]);
+    const [here, there] = await Promise.all([
+      fitStation(station("a"), { ...context, years }),
+      fitInWorker(station("a"), { ...context, years }),
+    ]);
+    assert.equal(there.fit.reason, "no year files");
+    assert.deepEqual(there, here);
+  });
+
+  it("says a station's year files are being written, as the main thread would", async () => {
+    const years = new Map([
+      ["test/a null null", { id: "test/a", epoch: null, year: null }],
+      ["test/a 1 2024", row(2024, "b")],
+    ]);
+    await assert.rejects(fitInWorker(station("a"), { ...context, years }), Busy);
+  });
+
+  it("stays free after a task that can't be sent", async () => {
+    const years = yearsOf([row(2024, "b", "test/other")]);
+    // A function can't cross to a worker.
+    const unsendable = station("a", { name: () => "x" });
+    await assert.rejects(fitInWorker(unsendable, { ...context, years }), /could not be cloned/);
+    const after = await fitInWorker(station("a"), { ...context, years });
+    assert.equal(after.fit.reason, "no year files");
+  });
+
+  it("fits no more stations at once than the machine has cores", () => {
+    assert.equal(workerCount(1), 1);
+    assert.equal(workerCount(0), 1);
+    assert.ok(workerCount(10_000) < 10_000);
   });
 });
 
@@ -392,6 +491,19 @@ describe("fitSource", () => {
     await assert.rejects(
       fitSource(store, finalizing, [station("a"), station("b")], { ...options, all: true }),
       /year files are being written/,
+    );
+    assert.equal((await readFits(store, "test")).get("test/a")!.version, "v");
+    assert.equal((await readConstituents(store, "test")).length, 1);
+  });
+
+  it("stops, writing nothing, where a source that finalizes has constants and no final year", async () => {
+    const [f, c] = constants("test/a");
+    await writeFits(store, "test", [f], [c]);
+    // Every value preliminary, as a years file rebuilt wrong might say.
+    await writeYears(store, "test", [{ ...row(2024, "b"), flags: [0, 0, 8760, 0, 0] }]);
+    await assert.rejects(
+      fitSource(store, finalizing, [station("a")], { ...options, all: true }),
+      /have constants; check its years file/,
     );
     assert.equal((await readFits(store, "test")).get("test/a")!.version, "v");
     assert.equal((await readConstituents(store, "test")).length, 1);

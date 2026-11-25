@@ -13,6 +13,7 @@ import {
   type FittedCandidate,
 } from "./fit.ts";
 import { Busy, emptyInputs, finalYear, inputsDigest, Unfit, type Inputs } from "./series.ts";
+import { fitInWorker, workerCount } from "./workers.ts";
 
 /**
  * A source's fits in the store: `fits/<source>.parquet`, a row per station,
@@ -30,6 +31,7 @@ const text = (value: unknown) => (value === null || value === undefined ? null :
 
 const FIT_NUMBERS = [
   "hours",
+  "z0_m",
   "rms_m",
   "years",
   "held_out",
@@ -199,7 +201,10 @@ export async function fitSource(
     all?: boolean;
     /** Only these stations, by `id`; none of them when empty, as an empty shard is. */
     only?: string[];
+    /** How many stations are fitted at once, each on a thread of its own; one where not given. */
     concurrency?: number;
+    /** Fits one station: on a worker thread, unless a caller gives another way. */
+    fit?: typeof fitStation;
     log?: (line: string) => void;
   },
 ): Promise<FitReport> {
@@ -260,6 +265,13 @@ export async function fitSource(
   report.current = chosen.length - todo.length - report.waiting.length;
 
   if (final === null) {
+    // A source that finalizes and has constants has had a final year, so losing it is a fault in
+    // the years file, such as a rebuild from a short listing, and no reason to take them away.
+    const fitted = todo.filter((s) => fits.get(s.id)?.version);
+    if (metadata.finalizes && fitted.length)
+      throw new Error(
+        `${metadata.id}: ${unfit}, though ${fitted.length} of its stations have constants; check its years file`,
+      );
     // No station of the source can be fitted, and each one's row says why.
     for (const station of todo) {
       fits.set(station.id, {
@@ -273,10 +285,12 @@ export async function fitSource(
     return report;
   }
   const context: FitContext = { ...base, finalYear: final };
+  const fit = options.fit ?? fitInWorker;
+  const workers = workerCount(options.concurrency ?? 1);
   for (let i = 0; i < todo.length; i += BATCH) {
-    await pool(todo.slice(i, i + BATCH), options.concurrency ?? 1, async (station) => {
+    await pool(todo.slice(i, i + BATCH), workers, async (station) => {
       try {
-        const result = await fitStation(station, context);
+        const result = await fit(station, context);
         fits.set(station.id, result.fit);
         if (result.constituents.length) constituents.set(station.id, result.constituents);
         else constituents.delete(station.id);

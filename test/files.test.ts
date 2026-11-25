@@ -100,6 +100,7 @@ const FIT: Fit = {
   since: "2005-01-01T00:00:00.000Z",
   until: "2024-01-01T00:00:00.000Z",
   hours: 160000,
+  z0_m: 5.02,
   rms_m: 0.1,
   years: 19,
   node_corrections: "iho",

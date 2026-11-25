@@ -5,6 +5,7 @@ import { listFiles, readObservationsBetween } from "../store/parquet.ts";
 import { seriesPath } from "../store/paths.ts";
 import type { YearRow } from "../store/years.ts";
 import type { Sample } from "../types.ts";
+import { CANDIDATES } from "./candidates.ts";
 
 /**
  * The levels a harmonic fit or a tidal datum reads from a station's year
@@ -55,6 +56,7 @@ export const emptyInputs = (): Inputs => ({
 /**
  * The fit's method, counted up whenever a change to `src/fit/` could change a
  * fit's constants or scores, so every stored fit comes due under the new one.
+ * The candidate list is in the digest itself, and needs no count.
  */
 export const METHOD = 1;
 
@@ -92,6 +94,7 @@ export function inputsDigest(
         finalizes: metadata.finalizes,
         settles_after_months: metadata.settles_after_months ?? null,
         method: METHOD,
+        candidates: CANDIDATES.map((c) => [c.name, c.doodson]),
       }),
     )
     .digest("hex")

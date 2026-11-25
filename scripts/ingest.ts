@@ -17,7 +17,7 @@
  *   node scripts/ingest.ts delete-years <source> <station> <epoch> <year,...>
  *   node scripts/ingest.ts years <source> [--rebuild-years]
  *   node scripts/ingest.ts analyze <source> [--all] [--requalify [--budget 120]]
- *   node scripts/ingest.ts fit <source> [<station,...>] [--all] [--shard 1/4]
+ *   node scripts/ingest.ts fit <source> [<station,...>] [--all] [--shard 1/4] [--concurrency 4]
  *
  * `stations` refreshes each source's list in the store, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
@@ -1276,12 +1276,13 @@ async function fitStations(sourceId: string, ids?: string): Promise<void> {
       : undefined;
   const unknown = (ids ? only! : []).filter((id) => !list.some((s) => s.id === id));
   if (unknown.length) throw new Error(`${sourceId} lists no ${unknown.join(", ")}`);
-  // One station at a time: a fit is computation on one core, so more would only hold more series in memory.
   const report = await fitSource(store, source, list, {
     now: new Date(),
     errata,
     all: values.all,
     ...(only ? { only } : {}),
+    // Each station on a thread of its own, as many at once as the machine has cores for.
+    concurrency: positive("concurrency"),
     log: (line) => console.log(line),
   });
   const lines = [
@@ -1474,7 +1475,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] [--prune] | matches [--concurrency N] [--accept-matches] [--prune] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | delete-years <source> <station> <epoch> <year,...> | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]] | fit <source> [station,...] [--all] [--shard I/N]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] [--prune] | matches [--concurrency N] [--accept-matches] [--prune] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | delete-years <source> <station> <epoch> <year,...> | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]] | fit <source> [station,...] [--all] [--shard I/N] [--concurrency N]",
   );
   process.exit(1);
 }

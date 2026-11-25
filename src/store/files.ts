@@ -739,10 +739,18 @@ export const FILES = {
         description: "How many values the fit read: final values stamped on a UTC hour.",
       },
       {
+        name: "z0_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The mean level over the fit's window, in meters in the station's current datum: a prediction from the constants is added to it.",
+      },
+      {
         name: "rms_m",
         type: "DOUBLE",
         nullable: true,
-        description: "The RMS of the fit's residual over its window, in meters.",
+        description:
+          "The RMS of the fit's residual over its window, in meters, under the fit's robust weights, which count surges and spikes for less.",
       },
       {
         name: "years",
@@ -888,7 +896,7 @@ export const FILES = {
     example: "constituents/smhi.parquet",
     title: "Harmonic constituents",
     description:
-      "One row per fitted station and candidate constituent, in the fit's priority order within a station: the constants of the candidates the fit kept, and why it left each of the others out. Each row defines its constituent by its Doodson numbers, so the constants can be used with any prediction software that applies the nodal corrections `fits/<source>.parquet` names.",
+      "One row per fitted station and candidate constituent, in the fit's priority order within a station: the constants of the candidates the fit kept, and why it left each of the others out. Each row gives its constituent's name and Doodson numbers, so the constants can be used with any prediction software that applies the nodal corrections `fits/<source>.parquet` names. The name is needed with the numbers: NO1 and M1, and MO3 and 2MK3, share numbers and differ in their nodal correction.",
     columns: [
       { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
       {
@@ -930,7 +938,7 @@ export const FILES = {
         type: "VARCHAR",
         nullable: true,
         description:
-          "Why a candidate isn't kept: `rayleigh`, the record can't separate it from `conflict`; `snr`, its signal-to-noise ratio is under 2; `nyquist`, the sampling can't resolve it; `rankDeficient`, the fit can't tell it from stronger candidates; `seasonal`, Sa or Ssa whose amplitude is under twice the standard error of its mean over the yearly fits; `unknown`, the fitting engine doesn't define it. Null for a kept one.",
+          "Why a candidate isn't kept: `rayleigh`, the record can't separate it from `conflict`; `snr`, its signal-to-noise ratio is under 2 in a fit without robust weights, which is how candidates are tested; `nyquist`, the sampling can't resolve it; `rankDeficient`, the fit can't tell it from stronger candidates; `seasonal`, Sa or Ssa whose amplitude is under twice the standard error of its mean over the yearly fits; `unknown`, the fitting engine doesn't define it. Null for a kept one.",
       },
       {
         name: "conflict",
