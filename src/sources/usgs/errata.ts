@@ -3194,16 +3194,15 @@ export default {
       stations: ["usgs/292859090004000"],
       handling: "avoided",
       error:
-        "Barataria Waterway south of Lafitte, Louisiana (292859090004000) is listed at 0.0 ft NAVD88, which puts its water 1.10 to 1.40 m above four CRMS gauges (CRMS0232-H01, CRMS0237-H01, CRMS3590-H01 and CRMS4690-H01) in the same marsh, each in its own NAVD88.",
+        "Barataria Waterway south of Lafitte, Louisiana (292859090004000) is listed at 0.0 ft NAVD88, which puts its water 1.38 to 1.40 m above three CRMS gauges (CRMS0232-H01, CRMS0237-H01 and CRMS4690-H01) in the same marsh, each in its own NAVD88.",
       response: "No offsets, by `GAGE_DATUMS`.",
       evidence:
-        "Hourly levels of the site and each gauge over the latest year the store holds for both (2020 for CRMS0232 and CRMS4690, 2014 for CRMS0237, 2012 for CRMS3590), where the differences have 1.7 to 3.1 cm spread and means of 1.40, 1.39, 1.38 and 1.10 m.",
+        "Hourly levels of the site and each gauge over the latest year the store holds for both (2020 for CRMS0232 and CRMS4690, 2014 for CRMS0237, after CRMS's 2013 change of geoid), where the differences have 1.7 to 3.1 cm spread and means of 1.40, 1.39 and 1.38 m.",
       check: async (store, e) => {
         // Each gauge's latest year with the site's, from the pairs the evidence compares.
         for (const [crms, year] of [
           ["CRMS0232-H01", 2020],
           ["CRMS0237-H01", 2014],
-          ["CRMS3590-H01", 2012],
           ["CRMS4690-H01", 2020],
         ] as const) {
           const above = await hourlyDifference(
@@ -3212,9 +3211,9 @@ export default {
             [`crms/${crms}`, 0],
             [`${year}-01-01`, `${year + 1}-01-01`],
           );
-          if (above < 0.9 || above > 1.6)
+          if (above < 1.3 || above > 1.5)
             throw new Error(
-              `usgs/292859090004000 reads ${above.toFixed(3)} m above ${crms} in ${year}, not 1.1 to 1.4 m`,
+              `usgs/292859090004000 reads ${above.toFixed(3)} m above ${crms} in ${year}, not 1.38 to 1.40 m`,
             );
         }
         await noOffsets(store, ...e.stations!);

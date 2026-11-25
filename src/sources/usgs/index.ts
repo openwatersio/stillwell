@@ -262,7 +262,7 @@ export const GAGE_DATUMS: Record<
     altitude: 0.0,
     vertical_datum: "NAVD88",
     datums: {},
-    note: "Barataria Waterway south of Lafitte: with the 0.0 ft altitude the water reads 1.10 to 1.40 m above four CRMS gauges in the same marsh, each in its own NAVD88, with 1.7 to 3.1 cm spread. Erratum `usgs-altitude-contradicts-crms`.",
+    note: "Barataria Waterway south of Lafitte: with the 0.0 ft altitude the water reads 1.38 to 1.40 m above three CRMS gauges in the same marsh, each in its own NAVD88, with 1.7 to 3.1 cm spread. Erratum `usgs-altitude-contradicts-crms`.",
   },
   "11312676": {
     altitude: 0.0,
