@@ -14,7 +14,7 @@
  *   node scripts/clock-check.ts 2020 dmi/30357=dmi/30357
  *
  * A record is a TICON record by name, or another dataset's by `<dataset>/<id>`
- * (`dmi/20002`), which must hold harmonic constituents. What makes the check
+ * (`dmi/30357`), which must hold harmonic constituents. What makes the check
  * independent is where the constants came from: constants fitted to the series
  * under test, or to a copy of it, only show a clock that has changed since,
  * so prefer a record fitted to another originator's observations.
@@ -40,7 +40,7 @@ const LAGS = Array.from({ length: 37 }, (_, i) => (i - 18) * 10);
 
 /**
  * A record's file under `data/`: a TICON record by its name, or another
- * dataset's by `<dataset>/<id>`, such as `dmi/20002`, which holds constants
+ * dataset's by `<dataset>/<id>`, such as `dmi/30357`, which holds constants
  * fitted to that agency's own observations.
  */
 function recordFile(record: string): string {
