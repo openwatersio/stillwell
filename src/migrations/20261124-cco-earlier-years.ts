@@ -4,13 +4,15 @@ import type { Migration } from "../jobs/migrations.ts";
 
 const DAY_MS = 86_400_000;
 
-// Where each gauge's archive starts in the API, which is before the first reading the store holds.
+// Each gauge's first reading with a value in the API, read from it on 2026-11-25 with the month before. The API lists
+// stamps from earlier, with no value: Herne Bay's from 1 January 1996, Deal Pier's from 27 August 2005 and Hastings
+// Pier's from 1 January 2017. Lymington's and Brighton's have none before their first value.
 const STARTS = [
-  ["cco/89", "1996-01-02"],
+  ["cco/89", "1996-03-19"],
   ["cco/87", "2003-01-02"],
   ["cco/88", "2004-07-12"],
-  ["cco/90", "2005-08-27"],
-  ["cco/126", "2017-01-02"],
+  ["cco/90", "2005-09-16"],
+  ["cco/126", "2017-01-27"],
 ] as const;
 
 // The years the archive adds at each gauge, up to the year the store's files started.
@@ -41,7 +43,7 @@ export default {
     { ingest: "publish" },
     {
       check:
-        "the gauges start where the API's archive does, every year has levels without fill values, and the erratum reads back",
+        "the gauges start at the API's first value, every year has levels without fill values, and the erratum reads back",
       async verify(store) {
         const reader = errataReader(() => store, store);
         const rows = await reader.rows("stations.parquet");
@@ -54,9 +56,8 @@ export default {
           if (!Number.isFinite(first(String(r.id))))
             throw new Error(`stations.parquet has no first value for ${r.id}`);
         for (const [id, day] of STARTS)
-          // The first day can start a few hours in, so only a start over two days later is a gap.
-          if (!(first(id) <= Date.parse(day) + 2 * DAY_MS))
-            throw new Error(`${id} starts ${new Date(first(id)).toISOString()}, after ${day}`);
+          if (!(first(id) >= Date.parse(day) && first(id) < Date.parse(day) + DAY_MS))
+            throw new Error(`${id} starts ${new Date(first(id)).toISOString()}, not on ${day}`);
         const mean = async (id: string, year: number) => {
           const levels = await reader.levels(id, `${year}-01-01`, `${year + 1}-01-01`);
           if (!levels.length) throw new Error(`the store holds no ${id} levels in ${year}`);
@@ -88,8 +89,6 @@ export default {
         for (const [id, from, until] of [
           ["cco/87", "2009-01-01", "2009-02-13"],
           ["cco/88", "2006-01-01", "2006-02-12"],
-          ["cco/90", "2005-08-27", "2005-09-16"],
-          ["cco/126", "2017-01-02", "2017-01-27"],
         ] as const)
           if (!(await reader.levels(id, from, until)).length)
             throw new Error(`the store holds no ${id} levels from ${from} to ${until}`);
