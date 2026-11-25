@@ -530,6 +530,17 @@ export default {
       asked: null,
       answer: null,
     },
+    {
+      id: "pegelonline-revision-log",
+      stations: "every station",
+      question:
+        "Does the WSV record when raw water-level values are changed after PEGELONLINE has published them, and can it tell us which stations and periods changed? We know of two cases. At Nienburg (47900118), the REST API gave about 5.55 m from 18:15 on 6 November 2026 to 10:00 on 7 November, and the download now gives 3.65 to 3.70 m for those times. At Cuxhaven Steubenhöft (5990020), the download for 13 May to 24 June 2025 sits 4 to 6 cm above GESLA's copy of the same series. How long after a value is first published can it still change: days, weeks, or years? Is there a change log, a validation date, or a way to ask for what changed since a date? A complete answer would also say whether the move of the REST API onto the download's data store, which the WSV described on 16 November 2026, changes any of this.",
+      why: "The store has no signal for revised values and reads each one once. A change log or a stated limit on how long values can change sets how often the store fetches old months again and how far back, and lets it refetch only what changed instead of downloading each station's months to compare.",
+      meanwhile:
+        "The store holds each value as first read. The REST API's values for recent days stay in the store, and nothing fetches those months from the download again unless a backfill is run over them.",
+      asked: null,
+      answer: null,
+    },
   ],
   retired: [],
 } satisfies ErrataFile;
