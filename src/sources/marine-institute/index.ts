@@ -7,6 +7,7 @@ import {
   type Source,
   type SourceMetadata,
 } from "../../schema.ts";
+import { defaultRefetch, REFETCH_YEARS, yearOf } from "../schedule.ts";
 
 /**
  * The Marine Institute's Irish National Tide Gauge Network: 5-minute sea levels
@@ -257,8 +258,31 @@ export function final(text: string, end: number): boolean {
   );
 }
 
+/**
+ * The first year the monthly refetch reads again beyond the default's window.
+ * The institute checks values years behind at some gauges (Dublin Port's end
+ * in 2019, Skerries Harbour's in 2019), so the years between its checks and the
+ * window hold unchecked values that only a read reaches. Earlier years hold few unchecked
+ * values (README.md, Scheduled runs).
+ */
+const UNCHECKED_FROM = 2018;
+
 export const source: Source = {
   metadata,
+  schedule: {
+    refetch: (today) => [
+      ...defaultRefetch(today),
+      // The years before it, whole, stopped gauges too: compaction only finds preliminary values from the
+      // window on, so the earlier ones can't pick the stations.
+      [
+        "all",
+        `${UNCHECKED_FROM}`,
+        `${yearOf(today) - REFETCH_YEARS}`,
+        "--refetch",
+        "--with-inactive",
+      ],
+    ],
+  },
   stations,
   observations: (s, start, end) => levels(s.name, start, end, s as MarineInstituteStation),
 };
