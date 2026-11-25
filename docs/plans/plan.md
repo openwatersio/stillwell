@@ -2,7 +2,7 @@
 
 How this repo becomes the water-level store and API ([api.md](api.md) has the API design): observed, predicted, residual and modeled water levels for tide, lake and river gauges, in one schema with a datum and a license per station, stored as Parquet on R2, served at `api.openwaters.io` and published as open bulk snapshots.
 
-It also becomes slackwater-database's source of observations, from each originator rather than GESLA's and TICON's copies. TICON's constants and GESLA's records have carried too many errors (local time labeled as UTC at WSV and RWS, Hong Kong an hour early, JODC year-end truncation, swapped constituent definitions), and they update about once a year. slackwater-database should re-fit harmonics and reduce datums from records fetched from each originator, with correct UTC clocks, QC flags and provenance, refreshed continuously.
+It also becomes slackwater-database's source of harmonic constants and tidal datums, fitted here from each originator's record rather than taken from TICON, which was fitted to GESLA's copies. TICON's constants and GESLA's records have carried too many errors (local time labeled as UTC at WSV and RWS, Hong Kong an hour early, JODC year-end truncation, swapped constituent definitions), and they update about once a year. This repo fits harmonics and reduces datums from records fetched from each originator, with correct UTC clocks, QC flags and provenance, and publishes them as files in the store. slackwater-database reads those files, decides which fits ship, and packages them.
 
 ## Where it stands
 
@@ -27,7 +27,7 @@ Each consumer, what it needs from the store, and which path serves it. "Live" is
 | Use case                                                                                                                                                    | Freshness              | Window                            | Datum                                  | Licenses                                 | Path                                          | Phase    |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | --------------------------------- | -------------------------------------- | ---------------------------------------- | --------------------------------------------- | -------- |
 | crowd-depth sounding reduction                                                                                                                              | Days                   | Years, a point and time           | Chart datum                            | Commercial only                          | Archive through DuckDB, then `at`             | 3, 10    |
-| slackwater-database re-fits and datums (decision 7)                                                                                                         | Monthly                | Whole record, up to 19 years      | Gauge zero, consistent over the record | Restricted allowed for derived constants | Archive through DuckDB                        | 5, 6     |
+| Harmonic fits and tidal datums, which slackwater-database packages (decision 7)                                                                             | Monthly                | Whole record, up to 19 years      | Gauge zero, consistent over the record | Restricted allowed for derived constants | Archive, then the fit files                   | 5, 6     |
 | Slackwater iOS and Android: observed level and residual on a tide station ([slackwater-ios#705](https://github.com/openwatersio/slackwater-ios/issues/705)) | Minutes                | Last 96 h                         | The bundled prediction's frame         | Commercial only; CHS stays on the device | Live, by slackwater-database ID               | 9        |
 | Anomaly and surge alerts at favorite stations ([slackwater#394](https://github.com/openwatersio/slackwater/issues/394))                                     | Minutes, on a schedule | Last 96 h                         | Same as the app                        | Commercial only                          | The live fetch, run from a cron               | 10       |
 | signalk-tides `heightNow`, Home Assistant                                                                                                                   | Minutes                | Last hours                        | Chart datum                            | Commercial only until tokens exist       | Live                                          | 9        |
@@ -48,8 +48,17 @@ Recommended answers. The plan below assumes them; each can change without reshap
 4. **IDs are `<source>/<source_id>`** (`coops/9447130`, `usgs/07022000`, `rws/hoekvanholland`), the same form as slackwater-database's station IDs and the API's `/stations/{source}/{id}` paths. Station lists, datum epochs and links between sources live in the store, as [stations.md](../stations.md) describes. Each station carries `tide_station` with the slackwater-database `source/id` when one exists, and the link also runs the other way: slackwater-database station records carry their store series ID, and subordinate stations their reference gauge's, so an offline app knows which stations have observations without asking. Links join the same physical gauge, never the nearest one.
 5. **Bulk snapshots ship with the public API**, quarterly, with a Zenodo DOI, in two parts: the stations with `commercial_use` true, and the rest, leaving out any station with data, in any epoch, from a contributor that hasn't answered a permission request, or whose terms are unknown (`unscanned` or `unreviewed`), since a published deposit can't be withdrawn. The commercial part is CC BY 4.0, with `sources.json` in the deposit so each source's license and terms travel with it, and a link to each source's page on the site, which describes the source's own changes to its data; the rest's Zenodo license is "other", pointing to the README's license section, since each of its stations keeps its contributor's terms.
 6. **The API lives in this repo**: a Worker bound into the gateway as `WATER_LEVELS`, so adapters, schema and reader change together.
-7. **Decided: slackwater-database keeps the harmonic fitting and datum reduction, and reads the store instead of GESLA.** Its fitting ([`packages/harmonic-analysis`](https://github.com/openwatersio/slackwater-database/tree/main/packages/harmonic-analysis)), constituent-name handling and datum rules ([`docs/datums.md`](https://github.com/openwatersio/slackwater-database/blob/main/docs/datums.md)) are already validated; porting them here would duplicate them. This repo's job is to be a better GESLA: originator records, fresh, in UTC, flagged, with provenance. Residuals from the store against slackwater-database's published constants then flag stations whose constants or clocks are wrong.
-8. **Constants fitted from restricted observations can still ship** where the operator agrees, as VLIZ did for IOC-derived constituents. So restricted series feed slackwater-database fits even though the API doesn't serve them.
+7. **Decided: this repo fits harmonic constants and reduces tidal datums from its own series, and publishes them in the store. slackwater-database packages them** (Brandon, 2026-11-25). GESLA has TICON, constants fitted from its records and published as a dataset of their own; the store has its fits. The split:
+   - **The fits are for any prediction engine**, UTide and XTide as much as `@slackwater/engine`. The method is the published one (least squares with nodal corrections in the design matrix, the Rayleigh and SNR rules), stated in the docs with its references, and the candidate list is data in this repo, by Doodson number.
+   - **`@slackwater/engine` runs the fit while it is the best tool for it**, which the calibration shows against UTide on the same series, and not because it is ours.
+   - **A fit carries the definitions it was fitted under, in terms any engine can read**: each constituent's speed, Doodson numbers and phase constant, phases as Greenwich lags in UTC, and the family of nodal corrections used (IHO's, Schureman's or Foreman's satellites). That is the contract between a fit and whatever predicts from it. No engine's catalog names or version are part of it; the tool and version that fitted are recorded as provenance.
+   - **The fits use Schureman's nodal corrections**, as NOAA's analyses and the FES tide models do (Brandon, 2026-11-25). Engines differ in their corrections, so constants fitted under one family predict slightly differently under another, and for a few constituents, M1 among them, by a lot. Compared at five gauges from 9°N to 59°N, no family predicts a held-out year best everywhere, and every difference is about 1% of the residual or less, so the choice rests on Schureman's having a form for every astronomical constituent, being the same at every latitude, and lining up with the largest sets of constants to compare with. Each fit names its corrections, and constants under another family, such as Foreman's for t_tide and UTide, can be published beside these where a use calls for them.
+   - **This repo decides what a fit reads and whether it can be trusted.** Which values count as final, each source's revision window, which flagged spans stay out, the checks before fitting, the fit's window, its score on a held-out year, and the datums reduced from the same series are all facts about a source and its data, so they live with the adapters, errata and QC.
+   - **This repo measures, and sets no threshold for publishing.** Every series with enough final record is fitted and published with its measurements, whether or not anyone ships it. How much tide a station needs before it is worth predicting has no single answer: agencies publish tables at some gauges where the tide explains under a fifth of the tidal band's variance and none at others.
+   - **slackwater-database decides what ships.** It reads the fit files, as it reads TICON's, and keeps its own gates on range and quality, the gate against TICON on the held-out scores, merges, the choice of chart datum, its license vocabulary, constituent definitions in the database format, and the TCD export. It reads no observations.
+   - **Code another project imports goes in an MIT package**, in this repo or the engine's, as [CONTRIBUTING.md](../../CONTRIBUTING.md#license-and-cla) says. The fit files are data, under each station's own terms.
+   - **A fit never checks the series it came from.** A clock or datum check needs a reference that doesn't share the series' clock: another originator's record of the gauge, a neighbor from another agency, or constants fitted elsewhere. Those checks run here, without slackwater-database's constants (phase 5).
+8. **Constants fitted from restricted observations can still ship** where the operator agrees, as VLIZ did for IOC-derived constituents. So restricted series feed the fits even though the API doesn't serve them, and such a fit goes in the public store only once its operator has agreed.
 9. **Current levels are polled continuously by one container into D1, and the API reads D1 for the last 8 days.** A poller in a Cloudflare Container polls every live station at its source's interval, merges the values it hasn't seen, runs QC, and writes D1 and the daily files `recent/<source>/<YYYY-MM-DD>.parquet` on R2; the API Worker reads D1 and the year files on R2, and never calls a source on a request. The Parquet files on R2 are the record and the public product. Store jobs run in GitHub Actions, and a Migrations workflow runs the store work each merged change needs. See [workers/live](../../workers/live/README.md) and [Operations](../contributing/operations.md).
 10. **Apps compute residuals themselves.** The API returns observed levels in the bundled prediction's frame, and Slackwater computes the residual against the constants it ships, as slackwater-ios#705 plans, so the number always matches the curve on screen. The API's own residual is for the website, alerts and API customers, and names the database version it used.
 11. **Observations keep their arrival time** (`received`) wherever we saw them arrive, because forecast correction needs to know what was available when, not just when it was measured.
@@ -63,8 +72,9 @@ Recommended answers. The plan below assumes them; each can change without reshap
 workers/api/           the levels API's Worker, bound into the gateway (phases 9 and 10)
 workers/live/          the poller's Worker, container and D1 database (phase 9)
 server/                the poller, its passes and its daily-file export (phase 9)
+src/fit/               which values a fit reads, the checks before it, the fit, its scores and the datums (phase 6)
 scripts/snapshot.ts    quarterly bulk snapshots (phase 12)
-.github/workflows/     snapshot-quarterly (phase 12)
+.github/workflows/     the fits, as a job of Monthly (phase 6); snapshot-quarterly (phase 12)
 ```
 
 Adapters run in Node, in Actions and on the Stillwell server. Adapter code uses only `fetch` and plain TypeScript, with the store's pieces (DuckDB, the disk cache) kept in `src/store/` and `scripts/`.
@@ -74,6 +84,8 @@ Adapters run in Node, in Actions and on the Stillwell server. Adapter code uses 
 [Files reference](https://openwatersio.github.io/stillwell/docs/reference/files/) has the store's layout and columns. The plan adds:
 
 ```
+fits/<source>.parquet                            a row per fit: its window, the year files read, its scores and datums (phase 6)
+constituents/<source>.parquet                    a row per fit and candidate constituent, kept or not, with why (phase 6)
 models/stofs2d/<cycle>.parquet                   station-point nowcast and forecast (phase 11)
 models/gtsm/<point>.parquet                      surge reanalysis at coastal points (phase 11)
 bulk/<snapshot>/<source>.parquet                 quarterly, Hive-partitioned by year (phase 12)
@@ -83,13 +95,13 @@ Series whose source bars republishing go in a separate private bucket, since eve
 
 ## Phases
 
-Ordered so crowd-depth and slackwater-database get what they need first, then the public product. Estimates are one person's working days, about 61 in all.
+Ordered so crowd-depth and slackwater-database get what they need first, then the public product. Estimates are one person's working days, about 73 in all.
 
 ### Phase 0: Update the internal evaluation
 
 Estimate: 1 day.
 
-The internal evaluation describes a smaller system than this plan, so bring it in line before building, and keep it in line when a decision changes: re-fitting from originators' records and live Slackwater levels, the build estimate (about 60 days, not four to six weeks), the realtime path and why, the gateway's lack of tokens and the `/water-levels` paths, the `received` column, the private store for restricted series, and the two-way station links with slackwater-database.
+The internal evaluation describes a smaller system than this plan, so bring it in line before building, and keep it in line when a decision changes: re-fitting from originators' records and live Slackwater levels, fitting constants here rather than in slackwater-database, the build estimate (about 73 days, not four to six weeks), the realtime path and why, the gateway's lack of tokens and the `/water-levels` paths, the `received` column, the private store for restricted series, and the two-way station links with slackwater-database.
 
 ### Phase 1: Foundations
 
@@ -156,23 +168,69 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 - [x] **UNAM** (`unam`): one-minute levels from each sensor at 26 of the Servicio Mareográfico Nacional's 27 gauges, a series per sensor above its own zero, in UTC, from the 5 days SMN serves, running hourly. SMN serves them openly but its site allows only non-profit, unaltered reproduction, so they're in the public store with `commercial_use` false while permission and the historical records are asked for ([#48](https://github.com/openwatersio/stillwell/issues/48)). The record starts when ingest starts reading; TICON's `unam_hist` records wait on SMN's answer. See [the adapter's README](../../src/sources/unam/README.md).
 - [ ] **WSV history before 2000**, and gauges with a later start or no download: GESLA 4.1's WSV records cover them for now. Ask WSV or BfG for the archive where GESLA has gaps.
 - [ ] Restricted series into the private store, for sources whose terms bar republishing.
-- [ ] Clock check on every new series: cross-correlate against the station's TICON prediction and against neighbors, and flag whole-hour offsets before anything fits to it. This is how the WSV, RWS and Hong Kong errors showed up. [`scripts/clock-check.ts`](../../scripts/clock-check.ts) does the TICON half for a station at a time, with K1's phase to catch 12-hour errors, and has checked 13 UHSLC series; neighbors, and running it on every new series, are still to do.
-- [ ] Readers outside this repo that read series paths directly, slackwater-database and crowd-depth, read `epochs`, or they stop at epoch 1.
+- [ ] Clock check on every new series, before anything fits to it: cross-correlate against the station's TICON prediction and against neighbors, and flag whole-hour offsets. This is how the WSV, RWS and Hong Kong errors showed up. [`scripts/clock-check.ts`](../../scripts/clock-check.ts) does the TICON half for a station at a time, with K1's phase to catch 12-hour errors, and has checked 13 UHSLC series; neighbors, and running it on every new series, are still to do. A constant offset over a whole record shows in no yearly fit, so the check needs a reference from outside the series.
+- [ ] A clock reference that needs no constants from slackwater-database: another originator's record of the gauge (`pair-check`), the phase a neighbor from another agency implies, and where neither exists an ocean tide model's constants at the gauge (see open questions). Constants fitted here never check the series they were fitted from. This is its own piece of work, and the fits in phase 6 don't wait for it.
+- [ ] Readers outside this repo that read series paths directly, such as crowd-depth, read `epochs`, or they stop at epoch 1.
 
-### Phase 6: slackwater-database reads the store
+### Phase 6: Fits from the store
 
-Estimate: 6 days, in slackwater-database.
+Estimate: 14 days here, and 4 in slackwater-database.
 
-- [ ] A sample reader in [`packages/harmonic-analysis`](https://github.com/openwatersio/slackwater-database/tree/main/packages/harmonic-analysis) that takes a store series ID and a period and returns samples, replacing `parseGeslaSamplesInZone` for converted contributors. DuckDB over `stillwell.openwaters.io` (and the private bucket for restricted series), cached like the GESLA zip.
-- [ ] A `sources/water-levels` importer (or a switch inside `sources/ticon`) that re-fits a converted record from its store series and reduces datums from the same series, under the rules in [`docs/datums.md`](https://github.com/openwatersio/slackwater-database/blob/main/docs/datums.md).
-- [ ] Gate each swap: fit on all but the last year, score the held-out year against the store, and swap only when the re-fit's RMS is no worse than TICON's published constants on the same year. Record both scores in the station's provenance.
+One pipeline fits every gauge that carries a tide, with a source's differences declared by its adapter. slackwater-database's [plan for constituents](https://github.com/openwatersio/slackwater-database/blob/main/docs/plans/stillwell-constituents.md) has the method and its references: the candidate list, the Rayleigh and SNR rules, Sa and Ssa, the held-out year and the calibration against agencies' own constants. Its `sources/stillwell` importer ([slackwater-database#450](https://github.com/openwatersio/slackwater-database/pull/450)) runs that method on SMHI and PEGELONLINE from outside the store. That importer, the verification report ([slackwater-database#425](https://github.com/openwatersio/slackwater-database/pull/425)) and the calibration ([slackwater-database#426](https://github.com/openwatersio/slackwater-database/pull/426)) are the code this phase starts from.
+
+Definitions, before a fit is published:
+
+- [ ] A definition format that names the nodal correction each constituent was fitted under, so a reader with another engine knows what it has ([slackwater-database#238](https://github.com/openwatersio/slackwater-database/issues/238)). slackwater-database's stored definitions can't carry M1's correction, so data fitted with it needs a pinned engine there. A fit's definitions are the contract only once that gap is closed.
+- [ ] The candidate list as data in `src/fit/`, in priority order and by Doodson number: Foreman's, then the constituents NOAA's 37 and TICON's 50 add, with IHO's names and the spellings other tools use. A candidate the fitting engine can't fit, as `@slackwater/engine` can't Foreman's H1 and H2, is reported as left out.
+
+What a fit reads:
+
+- [ ] Each source that never finalizes its values declares its revision window, measured or stated by the source ([#526](https://github.com/openwatersio/stillwell/issues/526)), so "values the source won't revise again" has one definition, in the adapter. Until #526 gives PEGELONLINE a measured or stated window, its adapter declares a year settled once it ended 12 months before the run, on the evidence of erratum `pegelonline-cuxhaven-2025-revised`.
+- [ ] A fit reads what the store's flags allow, and records every erratum touching the years it read. A value is `kept` only where its own evidence supports keeping it, and one no reader should use is `flagged`, so no consumer decides per erratum.
+- [ ] One reader for fits in `src/fit/`: every epoch in the current datum, final values for constants and every measured value for datums, hourly instantaneous samples, and the version of each year file read. It reads the restricted store too.
+- [ ] The filter behind any source's hourly values, and where each value is stamped in its interval, as source metadata, so a fit can correct amplitude and phase for it.
+- [ ] A level comparison in `stations/matches.parquet` for every linked pair. A fit and a TICON record count as the same gauge only where their levels agree within 1 cm with no lag, and 142 linked pairs of PEGELONLINE and GESLA series, Brake's among them, have no comparison, so those fits can't be scored against or merged with TICON's records of the gauge.
+
+Checks before fitting, which stop a fit or cut its series:
+
+- [ ] A fit of each calendar year by itself, with one fixed set of constituents. M2's and K1's phase from year to year finds a whole-hour jump, a 12-hour error and a drifting clock inside one record. The scatter of M2, S2, K1 and O1 marks a river-influenced or changing gauge, and is kept with the fit.
+- [ ] Datum steps, from yearly and monthly means against neighbors ([#112](https://github.com/openwatersio/stillwell/issues/112)). A step no epoch boundary explains stops the fit.
+
+The fit:
+
+- [ ] `src/fit/`: the whole window, up to 19 years before the held-out year, through the engine's `fit()` with robust weights, and the Rayleigh and SNR selection over the candidate list, which [`src/harmonic.ts`](../../src/harmonic.ts)'s `STANDARD` and `SHALLOW` lists give way to. QC, the tidal judgment and the cross-check then read a station's fit where it has one.
+- [ ] Sa and Ssa from the whole window and from each year, kept only where the mean is at least twice its standard error, with the spread recorded either way.
+- [ ] Observed tidal datums from the same series, over the latest window each gauge has within the fit's window and the held-out year, which the fit records as its datum epoch. The store has no shared epoch for observed datums, since a gauge's latest years are the ones its current levels sit in and few gauges share any one span. They follow the rules in slackwater-database's [`docs/datums.md`](https://github.com/openwatersio/slackwater-database/blob/main/docs/datums.md), which move here with the code. The fit names the series and the gauge zero they were reduced in. HAT and LAT come from a synthesis of the fit's constants over 19 years, which anything holding the fit and its definitions can run. Another 19 years gives other extremes, so the synthesis here runs over the epoch slackwater-database pins (`DATUM_EPOCH`, 2007 through 2025), and the fit records it. Which datum is a station's chart datum, by country and by sea, stays in slackwater-database.
+- [ ] Scores on the held-out year: tidal-band RMS, the share of the tidal band's variance the fit explains, energy by band, and the time and height of high and low waters, with one extremum picker.
+- [ ] The same code scores the constants slackwater-database holds for the gauge on the same year, from a pinned `@slackwater/database` release named in the fit. Those are slackwater-database's TICON records, which include its own refits of mislabeled clocks, not TICON as published. Each score stores a digest of the constants it scored, and a new release that changes a linked record's digest scores it again.
+- [ ] Every series with enough final record is fitted, and its row carries what a consumer needs to set its own threshold: mean range, variance explained, each constituent's SNR and the yearly scatter. On one-off fits of 2021 to 2023 with a fixed set of 24 constituents, scored on 2024 as one minus the residual's variance over the observed levels', both after the Godin filter, the tide explains 92 to 95% of the tidal band's variance at NOAA's Gulf gauges, 31 to 38% in the Kattegat, 18% at Gedser, where DMI publishes tables, and 4 to 18% at German Baltic gauges, where BSH publishes none. A screen run here to save compute is named for its cost and never as a judgment that a gauge has no tide.
+- [ ] A record too short to fit, or one a check stopped, gets a row that says why, and no constants.
+
+What is published:
+
+- [ ] `fits/<source>.parquet` and `constituents/<source>.parquet`, defined in [`src/store/files.ts`](../../src/store/files.ts) with the other published files: the window, the year files and their versions, which values counted as final, the engine's version, each candidate's amplitude, phase, intervals, SNR and selection verdict, the definition each constituent was fitted under, the yearly scatter, the datums, and every held-out score. Each fit carries its station's license, commercial use and attribution.
+- [ ] A superseded fit stays readable by its version, as year files do, so a database release can name the fit it shipped.
+- [ ] A fit from a restricted series stays in the restricted store until its operator agrees to the constants being published (decision 8), as a field the source declares. slackwater-database reads only the public store.
+- [ ] A page in the site's docs on reading the fits, and what each column means.
+- [ ] Calibration before any fit is published: 20 CO-OPS reference stations over NOAA's own analysis years against NOAA's published constants, the same against Kartverket's and JCG's, and RWS and PEGELONLINE against RWS's astronomical tide and BSH's tables. The report is checked in and rerun when the method changes.
+- [ ] The same calibration series fitted with UTide, and the constants and held-out scores compared with `@slackwater/engine`'s. Where UTide fits better, the fit moves to it or the engine is fixed first. UTide is Python, so this check is a Python step beside the one decision 12 allows.
+- [ ] Each published fit's constants predicted over the held-out year with UTide and with XTide, from the fit files alone, and the difference from `@slackwater/engine`'s prediction reported per station. UTide predicts only the constituents in its own table, with Foreman's corrections, so its comparison covers the constituents it defines as the fit does, and the rest are listed by name with the fit and not counted as differences. XTide reads each constituent's speed, equilibrium arguments and node factors from a TCD file, so its comparison tests the tables built from the fit's definitions, within libtcd's limit of 255 constituents a file.
+- [ ] The calibration report also gives the variance explained at gauges across regimes, from the Gulf of Mexico to the Great Lakes and the Baltic, so those figures come from checked-in code.
+
+Running:
+
+- [ ] A job in Monthly that fits a gauge again when a year file it read has a new version or its record has grown by a year, so constants follow the store instead of a TICON release.
+- [ ] A monthly residual report: observed minus predicted at every station with constants, from a fit here or from slackwater-database through `tide_station`. Tidal-band energy in the residual means wrong constants; a step means a datum shift; a whole-hour phase lag means a clock error.
+
+In slackwater-database:
+
+- [ ] `sources/stillwell` reads the fit files into station records, in place of fitting. Its reader of observations, its errata decisions and its settle cutoff go away.
+- [ ] Each record pins the version of the fit it was built from, and the monthly update arrives as a pull request to review, as the NOAA import's does.
+- [ ] It applies its own gates to the fit's measurements, such as its 2 cm range gate, and keeps the gate against TICON: a fit replaces a TICON record of the same gauge when the published scores say it predicts the held-out year no worse, by `decideHeldOut`, and TICON stays where a score was taken against constants that have since changed.
 - [ ] Convert contributor by contributor, in phase 2's order, with `report:merges` reviewing the result each time. A contributor whose records all convert drops out of the TICON import.
-- [ ] A monthly residual report here: observed minus slackwater-database's prediction at every converted and unconverted station. Tidal-band energy in the residual means wrong constants; a step means a datum shift; a whole-hour phase lag means a clock error. Open an issue in slackwater-database for each.
 - [ ] Link stations both ways: slackwater-database records gain the store series ID (subordinate stations take their reference gauge's), `@slackwater/database` exposes it, and the store's `tide_station` is filled from the same table.
-- [ ] Record, per station, which store series and gauge zero its datums were reduced from, so the API can return observations in the same frame as the prediction.
-- [ ] Re-fit on a schedule (yearly, or when a station's record has grown by a year), so constants improve as the store grows instead of waiting for a TICON release.
 
-Done when slackwater-database's monthly update re-fits from the store, and TICON supplies only the contributors whose originators phase 2 finds the store can't serve yet.
+Done when Monthly fits every source with tidal gauges, slackwater-database's monthly update builds from the fit files without reading an observation, and TICON supplies only the contributors whose originators phase 2 finds the store can't serve yet.
 
 ### Phase 7: Datums
 
@@ -183,6 +241,7 @@ Estimate: 3 days.
 - [x] Per source: CO-OPS datums API; RWS NAP and MSL; BSH and PEGELONLINE PNP, NHN and SKN; USGS gage datum to NAVD88; USACE series datums.
 - [x] Tests that convert a known level at a few stations to each datum and compare with the operator's published value.
 - [x] Offsets measured between linked series from their overlapping levels, in their own monthly job, so a series that shares a gauge's zero with a slackwater-database record, such as PEGELONLINE with WSV's GESLA files, gets its MSL and LAT. PEGELONLINE publishes only mean high and low tide for its tidal gauges, not a mean water level.
+- [ ] MSL, LAT and the other tidal datums from the station's own fit (phase 6) where it has one, as `datums_source: computed`, ahead of slackwater-database's, which then come only from records the store didn't fit.
 
 ### Phase 8: Remaining real-time feeds
 
@@ -200,7 +259,7 @@ The first public endpoint, because the apps need it before anything else in the 
 - [x] The poller (`server/ingest.ts`): polls every public hourly source's live stations at `min_interval_s`, runs `qcFor` over each 7-day window in the same step and writes only the values that changed (in level, flag, source flag, `received` or epoch) with `received`, deletes a withheld station's rows, records each pass in `polls`, writes each source's daily files, and on `DatumChanged` dispatches its source's refresh.
 - [x] Issues titled "Live polling is failing for <source>" for each source with no clean pass in 2 hours, opened and closed by the live Worker's cron.
 - [x] `GET /water-levels/stations/{source}/{id}/levels` ([api.md](api.md#get-water-levelsstationssourceidlevels)) served by `workers/api`, a Worker bound into the gateway as `WATER_LEVELS` on `/water-levels*`: the last 8 days from D1 and older ranges from the year files on R2. Levels in the requested datum (chart datum by default), `flag`, `received`, the datum offsets, `as_of`, `updated` and `status` (reporting, stale, offline). Cached per station for `min_interval_s`, with the last good copy served as `stale` when D1 or R2 can't be read.
-- [ ] Datum frame: return the offset slackwater-database used for the station's datums (phase 6 records which series and zero those came from), so the app's residual is observed minus prediction in one frame. Stations whose datums are in the constituent frame (TICON's MSL = 0 fallback) get `frame: unknown`, and the app shows the trend only.
+- [ ] Datum frame: return the offset behind the datums of the station's constants (a fit in phase 6 names the series and zero they were reduced in), so the app's residual is observed minus prediction in one frame. Stations whose datums are in the constituent frame (TICON's MSL = 0 fallback) get `frame: unknown`, and the app shows the trend only.
 - [ ] Slackwater: replace the per-provider fetchers in slackwater-ios#705 (NOAA now, more later) with this one call, keeping CHS on the device. Tracked in that issue.
 
 Done when a Slackwater station page for a CO-OPS, RWS or PEGELONLINE gauge shows a level under 15 minutes old.
@@ -265,6 +324,7 @@ As the architecture estimates: about $7 a month in year one on R2 and Workers, p
 ## Open questions
 
 - BSH's answer on the 1 August rule.
+- Which reference checks a gauge's clock where no other originator holds its record and no neighbor is close: an ocean tide model's constants at the gauge would share no gauge's clock, and the choice turns on which model's license allows it. EOT20 is the first to check; FES's and TPXO's terms are restrictive.
 - STOFS-2D station count and file sizes.
 - PSMSL's reply on commercial redistribution (request sent 2026-11-01).
 - Whether WSV or BfG will supply PEGELONLINE's archive before 2000, and whether they're content with scripted use of the raw-data download for a full backfill.
