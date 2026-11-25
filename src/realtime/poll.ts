@@ -1,8 +1,16 @@
 import { tooManyWithheld, withheldReason } from "../withhold.ts";
 import { isHeld } from "../epochs.ts";
+import { sweepDrops } from "../span.ts";
 import type { Observation, Source, StoredStation } from "../schema.ts";
 import type { StationObservation } from "../store/parquet.ts";
-import { chunks, emptySummary, pool, refreshStation, type RunSummary } from "../store/recent.ts";
+import {
+  chunks,
+  emptySummary,
+  noteDropped,
+  pool,
+  refreshStation,
+  type RunSummary,
+} from "../store/recent.ts";
 import type { ObservationStore } from "./live.ts";
 
 const DAY_MS = 86_400_000;
@@ -61,6 +69,11 @@ export async function pollSource({
   if (source.recent)
     swept = await source
       .recent(fetching, new Date(since), new Date(now))
+      .then((answer) => {
+        for (const [station, dropped] of sweepDrops.get(answer) ?? [])
+          noteDropped(summary, dropped, station);
+        return answer;
+      })
       .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
 
   for (const batch of chunks(live, BATCH)) {

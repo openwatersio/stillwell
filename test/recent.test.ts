@@ -521,7 +521,7 @@ describe("compactRecent", () => {
     await writeObservations(
       file,
       [
-        at(start - DAY, 30479.695), // before the fold: left for requalify
+        at(start - DAY, 30479.695), // before the fold, and all the file held before it
         at(start + HOUR, 0.6),
         at(start + 2 * HOUR, 30479.695), // USACE's 99,999 ft, which the window doesn't bring again
       ],
@@ -540,11 +540,79 @@ describe("compactRecent", () => {
         r.time - start,
         r.level > 9000 ? "fill" : r.level,
       ]),
-      [
-        [-DAY, "fill"],
-        [HOUR, 0.65],
-      ],
+      // The earlier fill goes too, since the file would otherwise hold fill beside levels.
+      [[HOUR, 0.65]],
     );
+  });
+
+  it("counts the levels a fold leaves out, and says when a year holds nothing else", async () => {
+    setConnections(4);
+    const root = store();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    await writeObservations(file, [at(start + HOUR, 0.6), at(start + 2 * HOUR, 30479.695)], "NAP");
+    await writeDays(root, [
+      [
+        { ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id, epoch: 1 },
+        { ...at(start + 3 * HOUR, -2438.095, start + 4 * HOUR), station: a.id, epoch: 1 },
+      ],
+    ]);
+    const summary = await compactRecent({
+      source: source({}),
+      stations: [a],
+      storeFor: () => root,
+      start,
+      end,
+    });
+    assert.deepEqual([summary.dropped!.below, summary.dropped!.above], [1, 1]);
+    assert.match(formatSummary(summary), /Left out 2 levels outside −500 to 9,000 m/);
+
+    const b = station("b");
+    const only = seriesPath(root, "levels", "test", "b", 2026);
+    await writeObservations(only, [at(start + 2 * HOUR, 30479.695)], "NAP");
+    await writeDays(root, [
+      [{ ...at(start + HOUR, 30479.695, start + 3 * HOUR), station: b.id, epoch: 1 }],
+    ]);
+    const kept = await compactRecent({
+      source: source({}),
+      stations: [b],
+      storeFor: () => root,
+      start,
+      end,
+    });
+    assert.match(kept.warned!.join(), /b 2026: holds only 2 levels outside −500 to 9,000 m/);
+  });
+
+  it("replaces a year of fill with the levels a fold brings, so a file never holds both", async () => {
+    setConnections(4);
+    const root = store();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    // Fill from before the fold's start, as a backfill of a year of nothing else leaves it.
+    await writeObservations(
+      file,
+      [at(start - 3 * DAY, 30479.695), at(start - 2 * DAY, 30479.695)].map((r) => ({
+        ...r,
+        flag: Flag.bad,
+      })),
+      "NAP",
+    );
+    await writeDays(root, [
+      [{ ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id, epoch: 1 }],
+    ]);
+    const folded = await compactRecent({
+      source: source({}),
+      stations: [a],
+      storeFor: () => root,
+      start,
+      end,
+    });
+    assert.deepEqual(
+      (await readObservations(file)).map((r) => r.level),
+      [0.65],
+    );
+    // The two fill rows it replaced are counted.
+    assert.equal(folded.dropped!.count, 2);
   });
 
   it("leaves a year file as it is when every row it would fold is outside the span", async () => {
