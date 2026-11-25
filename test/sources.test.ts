@@ -4036,6 +4036,64 @@ describe("usgs", () => {
     assert.equal(usgs.choose([paused, live]).get("USGS-01646500")!.parameter_code, "00065");
   });
 
+  it("chooses the same series whatever order USGS lists series that rank alike", () => {
+    // 07263883: a headwater and a tailwater series that began at the same minute, both reported in the last year.
+    const headwater = series("07263883", "00065", {
+      id: "5f0ae99f116d4e37a460e54a18ca1590",
+      sublocation_identifier: "HEADWATER",
+      begin: "2018-11-30T14:45:00.000001",
+      end: new Date(Date.now() - 20 * 86_400_000).toISOString(),
+    }).properties;
+    const tailwater = series("07263883", "00065", {
+      id: "54c778a685654e7a9d7d7f5e6d43a1d4",
+      sublocation_identifier: "TAILWATER",
+      begin: "2018-11-30T14:45:00.000001",
+      end: new Date(Date.now() - 50 * 86_400_000).toISOString(),
+    }).properties;
+    for (const listed of [
+      [headwater, tailwater],
+      [tailwater, headwater],
+    ])
+      assert.equal(usgs.choose(listed).get("USGS-07263883")!.id, tailwater.id);
+    // 09510200: two primary series with the same dates.
+    const first = series("09510200", "00065", {
+      id: "36860ca78f0b4c428744b5befb3266d1",
+      begin: "2007-10-01T07:00:00.000001",
+    }).properties;
+    const second = series("09510200", "00065", {
+      id: "8b0c32f930a04d18b314ebefe0c895fa",
+      begin: "2007-10-01T07:00:00.000001",
+    }).properties;
+    for (const listed of [
+      [first, second],
+      [second, first],
+    ])
+      assert.equal(usgs.choose(listed).get("USGS-09510200")!.id, first.id);
+    // A station keeps the series it holds, whichever ID is lower.
+    const holds = new Map([["usgs/09510200", second.id]]);
+    for (const listed of [
+      [first, second],
+      [second, first],
+    ])
+      assert.equal(usgs.choose(listed, holds).get("USGS-09510200")!.id, second.id);
+  });
+
+  it("reads the clock once, so a clock that advances between two series' ranks doesn't split a tie", (t) => {
+    const stopped = (id: string) =>
+      series("09510200", "00065", {
+        id,
+        begin: "2010-01-01T00:00:00Z",
+        end: "2024-01-01T00:00:00Z",
+      }).properties;
+    let now = Date.parse("2026-11-25T00:00:00Z");
+    t.mock.method(Date, "now", () => now++);
+    for (const listed of [
+      [stopped("a"), stopped("b")],
+      [stopped("b"), stopped("a")],
+    ])
+      assert.equal(usgs.choose(listed).get("USGS-09510200")!.id, "a");
+  });
+
   it("refuses a reply with more than 1 in 30 altitudes missing a method or accuracy, past 10", () => {
     const sites = (n: number, bad: number, field: "method" | "accuracy") =>
       Array.from({ length: n }, (_, i) => ({
