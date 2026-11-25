@@ -297,8 +297,6 @@ export default {
       stations: ["pegelonline/9570070"],
       since: "2024-09-01",
       handling: "kept",
-      // Neither the level nor a datum can be trusted while the gauge sits low against its neighbors.
-      fit: "drop",
       error:
         "PEGELONLINE's List auf Sylt levels have sat 8 to 20 cm lower against Hörnum and Wittdün since September 2024 than before, with no change of gauge zero.",
       response:
@@ -349,8 +347,6 @@ export default {
       since: "2025-06-03",
       until: "2025-06-04",
       handling: "kept",
-      // A single implausible value.
-      fit: "drop",
       error:
         "PEGELONLINE gives Este Inneres Sperrwerk BP 3.20 m at 08:10 UTC on 3 June 2025, after 6.51 and 6.40 m at 08:08 and 08:09, followed by a gap.",
       response:
@@ -371,8 +367,6 @@ export default {
       since: "2026-11-10",
       until: "2026-11-11",
       handling: "kept",
-      // A zero reading between steady levels.
-      fit: "drop",
       error:
         "PEGELONLINE gives Eichhorst OP and Eichhorst UP 0 cm at 03:30 UTC on 10 November 2026, then nothing until 05:15, between steady levels of 389 and 107 cm.",
       response:
@@ -397,8 +391,6 @@ export default {
       since: "2026-11-09",
       until: "2026-11-10",
       handling: "kept",
-      // A one-minute dip on a steady fall.
-      fit: "drop",
       error:
         "PEGELONLINE's REST API gives Hamburg St. Pauli 6.15 m above gauge zero at 04:10 UTC on 9 November 2026, 42 cm below the 6.59 and 6.55 m at 04:09 and 04:12, with 04:11 missing, on a tide falling about 1 cm a minute.",
       response:

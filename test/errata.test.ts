@@ -127,17 +127,8 @@ describe("parseErrata", () => {
         evidence: null,
         reported: null,
         report: null,
-        fit: null,
       },
     ]);
-  });
-
-  it("reads whether a kept erratum's values may enter a fit", () => {
-    const fit = (fields: Record<string, unknown>) =>
-      parseErrata("uhslc", file([entry({ handling: "kept", ...fields })])).errata[0]!.fit;
-    assert.equal(fit({}), null);
-    assert.equal(fit({ fit: "drop" }), "drop");
-    assert.equal(fit({ fit: "keep" }), "keep");
   });
 
   it("reads every station, and open ends", () => {
@@ -166,9 +157,6 @@ describe("parseErrata", () => {
     // A misspelled until would leave the span open.
     refused({ unitl: "2021-01-01" });
     refused({ check: true });
-    refused({ handling: "kept", fit: "maybe" });
-    // A flagged or corrected value is already handled, so it has no decision to make.
-    refused({ handling: "corrected", fit: "keep" });
     assert.throws(() => parseErrata("uhslc", { errata: [] }));
   });
 

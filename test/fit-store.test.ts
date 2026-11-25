@@ -56,7 +56,6 @@ const erratum = (fields: Partial<Erratum> = {}): Erratum => ({
   evidence: null,
   reported: null,
   report: null,
-  fit: null,
   ...fields,
 });
 
@@ -148,10 +147,10 @@ describe("inputsDigest", () => {
     assert.equal(inputsDigest(a, { ...base, years: more }), digest);
   });
 
-  it("changes with an erratum that names the station, and with its decision", () => {
-    const undecided = inputsDigest(a, { ...base, errata: [erratum()] });
-    assert.notEqual(undecided, digest);
-    assert.notEqual(inputsDigest(a, { ...base, errata: [erratum({ fit: "drop" })] }), undecided);
+  it("changes with an erratum that names the station, and with its handling", () => {
+    const kept = inputsDigest(a, { ...base, errata: [erratum()] });
+    assert.notEqual(kept, digest);
+    assert.notEqual(inputsDigest(a, { ...base, errata: [erratum({ handling: "flagged" })] }), kept);
     assert.equal(inputsDigest(a, { ...base, errata: [erratum({ stations: ["test/b"] })] }), digest);
   });
 
@@ -213,41 +212,22 @@ describe("readSeries", () => {
   });
 });
 
-describe("an undecided erratum", () => {
-  const context = {
-    store: "nowhere",
-    metadata: FINALIZES,
-    errata: [erratum({ stations: null, since: "2022-04-01" })],
-    now: NOW,
-  };
-
-  it("doesn't count against a station with no file in the years it covers", async () => {
-    // The record ended in 2010; the erratum names every station from 2022 on.
-    const years = yearsOf([row(2010, "a")]);
-    const read = readSeries(
-      station("a"),
-      { start: Date.UTC(2023, 0, 1), end: Date.UTC(2024, 0, 1) },
-      "final",
-      { ...context, years, inputs: emptyInputs() },
-    );
-    assert.deepEqual(await read, []);
-  });
-
-  it("stops a read of a year the station has a file for", async () => {
-    const years = yearsOf([row(2023, "a")]);
-    await assert.rejects(
-      readSeries(
+describe("a source-wide erratum", () => {
+  it("is recorded only by a read of a year the station has a file for", async () => {
+    const errata = [erratum({ stations: null, since: "2022-04-01" })];
+    const read = async (years: ReturnType<typeof yearsOf>) => {
+      const inputs = emptyInputs();
+      // No file is opened: the year read has no row in the years file.
+      await readSeries(
         station("a"),
         { start: Date.UTC(2023, 0, 1), end: Date.UTC(2024, 0, 1) },
         "final",
-        {
-          ...context,
-          years,
-          inputs: emptyInputs(),
-        },
-      ),
-      /test-x is kept as the source serves it/,
-    );
+        { store: "nowhere", metadata: FINALIZES, errata, now: NOW, years, inputs },
+      );
+      return Object.keys(inputs.errata);
+    };
+    // The record ended in 2010; the erratum names every station from 2022 on.
+    assert.deepEqual(await read(yearsOf([row(2010, "a")])), []);
   });
 });
 

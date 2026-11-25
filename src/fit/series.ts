@@ -8,8 +8,11 @@ import type { Sample } from "../types.ts";
 
 /**
  * The levels a harmonic fit or a tidal datum reads from a station's year
- * files: every datum epoch in the current datum, only values the source won't
- * revise again, and nothing a `kept` erratum says to leave out.
+ * files: every datum epoch in the current datum, and only values the source
+ * won't revise again. It reads what the store's flags allow. An erratum whose
+ * values shouldn't be read is `flagged`, which marks them suspect for every
+ * reader; one that is `kept` has evidence for serving its values, so a fit
+ * reads them, and records the erratum with what else it read.
  */
 
 /** Why a series can't be read for a fit. The fit's row carries the message. */
@@ -34,8 +37,8 @@ export interface Inputs {
   source_qc_start: string | null;
   /** For a source that never finalizes, the instant its measured values were read as final before. */
   settled_before: string | null;
-  /** The errata touching the station in the periods read, and what was done with each kept one. */
-  errata: Record<string, Pick<Erratum, "handling" | "since" | "until" | "fit">>;
+  /** The errata touching the station in the years read. */
+  errata: Record<string, Pick<Erratum, "handling" | "since" | "until">>;
   /** `inputsDigest` when the fit ran: the fit is due again when it changes. */
   digest: string;
 }
@@ -59,7 +62,7 @@ export const METHOD = 1;
  * A digest of everything a station's fit depends on: its
  * year files up to the source's final year, with their versions, its epochs
  * and their conversions, where its source's checks start, every erratum that
- * names it with its `fit` decision, the source's rule for final values, and
+ * names it with its handling, the source's rule for final values, and
  * the method's version.
  * A fit records it, and is due again when it changes.
  */
@@ -84,7 +87,7 @@ export function inputsDigest(
         source_qc_start: station.source_qc_start ?? null,
         errata: context.errata
           .filter((e) => touching.has(e.id))
-          .map((e) => [e.id, e.handling, e.since, e.until, e.fit])
+          .map((e) => [e.id, e.handling, e.since, e.until])
           .sort(),
         finalizes: metadata.finalizes,
         settles_after_months: metadata.settles_after_months ?? null,
@@ -183,9 +186,8 @@ export interface ReadContext {
  * meters in its current datum, sorted by time. Each epoch's levels are read
  * inside its span and moved by its `to_current`; an epoch that can't be
  * converted is left out, and where a rejected epoch and another share a time
- * the other wins. Throws `Unfit` where a `kept` erratum in the period has no
- * `fit` decision, where the station's year files are being written (`Busy`),
- * and, for `final` values of a source that never finalizes, where the period
+ * the other wins. Throws `Unfit` where the station's year files are being
+ * written (`Busy`) and, for `final` values of a source that never finalizes, where the period
  * ends after its values have settled. Throws an ordinary error where a year
  * file the years file counts is missing, so no fit records a file it didn't read.
  */
@@ -218,15 +220,6 @@ export async function readSeries(
         (e.until === null || utcDay(e.until) > y.start),
     ),
   );
-  const undecided = touching.filter((e) => e.handling === "kept" && !e.fit);
-  if (undecided.length)
-    throw new Unfit(
-      `${station.id}: erratum ${undecided.map((e) => e.id).join(", ")} is kept as the source serves it, with no decision on whether a fit may read it`,
-    );
-  const dropped = touching
-    .filter((e) => e.fit === "drop")
-    .map((e) => [e.since ? utcDay(e.since) : -Infinity, e.until ? utcDay(e.until) : Infinity]);
-  const inDropped = (t: number) => dropped.some(([since, until]) => t >= since! && t < until!);
 
   const qcStart = station.source_qc_start ? Date.parse(station.source_qc_start) : null;
   const takes = (flag: Flag, time: number) =>
@@ -277,10 +270,7 @@ export async function readSeries(
   inputs.epochs = used;
   inputs.source_qc_start = station.source_qc_start ?? null;
   if (settled) inputs.settled_before = settled.toISOString();
-  for (const { id, handling, since, until, fit } of touching)
-    inputs.errata[id] = { handling, since, until, fit };
-  return [...byTime]
-    .filter(([time]) => !inDropped(time))
-    .map(([time, { level }]) => ({ time, level }))
-    .sort((a, b) => a.time - b.time);
+  for (const { id, handling, since, until } of touching)
+    inputs.errata[id] = { handling, since, until };
+  return [...byTime].map(([time, { level }]) => ({ time, level })).sort((a, b) => a.time - b.time);
 }

@@ -71,7 +71,6 @@ const erratum = (e: Partial<Erratum>): Erratum => ({
   evidence: null,
   reported: null,
   report: null,
-  fit: null,
   ...e,
 });
 
@@ -334,29 +333,8 @@ describe("readSeries", () => {
     };
     const span = { since: "2024-01-02", until: "2024-01-04" };
 
-    it("drops the values of a kept erratum decided as drop", async () => {
-      assert.deepEqual(await read([erratum({ ...span, fit: "drop" })]), [1, 4, 5]);
-    });
-
-    it("keeps the values of a kept erratum decided as keep", async () => {
-      assert.deepEqual(await read([erratum({ ...span, fit: "keep" })]), [1, 2, 3, 4, 5]);
-    });
-
-    it("throws Unfit naming a kept erratum with no decision", async () => {
-      await assert.rejects(
-        read([erratum({ ...span, id: "test-undecided", fit: null })]),
-        (e: Error) => e instanceof Unfit && e.message.includes("test-undecided"),
-      );
-    });
-
-    it("reads past an undecided erratum with another handling or outside the period", async () => {
-      assert.deepEqual(
-        await read([
-          erratum({ ...span, id: "test-flagged", handling: "flagged", fit: null }),
-          erratum({ id: "test-later", since: "2026-01-01", until: "2026-01-02", fit: null }),
-        ]),
-        [1, 2, 3, 4, 5],
-      );
+    it("reads a kept erratum's values, as the store's evidence supports serving them", async () => {
+      assert.deepEqual(await read([erratum(span)]), [1, 2, 3, 4, 5]);
     });
   });
 
@@ -415,7 +393,6 @@ describe("readSeries", () => {
       id: "test-t",
       since: "2024-02-01",
       until: "2024-02-03",
-      fit: "keep",
     });
     const elsewhere = erratum({ id: "test-x", stations: ["test/2"], since: "2024-02-01" });
     const context = f.context({ errata: [touching, elsewhere] });
@@ -431,7 +408,7 @@ describe("readSeries", () => {
       "1 2024": f.years.get("test/1 1 2024")!.version,
     });
     assert.deepEqual(inputs.errata, {
-      "test-t": { handling: "kept", since: "2024-02-01", until: "2024-02-03", fit: "keep" },
+      "test-t": { handling: "kept", since: "2024-02-01", until: "2024-02-03" },
     });
     assert.equal(inputs.source_qc_start, "2020-01-01T00:00:00Z");
     assert.equal(inputs.settled_before, null);

@@ -677,7 +677,6 @@ describe("publishStations", () => {
       evidence: null,
       reported: null,
       report: null,
-      fit: null,
     });
     const errata = [
       erratum("test-a", "test", ["test/a", "test/gone"]),

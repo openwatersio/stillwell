@@ -711,7 +711,7 @@ export const FILES = {
         type: "VARCHAR",
         nullable: true,
         description:
-          "Why the station has no constants, such as too short a record of final values or an erratum with no decision; null where it has them.",
+          "Why the station has no constants, such as too short a record of final values; null where it has them.",
       },
       {
         name: "version",
@@ -878,7 +878,7 @@ export const FILES = {
         name: "inputs",
         type: "VARCHAR",
         description:
-          "What the fit read, as JSON: `versions`, each year file's version by `<epoch> <year>`, as the years file gives it; `epochs`, the station's datum epochs with their `to_current`; `errata`, each erratum touching the station in the years read, with its `fit` decision; and `digest`, of everything the fit depends on, which changes when the station is due another fit.",
+          "What the fit read, as JSON: `versions`, each year file's version by `<epoch> <year>`, as the years file gives it; `epochs`, the station's datum epochs with their `to_current`; `errata`, each erratum touching the station in the years read, with its handling; and `digest`, of everything the fit depends on, which changes when the station is due another fit.",
       },
     ],
     sort: ["id"],
@@ -1281,11 +1281,6 @@ export const ERRATA_SCHEMA: JsonSchema = {
       report: {
         type: nullable("string"),
         description: "Where the report went and what the agency answered.",
-      },
-      fit: {
-        type: nullable("string"),
-        description:
-          "For a `kept` erratum, whether its values may enter a harmonic fit: `keep` where the error leaves the levels usable, `drop` where it doesn't. Null for any other handling, and until decided: the store fits no window an undecided one touches.",
       },
       url: {
         type: "string",

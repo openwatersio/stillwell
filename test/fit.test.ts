@@ -207,27 +207,6 @@ describe("fitStation", () => {
     assert.deepEqual(rows, []);
   });
 
-  it("gives one naming a kept erratum that has no decision", async () => {
-    const { context } = await store([[2023, 24 * 30], [2024]]);
-    const erratum: Erratum = {
-      id: "test-undecided",
-      source: "test",
-      stations: null,
-      since: "2024-03-01",
-      until: "2024-03-05",
-      error: "",
-      handling: "kept",
-      response: "",
-      evidence: null,
-      reported: null,
-      report: null,
-      fit: null,
-    };
-    const { fit, constituents: rows } = await fitStation(station, context({ errata: [erratum] }));
-    assert.match(fit.reason!, /test-undecided/);
-    assert.deepEqual(rows, []);
-  });
-
   it("holds out an earlier year where the final year has under half its hours", async () => {
     const { context } = await store([[2021], [2022], [2023], [2024, 24 * 100]]);
     const { fit } = await fitStation(station, context());
