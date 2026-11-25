@@ -39,7 +39,7 @@ import {
   PRODUCTS,
 } from "./store/paths.ts";
 import type { StoredStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
-import { errataOf, published, type Erratum } from "./errata.ts";
+import { covers, errataOf, published, type Erratum, type Question } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { linkShifts, readLinks } from "./links.ts";
 import { readMatches } from "./matches.ts";
@@ -263,14 +263,16 @@ async function renumberAboveFiles(
  * preferred series as the file is built (`src/same-as.ts`), and the result
  * says what was linked. Each station carries the IDs of its `errata`, and
  * `errata.json` those of the sources the store holds (each source's
- * `errata.ts`, read by `src/errata.ts`); the result names any station an erratum lists that a source in the store
- * doesn't, a typo or a station since removed.
+ * `errata.ts`, read by `src/errata.ts`); the result names any station an erratum or a
+ * question to an agency lists that a source in the store doesn't, a typo or a station since
+ * removed. Questions aren't published.
  */
 export async function publishStations(
   store: string,
   all: Source[],
   expected: string[],
   errata: Erratum[],
+  questions: Pick<Question, "id" | "stations">[] = [],
 ): Promise<
   | { count: number; links: LinkReport; datums: DatumReport; unknownErrata: string[] }
   | { missing: string[] }
@@ -284,7 +286,23 @@ export async function publishStations(
     await ticonOriginators(),
     linkShifts(await readLinks(store), gauges),
   );
-  for (const station of linked) station.errata = errataOf(station, errata);
+  // A store's errata are its own sources' and those listing their copies; a restricted source's stay out of the public store, even where a public copy is listed.
+  const held = new Set(listed.map((s) => s.metadata.id));
+  // A source not passed in, such as a restricted one when publishing the public store, counts as restricted.
+  const open = new Set(
+    all.filter((s) => s.metadata.license.redistribution).map((s) => s.metadata.id),
+  );
+  const shown = errata
+    .filter(
+      (e) =>
+        held.has(e.source) || (open.has(e.source) && [...held].some((source) => covers(e, source))),
+    )
+    // A copy in another store, such as a restricted source's, isn't named here.
+    .map((e) => ({
+      ...e,
+      stations: e.stations && e.stations.filter((id) => held.has(id.slice(0, id.indexOf("/")))),
+    }));
+  for (const station of linked) station.errata = errataOf(station, shown);
   // Two files written one after the other: if the second write fails, they're from
   // different publishes until the next one.
   await writeOffsets(offsetsPath(store), linked.flatMap(offsetRows));
@@ -306,9 +324,7 @@ export async function publishStations(
       ),
     ),
   );
-  // A store's errata are its own sources', so a restricted source's stay out of the public store.
-  const held = new Set(listed.map((s) => s.metadata.id));
-  await writeJsonArray(errataPath(store), published(errata.filter((e) => held.has(e.source))));
+  await writeJsonArray(errataPath(store), published(shown));
   // The definition of every file above, for readers (src/store/files.ts).
   await writeJson(`${store}/datapackage.json`, dataPackage());
   for (const [path, schema] of Object.entries(JSON_FILES))
@@ -316,12 +332,10 @@ export async function publishStations(
   const ids = new Set(linked.map((s) => s.id));
   // A withheld station is gone on purpose, though an erratum may still name it.
   const withheld = (id: string) => listed.some((s) => withheldReason(s, id) !== null);
-  const unknownErrata = errata.flatMap((e) =>
-    held.has(e.source)
-      ? (e.stations ?? [])
-          .filter((id) => !ids.has(id) && !withheld(id))
-          .map((id) => `${e.id} ${id}`)
-      : [],
+  const unknownErrata = [...errata, ...questions].flatMap((e) =>
+    (e.stations ?? [])
+      .filter((id) => held.has(id.slice(0, id.indexOf("/"))) && !ids.has(id) && !withheld(id))
+      .map((id) => `${e.id} ${id}`),
   );
   return { count: linked.length, links: report, datums, unknownErrata };
 }

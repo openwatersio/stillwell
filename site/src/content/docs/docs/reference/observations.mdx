@@ -101,7 +101,7 @@ Which years a station still lacks is in `stations.parquet`: its `missing_years` 
 
 <Schema resource="years" />
 
-A row with a null `epoch` and `year` marks a station whose rows may be out of date: a run is writing its files, or one stopped partway. It can have a year with a file but no row. Read the list again later, and don't cache the station's files while it's marked. A mark usually clears the next night, but a station with many files can stay marked a few nights.
+A row with a null `epoch` and `year` marks a station whose rows may be out of date: a run is writing its files, or one stopped partway. It can have a year with a file but no row. Read the list again later, and don't cache the station's files while it's marked. A mark usually clears the next night, but a station with many files can stay marked a few nights. The row's `epoch`, `year`, `hours`, flag counts and `version` are null, so a filter on `epoch` or `year`, as in the queries here and on the Tools pages, leaves it out, and sums skip it. A query that counts rows or lists every row of the years list needs `WHERE year IS NOT NULL`.
 
 The years of one station since 2020, with how many of each year's values its source hasn't checked:
 

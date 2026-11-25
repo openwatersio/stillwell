@@ -1,7 +1,7 @@
 import { flaggedSpan, impossibleDropped, type Check, type ErrataFile } from "../../errata.ts";
 import { POSITIONS } from "../../positions.ts";
 import { Flag } from "../../schema.ts";
-import { distanceKm } from "../../stats.ts";
+import { distanceKm, median } from "../../stats.ts";
 import { dropped, fits, levels, station } from "./check.ts";
 
 /** Each of the entry's records is listed within 0.5 km of its gauge's position in `POSITIONS`. */
@@ -339,8 +339,8 @@ export default {
       response:
         "For the records' times labeled from 1 January 2020, the adapter swaps the day and month of a date whose day is 12 or less, then moves the time 10 hours earlier. That joins the two parts with no gap or overlap and gives one time for each label.",
       evidence:
-        "November 2026. In each of the seven records K1's phase moves by +148 to +152° and M2's by −69 to −72° from 2019 to 2020 and stays there through 2025, the shift 10 hours makes (+150° and −70°), while UHSLC's and BOM's own Cape Ferguson series (`uhslc/343a`, `gesla/cape_ferguson-59260-aus-bom`) hold their phases. Before 2020 Cape Ferguson's record equals UHSLC's at the same times to 1 to 3 cm (standard deviation) a year; in 2020 and 2021 it equals it 10 hours earlier on 409 of 730 days (r 0.99 or more a day, 3 to 4 cm). Most of the hours that differ are on days 1 to 12 of a month: in 2020, after the 10-hour move, 2,704 of 3,456 hours on those days are more than 10 cm from UHSLC's (standard deviation 50 cm), and with day and month swapped 26 are (1.6 cm). On days 13 to 31, 47 of 5,328 hours are. With both fixes, Cape Ferguson's record differs from UHSLC's by 1.7 cm (standard deviation) in 2020 and 4.4 cm in 2021, 10 minutes after UHSLC's times as in 2019 (3.3 cm), against 32 and 35 cm with the 10-hour move alone. In the raw file the label 2020/03/01 00:00 follows 2020/02/29 23:50 with a step of 84 cm, both flagged correct. In all seven records the mean step where day 12 meets day 13 and where a month meets the next is 3 to 13 cm a year to 2019, the size of the records' 10-minute steps, and 38 to 113 cm from 2020 to 2025; with day and month swapped back they're 1 to 12 cm in every record and year, against 3.5 to 10.6 cm for the records' other 10-minute steps, and no two values share a time. The same step test on the stored values of every other GESLA record with values from 2020 (3,131 with such joins) finds no other record with the swap. The store's level match of November 2026 found the record 75 cm from UHSLC's.",
-      // Fixed, Cape Ferguson's record lines up with UHSLC's 10 minutes later, as before 2020, on days 1 to 12 of March as well as after.
+        "November 2026. In each of the seven records K1's phase moves by +148 to +152° and M2's by −69 to −72° from 2019 to 2020 and stays there through 2025, the shift 10 hours makes (+150° and −70°), while UHSLC's and BOM's own Cape Ferguson series (`uhslc/343a`, `gesla/cape_ferguson-59260-aus-bom`) hold their phases. Before March 2019 Cape Ferguson's record equals UHSLC's at the same times to 1 to 3 cm (standard deviation) a year; in 2020 and 2021 it equals it 10 hours earlier on 409 of 730 days (r 0.99 or more a day, 3 to 4 cm). Most of the hours that differ are on days 1 to 12 of a month: in 2020, after the 10-hour move, 2,704 of 3,456 hours on those days are more than 10 cm from UHSLC's (standard deviation 50 cm), and with day and month swapped 26 are (1.6 cm). On days 13 to 31, 47 of 5,328 hours are. With both fixes, Cape Ferguson's record differs from UHSLC's by 1.7 cm (standard deviation) in 2020 and 4.4 cm in 2021, each read at the lag the record has by then (erratum `gesla-cape-ferguson-clock-drift`), against 32 and 35 cm with the 10-hour move alone. In the raw file the label 2020/03/01 00:00 follows 2020/02/29 23:50 with a step of 84 cm, both flagged correct. In all seven records the mean step where day 12 meets day 13 and where a month meets the next is 3 to 13 cm a year to 2019, the size of the records' 10-minute steps, and 38 to 113 cm from 2020 to 2025; with day and month swapped back they're 1 to 12 cm in every record and year, against 3.5 to 10.6 cm for the records' other 10-minute steps, and no two values share a time. The same step test on the stored values of every other GESLA record with values from 2020 (3,131 with such joins) finds no other record with the swap. The store's level match of November 2026 found the record 75 cm from UHSLC's.",
+      // Fixed, Cape Ferguson's record lines up with UHSLC's about 10 minutes later, as in 2019 from April, on days 1 to 12 of March as well as after.
       check: (store) =>
         fits(
           store,
@@ -351,6 +351,31 @@ export default {
           -10,
           [-600, -60, -10, 0, 60, 600],
         ),
+    },
+    {
+      id: "gesla-cape-ferguson-clock-drift",
+      stations: ["gesla/cape_ferguson-h033007a-aus-bom"],
+      since: "2019-03-12",
+      until: "2022-02-03",
+      handling: "flagged",
+      error:
+        "GESLA 4.1's Cape Ferguson record from Queensland (`cape_ferguson-h033007a-aus-bom`) is stamped late, by a clock that wanders, from 12 March 2019 to early February 2022. Against UHSLC's Cape Ferguson (`uhslc/343a`) the lag grows from nothing on 11 March 2019 to 7 minutes by 21 March, is 6 to 9 minutes through 2019, 8 to 15 in 2020, 11 to 13 to May 2021, 16 to 18 from June to August 2021 and 20 to 23 from September to December 2021, and reaches 28 on 31 December 2021, UHSLC's last value, and 38 on 30 January 2022. From 3 February 2022 the lag is 7 minutes or less in the other direction, and the span leaves those days unflagged. The level stamped T was measured 17 to 38 minutes before T from 22 January to 1 February 2022, and less earlier.",
+      response:
+        "12 March 2019 to 2 February 2022 is flagged `suspect`, keeping GESLA's own flag as `source_flag`. The adapter doesn't move the times, since the lag changes from day to day.",
+      evidence:
+        "November 2026. Against UHSLC's hourly record, each month's best lag of the 10-minute record, at exact hours with a parabola through the neighboring lags, is 0 to −1 minutes in every month from January 2018 to February 2019, −6 to −9 from April to December 2019, −8 to −15 in 2020, −11 to −13 from January to May 2021, −16 to −18 from June to August 2021 and −20 to −23 from September to December 2021 (a negative lag means GESLA's stamps run late: 2019-09 fits at −10 minutes with 1.5 cm RMS, against 4.6 at 0; 2021-10 fits at −20 against 6.1 at −10). Cape Ferguson's other two copies, `bom/995` and `gesla/cape_ferguson-59260-aus-bom`, equal UHSLC's to 0.1 cm or less in every span tried (2012 to 2021), so they don't show it. Independently of UHSLC, a harmonic fit of the record's own 2016 to 2018 hourly values times its later 30-day windows 8 to 14 minutes late from March 2019 to December 2019, 13 to 19 minutes in 2020, 15 to 26 minutes in 2021, and 0 to 3 minutes from February 2022 to November 2025 (−2 to +1 minute in 2016 to 2018; windows every 90 days). The harmonic timing underestimates lags past half an hour. The other six Queensland records (erratum `gesla-queensland-2020-aest`) stay within 10 minutes of their own 2016 to 2018 fit in the windows sampled, three months apart, from 2018 to 2023, with no run of windows late by more than 9 minutes: Cardwell's 6.2 in August 2022 and Thursday Island's −9.3 in November 2023 are single windows between smaller ones. BOM's own Cape Ferguson record in the store (`bom/995`) equals UHSLC's to 0.1 cm through 2021 and continues into 2022, so it times the end: against it the daily lag of this record is 17 to 38 minutes from 22 January to 1 February 2022 and 3 to 4 minutes the other way from 3 February. From 5 February 2022 to the end of 2025, in 475 windows of three days, the lag against `bom/995` is −2 to 7 minutes with a median of 3, bar one window at −11 and one with too few values; no stretch like 2019 to 2022 follows.",
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        const id = station(e);
+        // The lag is of the time UHSLC's record fits best, on a grid of 10 minutes.
+        await fits(store, id, "uhslc/343a", "2019-09-01", "2019-09-15", -10, [-20, -10, 0, 10]);
+        await fits(store, id, "uhslc/343a", "2021-10-01", "2021-10-15", -20, [-30, -20, -10, 0]);
+        // On time before the span.
+        await fits(store, id, "uhslc/343a", "2019-02-01", "2019-02-15", 0, [-10, 0, 10]);
+        // BOM's own record runs past UHSLC's: late before 3 February 2022, on time after.
+        await fits(store, id, "bom/995", "2022-01-22", "2022-01-27", -20, [-30, -20, -10, 0]);
+        await fits(store, id, "bom/995", "2022-02-05", "2022-02-15", 0, [-10, 0, 10]);
+      },
     },
     {
       id: "gesla-sfwmd-est",
@@ -441,6 +466,89 @@ export default {
           -5,
           [-10, -5, 0, 5, 10],
         ),
+    },
+    {
+      id: "gesla-vardo-uhslc-1989-2003-decimeters",
+      stations: ["gesla/vardo-805-nor-uhslc_fd", "gesla/vardo-805a-nor-uhslc_rq"],
+      since: "1989-11-01",
+      until: "2004-01-01",
+      handling: "kept",
+      error:
+        "GESLA 4.1 copies UHSLC's Vardø records (805 and 805a) with UHSLC's values, which from 1 November 1989 to 2003 are whole decimeters (erratum `uhslc-vardo-1989-2003-decimeters`).",
+      response:
+        "Kept as served, as UHSLC's own series is. Kartverket's own series of the gauge is the group's preferred series.",
+      evidence:
+        "November 2026. Both copies hold whole decimeters throughout 1998, as `uhslc/805` does, and finer values in 2005.",
+      check: async (store) => {
+        for (const [id, year, whole] of [
+          ["gesla/vardo-805a-nor-uhslc_rq", 1998, true],
+          ["gesla/vardo-805-nor-uhslc_fd", 1998, true],
+          ["gesla/vardo-805-nor-uhslc_fd", 2005, false],
+        ] as const) {
+          const rows = await levels(store, id, `${year}-03-01`, `${year}-04-01`);
+          const share =
+            rows.filter((o) => Math.abs(o.level * 10 - Math.round(o.level * 10)) < 1e-6).length /
+            rows.length;
+          if (whole ? share < 0.99 : share > 0.2)
+            throw new Error(
+              `${(100 * share).toFixed(1)}% of ${id}'s March ${year} values are whole decimeters`,
+            );
+        }
+      },
+    },
+    {
+      id: "gesla-vardo-uhslc-zero-steps",
+      stations: ["gesla/vardo-805-nor-uhslc_fd", "gesla/vardo-805a-nor-uhslc_rq"],
+      since: "1989-11-01",
+      handling: "kept",
+      error:
+        "GESLA 4.1 copies UHSLC's Vardø records (805 and 805a) with UHSLC's values, whose readings sit at four different heights above Kartverket's, which uses chart datum, from 1989 (erratum `uhslc-vardo-zero-steps`).",
+      response:
+        "Kept as served, as UHSLC's own series is. Kartverket's own series of the gauge is the group's preferred series.",
+      evidence:
+        "November 2026. Against `kartverket/VAW` at the same hours, the research-quality copy's median difference is 866 mm in March 1998 and 925 to 926 in June 2010, and the fast-delivery copy's is 907 mm in June 2022, as `uhslc/805`'s are.",
+      check: async (store) => {
+        for (const [id, span, expected] of [
+          ["gesla/vardo-805a-nor-uhslc_rq", ["1998-03-01", "1998-04-01"], 866],
+          ["gesla/vardo-805a-nor-uhslc_rq", ["2010-06-01", "2010-07-01"], 925],
+          ["gesla/vardo-805-nor-uhslc_fd", ["2022-06-01", "2022-07-01"], 907],
+        ] as const) {
+          const kartverket = new Map(
+            (await levels(store, "kartverket/VAW", span[0], span[1])).map((o) => [o.time, o.level]),
+          );
+          const d = (await levels(store, id, span[0], span[1]))
+            .filter((o) => kartverket.has(o.time))
+            .map((o) => o.level - kartverket.get(o.time)!);
+          if (d.length < 500) throw new Error(`${id} shares ${d.length} hours with Kartverket`);
+          const mm = median(d) * 1000;
+          if (Math.abs(mm - expected) > 6)
+            throw new Error(`${id} sits ${mm.toFixed(0)} mm above kartverket/VAW, not ${expected}`);
+        }
+      },
+    },
+    {
+      id: "gesla-tregde-uhslc-1987-2003-decimeters",
+      stations: ["gesla/tregde-804-nor-uhslc_fd", "gesla/tregde-804a-nor-uhslc_rq"],
+      since: "1987-12-11",
+      until: "2004-01-01",
+      handling: "kept",
+      error:
+        "GESLA 4.1 copies UHSLC's Tregde records (804 and 804a) with UHSLC's values, which from 11 December 1987 to 2003 are whole decimeters (erratum `uhslc-tregde-1987-2003-decimeters`).",
+      response: "Kept as served, as UHSLC's own series is.",
+      evidence:
+        "November 2026. Both copies hold whole decimeters throughout 1998, as `uhslc/804` does.",
+      check: async (store) => {
+        for (const id of ["gesla/tregde-804-nor-uhslc_fd", "gesla/tregde-804a-nor-uhslc_rq"]) {
+          const rows = await levels(store, id, "1998-03-01", "1998-04-01");
+          const share =
+            rows.filter((o) => Math.abs(o.level * 10 - Math.round(o.level * 10)) < 1e-6).length /
+            rows.length;
+          if (share < 0.99)
+            throw new Error(
+              `${(100 * share).toFixed(1)}% of ${id}'s March 1998 values are whole decimeters`,
+            );
+        }
+      },
     },
     {
       id: "gesla-crms-hour-early",
@@ -839,7 +947,7 @@ export default {
       error:
         "Some GESLA 4.1 records change datum partway through while every value stays flagged correct and usable, so a record mixes two zeros meters apart.",
       response:
-        "The adapter checks every coastal record's raw levels for jumps of more than 0.75 m in the 30-day median, and flags each segment that sits more than 0.75 m from the record's longest segment as suspect, keeping GESLA's own flag in `source_flag`. The stations listed are the ones found so far; the check covers any other coastal record. `datumJumps` takes daily means of the usable values on days they span at least 12 hours of, finds where the median of the next 30 such days differs from the previous 30 days (as few as 5 near the record's ends) by more than 0.75 m, places the jump at the largest day-to-day step nearby (at least half of 0.75 m, since a jump partway through a day splits across two days), and flags every segment whose median is more than 0.75 m from the longest segment's. Rivers and lakes aren't checked, tidal ones included, since their floods move monthly medians that far: the check would flag 30% of the Connecticut at Hartford's values and 15% of the Columbia at Vancouver's. It leaves the earthquake steps at Ayukawa and Onahama (Tōhoku, 2011), Kaikōura and Wellington (2016) alone.",
+        "The adapter checks every coastal record's raw levels for jumps of more than 0.75 m in the 30-day median, and flags each segment that sits more than 0.75 m from the record's longest segment as suspect, keeping GESLA's own flag in `source_flag`. The stations listed are the ones found so far; the check covers any other coastal record. `datumJumps` takes daily means of the usable values on days they span at least 12 hours of, finds where the median of the next 30 such days differs from the previous 30 days (as few as 5 near the record's ends) by more than 0.75 m, places the jump at the largest day-to-day step nearby (at least half of 0.75 m, since a jump partway through a day splits across two days), and flags every segment whose median is more than 0.75 m from the longest segment's. Values in another erratum's span are suspect already, so requalify leaves them out of the medians, and erratic readings, such as Holyhead's in February 2026, don't flag the sound ones around them. Rivers and lakes aren't checked, tidal ones included, since their floods move monthly medians that far: the check would flag 30% of the Connecticut at Hartford's values and 15% of the Columbia at Vancouver's. It leaves the earthquake steps at Ayukawa and Onahama (Tōhoku, 2011), Kaikōura and Wellington (2016) alone.",
       evidence:
         "Monthly means of the usable values (QC flag 1, use flag 1):\n\n| Record | Off segment | Main level |\n| --- | --- | --- |\n| Cape d'Or, MEDS 240 | 1965-06 to 1965-10: 23.5 to 32.3 m | 5.7 to 6.3 m, 1969 to 1979 |\n| Mazatlán float, UNAM 16 | 2021-06-20 to 2021-11-24: −0.1 to 1.5 m | 2.2 to 2.4 m |\n| Mazatlán radar, UNAM 16 | to 2021-11-25: 2.8 to 3.4 m | 2.2 to 2.6 m |\n| Ōminato, JCG HD04 | 1952: 3.6 to 3.8 m | 1.4 to 1.8 m, 1953 on |\n| Gorge at Craigflower, MEDS 7124 | 1969: 2.0 to 2.3 m | 0.8 m, 2011 |\n| Papeete, UHSLC's gauge, from CMEMS | 2010-09-14 to 2011-09-12: 1.43 to 1.52 m | 0.44 to 0.56 m, 2009 to 2012 |\n\nGESLA's metadata marks Cape d'Or and the Mazatlán float record \"Possible datum and quality control issues\", and Ōminato and Gorge at Craigflower \"Possible datum issues\", but leaves the values usable. The check found Ōminato and Gorge at Craigflower in a random sample of 80 coastal records, and nothing in the other 78. Papeete's CMEMS record of UHSLC's gauge (`papeeteuhslctg_01minute-pap-fra-cmems`) has the same 0.95 m step, on the same days, as REFMAR's own record of that gauge (erratum `refmar-papeete-uhslc-2010-offset`), and the check flags it in the store. GESLA's other Papeete records covering 2010 and 2011 (UHSLC's 015 and 015B, REFMAR's 383 and CMEMS's copy of it) don't have it.",
       check: async (store, e) => {
@@ -922,104 +1030,6 @@ export default {
       check: (store, e) => dropped(store, station(e), 2015, "gesla/arko-2545-swe-smhi"),
     },
     {
-      id: "gesla-st-pauli-wrong-minute",
-      stations: ["gesla/stpaulitg-stp-deu-cmems"],
-      since: "2025-03-01",
-      until: "2026-06-01",
-      handling: "kept",
-      error:
-        "From March 2025, GESLA 4.1's St. Pauli record (from CMEMS) has about 16% of its 10-minute values taken from a different minute than its timestamp says. Most are 1 or 2 cm off, but some are up to 42 cm off at mid-tide. GESLA flags all of them as correct and usable.",
-      response:
-        "The store keeps the values as GESLA serves them. The group's preferred station is `pegelonline/5952050`, which takes its history from HPA's own archive on kuestendaten.de, and that archive has the right values.",
-      evidence:
-        "I compared GESLA's record (`stpaulitg-stp-deu-cmems`, created 2026-07-19) with HPA's 1-minute file for gauge 5952050 from kuestendaten.de (downloaded 2026-11-09, shifted from UTC+1 to UTC).\n\n- From 1999-11-01 to 2025-02-28, every one of about 1.3 million shared 10-minute times differs by exactly 5.004 m, which is the gauge zero's offset to NHN. That holds for all 12,954 times in December 2024 to February 2025 too.\n- From 2025-03-01 03:40 to the end of the record on 2026-05-31, 12,838 of 65,622 shared times differ. Of those, 10,207 are off by 1 cm, 1,991 by 2 cm, 640 by 3 to 9 cm and 101 by more than 5 cm, up to 42 cm. Every month from March 2025 to May 2026 has between 759 and 931.\n- At 11,803 of the 12,838, GESLA's value equals HPA's value from a minute within 10 minutes of the stated time, most often 1 minute before or after. The large differences come from minutes 5 to 29 away, on the steep part of the tide. 5,495 are single points with both 10-minute neighbors matching HPA exactly.\n- HPA's series is smooth around these times. Its largest 1-minute step near the 101 large differences is 3 cm. Against Seemannshöft and Blankenese, two HPA gauges downstream, HPA's St. Pauli value is the one that fits the local difference between the gauges at 100 of the 101 large differences. The median departure is 1 cm for HPA and 6 cm for GESLA.\n- Example (UTC, meters above gauge zero): on 2025-05-14 06:10, HPA has 6.12 and GESLA 5.82. Seemannshöft has 6.04, and both copies have 6.29 at 06:00 and 5.98 at 06:20.\n\nThere's no third copy to compare with. PEGELONLINE's REST API keeps 31 days, and BSH's `508P` holds predictions only.",
-      // Kept as served: 2025-05-14 06:10 holds a value from another minute, 16 cm below the next on a falling tide (HPA has it 14 cm above).
-      check: async (store, e) => {
-        const rows = await levels(store, station(e), "2025-05-14", "2025-05-15");
-        const at = (hhmm: string) =>
-          rows.find((o) => o.time === Date.parse(`2025-05-14T${hhmm}:00Z`))?.level;
-        const [before, wrong, after] = [at("06:00"), at("06:10"), at("06:20")];
-        if (before === undefined || wrong === undefined || after === undefined)
-          throw new Error(
-            "the store holds no St. Pauli value at 06:00, 06:10 or 06:20 on 2025-05-14",
-          );
-        if (!(wrong < after - 0.1 && after < before))
-          throw new Error(
-            `St. Pauli reads ${before}, ${wrong} and ${after} m at 06:00, 06:10 and 06:20 on 2025-05-14, not GESLA's dip`,
-          );
-      },
-    },
-    {
-      id: "gesla-goteborg-2007-hour-early",
-      stations: ["gesla/goteborgorsh-819-swe-uhslc_fd", "gesla/goteborgorsh-819a-swe-uhslc_rq"],
-      since: "2007-07-23",
-      until: "2008-01-01",
-      handling: "flagged",
-      error:
-        "GESLA's copies of UHSLC's Göteborg-Torshamnen (fast delivery and research quality) are stamped one hour early from 23 July to 31 December 2007, as UHSLC's own files are.",
-      response:
-        "23 July to 31 December 2007 is flagged `suspect` in both records, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "Both records equal `uhslc/819` on every day of 2007, which is an hour early against SMHI's record of the gauge over that span (erratum `uhslc-goteborg-2007-hour-early`). GESLA rates the records usable.",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-goteborg-2011-hour-early",
-      stations: ["gesla/goteborgorsh-819-swe-uhslc_fd", "gesla/goteborgorsh-819a-swe-uhslc_rq"],
-      since: "2011-02-01",
-      until: "2011-07-01",
-      handling: "flagged",
-      error:
-        "GESLA's copies of UHSLC's Göteborg-Torshamnen (fast delivery and research quality) are stamped one hour early from 1 February to 30 June 2011, as UHSLC's own files are.",
-      response:
-        "February to June 2011 is flagged `suspect` in both records, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "Both records equal `uhslc/819` on every day of 2011, which is an hour early against SMHI's record of the gauge over that span (erratum `uhslc-goteborg-2011-hour-early`).",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-cuxhaven-uhslc-2024-march",
-      stations: ["gesla/cuxhaven-825-deu-uhslc_fd"],
-      since: "2024-02-29",
-      until: "2024-04-01",
-      handling: "flagged",
-      error:
-        "GESLA's copy of UHSLC's fast-delivery Cuxhaven doesn't match the gauge's other records from 29 February to 31 March 2024, as UHSLC's own file doesn't.",
-      response:
-        "29 February to 31 March 2024 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "The record equals `uhslc/825` over the span, which differs from PEGELONLINE's and GESLA's other Cuxhaven records by 56 cm RMS (erratum `uhslc-cuxhaven-2024-march`).",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-cuxhaven-uhslc-2024-summer",
-      stations: ["gesla/cuxhaven-825-deu-uhslc_fd"],
-      since: "2024-07-01",
-      until: "2024-09-01",
-      handling: "flagged",
-      error:
-        "GESLA's copy of UHSLC's fast-delivery Cuxhaven doesn't match the gauge's other records in July and August 2024, as UHSLC's own file doesn't.",
-      response:
-        "July and August 2024 are flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "The record equals `uhslc/825` over the span, which differs from PEGELONLINE's and GESLA's other Cuxhaven records by 52 to 54 cm RMS (erratum `uhslc-cuxhaven-2024-summer`).",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-buesum-cmems-spikes",
-      stations: ["gesla/buesumtg-bue-deu-cmems"],
-      since: "2024-02-25",
-      until: "2025-05-05",
-      handling: "flagged",
-      error:
-        "GESLA's CMEMS record of Büsum has spikes of up to 3 m and repeated values from February 2024 to early May 2025 that PEGELONLINE's record of the gauge doesn't have.",
-      response:
-        "25 February 2024 to 4 May 2025 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026. The record equals PEGELONLINE's Büsum (`pegelonline/9510095`) to 0.0 cm through January 2024. From 25 February 2024 it differs by 3 cm RMS on most days, from values held for several 10-minute steps, and by 34 to 101 cm on 25 February, 18 March, 22 April and 1 to 3 August 2024, from spikes of up to 3 m. From 5 May 2025 to the record's end in May 2026 it matches PEGELONLINE's again, within 2 cm RMS every day.",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
       id: "gesla-usgs-nj-2003-daylight-time",
       stations: [
         "gesla/absecon_creek_at_absecon_nj-1410510-usa-usgs",
@@ -1039,140 +1049,6 @@ export default {
       evidence:
         "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide-timing check put all six 49 to 71 minutes late in the windows from 8 April to 8 May 2003, and nowhere near that before or after. Day by day, Cape May Harbor's tide best matches CO-OPS's Atlantic City (`coops/8534720`) at a 60-minute lag before 6 April and after 9 May, and at 120 minutes between. The store's own USGS series of these gauges start later, so only GESLA's records hold the span.",
       check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-eemshaven-waddenzee-2016-offset",
-      stations: ["gesla/eemshaven_waddenzee-eem-nld-rws"],
-      since: "2016-04-07",
-      until: "2016-05-12",
-      handling: "flagged",
-      error:
-        "GESLA's RWS record of Eemshaven Waddenzee sits 15 to 20 cm higher than usual against Delfzijl from 7 April to 11 May 2016.",
-      response:
-        "7 April to 11 May 2016 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: a step of +18 cm against three of three neighboring gauges on 8 April 2016 and back on 20 May. Daily means against GESLA's Delfzijl (`gesla/delfzijl-del-nld-rws`) are about −9 cm through March and from mid-May, +1 cm on 7 April, and +7 to +12 cm on most days from 14 April to 11 May, falling to −3 cm on 12 May. The step check compares 30-day medians, so its dates are a few days off; the span follows the daily means.",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-helgoland-binnenhafen-2000-offset",
-      stations: ["gesla/helgolandbinnenhafen-9510070-deu-wsv"],
-      until: "2000-11-01",
-      handling: "flagged",
-      error:
-        "GESLA's WSV record of Helgoland Binnenhafen sits about 25 cm low before 1 November 2000, as PEGELONLINE's does.",
-      response:
-        "Values before 1 November 2000 are flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "GESLA's WSV record of the gauge, hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm at the median, 0.2 cm standard deviation, over 305 days (erratum `pegelonline-helgoland-binnenhafen-2000-offset`).",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-helgoland-suedhafen-2001-offset",
-      stations: ["gesla/helgolandsdhafen-9510075-deu-wsv"],
-      until: "2004-01-01",
-      handling: "flagged",
-      error:
-        "GESLA's WSV record of Helgoland Südhafen sits about 29 cm low until its 2002 and 2003 outage, as PEGELONLINE's does.",
-      response:
-        "Values before 2004 are flagged `suspect`, keeping GESLA's own flag as `source_flag`: the step falls in the 2002 and 2003 outage, so the few values left from then are flagged too.",
-      evidence:
-        "GESLA's WSV record of the gauge, hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm at the median over 407 days (erratum `pegelonline-helgoland-suedhafen-2001-offset`).",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-helgoland-suedhafen-2013-clock",
-      stations: ["gesla/helgolandsdhafen-9510075-deu-wsv"],
-      since: "2013-05-29",
-      until: "2013-07-25",
-      handling: "flagged",
-      error:
-        "GESLA's WSV record of Helgoland Südhafen runs about 19 minutes late on 29 and 30 May and from 17 June to 24 July 2013, as PEGELONLINE's does.",
-      response:
-        "29 May to 24 July 2013 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "Its hourly values equal the means of PEGELONLINE's minute values over the same hours to 0.0 cm RMS from April to August 2013, so it carries PEGELONLINE's clock error (erratum `pegelonline-helgoland-suedhafen-2013-clock`).",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-bake-z-2004-offset",
-      stations: ["gesla/bakez-9510066-deu-wsv"],
-      since: "2004-11-11",
-      until: "2005-03-08",
-      handling: "flagged",
-      error:
-        "GESLA's WSV record of Bake Z sits 0.5 to 1 m high from 11 November 2004 to 7 March 2005, as PEGELONLINE's does.",
-      response:
-        "11 November 2004 to 7 March 2005 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "GESLA's WSV record of the gauge, hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm at the median over 93 days, with a few days apart (erratum `pegelonline-bake-z-2004-offset`).",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-mittelgrund-2012-offset",
-      stations: ["gesla/mittelgrund-9510132-deu-wsv"],
-      since: "2012-10-10",
-      until: "2012-11-20",
-      handling: "flagged",
-      error:
-        "GESLA's WSV record of Mittelgrund sits about 13 cm low from 10 October to 19 November 2012, as PEGELONLINE's does.",
-      response:
-        "10 October to 19 November 2012 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "GESLA's WSV record of the gauge, hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm over 41 days (erratum `pegelonline-mittelgrund-2012-offset`).",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-borkum-suedstrand-2014-offset",
-      stations: ["gesla/borkumsdstrand-9340030-deu-wsv"],
-      since: "2014-12-05",
-      until: "2015-03-12",
-      handling: "flagged",
-      error:
-        "GESLA's WSV record of Borkum Südstrand sits about 11 cm high from 5 December 2014 to 11 March 2015, as PEGELONLINE's does.",
-      response:
-        "5 December 2014 to 11 March 2015 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "GESLA's WSV record of the gauge, hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm over 97 days (erratum `pegelonline-borkum-suedstrand-2014-offset`).",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-eriksberg-2018-tingstadstunneln",
-      stations: ["gesla/goteborg_eriksberg-33096-swe-smhi"],
-      since: "2018-01-01",
-      until: "2018-11-13",
-      handling: "flagged",
-      error:
-        "GESLA's SMHI record of Göteborg-Eriksberg holds Tingstadstunneln's levels from 1 January to 12 November 2018, as SMHI's own does.",
-      response:
-        "1 January to 12 November 2018 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
-      evidence:
-        "Its daily means equal SMHI's Eriksberg (`smhi/33096`) to 0.0 cm at the median over 297 days of the span (erratum `smhi-eriksberg-2018-tingstadstunneln`). GESLA's CMEMS record of the gauge differs from SMHI's by 5 cm at the median over the span, and agrees outside it, so it may hold Eriksberg's own levels.",
-      check: (store, e) => flaggedSpan(store, e),
-    },
-    {
-      id: "gesla-kilrush-2025-01-09-offset",
-      stations: ["gesla/kilrushlough-kil-irl-cmems"],
-      since: "2025-01-09",
-      until: "2025-01-10",
-      handling: "flagged",
-      error:
-        "GESLA's hourly CMEMS record of Kilrush Lough holds 4 values about 6 m low, from 02:00 to 05:00 UTC on 9 January 2025, with GESLA's good flag, from the drop the Marine Institute's own record has.",
-      response:
-        "9 January 2025 is flagged `suspect` in the CMEMS record, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the day's other values are flagged too. GESLA's Marine Institute record (`gesla/kilrush_lough-kil-irl-mi_c`) holds the same drop as 53 values from 01:20 to 05:40, which GESLA already flags, so it isn't listed.",
-      evidence:
-        "In the store, checked in November 2026: the CMEMS record (`gesla/kilrushlough-kil-irl-cmems`) has 4 values below −3 m, down to −5.95 m, from 02:00 to 05:00 with flag good, against daily medians of 0.13 m on 8 January and 0.07 m on 10 January. The Marine Institute record has the same 53 values as the Marine Institute's own (erratum `marine-institute-kilrush-2025-01-09-offset`).",
-      // The drop is kept, flagged.
-      check: async (store, e) => {
-        await flaggedSpan(store, e);
-        const low = (await levels(store, station(e), e.since!, e.until!)).filter(
-          (o) => o.level < -3,
-        );
-        if (low.length !== 4)
-          throw new Error(
-            `the store holds ${low.length} Kilrush levels below −3 m on 2025-01-09, not 4`,
-          );
-      },
     },
     {
       id: "gesla-unam-carmen-number",
@@ -1375,20 +1251,6 @@ export default {
             throw new Error(`${id} isn't linked to ${linz}`);
         }
       },
-    },
-    {
-      id: "gesla-petten-meetraai3-2012-zero",
-      stations: ["gesla/petten_meetraai_03-pet-nld-rws"],
-      since: "2012-10-22",
-      until: "2013-05-16",
-      handling: "flagged",
-      error:
-        "GESLA's copy of RWS's Petten meetraai 03 holds exactly 0.00 m NAP for hours at a time through high and low water from 22 October 2012 to the record's end on 15 May 2013, as RWS's own series does (erratum `rws-petten-meetraai3-2012-zero`).",
-      response:
-        "22 October 2012 to 15 May 2013 is flagged `suspect`, keeping the source flag as `source_flag`. About 800 of the span's 19,000 values are the held fill, and the rest is sound tide, but the fill comes and goes within hours, so only the whole span covers it: QC of a tidal gauge flags 199 of the 797 held values.",
-      evidence:
-        "The same 778 values of 0.00 m in 2012 and 466 in 2013 as RWS's series. Found from the station's analysis, November 2026: the held values counted as drains and judged it not tidal. 0.00 m NAP is about mid-tide at Petten, where the tide runs from about −1.0 to 0.8 m. From 22 October 2012 to 3 May 2013 the series jumps from the tide to exactly 0.00 m and holds it in 33 runs of an hour or more, 5 of them 6 hours or more, through high and low water. Before that, 0.00 m appears 60 to 125 times a year as the tide passes through it, rarely twice in a row.",
-      check: (store, e) => flaggedSpan(store, e),
     },
     {
       id: "gesla-fill-values",
@@ -1640,5 +1502,22 @@ export default {
       check: atPositions,
     },
   ],
-  retired: [],
+  retired: [
+    "gesla-st-pauli-wrong-minute",
+    "gesla-kilrush-2025-01-09-offset",
+    "gesla-eemshaven-waddenzee-2016-offset",
+    "gesla-buesum-cmems-spikes",
+    "gesla-petten-meetraai3-2012-zero",
+    "gesla-eriksberg-2018-tingstadstunneln",
+    "gesla-borkum-suedstrand-2014-offset",
+    "gesla-mittelgrund-2012-offset",
+    "gesla-bake-z-2004-offset",
+    "gesla-helgoland-suedhafen-2013-clock",
+    "gesla-helgoland-suedhafen-2001-offset",
+    "gesla-helgoland-binnenhafen-2000-offset",
+    "gesla-cuxhaven-uhslc-2024-summer",
+    "gesla-cuxhaven-uhslc-2024-march",
+    "gesla-goteborg-2011-hour-early",
+    "gesla-goteborg-2007-hour-early",
+  ],
 } satisfies ErrataFile;

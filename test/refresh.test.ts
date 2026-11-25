@@ -683,20 +683,38 @@ describe("publishStations", () => {
       erratum("test-every", "test", null),
       // Another source's isn't this store's to report or publish.
       erratum("other-x", "other", ["other/x"]),
+      // Another source's that lists a copy here is, naming only this store's stations.
+      erratum("other-copied", "other", ["other/x", "test/b"]),
+      // A restricted source's stays out, even listing a copy here.
+      erratum("secret-copied", "secret", ["secret/x", "test/b"]),
     ];
-    const result = await publishStations(store, [sourceOf([])], ["test"], errata);
-    assert.deepEqual("count" in result && result.unknownErrata, ["test-a test/gone"]);
+    // As publish passes only the store's own sources, a restricted one isn't among them.
+    const other: Source = { ...sourceOf([]), metadata: { ...metadata, id: "other" } };
+    // A question's stations are checked the same way, though questions aren't published.
+    const questions = [
+      { id: "test-q", stations: ["test/a", "test/typo"] },
+      { id: "test-all", stations: null },
+    ];
+    const result = await publishStations(store, [sourceOf([]), other], ["test"], errata, questions);
+    assert.deepEqual("count" in result && result.unknownErrata, [
+      "test-a test/gone",
+      "test-q test/typo",
+    ]);
     const db = await (await DuckDBInstance.create(":memory:")).connect();
     const rows = (
       await db.runAndReadAll(`SELECT id, errata FROM '${stationsPath(store)}' ORDER BY id`)
     ).getRowObjectsJson();
     assert.deepEqual(rows, [
       { id: "test/a", errata: ["test-a", "test-every"] },
-      { id: "test/b", errata: ["test-every"] },
+      { id: "test/b", errata: ["test-every", "other-copied"] },
     ]);
     assert.deepEqual(
-      JSON.parse(await readFile(errataPath(store), "utf8")).map((e: Erratum) => e.id),
-      ["test-a", "test-every"],
+      JSON.parse(await readFile(errataPath(store), "utf8")).map((e: Erratum) => [e.id, e.stations]),
+      [
+        ["test-a", ["test/a", "test/gone"]],
+        ["test-every", null],
+        ["other-copied", ["test/b"]],
+      ],
     );
   });
 

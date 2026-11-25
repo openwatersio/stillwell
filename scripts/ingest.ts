@@ -14,6 +14,7 @@
  *   node scripts/ingest.ts withhold <source> [--accept-withheld]
  *   node scripts/ingest.ts drop <source> [--dry-run]
  *   node scripts/ingest.ts misplaced <source> [--dry-run]
+ *   node scripts/ingest.ts delete-years <source> <station> <epoch> <year,...>
  *   node scripts/ingest.ts years <source> [--rebuild-years]
  *   node scripts/ingest.ts analyze <source> [--all] [--requalify [--budget 120]]
  *
@@ -57,6 +58,10 @@
  * `misplaced` drops the rows in a datum epoch's files from outside its span that
  * the epoch holding their time already has, as an epoch opened with a start in
  * the past leaves them, and lists any others (src/store/misplaced.ts).
+ * `delete-years` deletes a station's year files of levels that hold only values
+ * flagged bad and outside the span, which a year file can't be emptied of, and their rows in the
+ * years file (src/delete-years.ts); the bounds and `missing_years` follow
+ * `compact --rebuild-bounds` and `publish`.
  * `years` reads the source's year files of levels into stations/years/<source>.parquet,
  * which backfill, compaction and requalify then keep (src/store/years.ts).
  * `analyze` judges the source's stations that are due from their levels in the
@@ -173,8 +178,9 @@ import type {
   SourceMetadata,
   Station,
 } from "../src/schema.ts";
-import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
+import { errata, errataProblems, questions, sourceOf, sources } from "../src/sources/index.ts";
 import { DROPS, dropFiles, removePrefixes, withhold, withheldReason } from "../src/withhold.ts";
+import { deleteYears } from "../src/delete-years.ts";
 import { misplaced } from "../src/store/misplaced.ts";
 import { storeFor, storeOfSource } from "../src/store/stores.ts";
 import { measureLinks, readLinks, writeLinks } from "../src/links.ts";
@@ -425,6 +431,30 @@ switch (command) {
     await misplacedRows(source);
     break;
   }
+  case "delete-years": {
+    const [source, station, epoch, years] = args;
+    if (!source || !station || !epoch || !years || args.length > 4 || values["dry-run"]) usage();
+    const { files, gone, rows } = await deleteYears(
+      storeOfSource(sourceOf(source).metadata),
+      source,
+      station,
+      parseEpoch(epoch),
+      years.split(",").map(parseYear),
+      removePrefixes,
+    );
+    const lines = [
+      `${source}/${station}: ${files.length} year files deleted, ${rows} values flagged bad`,
+      ...files.map((f) => `  ${f}`),
+      ...(gone.length
+        ? [`${gone.length} named years had no file, deleted by an earlier run or never there`]
+        : []),
+      `Run \`compact ${source} --rebuild-bounds\` and \`publish\` to rebuild the bounds and the missing years.`,
+    ];
+    for (const line of lines) console.log(line);
+    const summary = process.env.GITHUB_STEP_SUMMARY;
+    if (summary) await appendFile(summary, ["```", ...lines, "```", ""].join("\n"));
+    break;
+  }
   case "years": {
     const [source] = args;
     if (!source) usage();
@@ -524,7 +554,7 @@ async function publish(store: string): Promise<void> {
   for (const { metadata } of held)
     if (published.has(metadata.id) || (await hasHistory(store, metadata.id)))
       expected.push(metadata.id);
-  const result = await publishStations(store, held, expected, errata);
+  const result = await publishStations(store, held, expected, errata, questions);
   if ("count" in result) {
     console.log(`${stationsPath(store)}: ${result.count} stations`);
     const { pairs, dropped, skipped, wide, shifted } = result.links;
@@ -556,9 +586,9 @@ async function publish(store: string): Promise<void> {
     for (const f of far) console.log(`  datums join dropped: ${f}`);
     for (const d of disagree) console.log(`  datums differ: ${d}`);
     for (const e of result.unknownErrata)
-      console.error(`  erratum lists a station not in the store: ${e}`);
+      console.error(`  erratum or question lists a station not in the store: ${e}`);
     for (const p of errataProblems) console.error(`  errata: ${p}; left out`);
-    // A typo in an erratum's stations tags nothing, and a bad errata file leaves
+    // A typo in an erratum's stations tags nothing, one in a question's names the wrong gauge to its agency, and a bad errata file leaves
     // its errata out, so fail the run to say so, after publishing: holding back
     // every source's list for it would cost more.
     if (result.unknownErrata.length || errataProblems.length) process.exitCode = 1;
@@ -1385,6 +1415,11 @@ async function misplacedRows(sourceId: string): Promise<void> {
   if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
 }
 
+function parseEpoch(value: string): number {
+  if (!/^[1-9]\d*$/.test(value)) throw new Error(`Not an epoch: ${value}`);
+  return Number(value);
+}
+
 function parseYear(value: string): number {
   if (!/^\d{4}$/.test(value)) throw new Error(`Not a year: ${value}`);
   return Number(value);
@@ -1398,7 +1433,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] [--prune] | matches [--concurrency N] [--accept-matches] [--prune] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] [--prune] | matches [--concurrency N] [--accept-matches] [--prune] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | delete-years <source> <station> <epoch> <year,...> | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }

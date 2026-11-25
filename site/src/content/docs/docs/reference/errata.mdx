@@ -10,7 +10,7 @@ sidebar:
 import Schema from "../../../../components/Schema.astro";
 import QueryResult from "../../../../components/QueryResult.astro";
 
-`errata.json` lists every erratum in the store: an error in what a source publishes, such as values on the wrong clock, a gauge placed far from where it is, or metadata that contradicts the data. Each entry gives the stations and span it's in, what's wrong, what Stillwell does about it, the evidence, and what the agency answered. It's rebuilt with [`stations.parquet`](/docs/reference/stations/) from the errata files in the Stillwell repository. When an agency fixes its data and the store has fetched it again, the entry leaves the file and its ID is never used again.
+`errata.json` lists every erratum in the store: an error in what a source publishes, such as values on the wrong clock, a gauge placed far from where it is, or metadata that contradicts the data. Each entry gives the stations and span it's in, including other sources' copies of the record that carry the same error, what's wrong, what Stillwell does about it, the evidence, and what the agency answered. It's rebuilt with [`stations.parquet`](/docs/reference/stations/) from the errata files in the Stillwell repository. When an agency fixes its data and the store has fetched it again, or the entry joins the original's as a copy, the entry leaves the file and its ID is never used again.
 
 It's a JSON array, one object per erratum, which DuckDB reads with `read_json`.
 

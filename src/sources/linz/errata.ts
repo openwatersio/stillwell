@@ -389,7 +389,7 @@ export default {
     },
     {
       id: "linz-korotiti-bay-sensors",
-      stations: ["linz/GBIT"],
+      stations: ["linz/GBIT", "gesla/korotiti_bay-gbit-nzl-ttw"],
       since: "2021-08-01",
       until: "2024-09-11",
       handling: "flagged",
@@ -398,9 +398,17 @@ export default {
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Neither sensor is known to be right, so neither is read as a replacement.",
       evidence:
-        "The 2021 to 2024 sensor 40 and 41 files, monthly medians, November 2026; the README's gauge history and calibration.",
+        "The 2021 to 2024 sensor 40 and 41 files, monthly medians, November 2026; the README's gauge history and calibration. GESLA's copy (`gesla/korotiti_bay-gbit-nzl-ttw`) holds the same values at all 2,795 times the two share, on 119 of the 150 days read in five 30-day pieces spread over the span's 1,137.",
       check: async (store, e) => {
-        await flaggedSpan(store, e);
+        await flaggedSpan(store, e, ["linz/GBIT"]);
+        // The new sensors' zero sits below the one before the span (`linz-korotiti-bay-step-2024`), so GESLA's datum-jump rule (`gesla-datum-jumps`) flags the copy's values from the day the span ends, which isn't judged as spill from the span.
+        const gesla = "gesla/korotiti_bay-gbit-nzl-ttw";
+        await flaggedSpan(store, e, [gesla], { untilDay: false });
+        const after = await store.levels(gesla, e.until!, dayAfter(e.until!, 1));
+        if (!after.length || after.some((o) => o.flag < Flag.suspect))
+          throw new Error(
+            `${gesla}'s levels on ${e.until} aren't all suspect, as the datum-jump rule flags them`,
+          );
         const s = await store.station("linz/GBIT");
         if (s?.datums && "CD" in s.datums)
           throw new Error("the store publishes GBIT's chart datum");
@@ -526,7 +534,7 @@ export default {
     },
     {
       id: "linz-devonport-sensor-fault-2012",
-      stations: ["linz/AUCT"],
+      stations: ["linz/AUCT", "gesla/auckland-auct-nzl-ttw"],
       since: "2012-07-11",
       until: "2012-08-28",
       handling: "flagged",
@@ -534,12 +542,13 @@ export default {
         "Sensor 40 at Devonport is erratic from 11 July to 27 August 2012: its daily medians run from 1.2 to 5.1 m and its daily ranges up to 5.8 m, while sensor 41's medians are 5.4 to 6.0 m with ranges of 1.8 to 3.0 m. The README lists sensors replaced on 28 August.",
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own. Sensor 41's median level is 5.61 m, against sensor 40's 5.36 m in the 60 days before and 5.03 m after.",
-      evidence: "The sensor 40 and 41 files for the years, November 2026.",
+      evidence:
+        "The sensor 40 and 41 files for the years, November 2026. GESLA's copy (`gesla/auckland-auct-nzl-ttw`) holds the same values at all 1,152 times the two share, on all 48 days of the span.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
       id: "linz-boat-cove-sensor-fault-2013",
-      stations: ["linz/RBCT"],
+      stations: ["linz/RBCT", "gesla/boat_cove-rbct-nzl-ttw"],
       since: "2013-07-16",
       until: "2013-11-12",
       handling: "flagged",
@@ -547,7 +556,8 @@ export default {
         "Sensor 40 at Boat Cove is erratic from 16 July to 11 November 2013: its daily medians run from 2.8 to 4.9 m and its daily ranges up to 11.7 m, and it is stuck on some days. Sensor 41's own range is 0.0 to 5.5 m, so it is stuck or erratic on some days too.",
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own.",
-      evidence: "The sensor 40 and 41 files for the years, November 2026.",
+      evidence:
+        "The sensor 40 and 41 files for the years, November 2026. GESLA's copy (`gesla/boat_cove-rbct-nzl-ttw`) holds the same values at all 2,842 times the two share, on all 119 days of the span.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
@@ -578,7 +588,7 @@ export default {
     },
     {
       id: "linz-napier-sensor-fault-2010-12",
-      stations: ["linz/NAPT"],
+      stations: ["linz/NAPT", "gesla/napier-napt-nzl-ttw"],
       since: "2010-12-07",
       until: "2010-12-15",
       handling: "flagged",
@@ -586,7 +596,8 @@ export default {
         "Sensor 40 at Napier is erratic from 7 to 14 December 2010: its daily medians run from 2.7 to 27.9 m and its daily ranges up to 30 m, while sensor 41's medians are 3.0 to 3.1 m. The README lists sensors replaced on 15 December.",
       response:
         "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own. Sensor 41's median level is 3.07 m, against sensor 40's 2.70 m in the 60 days before and 2.76 m after.",
-      evidence: "The sensor 40 and 41 files for the years, November 2026.",
+      evidence:
+        "The sensor 40 and 41 files for the years, November 2026. GESLA's copy (`gesla/napier-napt-nzl-ttw`) holds the same values at all 109 times the two share, on all 8 days of the span.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
@@ -1011,7 +1022,7 @@ export default {
     },
     {
       id: "linz-scott-base-steps-2019-01",
-      stations: ["linz/SCOT"],
+      stations: ["linz/SCOT", "gesla/scott_base_antarctica-scot-nzl-ttw"],
       since: "2019-01-17",
       until: "2019-01-20",
       handling: "flagged",
@@ -1020,7 +1031,7 @@ export default {
       response:
         "The days of the three shifts, 17 to 19 January, are flagged `suspect`, keeping the source's own flag as `source_flag`. No epoch opens, since no step shows.",
       evidence:
-        "Scott Base's and Cape Roberts' hourly levels, the medians of the differences either side, November 2026; the README's gauge history.",
+        "Scott Base's and Cape Roberts' hourly levels, the medians of the differences either side, November 2026; the README's gauge history. GESLA's copy (`gesla/scott_base_antarctica-scot-nzl-ttw`) holds the same values at all 72 times the two share, on all 3 days of the span.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
         await noEpochBetween(store, "linz/SCOT", "2019-01-06", "2019-02-01");
@@ -1073,7 +1084,7 @@ export default {
     },
     {
       id: "linz-scott-base-unreliable-2021",
-      stations: ["linz/SCOT"],
+      stations: ["linz/SCOT", "gesla/scott_base_antarctica-scot-nzl-ttw"],
       since: "2021-02-07",
       until: "2021-03-17",
       handling: "flagged",
@@ -1081,7 +1092,7 @@ export default {
         "Scott Base's README marks its levels from 8 February to 17 March 2021 unreliable, after a drift of TG0, and lists six shifts of TG0 from 17 February to 16 March. The levels still follow a tide, and against Cape Roberts' the difference moves from 5.403 m over the 4 weeks before to 5.583 m over the span, with a standard deviation of 0.103 m against 0.065 m, and by 0.2 to 0.3 m over days.",
       response: "The span is flagged `suspect`, keeping the source's own flag as `source_flag`.",
       evidence:
-        "Scott Base's and Cape Roberts' hourly levels, November 2026; the README's gauge history.",
+        "Scott Base's and Cape Roberts' hourly levels, November 2026; the README's gauge history. GESLA's copy (`gesla/scott_base_antarctica-scot-nzl-ttw`) holds the same values at all 906 times the two share, on all 38 days of the span.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
@@ -1176,6 +1187,41 @@ export default {
         await absent(store, "linz/SCOT", `${e.since}T01:00`, "2025-11-20T01:00");
         await epochFrom(store, "linz/SCOT", "2025-11-20");
       },
+    },
+  ],
+  questions: [
+    {
+      id: "linz-calibration-history",
+      stations: "every station",
+      question:
+        "For each gauge, the calibration results at every visit or sensor replacement since the record began: the date, the benchmark used, and the height of tide gauge zero (TG0) below it. The README files give one calibration at ten gauges, none at six (Devonport, Gisborne, Napier, Port Chalmers, Tauranga, Wellington), and yearly tables only for Cape Roberts and Scott Base. Which sensor, 40 or 41, does each calibration apply to? The two sensors differ by 0.3 to 1.5 m on a yearly cycle at Lottin Point, Kaikoura, Korotiti Bay, Fishing Rock, Boat Cove and Napier. Is one of them the reference?",
+      why: "The store could put each gauge's levels on one continuous height reference, with chart datum on every epoch, instead of on each sensor's own tide gauge zero.",
+      meanwhile:
+        "The store keeps each level above the tide gauge zero of its time and opens a datum epoch where the data show a step. It sets `datums.CD` only where a README gives chart datum against TG0, and reads sensor 40, with sensor 41 where sensor 40 fails.",
+      asked: null,
+      answer: null,
+    },
+    {
+      id: "linz-steps-in-the-zero",
+      stations: ["linz/NAPT", "linz/WLGT", "linz/OTAT", "linz/TAUT", "linz/GIST"],
+      question:
+        'What happened at these steps? Compared with UHSLC\'s hourly records, both sensors step down together at Napier at 18:51 UTC on 24 February 2008 (0.34 m; the README says "step in data on February 25"); at Wellington on 30 May 2012 (0.26 m) and between 20:25 and 21:56 UTC on 15 April 2021 (0.38 m; the README lists no work in April 2021); at Port Chalmers on 26 May 2021 (0.56 m); at Tauranga between 22:17 and 23:17 UTC on 20 March 2024 (0.47 m; the README lists nothing in 2024); and at Gisborne on 25 to 26 September 2013 (0.57 m), 11 to 12 May 2021 (0.41 m) and 12 to 13 December 2024 (0.54 m; none listed except the 2024 sensor replacement). The sizes are 30-day median offsets against UHSLC, good to about 0.01 to 0.08 m.',
+      why: "Whether each step is a move of the gauge's zero, which the store should carry as a datum change, or an error in the levels.",
+      meanwhile:
+        "The store records each step in an erratum and a datum epoch, with a note on how far the levels before it sit above the same water since.",
+      asked: null,
+      answer: null,
+    },
+    {
+      id: "linz-quality-controlled-series",
+      stations: "every station",
+      question:
+        "Does LINZ publish the quality-controlled series it uses for tsunami warning or for the reference ports, and where? We also have a list of spells when sensor 40 was stuck or erratic, such as Sumner from June 2016 to 2020, and can send it to whoever looks after the data.",
+      why: "The store could take LINZ's own checked values, with quality flags, in place of the unchecked ones it reads now.",
+      meanwhile:
+        "LINZ sends no quality flag, so the store marks day files `preliminary` and year files `good`, which here means final and not checked, and flags the sensor faults it has found in its errata.",
+      asked: null,
+      answer: null,
     },
   ],
   retired: [],

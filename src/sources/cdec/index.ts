@@ -1,5 +1,6 @@
 import { getText } from "../../http.ts";
 import { currentEpoch } from "../../epochs.ts";
+import { possible } from "../../span.ts";
 import {
   Flag,
   stationDefaults,
@@ -356,7 +357,7 @@ export function parse(text: string, code: string): Observation[] {
   if (!lines.length) throw new Error(`CDEC ${code} sent an empty reply`);
   if (!/^STATION_ID,DURATION,SENSOR_NUMBER,SENSOR_TYPE,DATE TIME,OBS DATE,VALUE/.test(lines[0]!))
     throw new Error(`CDEC ${code} sent an unexpected header: ${lines[0]}`);
-  const byTime = new Map<number, Observation>();
+  const rows: { wall: number; feet: number }[] = [];
   for (const line of lines.slice(1)) {
     const [id, , sensor, , stamp, , value, , units] = line.split(",");
     if (id !== code || sensor !== "1")
@@ -371,14 +372,30 @@ export function parse(text: string, code: string): Observation[] {
     // Date.UTC rolls an impossible date or time into the next, so check it reads back.
     if (!new Date(wall).toISOString().startsWith(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}`))
       throw new Error(`CDEC ${code} sent a bad row: ${line}`);
+    rows.push({ wall, feet });
+  }
+  const stamped = [...new Map(rows.map((r) => [r.wall, r])).values()];
+  const standardFrom = fallBackStandard(stamped);
+  const byTime = new Map<number, Observation>();
+  for (const { wall, feet } of stamped) {
     const time = fromPacific(wall);
     // A wall time in the hour skipped when daylight saving starts doesn't exist.
     if (time + offsetAt(time) !== wall) continue;
-    // On the day daylight saving ends, CDEC sends the repeated hour once, as
-    // standard time, but its 00:45 reading is daylight time in some years and
-    // standard in others (2014, 2015, 2022, 2024, 2025), so readings from
-    // 00:45 to 01:00 that day are dropped.
-    if (+m[4]! === 0 && +m[5]! >= 45 && offsetAt(time) > offsetAt(time + 2 * 3_600_000)) continue;
+    const day = wall - (wall % DAY_MS);
+    const from = standardFrom.get(day);
+    // On the day daylight saving ends, the stamps after the clock's switch are standard time.
+    if (from !== undefined && wall - day < SWITCH_END_MS) {
+      // No clear switch: a stamp it could fall on, from 00:30 to 01:00, is dropped.
+      if (from === null && wall - day >= SWITCH_FROM_MS && wall - day < 3_600_000) continue;
+      if (from !== null && wall >= from) {
+        byTime.set(wall + 8 * 3_600_000, {
+          time: wall + 8 * 3_600_000,
+          level: Math.round(feet * FEET * 1000) / 1000 + 0,
+          flag: Flag.preliminary,
+        });
+        continue;
+      }
+    }
     byTime.set(time, {
       time,
       level: Math.round(feet * FEET * 1000) / 1000 + 0,
@@ -386,6 +403,78 @@ export function parse(text: string, code: string): Observation[] {
     });
   }
   return [...byTime.values()].sort((a, b) => a.time - b.time);
+}
+
+/** The stamps of the day daylight saving ends that the clock's switch to standard time can fall on start here, 00:30. */
+const SWITCH_FROM_MS = 30 * 60_000;
+/** CDEC's stamps from 01:00 to 02:00 on that day are standard time, which `fromPacific` reads. */
+const SWITCH_END_MS = 2 * 3_600_000;
+/** How far a level must jump across the hour a switch skips, in feet, and over every other step. */
+const SWITCH_JUMP_FT = 0.2;
+const SWITCH_JUMP_OVER = 2;
+
+/**
+ * For each day daylight saving ends, the wall time (as if UTC) of the first
+ * stamp CDEC wrote in standard time, or null where the data doesn't say
+ * (erratum `cdec-fall-back-clock`). On that day CDEC sends the repeated 01:00
+ * hour once, as standard time, and its clock switches to standard time at
+ * 00:30, 00:45 or 01:00 (Fisherman's Cut against DWR's record of the gauge:
+ * 00:30 in 2018 and 00:45 in 2017, 2019 and 2021 to 2023), so a 00:30 or 00:45
+ * stamp can be either time. The hour the switch skips shows as one jump in the
+ * level between two consecutive stamps, at least 0.2 ft and twice any other
+ * step from 00:00 to 02:00, and the first stamp after it is the first in
+ * standard time. It's null where no jump stands out, where the reply has no
+ * stamp at 00:15 or before and one at 01:45 or after (a window that starts or
+ * ends inside the day's first two hours, as a live poll's can, so a later reply never
+ * decides otherwise), and where a stamp is missing
+ * around the jump, since the one step then spans two. A level no gauge reads
+ * (`possible`) is left out of the search.
+ */
+function fallBackStandard(rows: { wall: number; feet: number }[]): Map<number, number | null> {
+  const days = new Map<number, { wall: number; feet: number }[]>();
+  for (const r of rows) {
+    const day = r.wall - (r.wall % DAY_MS);
+    if (r.wall - day >= SWITCH_END_MS || !possible(r.feet * FEET)) continue;
+    (days.get(day) ?? days.set(day, []).get(day)!).push(r);
+  }
+  const out = new Map<number, number | null>();
+  for (const [day, stamps] of days) {
+    // Only the day offsets differ across: daylight time at 00:30, standard at 03:00.
+    const probe = fromPacific(day + SWITCH_FROM_MS);
+    if (!(offsetAt(probe) > offsetAt(probe + 2 * 3_600_000))) continue;
+    stamps.sort((a, b) => a.wall - b.wall);
+    const steps = stamps.slice(1).map((b, i) => ({
+      to: b.wall,
+      from: stamps[i]!.wall,
+      // CDEC's values are in hundredths of a foot.
+      jump: Math.round(Math.abs(b.feet - stamps[i]!.feet) * 100) / 100,
+    }));
+    const gaps = steps.map((x) => x.to - x.from).sort((a, b) => a - b);
+    const usual = gaps[Math.floor(gaps.length / 2)] ?? 0;
+    // The switch lies between stamps ending from 00:30 on, up to the first at or after 01:00.
+    const end = steps.find((x) => x.to - day >= 3_600_000)?.to;
+    const candidates = steps.filter(
+      (x) => end !== undefined && x.to - day >= SWITCH_FROM_MS && x.to <= end,
+    );
+    const even = candidates.every((x) => x.to - x.from > 0 && x.to - x.from <= 1.5 * usual);
+    const best = candidates.reduce<(typeof steps)[number] | undefined>(
+      (a, x) => (!a || x.jump > a.jump ? x : a),
+      undefined,
+    );
+    const rest = steps.filter((x) => x !== best).reduce((a, x) => Math.max(a, x.jump), 0);
+    out.set(
+      day,
+      best &&
+        even &&
+        stamps[0]!.wall - day <= 15 * 60_000 &&
+        stamps.at(-1)!.wall - day >= 105 * 60_000 &&
+        best.jump >= SWITCH_JUMP_FT &&
+        best.jump >= SWITCH_JUMP_OVER * rest
+        ? best.to
+        : null,
+    );
+  }
+  return out;
 }
 
 const PACIFIC = new Intl.DateTimeFormat("en-US", {

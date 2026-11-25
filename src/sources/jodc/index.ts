@@ -27,7 +27,7 @@ export const metadata: SourceMetadata = {
     url: `${SITE}/jodcweb/JDOSS/index.html`,
     // JODC asks for permission before its data is passed to third parties (#47).
     commercial_use: false,
-    // Public while JODC's permission is asked for (#47), on the expectation it's given.
+    // Public under the maintainers' decision (#47), though JODC hasn't given the permission its terms ask for.
     // The files are open URLs, and the download form collects no name or address. The
     // tide pages say "No reproduction or republication without written permission", and
     // the Japan Coast Guard's general terms, compatible with CC BY 4.0, exclude content
@@ -38,7 +38,7 @@ export const metadata: SourceMetadata = {
   // The mailbox JODC's contact page gives.
   contact: { email: "jodc@jodc.go.jp", url: `${SITE}/jodcweb/contactUs.html` },
   terms:
-    "JODC serves these records to anyone, but its J-DOSS terms say not to copy the data and provide it to third parties without permission (無断で、データ等を複製して第三者に提供しないようにしてください), and ask that work using it credit JODC. Permission to republish has been asked for (openwatersio/stillwell#47); until it's given, treat the data as research use only. Credit JODC and the observing agency each station's attribution names, and, as JODC asks, send it a copy of work that uses the data.",
+    "JODC serves these records to anyone, but its J-DOSS terms say not to copy the data and provide it to third parties without permission (無断で、データ等を複製して第三者に提供しないようにしてください), and ask that work using it credit JODC. JODC hasn't given permission to republish (asked in openwatersio/stillwell#47), so treat the data as research use only. Credit JODC and the observing agency each station's attribution names, and, as JODC asks, send it a copy of work that uses the data.",
   // Records arrive in a yearly batch.
   hourly: false,
   // JODC publishes final values only.

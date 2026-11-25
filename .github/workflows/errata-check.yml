@@ -2,12 +2,15 @@ name: Errata check
 
 # Run every erratum's check against the public store (scripts/errata-check.ts)
 # after each full Monthly or Refetch run on main that refreshed or refetched a
-# source, and bring the `errata-check` issues in line
-# (scripts/errata-issues.ts): one open issue for each failing erratum, closed
-# when its check passes. A failing check opens an issue and leaves the run
-# green; the run fails when the checks can't run, can't read the store, or the
-# errata files have problems. Dispatch it with sources or erratum IDs to check
-# only those, such as after a backfill.
+# source, and write the errata report (scripts/errata-report.ts): the failing
+# checks, and the cross-station findings of the full Monthly run, or the latest
+# one, that nothing settles. The report goes to the run's summary and its `errata report`
+# artifact, which the errata runbook (docs/contributing/errata-runbook.md)
+# works. A failing check leaves the run green; the run fails when the checks
+# can't run or can't read the store, the report can't be written, the errata
+# files have problems, or cross-check findings are missing.
+# Dispatch it with sources or erratum IDs to check only those, such as after a
+# backfill.
 on:
   workflow_run:
     workflows: [Monthly]
@@ -38,7 +41,6 @@ jobs:
     permissions:
       actions: read
       contents: read
-      issues: write
     steps:
       # A backup run that found the dispatched one, or a run cancelled before
       # its work, refreshed and refetched nothing, so its store is no newer.
@@ -75,7 +77,63 @@ jobs:
         env:
           ONLY: ${{ inputs.only }}
           STILLWELL_STORE: https://stillwell.openwaters.io
+      # A full Monthly run's own cross-check findings; after a dispatch or a Refetch, those of the
+      # latest full Monthly run whose cross-check jobs all succeeded. The report names the run its
+      # findings came from, and the run fails, once the report is uploaded, when they're missing
+      # or a region's job failed.
       - if: steps.ran.outputs.run == 'true'
-        run: node scripts/errata-issues.ts report.json
+        run: |
+          if [ "$TITLE" = Monthly ]; then
+            runs=$RUN_ID
+          else
+            # Assigned first, so a failed lookup fails the step rather than reading as no runs.
+            runs=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow monthly.yml --branch main --status completed \
+              --limit 200 --json databaseId,displayTitle --jq '[.[] | select(.displayTitle == "Monthly")][:5][] | .databaseId')
+          fi
+          partial=
+          for id in $runs; do
+            gh run download "$id" --repo "$GITHUB_REPOSITORY" --pattern 'cross-check *' --dir "runs/$id" || continue
+            compgen -G "runs/$id/*/findings.json" > /dev/null || continue
+            # Assigned first, so a failed lookup fails the step.
+            failed=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$id/jobs?per_page=100" --paginate \
+              --jq '.jobs[] | select((.name | startswith("cross-check")) and .conclusion != "success") | .name')
+            if [ -z "$failed" ]; then
+              mv "runs/$id" findings
+              echo "Cross-check findings from run $id"
+              exit 0
+            fi
+            echo "::warning::Cross-check jobs of run $id that didn't succeed: $failed"
+            partial=${partial:-$id}
+          done
+          echo "FINDINGS_MISSING=true" >> "$GITHUB_ENV"
+          if [ -n "$partial" ]; then
+            mv "runs/$partial" findings
+            echo "::error::No run has every region's findings; the report has run $partial's, which lacks some"
+          else
+            echo "::error::No cross-check findings could be downloaded"
+          fi
         env:
+          TITLE: ${{ github.event.workflow_run.display_title }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
           GH_TOKEN: ${{ github.token }}
+      - if: steps.ran.outputs.run == 'true'
+        run: |
+          shopt -s nullglob
+          # Written whole or not at all, so a report that fails is never uploaded empty.
+          node scripts/errata-report.ts report.json findings/*/findings.json > report.tmp
+          mv report.tmp errata-report.md
+          cat errata-report.md >> "$GITHUB_STEP_SUMMARY"
+          # Problems in the errata files, or checks that couldn't read the store, mean some errata weren't checked; the report lists them.
+          jq -e '(.problems | length) == 0 and ([.results[] | select(.unreadable)] | length) == 0' report.json > /dev/null
+      - if: always() && steps.ran.outputs.run == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: errata report
+          path: |
+            errata-report.md
+            report.json
+      # After the report is uploaded, so it's there to read.
+      - if: steps.ran.outputs.run == 'true' && env.FINDINGS_MISSING == 'true'
+        run: |
+          echo "::error::The report is missing cross-check findings; see the findings step"
+          exit 1

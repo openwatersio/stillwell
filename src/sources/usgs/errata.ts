@@ -35,22 +35,23 @@ async function weekMedian(store: StoreReader, id: string): Promise<number> {
   return median(rows.map((o) => o.level));
 }
 
-/** The median of a's hourly median level, plus `addA`, less b's, plus `addB`, over the hours of `WEEK` both have. */
+/** The median of a's hourly median level, plus `addA`, less b's, plus `addB`, over the hours of `span`, `WEEK` by default, both have. */
 async function hourlyDifference(
   store: StoreReader,
   [a, addA]: [string, number],
   [b, addB]: [string, number],
+  span: readonly [string, string] = WEEK,
 ): Promise<number> {
   const hourly = async (id: string, add: number) =>
     new Map(
-      [...Map.groupBy(await store.levels(id, ...WEEK), (o) => Math.floor(o.time / HOUR_MS))].map(
+      [...Map.groupBy(await store.levels(id, ...span), (o) => Math.floor(o.time / HOUR_MS))].map(
         ([hour, rows]) => [hour, median(rows.map((o) => o.level)) + add],
       ),
     );
   const [x, y] = [await hourly(a, addA), await hourly(b, addB)];
   const differences = [...x].filter(([h]) => y.has(h)).map(([h, v]) => v - y.get(h)!);
   if (!differences.length)
-    throw new Error(`${a} and ${b} share no hours from ${WEEK[0]} to ${WEEK[1]}`);
+    throw new Error(`${a} and ${b} share no hours from ${span[0]} to ${span[1]}`);
   return median(differences);
 }
 
@@ -3186,6 +3187,36 @@ export default {
               `${id} reads ${above.toFixed(3)} m above Old River near Byron, not 2.9 to 5.2 ft`,
             );
         }
+      },
+    },
+    {
+      id: "usgs-altitude-contradicts-crms",
+      stations: ["usgs/292859090004000"],
+      handling: "avoided",
+      error:
+        "Barataria Waterway south of Lafitte, Louisiana (292859090004000) is listed at 0.0 ft NAVD88, which puts its water 1.38 to 1.40 m above three CRMS gauges (CRMS0232-H01, CRMS0237-H01 and CRMS4690-H01) in the same marsh, each in its own NAVD88.",
+      response: "No offsets, by `GAGE_DATUMS`.",
+      evidence:
+        "Hourly levels of the site and each gauge over the latest year the store holds for both (2020 for CRMS0232 and CRMS4690, 2014 for CRMS0237, after CRMS's 2013 change of geoid), where the differences have 1.7 to 3.1 cm spread and means of 1.40, 1.39 and 1.38 m.",
+      check: async (store, e) => {
+        // Each gauge's latest year with the site's, from the pairs the evidence compares.
+        for (const [crms, year] of [
+          ["CRMS0232-H01", 2020],
+          ["CRMS0237-H01", 2014],
+          ["CRMS4690-H01", 2020],
+        ] as const) {
+          const above = await hourlyDifference(
+            store,
+            [e.stations![0]!, 0],
+            [`crms/${crms}`, 0],
+            [`${year}-01-01`, `${year + 1}-01-01`],
+          );
+          if (above < 1.3 || above > 1.5)
+            throw new Error(
+              `usgs/292859090004000 reads ${above.toFixed(3)} m above ${crms} in ${year}, not 1.38 to 1.40 m`,
+            );
+        }
+        await noOffsets(store, ...e.stations!);
       },
     },
   ],

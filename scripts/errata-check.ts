@@ -10,11 +10,13 @@
  *   STILLWELL_STORE=https://stillwell.openwaters.io npm run errata:check
  *   npm run errata:check -- --report report.json  also write each result as JSON
  *
- * The report is what scripts/errata-issues.ts reads: `{ problems, results }`,
+ * The report is what scripts/errata-report.ts reads: `{ only, problems, results }`,
+ * `only` the sources or IDs asked for, empty for every erratum,
  * each result `{ id, source, error, unreadable }`, `error` null where the
  * check passed and `unreadable` true where it failed reading the store.
  */
 import { existsSync, writeFileSync } from "node:fs";
+import { covers, type Erratum } from "../src/errata.ts";
 import { errata, errataProblems } from "../src/sources/index.ts";
 import { errataReader, StoreReadError } from "../src/store/errata-reader.ts";
 import { STORE } from "../src/store/stores.ts";
@@ -31,9 +33,11 @@ const report = at === -1 ? null : args.splice(at, 2)[1];
 if (at !== -1 && !report?.endsWith(".json")) throw new Error("--report needs a .json file");
 // A file that breaks the rules is left out whole, so its checks would silently not run.
 for (const p of errataProblems) console.error(p);
-const unknown = args.filter((a) => !errata.some((e) => e.source === a || e.id === a));
+// A source names every erratum that affects its stations, including those kept with the record it copies.
+const picks = (e: Erratum, a: string) => e.id === a || covers(e, a);
+const unknown = args.filter((a) => !errata.some((e) => picks(e, a)));
 if (unknown.length) throw new Error(`no source or erratum ${unknown.join(", ")}`);
-const chosen = errata.filter((e) => !args.length || args.includes(e.source) || args.includes(e.id));
+const chosen = errata.filter((e) => !args.length || args.some((a) => picks(e, a)));
 
 let failed = 0;
 const results: { id: string; source: string; error: string | null; unreadable: boolean }[] = [];
@@ -63,6 +67,7 @@ if (report)
   writeFileSync(
     report,
     JSON.stringify({
+      only: args,
       problems: errataProblems,
       results: results.sort((a, b) => a.id.localeCompare(b.id)),
     }),

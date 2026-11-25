@@ -182,6 +182,44 @@ export default {
       },
     },
     {
+      id: "ea-immingham-aod-offset",
+      stations: ["ea/E71139"],
+      since: "2026-11-10",
+      until: "2026-11-12",
+      handling: "flagged",
+      error:
+        "The EA's Immingham series in metres above ordnance datum (E71139) reads 1.46 m higher against the chart-datum series at the same gauge (E71124) from 13:00 UTC on 10 November 2026 to 19:15 on the 11th. E71124 less E71139 is 2.44 m at all 97 readings the two share in that stretch and 3.90 m, the datum's offset, at every other reading the store holds for both.",
+      response:
+        "Both days are flagged `suspect`, keeping the EA's own flag as `source_flag`, since a span covers whole days.",
+      evidence:
+        "Found when the pair check on CMEMS's Immingham, the National Oceanography Centre's record, showed it 18 cm RMS from E71139 in 2026. E71124 is within a millimeter of that record at every time, the stretch included. E71124 less E71139 is 3.90 m at every 2025 reading (4,902 compared) and every 2026 reading outside these two days, and 2.44 m at all 97 the two share from 13:00 UTC on 10 November to 19:15 on the 11th. So E71139 steps by 1.46 m and steps back, while E71124 and the NOC record follow the tide without a step.",
+      reported: null,
+      report: null,
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        await allSuspect(store, e.stations![0]!, e.since!, e.until!);
+        // The twin's difference on the stretch's last day, and on the day after, where the offset is back.
+        for (const [day, expected, n] of [
+          ["2026-11-11", 2.44, 50],
+          ["2026-11-12", 3.9, 90],
+        ] as const) {
+          const [a, b] = [
+            await levels(store, "ea/E71124", day),
+            await levels(store, "ea/E71139", day),
+          ];
+          const at = new Map(b.map((o) => [o.time, o.level]));
+          const shared = a.filter((o) => at.has(o.time)).map((o) => o.level - at.get(o.time)!);
+          if (shared.length < n)
+            throw new Error(`the two series share ${shared.length} readings on ${day}, under ${n}`);
+          const d = median(shared);
+          if (Math.abs(d - expected) > 0.02)
+            throw new Error(
+              `E71124 less E71139 has a median of ${d.toFixed(3)} m on ${day}, not ${expected} m`,
+            );
+        }
+      },
+    },
+    {
       id: "ea-archive-missing-2026-07-25",
       stations: "every station",
       since: "2026-07-25",

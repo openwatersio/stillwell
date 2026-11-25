@@ -133,8 +133,6 @@ async function tides(time: string, query = "", hours?: number): Promise<Feature[
       timeout: hours !== undefined && hours > 24 ? 900 : undefined,
     }),
   );
-  // A window with no readings answers `{"type":"FeatureCollection","features":]}`, which isn't JSON (erratum `cco-empty-window-answers`).
-  if (/"features"\s*:\s*\]/.test(text)) return [];
   const body = JSON.parse(text) as { features?: Feature[] };
   if (!Array.isArray(body.features)) throw new Error("CCO answered without a feature list");
   return body.features;
@@ -307,7 +305,7 @@ function flagOf(code: unknown): Flag {
 export const source: Source = {
   metadata,
   // A month's flags arrive within weeks, and reading from the earliest preliminary reading would read the
-  // archive from 2005, so every active station is read again from 12 months back (README.md).
+  // archive from 1996, so every active station is read again from 12 months back (README.md).
   schedule: {
     refetch: (today) => [["all", firstOfMonth(today, -12), firstOfMonth(today), "--refetch"]],
   },

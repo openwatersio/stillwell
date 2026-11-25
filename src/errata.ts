@@ -10,7 +10,9 @@
  * column of `stations.parquet` and writes them to `errata.json`. An entry
  * also records its report to the agency, which `npm run errata` drafts.
  * Once the agency fixes the data and the store has refetched it, the entry
- * goes and its ID moves to `retired`. See docs/contributing/sources.md.
+ * goes and its ID moves to `retired`. The same file holds the source's
+ * `questions` to its agency that aren't errors, which go in the same message
+ * and aren't published. See docs/contributing/sources.md.
  */
 import {
   Flag,
@@ -21,6 +23,7 @@ import {
   type StoredStation,
 } from "./schema.ts";
 import { possible } from "./span.ts";
+import { isUrlSafe } from "./store/paths.ts";
 
 /** What the store does about an erratum. */
 export const HANDLING = ["corrected", "flagged", "dropped", "refused", "avoided", "kept"] as const;
@@ -40,7 +43,9 @@ export interface Erratum {
   /**
    * Store station IDs known to be affected; null for every station of the
    * source. Partial or empty where the source doesn't say which stations, or
-   * they aren't in the store; `error` says which.
+   * they aren't in the store; `error` says which. Other sources' records that
+   * copy the source's values, such as GESLA's copy of a gauge, are listed here
+   * too, so one erratum covers every record that carries the error.
    */
   stations: string[] | null;
   /**
@@ -114,12 +119,16 @@ export const dayAfter = (day: string, n: number) =>
  * value stored before it was kept and already suspect has none; outside, such
  * a value doesn't count. A day with no levels, such as one in a gap or a
  * dropped span, isn't judged, and a station with none on all three fails.
- * `stations` defaults to every station the entry lists.
+ * `stations` defaults to every station the entry lists. Pass `outside: false`
+ * for a record whose values the day the span ends are suspect for a reason of
+ * their own, such as a datum jump GESLA's rule finds there; the day before the
+ * span is judged still.
  */
 export async function flaggedSpan(
   store: StoreReader,
   e: Pick<Erratum, "id" | "stations" | "since" | "until">,
   stations: string[] = e.stations ?? [],
+  { untilDay = true }: { untilDay?: boolean } = {},
 ): Promise<void> {
   if (!e.since && !e.until) throw new Error(`${e.id} has no span`);
   if (!stations.length) throw new Error(`${e.id} names no station to read`);
@@ -131,7 +140,9 @@ export async function flaggedSpan(
   const inside = [e.since, middle, e.until && dayAfter(e.until, -1)].filter(
     (d): d is string => !!d,
   );
-  const outside = [e.since && dayAfter(e.since, -1), e.until].filter((d): d is string => !!d);
+  const outside = [e.since && dayAfter(e.since, -1), untilDay ? e.until : null].filter(
+    (d): d is string => !!d,
+  );
   for (const station of stations) {
     let read = 0;
     for (const day of new Set(inside)) {
@@ -181,7 +192,30 @@ export async function impossibleDropped(
     throw new Error(`${station}'s ${year} holds impossible levels not flagged bad`);
 }
 
-/** A source's `errata.ts`: its errata as written, and the IDs it retired. */
+/**
+ * A question to a source's agency that isn't an error, such as what a datum
+ * or flag means, whether a series is right, or a request for data. No work
+ * waits on its answer: `meanwhile` says what the store does until then.
+ */
+export interface Question {
+  /** `<source>-<what>`, never reused, and unique across errata and questions. */
+  id: string;
+  source: string;
+  /** The source's own store station IDs it's about; null for the source as a whole. */
+  stations: string[] | null;
+  /** What we ask the agency, in plain English. */
+  question: string;
+  /** What the answer would change in the store. */
+  why: string;
+  /** What the store does until it's answered. */
+  meanwhile: string;
+  /** The day it was sent to the agency; null until then. */
+  asked: string | null;
+  /** Where it went and what the agency said; with no `asked` date, why it's held back. */
+  answer: string | null;
+}
+
+/** A source's `errata.ts`: its errata and questions as written, and the IDs it retired. */
 export interface ErrataFile {
   errata: {
     id: string;
@@ -195,6 +229,15 @@ export interface ErrataFile {
     reported?: string | null;
     report?: string | null;
     check: Check;
+  }[];
+  questions?: {
+    id: string;
+    stations: string[] | "every station";
+    question: string;
+    why: string;
+    meanwhile: string;
+    asked?: string | null;
+    answer?: string | null;
   }[];
   retired: string[];
 }
@@ -214,6 +257,38 @@ const FIELDS = new Set([
   "report",
   "check",
 ]);
+/** A question's fields, refused otherwise for the same reason. */
+const QUESTION_FIELDS = new Set([
+  "id",
+  "stations",
+  "question",
+  "why",
+  "meanwhile",
+  "asked",
+  "answer",
+]);
+
+/** Reads an entry's text and day fields, refusing what they can't be. */
+function reader(raw: Record<string, unknown>, at: string) {
+  const text = (name: string, required: boolean): string | null => {
+    const value = raw[name] ?? null;
+    if (value !== null && (typeof value !== "string" || !value.trim()))
+      throw new Error(`${at}: "${name}" isn't text`);
+    if (required && value === null) throw new Error(`${at}: no "${name}"`);
+    return value as string | null;
+  };
+  const day = (name: string): string | null => {
+    const value = text(name, false);
+    if (value !== null)
+      try {
+        utcDay(value);
+      } catch {
+        throw new Error(`${at}: "${name}" is ${value}, not YYYY-MM-DD`);
+      }
+    return value;
+  };
+  return { text, day };
+}
 
 /** A source's errata and retired IDs from its `errata.ts`, or an Error saying what's wrong. */
 export function parseErrata(
@@ -231,23 +306,7 @@ export function parseErrata(
     const at = `${where} #${i + 1}`;
     const unknown = Object.keys(raw).filter((k) => !FIELDS.has(k));
     if (unknown.length) throw new Error(`${at}: no field ${unknown.join(", ")}`);
-    const text = (name: string, required: boolean): string | null => {
-      const value = raw[name] ?? null;
-      if (value !== null && (typeof value !== "string" || !value.trim()))
-        throw new Error(`${at}: "${name}" isn't text`);
-      if (required && value === null) throw new Error(`${at}: no "${name}"`);
-      return value as string | null;
-    };
-    const day = (name: string): string | null => {
-      const value = text(name, false);
-      if (value !== null)
-        try {
-          utcDay(value);
-        } catch {
-          throw new Error(`${at}: "${name}" is ${value}, not YYYY-MM-DD`);
-        }
-      return value;
-    };
+    const { text, day } = reader(raw, at);
     const id = text("id", true)!;
     if (!new RegExp(`^${source}-[a-z0-9-]+$`).test(id))
       throw new Error(`${at}: ID ${id} isn't ${source}-<what>`);
@@ -260,7 +319,10 @@ export function parseErrata(
       throw new Error(`${at}: "stations" is neither a list nor "every station"`);
     const stations = listed === "every station" ? null : (listed as string[]);
     for (const s of stations ?? [])
-      if (!s.startsWith(`${source}/`)) throw new Error(`${at}: station ${s} isn't ${source}'s`);
+      if (!/^[a-z0-9-]+\/./.test(s)) throw new Error(`${at}: station ${s} isn't <source>/<id>`);
+    // Another source's record is listed only beside the original it copies.
+    if (stations?.length && !stations.some((s) => s.startsWith(`${source}/`)))
+      throw new Error(`${at}: lists none of ${source}'s stations`);
     const [since, until] = [day("since"), day("until")];
     if (since && until && since >= until) throw new Error(`${at}: "since" isn't before "until"`);
     if (raw.check !== undefined && typeof raw.check !== "function")
@@ -287,22 +349,82 @@ export function parseErrata(
 }
 
 /**
- * Every source's errata, from each one's `errata.ts`, by source ID, and what
- * is wrong with them: a file whose entries break the rules is left out whole,
- * and an ID two entries share or one retired anywhere leaves out the later
- * entry. The registry reads them as it loads, so such a file must cost only
+ * A source's questions from its `errata.ts`, or an Error saying what's wrong.
+ * Read apart from its errata, so a bad question costs only the file's
+ * questions, never the errata that change what the store holds.
+ */
+export function parseQuestions(source: string, data: unknown): Question[] {
+  const where = `src/sources/${source}/errata.ts`;
+  const file = (data ?? {}) as { questions?: unknown; retired?: unknown };
+  if (file.questions === undefined) return [];
+  if (!Array.isArray(file.questions)) throw new Error(`${where}: "questions" isn't an array`);
+  const retired = Array.isArray(file.retired) ? (file.retired as unknown[]) : [];
+  return (file.questions as Record<string, unknown>[]).map((raw, i) => {
+    const at = `${where} question #${i + 1}`;
+    if (raw === null || typeof raw !== "object") throw new Error(`${at}: isn't an entry`);
+    const unknown = Object.keys(raw).filter((k) => !QUESTION_FIELDS.has(k));
+    if (unknown.length) throw new Error(`${at}: no field ${unknown.join(", ")}`);
+    const { text, day } = reader(raw, at);
+    const id = text("id", true)!;
+    if (!new RegExp(`^${source}-[a-z0-9-]+$`).test(id))
+      throw new Error(`${at}: ID ${id} isn't ${source}-<what>`);
+    if (retired.includes(id)) throw new Error(`${at}: ID ${id} is retired`);
+    const listed = raw.stations;
+    if (
+      listed !== "every station" &&
+      !(Array.isArray(listed) && listed.every((s) => typeof s === "string"))
+    )
+      throw new Error(`${at}: "stations" is neither a list nor "every station"`);
+    const stations = listed === "every station" ? null : (listed as string[]);
+    if (stations && (!stations.length || new Set(stations).size < stations.length))
+      throw new Error(`${at}: "stations" is empty or names a station twice`);
+    // A question goes to the source's own agency, about its own stations.
+    for (const s of stations ?? [])
+      if (!s.startsWith(`${source}/`) || !isUrlSafe(s.slice(source.length + 1)))
+        throw new Error(`${at}: station ${s} isn't one of ${source}'s`);
+    return {
+      id,
+      source,
+      stations,
+      question: text("question", true)!,
+      why: text("why", true)!,
+      meanwhile: text("meanwhile", true)!,
+      asked: day("asked"),
+      answer: text("answer", false),
+    };
+  });
+}
+
+/**
+ * Every source's errata and questions, from each one's `errata.ts`, by source
+ * ID, and what is wrong with them: a file whose errata break the rules loses
+ * its errata, one whose questions do loses its questions, and an ID two
+ * entries share, erratum or question, or one retired anywhere leaves out the
+ * later entry, as does an erratum listing a station of a source not in `known`. The registry reads them as it loads, so such a file must cost only
  * its own errata, not every job; the tests and `publish` fail on the problems.
  * A file that doesn't load fails the registry's import, which the type check
  * and the tests catch before it merges.
  */
-export function readErrata(files: Record<string, unknown>): {
+export function readErrata(
+  files: Record<string, unknown>,
+  known: string[] = Object.keys(files),
+): {
   errata: Erratum[];
+  questions: Question[];
   problems: string[];
 } {
   const problems: string[] = [];
   const all = Object.entries(files).flatMap(([source, data]) => {
     try {
       return [parseErrata(source, data)];
+    } catch (error) {
+      problems.push((error as Error).message);
+      return [];
+    }
+  });
+  const asks = Object.entries(files).flatMap(([source, data]) => {
+    try {
+      return parseQuestions(source, data);
     } catch (error) {
       problems.push((error as Error).message);
       return [];
@@ -315,10 +437,22 @@ export function readErrata(files: Record<string, unknown>): {
     .filter((e) => {
       const problem = seen.has(e.id) ? "used twice" : retired.has(e.id) ? "retired" : null;
       if (problem) problems.push(`erratum ID ${e.id} is ${problem}`);
+      // A copy's station is checked here, where every source is known: one of no source would flag nothing.
+      const stranger = (e.stations ?? []).find(
+        (id) => !known.includes(id.slice(0, id.indexOf("/"))),
+      );
+      if (stranger)
+        problems.push(`erratum ${e.id} lists ${stranger}, a station of no registered source`);
       seen.add(e.id);
-      return !problem;
+      return !problem && !stranger;
     });
-  return { errata, problems };
+  const questions = asks.filter((q) => {
+    const problem = seen.has(q.id) ? "used twice" : retired.has(q.id) ? "retired" : null;
+    if (problem) problems.push(`question ID ${q.id} is ${problem}`);
+    seen.add(q.id);
+    return !problem;
+  });
+  return { errata, questions, problems };
 }
 
 /**
@@ -347,7 +481,7 @@ export function spans(station: { id: string }, errata: Erratum[]): [number, numb
  * flag as `source_flag`.
  */
 export function withErrata(source: Source, errata: Erratum[]): Source {
-  const own = errata.filter((e) => e.source === source.metadata.id);
+  const own = errata.filter((e) => covers(e, source.metadata.id));
   if (!own.some((e) => e.handling === "flagged")) return source;
   const mark = (station: { id: string }, rows: Observation[]): Observation[] => {
     const marked = spans(station, own);
@@ -366,8 +500,27 @@ export function withErrata(source: Source, errata: Erratum[]): Source {
     ...source,
     suspect: async (station, record) => {
       let adapter: [number, number][];
+      // The adapter judges the values outside the errata spans: an erratic span
+      // mustn't move a median the adapter's rule reads, such as GESLA's datum
+      // jumps, and flag the sound values around it. The values stay, so a
+      // rule that needs the record's ends still sees them.
+      const marked = spans(station, own);
+      const judged = marked.length
+        ? async function* () {
+            for await (const rows of record())
+              yield rows.map((o) =>
+                marked.some(([from, to]) => o.time >= from && o.time < to)
+                  ? {
+                      ...o,
+                      flag: Math.max(o.flag, Flag.suspect) as Flag,
+                      source_flag: Math.max(o.source_flag ?? o.flag, Flag.suspect) as Flag,
+                    }
+                  : o,
+              );
+          }
+        : record;
       try {
-        adapter = (await suspect?.(station, record)) ?? [];
+        adapter = (await suspect?.(station, judged)) ?? [];
       } catch (error) {
         // The errata spans hold whatever the adapter can't judge.
         if (error instanceof Unjudged)
@@ -399,9 +552,77 @@ export function published(errata: Erratum[]): object[] {
   }));
 }
 
+const between = (since: string | null, until: string | null) =>
+  since && until
+    ? `${since} to before ${until}`
+    : since
+      ? `from ${since}`
+      : until
+        ? `before ${until}`
+        : "";
+
+/**
+ * The draft of the message to `source`'s agency (`npm run errata`): its
+ * errata not yet reported, then its questions not yet asked, under
+ * "Questions", each naming only the source's own stations; null when it has
+ * neither. An entry with a `report` or a question with an `answer`, but no
+ * date it went, is held back, and `held` says why.
+ */
+export function draft(
+  source: string,
+  metadata: { name: string; contact: { email?: string; url?: string } },
+  errata: Erratum[],
+  questions: Question[],
+): { text: string | null; held: string[] } {
+  // A `report` or `answer` with no date says why the entry is held back for now.
+  const own = errata.filter((e) => e.source === source && !e.reported);
+  const asks = questions.filter((q) => q.source === source && !q.asked);
+  const due = own.filter((e) => !e.report);
+  const ask = asks.filter((q) => !q.answer);
+  const held = [
+    ...own.filter((e) => e.report).map((e) => `${e.id} held: ${e.report}`),
+    ...asks.filter((q) => q.answer).map((q) => `${q.id} held: ${q.answer}`),
+  ];
+  if (!due.length && !ask.length) return { text: null, held };
+  const { email, url } = metadata.contact;
+  const stations = (list: string[] | null) =>
+    list === null
+      ? "every station"
+      : list.filter((s) => s.startsWith(`${source}/`)).join(", ") || "none listed";
+  const block = (lines: string[]) => lines.filter(Boolean).join("\n\n") + "\n";
+  const text = [
+    `## ${metadata.name}\n\nTo: ${[email, url].filter(Boolean).join(" or ")}\n`,
+    ...due.map((e) =>
+      block([
+        `### ${e.id}`,
+        e.error,
+        `Stations: ${stations(e.stations)}${between(e.since, e.until) ? `; values ${between(e.since, e.until)}` : ""}.`,
+        e.evidence ?? "",
+        `What we do meanwhile: ${e.response}`,
+      ]),
+    ),
+    ...(ask.length ? ["### Questions\n"] : []),
+    ...ask.map((q) =>
+      block([
+        `#### ${q.id}`,
+        q.question,
+        `Stations: ${q.stations === null ? "the source as a whole" : stations(q.stations)}.`,
+        `What the answer would change: ${q.why}`,
+        `What we do meanwhile: ${q.meanwhile}`,
+      ]),
+    ),
+  ].join("\n");
+  return { text, held };
+}
+
 /** The IDs of the errata that affect a station. */
 export function errataOf(station: { id: string; source: string }, errata: Erratum[]): string[] {
   return errata
-    .filter((e) => e.source === station.source && (!e.stations || e.stations.includes(station.id)))
+    .filter((e) => (e.stations ? e.stations.includes(station.id) : e.source === station.source))
     .map((e) => e.id);
+}
+
+/** Whether `e` is `source`'s, or lists one of its stations as a copy. */
+export function covers(e: Erratum, source: string): boolean {
+  return e.source === source || (e.stations ?? []).some((s) => s.startsWith(`${source}/`));
 }

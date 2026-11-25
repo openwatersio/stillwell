@@ -9,6 +9,7 @@ Tidal levels every 15 minutes at the Environment Agency's tide gauges, from its 
 - **Flags:** the API sends no quality code. The EA doesn't quality-control or revise its real-time readings, so every value is `preliminary`.
 - **Freshness:** each station's last 12 hours are read every hour. The readings API keeps about 30 days and the EA's daily archive files about a year, so a gap longer than 12 hours stays until it's backfilled from one of them.
 - **Gaps:** a day the archive never published has no values unless the poller read it. The store never removes a value it holds, so a span the EA got wrong is flagged by an erratum.
+- **Independent checks:** the [pair check](../../../docs/contributing/checks.md#pair-check) on 41 pairs of an EA gauge (39 stations) and another originator's record of it, over the latest year both hold: 39 CMEMS records from the National Oceanography Centre and the regional coastal monitoring programmes, whose RMS is 1.0 cm at the median, and one each from CCO and BODC. Another 22 pairs, BODC's and the NOC's records of the same gauges, hold the EA's values to the millimeter, so they check nothing. The clocks agree at all 41 (best lag 0 or none better). EA gauges are in AOD or chart datum, and no other originator's record names either, so the datums are unchecked. The check found the EA's Immingham mAOD series stepping 1.46 m for a day and a half (erratum `ea-immingham-aod-offset`).
 
 ## Running ingest
 

@@ -1,6 +1,27 @@
 import { flaggedSpan, type ErrataFile } from "../../errata.ts";
 import { Flag } from "../../schema.ts";
 
+// The day after the last day probed against the data API, which the evidence dates.
+const PROBED_UNTIL = "2026-11-23";
+
+// The years of each station's preliminary 6-minute periods that the data inventory lists and the data API answers nothing for.
+const UNSERVED_YEARS = {
+  "8720244": [2024, 2025],
+  "8722376": [2026],
+  "8725439": [2023, 2024],
+  "8726247": [2022, 2023, 2024],
+  "8729548": [2023, 2024],
+  "8730667": [2006, 2007],
+  "9458907": [2003],
+  "9462711": [2008],
+  "9752621": [2023, 2024, 2025, 2026],
+  "9754229": [2023, 2024, 2025, 2026],
+  "9755968": [2022, 2023, 2024, 2025, 2026],
+  "9757811": [2023, 2024, 2025, 2026],
+  "9758066": [2022, 2023, 2024, 2025, 2026],
+  "9759413": [2024, 2025, 2026],
+} as const satisfies Record<string, readonly number[]>;
+
 export default {
   errata: [
     {
@@ -21,6 +42,40 @@ export default {
         if (!rows.length) throw new Error(`the store holds no ${id} levels in November 1994`);
         if (rows.some((o) => o.flag === Flag.preliminary))
           throw new Error(`the store holds preliminary ${id} levels in November 1994`);
+      },
+    },
+    {
+      id: "coops-inventory-lists-unserved-water-levels",
+      stations: Object.keys(UNSERVED_YEARS).map((id) => `coops/${id}`),
+      handling: "avoided",
+      error:
+        'CO-OPS\'s data inventory lists preliminary 6-minute water-level periods at 14 stations that the data API serves nothing for. It answers "No data was found. This product may not be offered at this station at the requested time." for every one of those months. Twelve are stations whose only water-level periods are these: Mill Cove (8720244), South Fork, St. Lucie River (8722376), Tropical Homesites, Matlacha (8725439), Bradenton, Manatee River (8726247), Camp Pinchot (8729548), Alabama Point (8730667), and six in Puerto Rico, Isabel Segunda, Vieques (9752621), Yabucoa Harbor (9754229), Salinas, Bahia de Jobos (9755968), Arecibo (9757811), Guayanilla (9758066) and Aguadilla, Crashboat Beach (9759413), whose periods start between December 2022 and May 2024. The other two serve values in their other periods: Castle Bay (9458907) in 2001 and Surf Bay, Akutan Bay (9462711) in 2011, but not in the 2003 and 2008 periods.',
+      response:
+        "The store holds no values for these years, since there are none to hold, and a backfill that asks for them writes no levels. A backfill still asks for these months and gets nothing back; nothing is dropped or flagged.",
+      evidence:
+        "2026-11-22: each station's inventory against the data API, asking `water_level` with `datum=STND` for every calendar month of every listed period, 330 in all, none of which answered a value; and against the store, which holds no `obs` file for any of the 39 station-years. Verified hourly heights are another product and are not covered here.",
+      check: async (store, e) => {
+        // Values in the other periods of these two show the reader finds a station's values when it has them.
+        for (const [id, year] of [
+          ["coops/9458907", 2001],
+          ["coops/9462711", 2011],
+        ] as const)
+          if (!(await store.levels(id, `${year}-01-01`, `${year + 1}-01-01`)).length)
+            throw new Error(`the store holds no ${id} levels in ${year}`);
+        for (const id of e.stations!) {
+          if (!(await store.station(id))) throw new Error(`the store doesn't list ${id}`);
+          for (const year of UNSERVED_YEARS[
+            id.slice("coops/".length) as keyof typeof UNSERVED_YEARS
+          ]) {
+            const rows = await store.levels(
+              id,
+              `${year}-01-01`,
+              year + 1 > Number(PROBED_UNTIL.slice(0, 4)) ? PROBED_UNTIL : `${year + 1}-01-01`,
+            );
+            if (rows.length)
+              throw new Error(`the store holds ${rows.length} ${id} levels in ${year}`);
+          }
+        }
       },
     },
     {
@@ -47,7 +102,7 @@ export default {
     },
     {
       id: "coops-boston-light-2001-offset",
-      stations: ["coops/8444162"],
+      stations: ["coops/8444162", "gesla/boston_light-8444162-usa-noaa"],
       since: "2001-03-06",
       until: "2001-06-30",
       handling: "flagged",
@@ -55,7 +110,7 @@ export default {
       response:
         "6 March to 29 June 2001 is flagged `suspect`, keeping CO-OPS's own flag as `source_flag`.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Boston (`coops/8443970`), 13 km away: the difference is 1.09 to 1.12 m before and after and 2.73 m over the span; Block Island (`coops/8459681`) gives the same step.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Boston (`coops/8443970`), 13 km away: the difference is 1.09 to 1.12 m before and after and 2.73 m over the span; Block Island (`coops/8459681`) gives the same step. GESLA's copy (`gesla/boston_light-8444162-usa-noaa`) holds values on only 2 of the span's 116 days, the same at all 23 times the two share.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
@@ -86,7 +141,7 @@ export default {
     },
     {
       id: "coops-burlington-2002-datum",
-      stations: ["coops/8539094"],
+      stations: ["coops/8539094", "gesla/burlington-8539094-usa-noaa"],
       until: "2002-06-11",
       handling: "flagged",
       error:
@@ -94,7 +149,7 @@ export default {
       response:
         "Values before 11 June 2002 are flagged `suspect`, keeping CO-OPS's own flag as `source_flag`.",
       evidence:
-        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Bergen Point (`coops/8519483`) and Atlantic City (`coops/8534720`): the differences are 0.28 and 0.25 m before the date and 4.15 and 4.09 m after.",
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Bergen Point (`coops/8519483`) and Atlantic City (`coops/8534720`): the differences are 0.28 and 0.25 m before the date and 4.15 and 4.09 m after. GESLA's copy (`gesla/burlington-8539094-usa-noaa`) holds the same values at all 707 times the two share, on 31 of the 150 days read in five 30-day pieces spread from the record's start to the date, 8,394 days in all.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {

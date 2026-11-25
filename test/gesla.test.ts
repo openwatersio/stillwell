@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { linkGauges } from "../src/same-as.ts";
+import { withErrata, type Erratum } from "../src/errata.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
 import geslaErrata from "../src/sources/gesla/errata.ts";
@@ -924,6 +925,41 @@ describe("datumJumps", () => {
       }),
       [],
     );
+  });
+
+  it("leaves an erratum's erratic span out of the jump search, so it doesn't flag the sound values around it", async () => {
+    const { times, levels } = series(200, 2, 0, 0);
+    // 30 days of readings up to 10 m high, erratic as Holyhead's readings are in February 2026.
+    const [from, to] = [100 * DAY, 130 * DAY];
+    const rows = [...times].map((time, i) => ({
+      time,
+      level: time >= from && time < to ? levels[i]! + 5 * (1 + Math.sin(i / 7)) : levels[i]!,
+      flag: Flag.good,
+      source_flag: Flag.good,
+    }));
+    const station = {
+      id: "gesla/holyhead-hol-gbr-cmems",
+      source_id: "holyhead-hol-gbr-cmems",
+      kind: "coastal",
+      record_start: "1970-01-01T00:00:00Z",
+      record_end: "1970-07-19T00:00:00Z",
+    } as unknown as Station;
+    const record = async function* () {
+      yield rows;
+    };
+    // Without the erratum, the rule flags the erratic readings in segments of its own.
+    assert.notDeepEqual(await gesla.source.suspect!(station, record), [[from, to]]);
+    const erratum = {
+      id: "test-erratic",
+      source: "gesla",
+      stations: [station.id],
+      since: new Date(from).toISOString().slice(0, 10),
+      until: new Date(to).toISOString().slice(0, 10),
+      handling: "flagged",
+    } as unknown as Erratum;
+    assert.deepEqual(await withErrata(gesla.source, [erratum]).suspect!(station, record), [
+      [from, to],
+    ]);
   });
 
   it("returns the shorter side of a jump", () => {
