@@ -104,7 +104,7 @@ Foreman's corrections fit the two gauges with a large diurnal tide measurably be
 | Schureman    | Foreman         | 4.6 mm    | 3.1 mm   | 3.6 mm    | 7.7 mm   | 7.2 mm   |
 | IHO          | Foreman         | 4.8 mm    | 3.5 mm   | 4.2 mm    | 8.0 mm   | 8.1 mm   |
 
-At the two northern gauges most of the difference from Foreman is in Mf and Mm, which Foreman's set gives no nodal modulation.
+At the two northern gauges most of the difference from Foreman is in Mf and Mm, which Foreman's set gives no nodal modulation. The held-out score above can't see that difference, since its filter removes everything slower than a day: Mf's modulation is about 40% of its amplitude over the nodal cycle ([Parker 2007](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf), p. 41), which Schureman's and IHO's corrections follow and Foreman's don't.
 
 **The constants themselves.** Against Schureman's, IHO's O1 and Q1 are 0.8% smaller, Mf 3.5 to 5% smaller and J1 8% smaller at every gauge, and M2 agrees within 0.04%. Foreman's differ most in Mf, by 2 to 13%, and in the M1 line, which t_tide calls NO1. The same differences appear in a synthetic series fitted under each family.
 
@@ -116,15 +116,20 @@ Prediction skill doesn't settle the choice: each family is measurably best somew
 - **The IHO list isn't meant for this.** It says it "is not intended to be used to produce accurate tidal predictions" ([IHO TWCWG 2017](https://iho.int/uploads/user/Services%20and%20Standards/TWCWG/MISC/TWCWG_Constituent_list.pdf)).
 - **It sits between the other two.** Schureman's and IHO's constants give curves 1.3 to 1.8 mm apart, and at every gauge Schureman's are closer to Foreman's than IHO's are.
 - **It doesn't depend on the gauge.** Foreman's third-degree satellites scale with latitude, and the factor is singular at the equator, where t_tide applies "a crude limiting" ([Pawlowicz, Beardsley and Lentz 2002](<https://doi.org/10.1016/S0098-3004(02)00013-4>), p. 932). One family for every gauge keeps fits comparable.
-- **It is what the largest publisher of constants uses.** NOAA's constants and predictions use Schureman's factors, and [Parker (2007)](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf) gives NOAA's reasons for node factors over satellite sums on p. 149.
+- **It is what the largest sets to compare with use.** NOAA's constants and predictions use Schureman's factors, as the FES tide models do, so a fit can be compared with either without a term for the family. [Parker (2007)](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf) gives NOAA's reasons for node factors over satellite sums on p. 149.
+- **Fitting costs the same.** The 19-year fit takes 24 to 31 seconds under Schureman's or IHO's corrections and 29 to 40 under Foreman's, and the residuals agree within 0.1 mm.
 
 ### What it costs
 
 - **Comparison with TICON.** TICON's constants were fitted under IHO factors ([Piccioni et al. 2019](https://doi.org/10.1002/gdj3.72)), so a fit's O1 reads 0.8% above TICON's for the same tide, and its Mf 4% above. A comparison of constants across the two has to allow for the family.
 - **Diurnal gauges.** At Honolulu and Pensacola, Foreman's corrections leave 0.2 to 0.3 mm less RMS in the held-out residual than Schureman's, about 1% of it.
-- **Use in t_tide or UTide.** Those predict under Foreman's set, and a Schureman fit used there differs by 3 to 8 mm RMS at these gauges. A user who needs exact agreement refits the series under Foreman's set, which the store's levels allow.
+- **Use in t_tide or UTide.** Those predict under Foreman's set, and a Schureman fit used there differs by 3 to 8 mm RMS at these gauges. Direct reuse there would also need t_tide's own definitions of SA, S1 and M1, and only the constituents in its table. A user who needs exact agreement refits the series under Foreman's set, which the store's levels allow.
 - **A limit every family shares.** All three assume the nodal modulation the equilibrium tide has. Observed modulation departs from it in shallow water ([Amin 1985](https://doi.org/10.1111/j.1365-246X.1985.tb05138.x); [Feng, Tsimplis and Woodworth 2015](https://doi.org/10.1002/2014JC010312)). A 19-year window averages the modulation out of the fitted amplitude, but a prediction for one year carries the assumption.
 - **M1 and L2.** M1 is several lines, defined and corrected differently in each family ([Woodworth 2019](https://os.copernicus.org/articles/15/431/2019/)), and L2 shares its frequency with 2MN2, whose node factor differs ([Parker 2007](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf), pp. 59–60). Their constants depend on the family more than any others.
+
+### Other families
+
+The fit's row names its corrections so that constants fitted under another family can be published beside these where a use calls for them, such as Foreman's for t_tide and UTide. The 19-year fit is about a third of a station's work, so a second family adds about that much.
 
 ### What is still to measure
 
