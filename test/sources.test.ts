@@ -4069,6 +4069,29 @@ describe("usgs", () => {
       [second, first],
     ])
       assert.equal(usgs.choose(listed).get("USGS-09510200")!.id, first.id);
+    // A station keeps the series it holds, whichever ID is lower.
+    const holds = new Map([["usgs/09510200", second.id]]);
+    for (const listed of [
+      [first, second],
+      [second, first],
+    ])
+      assert.equal(usgs.choose(listed, holds).get("USGS-09510200")!.id, second.id);
+  });
+
+  it("reads the clock once, so a clock that advances between two series' ranks doesn't split a tie", (t) => {
+    const stopped = (id: string) =>
+      series("09510200", "00065", {
+        id,
+        begin: "2010-01-01T00:00:00Z",
+        end: "2024-01-01T00:00:00Z",
+      }).properties;
+    let now = Date.parse("2026-11-25T00:00:00Z");
+    t.mock.method(Date, "now", () => now++);
+    for (const listed of [
+      [stopped("a"), stopped("b")],
+      [stopped("b"), stopped("a")],
+    ])
+      assert.equal(usgs.choose(listed).get("USGS-09510200")!.id, "a");
   });
 
   it("refuses a reply with more than 1 in 30 altitudes missing a method or accuracy, past 10", () => {

@@ -1,5 +1,5 @@
 import { impossibleDropped, type ErrataFile, type StoreReader } from "../../errata.ts";
-import { Flag, type StoredStation } from "../../schema.ts";
+import type { StoredStation } from "../../schema.ts";
 import { median } from "../../stats.ts";
 import { overrides } from "./overrides.ts";
 
@@ -77,40 +77,6 @@ export default {
         "November 2026. A scan of the range of levels in every year file of every source in the store (335,320 files) found 383 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span.",
       check: async (store, e) => {
         for (const id of e.stations!) await impossibleDropped(store, id, 2026);
-      },
-    },
-    {
-      id: "usgs-gila-painted-rock-high-readings",
-      stations: ["usgs/09519800"],
-      since: "2026-11-12",
-      until: "2026-11-14",
-      handling: "corrected",
-      error:
-        "Gila River below Painted Rock Dam, Arizona, published 187 gage heights of 926 to 990 ft (282.24 to 301.75 m) between 18:20 UTC on 12 November 2026 and 11:20 on the 13th, at 5-minute steps among readings that look normal, as Provisional with no qualifier. The gage reads 0.3 to 3.7 m on every other day of the month. USGS now serves 10.4 ft at the 55 of those times that fall on its 15-minute steps, and no reading at the other 132.",
-      response:
-        "A refetch of 2026 replaces every stored reading in a month it fetched, so the 187 readings are gone and the store holds the 15-minute readings USGS serves for the span, all of them ordinary levels.",
-      evidence:
-        "The levels stored for the station on 11 to 14 November 2026 before the refetch, and USGS's current series for the station (gage height, `continuous`, series 897594e7) over the same times, read on 21 and 25 November 2026.",
-      check: async (store, e) => {
-        const id = e.stations![0]!;
-        const all = await store.levels(id, e.since!, e.until!);
-        const high = all.filter((o) => o.level > 100);
-        if (high.length)
-          throw new Error(
-            `the store holds ${high.length} ${id} levels above 100 m on 12 to 13 November`,
-          );
-        // USGS serves a reading every 15 minutes, 192 across the two days.
-        const [first, last] = [
-          Date.parse("2026-11-12T18:20:00Z"),
-          Date.parse("2026-11-13T11:20:00Z"),
-        ];
-        const inside = all.filter((o) => o.time >= first && o.time <= last);
-        if (inside.length < 60)
-          throw new Error(
-            `${id} holds ${inside.length} levels between 18:20 on 12 and 11:20 on 13 November, not about 69`,
-          );
-        const off = inside.filter((o) => o.level > 10);
-        if (off.length) throw new Error(`${off.length} of ${id}'s levels in the span exceed 10 m`);
       },
     },
     {
@@ -3208,5 +3174,5 @@ export default {
       },
     },
   ],
-  retired: [],
+  retired: ["usgs-gila-painted-rock-high-readings"],
 } satisfies ErrataFile;
