@@ -32,6 +32,8 @@ import {
   writeStations,
 } from "../src/store/parquet.ts";
 import { writeYears } from "../src/store/years.ts";
+import type { Fit, FittedCandidate } from "../src/fit/fit.ts";
+import { readConstituents, readFits, writeFits } from "../src/fit/store.ts";
 import { analysisPath } from "../src/store/paths.ts";
 
 // Every field set, so a field added to the type must be added here, where the test below checks that the definition has it.
@@ -89,6 +91,58 @@ const STATION: Required<StoredStation> = {
 
 const HOUR = 3_600_000;
 const T = Date.UTC(2026, 0, 1);
+
+const FIT: Fit = {
+  id: "test/a",
+  fitted: "2026-11-25T00:00:00.000Z",
+  reason: null,
+  version: "0123456789abcdef",
+  since: "2005-01-01T00:00:00.000Z",
+  until: "2024-01-01T00:00:00.000Z",
+  hours: 160000,
+  z0_m: 5.02,
+  rms_m: 0.1,
+  years: 19,
+  node_corrections: "iho",
+  engine: "@slackwater/engine@1.0.0",
+  held_out: 2024,
+  held_out_hours: 8700,
+  held_out_rms_m: 0.05,
+  variance_explained: 0.9,
+  d1_rms_m: 0.01,
+  d2_rms_m: 0.02,
+  d4_rms_m: 0.003,
+  d6_rms_m: 0.001,
+  turns: 1400,
+  turns_missed: 3,
+  turn_time_mean_min: -1.5,
+  turn_time_rms_min: 9,
+  turn_height_mean_m: 0.001,
+  turn_height_rms_m: 0.06,
+  mean_range_m: 2.1,
+  settled_before: null,
+  source_qc_start: "2020-01-01T00:00:00.000Z",
+  inputs: JSON.stringify({ versions: { "1 2024": "v" }, epochs: [], errata: {} }),
+};
+const CANDIDATE: FittedCandidate = {
+  id: "test/a",
+  version: "0123456789abcdef",
+  name: "M2",
+  rank: 35,
+  doodson: [2, 0, 0, 0, 0, 0, 0],
+  speed: 28.9841042,
+  kept: true,
+  reason: null,
+  conflict: null,
+  amplitude_m: 1.02,
+  phase_deg: 31.5,
+  amplitude_ci_m: 0.002,
+  phase_ci_deg: 0.1,
+  snr: 250000,
+  yearly_amplitude_sd_m: 0.004,
+  yearly_phase_sd_deg: 0.2,
+  yearly_se_m: null,
+};
 
 describe("published file definitions", () => {
   let store: string;
@@ -156,6 +210,8 @@ describe("published file definitions", () => {
           requalified: null,
         },
       ]),
+    fits: () => writeFits(store, "test", [FIT], [CANDIDATE]),
+    constituents: () => writeFits(store, "test", [FIT], [CANDIDATE]),
     recent: (path) =>
       writeRecent(path, [
         [
@@ -279,6 +335,12 @@ describe("published file definitions", () => {
       assert.deepEqual(jsonProblems(ERRATA_SCHEMA, [{ ...published(errata)[0], since: day }]), [
         `$[0].since: ${day} isn't a date`,
       ]);
+  });
+
+  it("reads a fit and its candidates back as written", async () => {
+    await writeFits(store, "test", [FIT], [CANDIDATE]);
+    assert.deepEqual([...(await readFits(store, "test")).values()], [FIT]);
+    assert.deepEqual(await readConstituents(store, "test"), [CANDIDATE]);
   });
 
   it("lists every handling an erratum can have", () => {

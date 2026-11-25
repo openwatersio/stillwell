@@ -40,6 +40,7 @@ import {
 } from "./store/paths.ts";
 import type { Source } from "./schema.ts";
 import { dropYears } from "./store/years.ts";
+import { dropFits } from "./fit/store.ts";
 
 /** Why a station, by its store ID, is withheld, or null; null for another source's station. */
 export function withheldReason(source: Source, id: string): string | null {
@@ -50,7 +51,7 @@ export function withheldReason(source: Source, id: string): string | null {
 
 /**
  * Drop withheld stations' rows from the source's bounds, years, daily files,
- * empty-years record, backfilled years, requalify list and analysis, with its history, in `store`, rewriting only a file that holds one. Returns
+ * empty-years record, backfilled years, requalify list, analysis, with its history, and fits, in `store`, rewriting only a file that holds one. Returns
  * the station IDs it dropped rows for.
  */
 export async function dropWithheldRows(store: string, source: Source): Promise<string[]> {
@@ -103,6 +104,8 @@ export async function dropWithheldRows(store: string, source: Source): Promise<s
     );
   }
   for (const station of await dropAnalysis(store, id, held)) dropped.add(station);
+  // Constants fitted to a station's values leave with them.
+  for (const station of await dropFits(store, id, held)) dropped.add(station);
   // Last, so the values themselves are gone even if this file can't be written.
   for (const station of await dropYears(store, id, held)) dropped.add(station);
   return [...dropped].sort();
@@ -304,6 +307,7 @@ export async function dropFiles(
   await remove(store, prefixes);
   const gone = new Set(ids);
   await dropAnalysis(store, source, (id) => gone.has(id));
+  await dropFits(store, source, (id) => gone.has(id));
   await dropYears(store, source, (id) => gone.has(id));
   return { ids, prefixes, cleared };
 }

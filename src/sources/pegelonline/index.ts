@@ -42,6 +42,12 @@ export const metadata: SourceMetadata = {
   // Raw values only: neither the feed nor the download ever finalizes them.
   hourly: true,
   finalizes: false,
+  // PEGELONLINE states no revision window, so this one is decided here, not measured: its
+  // download of November 2026 sits 4 to 6 cm above an earlier copy for 13 May to 24 June 2025
+  // (erratum `pegelonline-cuxhaven-2025-revised`), so it changed raw values after publishing them,
+  // and a year counts once it ended 12 months ago. That revision isn't dated and sets no upper
+  // bound, so a later one can still reach a year a fit has read (#526).
+  settles_after_months: 12,
   // Central European time, standard or summer.
   utc_offsets: [1, 2],
   // The download shows no step at any gauge zero's validFrom it covers (README).

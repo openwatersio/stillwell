@@ -44,6 +44,8 @@ import {
 } from "../src/refresh.ts";
 import type { Erratum } from "../src/errata.ts";
 import { JUDGE, RULES, readAnalysis, writeAnalysis } from "../src/store/analysis.ts";
+import type { Fit, FittedCandidate } from "../src/fit/fit.ts";
+import { readConstituents, readFits, writeFits } from "../src/fit/store.ts";
 import { Flag, type ListedStation, type Source, type SourceMetadata } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
@@ -130,6 +132,26 @@ beforeEach(async () => {
 });
 afterEach(() => rm(store, { recursive: true }));
 
+const fitted = (id: string) =>
+  ({
+    id,
+    fitted: "2026-11-25T00:00:00.000Z",
+    reason: null,
+    version: "v",
+    engine: "e",
+    inputs: "{}",
+  }) as Fit;
+const candidate = (id: string) =>
+  ({
+    id,
+    version: "v",
+    name: "M2",
+    rank: 1,
+    doodson: [2, 0, 0, 0, 0, 0, 0],
+    speed: 28.9841042,
+    kept: true,
+  }) as FittedCandidate;
+
 describe("refreshSource with withheld stations", () => {
   it("drops them from the list, its snapshot, bounds and daily files, without tripping the shrink guard", async () => {
     // 20 active stations, 12 of them withheld: the 8 left would be a sharp shrink.
@@ -184,6 +206,12 @@ describe("refreshSource with withheld stations", () => {
       requalified: null,
     });
     await writeAnalysis(store, "test", [verdict("test/k12"), verdict("test/x0")]);
+    await writeFits(
+      store,
+      "test",
+      [fitted("test/k12"), fitted("test/x0")],
+      [candidate("test/k12"), candidate("test/x0")],
+    );
     const history = analysisHistoryPath(store, "test", NOW);
     await writeJsonArray(history, [
       {
@@ -260,6 +288,12 @@ describe("refreshSource with withheld stations", () => {
     );
     // Its analysis, and the history of it, which carry the station's measures.
     assert.deepEqual([...(await readAnalysis(store, "test")).keys()], ["test/k12"]);
+    // Constants fitted to a withheld station's values leave with them.
+    assert.deepEqual([...(await readFits(store, "test")).keys()], ["test/k12"]);
+    assert.deepEqual(
+      (await readConstituents(store, "test")).map((c) => c.id),
+      ["test/k12"],
+    );
     assert.deepEqual(
       JSON.parse(await readFile(history, "utf8"))[0].changed.map((c: { id: string }) => c.id),
       ["test/k12"],
@@ -566,6 +600,12 @@ describe("withhold", () => {
       requalified: null,
     });
     await writeAnalysis(store, "test", [verdict("test/d1"), verdict("test/k")]);
+    await writeFits(
+      store,
+      "test",
+      [fitted("test/d1"), fitted("test/k")],
+      [candidate("test/d1"), candidate("test/k")],
+    );
     // d2's ranges stay from a drop before it cleared them.
     const ranges = (id: string) => ({ id, epoch: 1, years: [[1990, 2027]] });
     await writeJsonArray(backfilledPath(store, "test"), [
@@ -598,6 +638,11 @@ describe("withhold", () => {
       ["test/k"],
     );
     assert.deepEqual([...(await readAnalysis(store, "test")).keys()], ["test/k"]);
+    assert.deepEqual([...(await readFits(store, "test")).keys()], ["test/k"]);
+    assert.deepEqual(
+      (await readConstituents(store, "test")).map((c) => c.id),
+      ["test/k"],
+    );
     assert.deepEqual(await recorded(), ["test/k"]);
     for (const dir of ["obs/test/keep/2000.parquet", "obs/test/k/2000.parquet"])
       assert.equal(existsSync(join(store, dir)), true, dir);

@@ -697,6 +697,312 @@ export const FILES = {
     ],
     sort: ["id"],
   },
+  fits: {
+    path: "fits/<source>.parquet",
+    example: "fits/smhi.parquet",
+    title: "Harmonic fits",
+    description:
+      "One row per station the store has tried to fit harmonic constants for: the window the fit read, how it scored on a year it didn't read, and what it read, or why the station has no constants. The constants are in `constituents/<source>.parquet`. A fit is a measurement, and no row says whether a gauge has enough tide to predict.",
+    columns: [
+      { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
+      { name: "fitted", type: "TIMESTAMPTZ", description: "When the fit ran." },
+      {
+        name: "reason",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "Why the station has no constants, such as too short a record of final values; null where it has them.",
+      },
+      {
+        name: "version",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "A digest of the fit's window and kept constants, which changes when either does; null without constants.",
+      },
+      {
+        name: "since",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description: "The start of the fit's window: up to 19 years before the held-out year.",
+      },
+      {
+        name: "until",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description: "The end of the fit's window, exclusive: the start of the held-out year.",
+      },
+      {
+        name: "hours",
+        type: "INTEGER",
+        nullable: true,
+        description: "How many values the fit read: final values stamped on a UTC hour.",
+      },
+      {
+        name: "z0_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The mean level over the fit's window, in meters in the station's current datum: a prediction from the constants is added to it.",
+      },
+      {
+        name: "rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The RMS of the fit's residual over its window, in meters, under the fit's robust weights, which count surges and spikes for less.",
+      },
+      {
+        name: "years",
+        type: "INTEGER",
+        nullable: true,
+        description:
+          "How many calendar years of the window, each with two thirds of its hours, were also fitted on their own for the yearly scatter in the constituents file.",
+      },
+      {
+        name: "node_corrections",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "The nodal corrections the fit used: `schureman`, for Schureman's (1958), as NOAA's analyses use. A prediction from the constants has to use the same one.",
+      },
+      {
+        name: "engine",
+        type: "VARCHAR",
+        description:
+          "The software that fitted and its version, as provenance. A prediction from the constants needs `node_corrections` and each constituent's Doodson numbers, and no particular software.",
+      },
+      {
+        name: "held_out",
+        type: "INTEGER",
+        nullable: true,
+        description:
+          "The UTC year the fit is scored on, which it didn't read: the latest year of final values in which half the station's hours can be scored, an hour counting when the 71 hours around it all have values.",
+      },
+      {
+        name: "held_out_hours",
+        type: "INTEGER",
+        nullable: true,
+        description: "How many hours of the held-out year are scored.",
+      },
+      {
+        name: "held_out_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The RMS of observed minus predicted levels over the held-out year in the tidal band, in meters: hourly, after a Godin filter (running means of 24, 24 and 25 hours) takes out the slower part.",
+      },
+      {
+        name: "variance_explained",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The share of the tidal band's variance the constants explain over the held-out year: one minus the residual's variance over the observed levels', both after the Godin filter.",
+      },
+      {
+        name: "d1_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The held-out residual's RMS in the diurnal band, in meters.",
+      },
+      {
+        name: "d2_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The held-out residual's RMS in the semidiurnal band, in meters.",
+      },
+      {
+        name: "d4_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The held-out residual's RMS in the quarter-diurnal band, in meters.",
+      },
+      {
+        name: "d6_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The held-out residual's RMS in the sixth-diurnal band, in meters.",
+      },
+      {
+        name: "turns",
+        type: "INTEGER",
+        nullable: true,
+        description:
+          "Observed high and low waters of the held-out year with a predicted one of the same kind within 3 hours. One picker finds the turns of both hourly series.",
+      },
+      {
+        name: "turns_missed",
+        type: "INTEGER",
+        nullable: true,
+        description: "Observed high and low waters of the held-out year without one.",
+      },
+      {
+        name: "turn_time_mean_min",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "Predicted minus observed time of the matched turns, in minutes: the mean. Negative is early.",
+      },
+      {
+        name: "turn_time_rms_min",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed time of the matched turns, in minutes: the RMS.",
+      },
+      {
+        name: "turn_height_mean_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed height of the matched turns, in meters: the mean.",
+      },
+      {
+        name: "turn_height_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed height of the matched turns, in meters: the RMS.",
+      },
+      {
+        name: "mean_range_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "Mean high water minus mean low water of the curve the constants predict over the held-out year, in meters.",
+      },
+      {
+        name: "settled_before",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description:
+          "For a source that never finalizes its values, the instant before which the fit read them as final (`settles_after_months` in `sources.json`); null for a source that finalizes.",
+      },
+      {
+        name: "source_qc_start",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description:
+          "The station's `source_qc_start` when the fit ran: preliminary values before it were read as final.",
+      },
+      {
+        name: "inputs",
+        type: "VARCHAR",
+        description:
+          "What the fit read, as JSON: `versions`, each year file's version by `<epoch> <year>`, as the years file gives it; `epochs`, the station's datum epochs with their `to_current`; `errata`, each erratum touching the station in the years read, with its handling; and `digest`, of everything the fit depends on, which changes when the station is due another fit.",
+      },
+    ],
+    sort: ["id"],
+  },
+  constituents: {
+    path: "constituents/<source>.parquet",
+    example: "constituents/smhi.parquet",
+    title: "Harmonic constituents",
+    description:
+      "One row per fitted station and candidate constituent, in the fit's priority order within a station: the constants of the candidates the fit kept, and why it left each of the others out. Each row gives its constituent's name and Doodson numbers, so the constants can be used with any prediction software that applies the nodal corrections `fits/<source>.parquet` names. The name is needed with the numbers: NO1 and M1, and MO3 and 2MK3, share numbers and differ in their nodal correction.",
+    columns: [
+      { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
+      {
+        name: "version",
+        type: "VARCHAR",
+        description:
+          "The `version` of the row's fit in `fits/<source>.parquet`. The two files are written one after the other, so join them on `id` and `version`.",
+      },
+      {
+        name: "name",
+        type: "VARCHAR",
+        description: "The constituent's name, as IHO's list spells it.",
+      },
+      {
+        name: "rank",
+        type: "INTEGER",
+        description:
+          "The candidate's place in the fit's priority order, from 1: where the record can't separate two candidates, the one with the lower rank is kept.",
+      },
+      {
+        name: "doodson",
+        type: "INTEGER[]",
+        description:
+          "The line the name means here: the multiples of τ, s, h, p, N′ and p′ in its argument, then its phase constant in quarter cycles.",
+      },
+      {
+        name: "speed",
+        type: "DOUBLE",
+        description: "The constituent's speed, in degrees per hour.",
+      },
+      {
+        name: "kept",
+        type: "BOOLEAN",
+        description:
+          "Whether the constituent is one of the fit's constants. A prediction uses the kept rows.",
+      },
+      {
+        name: "reason",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "Why a candidate isn't kept: `rayleigh`, the record can't separate it from `conflict`; `snr`, its signal-to-noise ratio is under 2 in a fit without robust weights, which is how candidates are tested; `nyquist`, the sampling can't resolve it; `rankDeficient`, the fit can't tell it from stronger candidates; `seasonal`, Sa or Ssa whose amplitude is under twice the standard error of its mean over the yearly fits; `unknown`, the fitting engine doesn't define it. Null for a kept one.",
+      },
+      {
+        name: "conflict",
+        type: "VARCHAR",
+        nullable: true,
+        description: "The stronger constituent a `rayleigh` candidate couldn't be separated from.",
+      },
+      {
+        name: "amplitude_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The fitted amplitude, in meters, unrounded; null for a candidate that wasn't fitted.",
+      },
+      {
+        name: "phase_deg",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The fitted phase, in degrees: the Greenwich phase lag, with time in UTC.",
+      },
+      {
+        name: "amplitude_ci_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The half-width of the amplitude's 95% confidence interval, in meters, from the residual spectrum around the constituent.",
+      },
+      {
+        name: "phase_ci_deg",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The half-width of the phase's 95% confidence interval, in degrees.",
+      },
+      {
+        name: "snr",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The signal-to-noise ratio: amplitude squared over its variance. For a candidate cut for `snr`, its value in the fit that cut it.",
+      },
+      {
+        name: "yearly_amplitude_sd_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "For M2, S2, K1 and O1: the standard deviation of the amplitude between the yearly fits, in meters.",
+      },
+      {
+        name: "yearly_phase_sd_deg",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "For M2, S2, K1 and O1: the circular standard deviation of the phase between the yearly fits, in degrees.",
+      },
+      {
+        name: "yearly_se_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "For Sa and Ssa: the standard error of the mean of the yearly fits, in meters, which decides whether they are kept.",
+      },
+    ],
+    sort: ["id", "rank"],
+  },
   recent: {
     path: "recent/<source>/<YYYY-MM-DD>.parquet",
     example: "recent/rws/2026-11-19.parquet",
@@ -828,6 +1134,7 @@ export const SOURCES_SCHEMA: JsonSchema = {
       "license",
       "attribution",
       "contact",
+      // `settles_after_months` isn't required, so a file published before it was kept still passes.
       "finalizes",
       "stations",
       "backfill",
@@ -879,6 +1186,11 @@ export const SOURCES_SCHEMA: JsonSchema = {
         type: "boolean",
         description:
           "Whether values the source publishes as preliminary become final later. Where false, `preliminary` values stay so.",
+      },
+      settles_after_months: {
+        type: nullable("integer"),
+        description:
+          "For a source that never finalizes: how many months after a calendar year ends its values are read as final: the source's own figure where it states one, otherwise one decided from its record of revisions, with the evidence in the source's README. Null for a source that finalizes, and where none is known.",
       },
       stations: { type: "integer", description: "How many active stations the source has." },
       backfill: {
