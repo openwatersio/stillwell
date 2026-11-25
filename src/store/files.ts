@@ -891,6 +891,205 @@ export const FILES = {
     ],
     sort: ["id"],
   },
+  references: {
+    path: "fits/references/<source>.parquet",
+    example: "fits/references/smhi.parquet",
+    title: "Reference scores",
+    description:
+      "One row per fit and slackwater-database record of the same gauge: how the record's constants predict the fit's held-out year, scored by the code that scores the fit, on the same hours. The fit's own scores are in `fits/<source>.parquet`. A station whose gauge has no record in the database has no rows, and a source that has never had one has no file. Each row carries its record's terms: a product that bars non-commercial data filters on `reference_commercial_use`. The rows are measurements: none says which constants are better.",
+    columns: [
+      {
+        name: "id",
+        type: "VARCHAR",
+        description: "The station's `id` in `stations.parquet`.",
+      },
+      {
+        name: "version",
+        type: "VARCHAR",
+        description:
+          "The `version` of the fit the record is scored against, in `fits/<source>.parquet`. The files are written one after another, so join them on `id`, `version` and `fitted`.",
+      },
+      {
+        name: "fitted",
+        type: "TIMESTAMPTZ",
+        description:
+          "The `fitted` of that fit. A fit's `version` covers its window and constants and not the held-out year's values, so rows whose `fitted` isn't the fit's are from an earlier fit and aren't comparable with its scores.",
+      },
+      {
+        name: "reference",
+        type: "VARCHAR",
+        description:
+          "The record's ID in slackwater-database, such as `ticon/kungsvik-2130-swe-smhi`. Every record linked as `link` says is scored where the database accepts it or keeps it only as another's duplicate. One it rejects for its constants, clock, datum or range isn't.",
+      },
+      {
+        name: "reference_source",
+        type: "VARCHAR",
+        description: "The name slackwater-database gives the record's source.",
+      },
+      {
+        name: "reference_license",
+        type: "VARCHAR",
+        description:
+          "The record's license in slackwater-database, such as `cc-by-4.0`, in its spelling.",
+      },
+      {
+        name: "reference_commercial_use",
+        type: "BOOLEAN",
+        description:
+          "Whether the record's terms allow commercial use. The row's scores are measured against the record's constants, so they follow its terms as well as the station's.",
+      },
+      {
+        name: "reference_attribution",
+        type: "VARCHAR",
+        description: "The credit slackwater-database asks for wherever the record is shown.",
+      },
+      {
+        name: "release",
+        type: "VARCHAR",
+        description:
+          "The `@slackwater/database` release the constants were read from when the row was scored. A later release that leaves the record's constants as they were doesn't score it again, so this can be older than the latest release.",
+      },
+      {
+        name: "digest",
+        type: "VARCHAR",
+        description:
+          "A digest of the constants scored: the first 16 hex digits of the SHA-256 of the array of `[name, amplitude, phase]` in the record's order, as JavaScript's `JSON.stringify` writes it, with no spaces and each number in its shortest form that reads back the same, the amplitudes in meters and phases in degrees as the release's database file gives them. A score describes the record only while its constants have this digest.",
+      },
+      {
+        name: "link",
+        type: "VARCHAR",
+        description:
+          "Why the record counts as the station's gauge: `id`, it carries the station's own ID in its source and is within 10 km; `levels`, it carries the ID of `linked`, another series of the gauge whose hourly levels agree with the station's within 1 cm RMS with no lag in `stations/matches.parquet`, which compares the latest years both hold.",
+      },
+      {
+        name: "linked",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "For `levels`, the `id` of the series the record belongs to, whose comparison with the station is in `stations/matches.parquet`; null for `id`.",
+      },
+      {
+        name: "node_corrections",
+        type: "VARCHAR",
+        description:
+          "The nodal corrections the record's constants were predicted under for this score: `iho` or `schureman`. The fit itself is predicted under its own, in `fits/<source>.parquet`.",
+      },
+      {
+        name: "node_corrections_assumed",
+        type: "BOOLEAN",
+        description:
+          "False where the source's documentation names the corrections it fits under, or refers to a paper that does: NOAA's names Schureman's, and TICON-4's manual names none and refers for its method to the paper on the first TICON, which names the IHO's. True where it doesn't, and the record is predicted under the IHO's, which slackwater-database's predictions use by default; constants fitted under another family then score worse than they would under their own.",
+      },
+      {
+        name: "seen",
+        type: "BOOLEAN",
+        nullable: true,
+        description:
+          "Whether the span the record says it was analyzed over includes any of the held-out year, which then favors it over the fit, which didn't read the year; null where the record gives no span.",
+      },
+      {
+        name: "constituents",
+        type: "INTEGER",
+        description: "How many constants the record has.",
+      },
+      {
+        name: "unpredicted",
+        type: "INTEGER",
+        description:
+          "How many of them the fitting engine doesn't define, which predict nothing in this score.",
+      },
+      {
+        name: "scored",
+        type: "TIMESTAMPTZ",
+        description: "When the row was scored.",
+      },
+      {
+        name: "held_out",
+        type: "INTEGER",
+        description: "The UTC year scored: the fit's `held_out`.",
+      },
+      {
+        name: "held_out_hours",
+        type: "INTEGER",
+        description: "How many hours of the held-out year are scored: the same hours as the fit's.",
+      },
+      {
+        name: "held_out_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The RMS of observed minus the record's predicted levels over the held-out year in the tidal band, in meters, taken as the fit's `held_out_rms_m` is.",
+      },
+      {
+        name: "variance_difference_se_m2",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The standard error of the fit's residual variance minus the record's (`held_out_rms_m` squared, each), in square meters: how far that difference could move by chance in the year scored. It is taken from the means of 30-day blocks, so the weather's hour-to-hour correlation doesn't shrink it; null where fewer than two blocks have a week of scored hours.",
+      },
+      {
+        name: "d1_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The record's held-out residual RMS in the diurnal band, in meters.",
+      },
+      {
+        name: "d2_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The record's held-out residual RMS in the semidiurnal band, in meters.",
+      },
+      {
+        name: "d4_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The record's held-out residual RMS in the quarter-diurnal band, in meters.",
+      },
+      {
+        name: "d6_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The record's held-out residual RMS in the sixth-diurnal band, in meters.",
+      },
+      {
+        name: "turns",
+        type: "INTEGER",
+        description:
+          "Observed high and low waters of the held-out year with one the record predicts, of the same kind, within 3 hours.",
+      },
+      {
+        name: "turns_missed",
+        type: "INTEGER",
+        description: "Observed high and low waters of the held-out year without one.",
+      },
+      {
+        name: "turn_time_mean_min",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "Predicted minus observed time of the matched turns, in minutes: the mean. Negative is early.",
+      },
+      {
+        name: "turn_time_rms_min",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed time of the matched turns, in minutes: the RMS.",
+      },
+      {
+        name: "turn_height_mean_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed height of the matched turns, in meters: the mean.",
+      },
+      {
+        name: "turn_height_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed height of the matched turns, in meters: the RMS.",
+      },
+    ],
+    sort: ["id", "reference"],
+  },
   constituents: {
     path: "constituents/<source>.parquet",
     example: "constituents/smhi.parquet",

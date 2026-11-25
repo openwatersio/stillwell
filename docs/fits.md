@@ -1,6 +1,6 @@
 # Harmonic fits
 
-How the store fits harmonic constants to a station's water levels, and why each choice was made. [Running ingest](contributing/ingest.md) covers the `fit` command, [`src/store/files.ts`](../src/store/files.ts) defines every column of the two files it writes, and the code is in [`src/fit/`](../src/fit/).
+How the store fits harmonic constants to a station's water levels, and why each choice was made. [Running ingest](contributing/ingest.md) covers the `fit` command, [`src/store/files.ts`](../src/store/files.ts) defines every column of the three files it writes, and the code is in [`src/fit/`](../src/fit/).
 
 A fit is a measurement. It is published whatever its size, with what a reader needs to judge it: the window, the files read, each constituent's confidence interval and signal-to-noise ratio, the scatter between years, and a score on a year the fit didn't read. Nothing here decides whether a gauge has enough tide to predict.
 
@@ -145,6 +145,23 @@ The held-out year is scored the same way for any constants:
 - **High and low waters.** One picker finds the turns of the observed and the predicted hourly series, so both are picked the same way, and the time and height differences of matched turns are reported.
 
 One year decides each score, so an unusual year can move it.
+
+### Reference scores
+
+The constants [slackwater-database](https://github.com/openwatersio/slackwater-database) holds for the same gauge are scored on the fit's held-out year by the same code, on the same hours, into `fits/references/<source>.parquet`: a row per fit and record. A reader comparing the two has the fit's score in `fits/<source>.parquet`, the record's here, and the standard error of the difference of their residual variances, taken from 30-day blocks as in [What was measured](#what-was-measured). No row says which is better.
+
+**Which records.** A record counts as the station's gauge on what the store records, never on position or name alone ([`src/fit/reference-links.ts`](../src/fit/reference-links.ts)):
+
+- `id`: the record carries the station's own ID in its source and is within 10 km of it, as a NOAA record does for a CO-OPS station, and a TICON record for the GESLA file it was analyzed from.
+- `levels`: the record carries the ID of another series of the gauge (`same_as`) whose hourly levels agree with the station's within 1 cm RMS with no lag in `stations/matches.parquet` ([Stations](stations.md#gauges-in-more-than-one-source)). That comparison covers the latest years both series hold, so it shows the two are one series now. It doesn't cover the years the record was analyzed over.
+
+A record reached only through a link nothing has compared isn't scored, since series linked along one estuary can be different gauges. That includes a station's `tide_station` where it was taken from such a link. A record linked either way is scored where the database accepts it or keeps it only as another's duplicate, and one it rejects for its constants, clock, datum or range isn't. A record of a GESLA file whose values are another gauge's has none, and neither does a record of a database source whose IDs name no series in the store (`seriesOf` in [`src/datums.ts`](../src/datums.ts)). A withheld series links nothing.
+
+**Under its own corrections.** Each record is predicted under the nodal corrections its constants were fitted with, where its publisher says: the IHO's for TICON, Schureman's for NOAA. TICON-4's manual names none and refers for its method to [Piccioni et al. (2019)](https://doi.org/10.1002/gdj3.72), which cites the IHO's. The phases slackwater-database fitted again for some TICON records are predicted as TICON's. The fit is predicted under its own. Predicting constants under the other of those two families moves the curve by the amounts in [What was measured](#what-was-measured), part of it in the long-period constituents the score can't see. Where a publisher doesn't say, the record is predicted under the IHO's, which slackwater-database's predictions use by default, and the row says the corrections are assumed (`node_corrections_assumed`). The engine predicts under Schureman's and the IHO's corrections only, so a record fitted under Foreman's is scored under an assumption.
+
+**What a row carries.** The record's ID and source, the `@slackwater/database` release its constants were read from, a digest of those constants, how the record is linked, the corrections it was predicted under, and whether the span it says it was analyzed over includes the held-out year (`seen`), which then favors it over the fit. A score describes a record only while its constants have the row's digest. It holds none of the record's values, and is measured against them, so each row also carries the record's license, whether its terms allow commercial use, and its credit.
+
+**When they are taken again.** With the fit, whenever the station is fitted. Without fitting, when a release changes a linked record's constants, its terms or whether its analysis covers the held-out year, a record joins or leaves the gauge, or the link to one changes: the held-out year is read as the fit read it, and the scoring stops if the fit's own score no longer comes out as its row says. Each row carries its fit's `version` and `fitted`, a reader joins on both with `id`, and rows that don't match the fit's are taken again.
 
 ## What the IHO asks a publisher to state
 
