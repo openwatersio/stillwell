@@ -63,15 +63,16 @@ A fit is a measurement, published whatever its size. No row says whether a gauge
 
 <Schema resource="fits" />
 
-`constituents/<source>.parquet` has a row for each candidate constituent of each station with constants, in the fit's priority order. The rows with `kept` true are the fit's constants. The others say why they were left out. The two files are written one after the other, so join them on `id` and `version`.
+`constituents/<source>.parquet` has a row for each candidate constituent of each station with constants, in the fit's priority order. The rows with `kept` true are the fit's constants. The others say why they were left out. The two files are written one after the other, so join them on `id` and `version`, as the query below does: a station's candidate rows can be a fit ahead of its row in the other file for as long as one run takes to write both.
 
 Kungsvik's ten largest constants:
 
 <QueryResult
-  sql={`SELECT name, round(amplitude_m * 1000, 1) AS amplitude_mm, round(phase_deg, 2) AS phase_deg, round(snr) AS snr
-FROM 'https://stillwell.openwaters.io/constituents/smhi.parquet'
-WHERE id = 'smhi/2130' AND kept
-ORDER BY amplitude_m DESC
+  sql={`SELECT c.name, round(c.amplitude_m * 1000, 1) AS amplitude_mm, round(c.phase_deg, 2) AS phase_deg, round(c.snr) AS snr
+FROM 'https://stillwell.openwaters.io/constituents/smhi.parquet' c
+JOIN 'https://stillwell.openwaters.io/fits/smhi.parquet' f USING (id, version)
+WHERE c.id = 'smhi/2130' AND c.kept
+ORDER BY c.amplitude_m DESC
 LIMIT 10`}
 />
 
