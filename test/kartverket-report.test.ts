@@ -38,6 +38,8 @@ describe("the Kartverket calibration", () => {
       render(read()),
       "run `npm run calibrate:kartverket -- --report`",
     );
+    // A sentence written without backticks would print its placeholders.
+    assert.doesNotMatch(render(read()), /\$\{/);
   });
 
   it("uses the filter its own constants estimate", () => {

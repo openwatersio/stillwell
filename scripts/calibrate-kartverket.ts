@@ -49,6 +49,7 @@ import {
   FILTER,
   FIT,
   GAUGES,
+  isOutside,
   IN_TIME,
   kartverketDigest,
   LONG_PERIOD,
@@ -146,7 +147,7 @@ async function calibrate(task: Task): Promise<Result> {
       return x ? [x.d] : [];
     });
     return {
-      outside: found.filter((d) => (d.ratio ?? 0) > 1).length,
+      outside: found.filter(isOutside).length,
       vector: found.reduce((s, d) => s + d.vector, 0) / Math.max(found.length, 1),
     };
   };
@@ -354,6 +355,8 @@ async function main(): Promise<void> {
     return;
   }
   const concurrency = concurrencyOf(values.concurrency, GAUGES.length);
+  // Of the code as the fits start with it.
+  const inputs = kartverketDigest();
   const copy = await openCopy(SOURCE);
   const tasks: Task[] = [];
   // Every gauge's constants are asked for, so the ones calibrated are shown to be all that meet the rule.
@@ -367,7 +370,7 @@ async function main(): Promise<void> {
   }
   if (meeting.sort().join() !== [...GAUGES].sort().join())
     throw new Error(
-      `the gauges whose constants are from a period that ends with 2020 and starts before 2011 are now ${meeting.join(" ")}; set GAUGES from that`,
+      `the listed gauges whose constants are from a period that ends with 2020 and starts before 2011 are now ${meeting.join(" ")}; set GAUGES from that`,
     );
   for (const code of GAUGES) {
     const station = await stationOf(copy, `${SOURCE}/${code}`);
@@ -387,7 +390,7 @@ async function main(): Promise<void> {
   const results = await inWorkers<Task, Result>(new URL(import.meta.url), copy, tasks, concurrency);
   const report: Report = {
     engine: copy.engine,
-    inputs: kartverketDigest(),
+    inputs,
     method: METHOD,
     final_year: copy.final,
     filter: FILTER,

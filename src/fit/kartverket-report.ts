@@ -35,10 +35,10 @@ export const SA_YEARS = [1991, 2020] as const;
 export const IN_TIME = { gap_hours: 1, run_days: 4, trim_days: 1 };
 
 /**
- * The gauges: every one whose constants Kartverket analyzed from a period
- * that ends with 2020 and starts before 2011, in its UTC+1, which is each
- * gauge with ten years or more in the analysis. A run asks for every gauge's
- * constants and stops where these aren't the ones that meet that.
+ * The gauges: every one in the store's list whose constants Kartverket
+ * analyzed from a period that ends with 2020 and starts before 2011, in its
+ * UTC+1. A run asks for every listed gauge's constants and stops where these
+ * aren't the ones that meet that.
  */
 // prettier-ignore
 export const GAUGES = ["AES","ANX","BGO","BOO","HAR","HEI","HFT","HRO","HVG","KAB","KSU","MAY","MSU","NVK","NYA","OSC","OSL","RVK","SVG","TOS","TRD","TRG","VAW","VIK"];
@@ -118,15 +118,17 @@ export interface Result {
 /**
  * A digest of what the comparison rests on besides the fit's `METHOD`: the
  * gauges, the names, the fit's options, the filter, the limits above, and the
- * script and parser that fit and convert, byte for byte. The report records
+ * scripts, parser and comparison that fit, convert and judge, byte for byte. The report records
  * it, and is of other inputs when it changes.
  */
 export function kartverketDigest(): string {
   // The files that fit and convert, as they are: a rule changed in them is a report of other inputs.
   const code = [
     "scripts/calibrate-kartverket.ts",
+    "scripts/calibration-run.ts",
     "src/sources/kartverket/constants.ts",
     "src/fit/butterworth.ts",
+    "src/fit/calibration.ts",
   ].map((path) => createHash("sha256").update(readFileSync(path)).digest("hex"));
   return createHash("sha256")
     .update(
@@ -147,6 +149,8 @@ export function kartverketDigest(): string {
           SEARCH,
           MAJOR,
         ],
+        // A function has no JSON of its own.
+        [chosen.toString(), isOutside.toString()],
         code,
       ]),
     )
@@ -167,10 +171,11 @@ export interface Report {
 type Fitted = Exclude<Row["ours"], { reason: string }>;
 const fitted = (row: Row): Fitted | null => ("reason" in row.ours ? null : row.ours);
 const isLong = (row: Row) => row.speed < LONG_PERIOD;
-/** Outside the interval, or without one to be inside of. */
+/** Whether a difference is outside the fit's interval, or has none to be inside of. The script and the report count by this one rule. */
+export const isOutside = (d: Difference) => d.ratio === null || d.ratio > 1;
 const outside = (row: Row) => {
   const ours = fitted(row);
-  return !!ours && (ours.d.ratio === null || ours.d.ratio > 1);
+  return !!ours && isOutside(ours.d);
 };
 
 /** Every compared pair: short-period rows where the fit has the constituent. */
@@ -248,7 +253,7 @@ export function render(report: Report): string {
 
   p("# Calibration of the harmonic fits against Kartverket's constants");
   p(
-    `Kartverket, the Norwegian Mapping Authority's Hydrographic Service, publishes harmonic constants for its gauges, analyzed from its own observations of them, which the store holds as \`kartverket\`. This report fits ${results.length} of those gauges from the store the way that reproduces Kartverket's analysis and compares the constants with Kartverket's, constituent by constituent. It is written by [\`scripts/calibrate-kartverket.ts\`](../../scripts/calibrate-kartverket.ts) (\`npm run calibrate:kartverket\`), with every number in [kartverket-calibration.json](kartverket-calibration.json), and is run again whenever the method changes. [Checks](../contributing/checks.md#kartverket) says how to run it, and the [calibration against NOAA](fit-calibration.md) is its companion. Kartverket's constants are © Kartverket, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), and the differences here are derived from them.`,
+    `Kartverket, the Norwegian Mapping Authority's Hydrographic Service, publishes harmonic constants for its gauges, analyzed from its own observations of them, which the store holds as \`kartverket\`. This report fits ${results.length} of those gauges, every one in the store's list whose constants are from a period that ends with 2020 and starts before 2011, from the store the way that reproduces Kartverket's analysis, and compares the constants with Kartverket's, constituent by constituent. It is written by [\`scripts/calibrate-kartverket.ts\`](../../scripts/calibrate-kartverket.ts) (\`npm run calibrate:kartverket\`), with every number in [kartverket-calibration.json](kartverket-calibration.json), and is run again whenever the method changes. [Checks](../contributing/checks.md#kartverket) says how to run it, and the [calibration against NOAA](fit-calibration.md) is its companion. Kartverket's constants are © Kartverket, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), and the differences here are derived from them.`,
   );
   p(
     `These fits ran with ${report.engine}, method ${report.method} of [\`src/fit/\`](../../src/fit/), and ${report.final_year} as the source's last year of final values.`,
@@ -259,7 +264,7 @@ export function render(report: Report): string {
     `Kartverket's constants are from its tide API's \`constituents\` request, which gives amplitudes in centimeters, to a hundredth, and phases to a hundredth of a degree against UTC+1, with the period of observations analyzed ([Kartverket](../../src/sources/kartverket/README.md)). The API doesn't describe the analysis. The fit compared here is the one that reproduces it from the store's values: one least-squares fit over Kartverket's period, without robust weights, of Kartverket's own constituents, with Foreman's nodal corrections at the gauge's latitude evaluated at each sample. It reads the store's final values on the hour. With robust weights, as the store's own fits have, the same fit is a median ${mm(median(results.map((r) => r.robust.vector)), 3)} mm from Kartverket's constants over a gauge's short-period constituents, against ${mm(median(results.map((r) => r.vector)), 3)} mm without them.`,
   );
   p(
-    `Two things about Kartverket's analysis aren't documented and are taken from the comparison itself, so on them it shows consistency and is no independent check:`,
+    `Two things about Kartverket's analysis aren't documented and are taken from the comparison itself, so on them it shows consistency and is no independent check. Both are asked of Kartverket ([questions](../../src/sources/kartverket/errata.ts)):`,
   );
   p(
     `- **The filter.** Kartverket's constants are smaller than the fit's above four cycles a day, as the gain of a low-pass filter would make them, which they would be if its analysis read a series filtered beyond the 10-minute values its API serves. The fit's amplitudes and their intervals are scaled by the gain of a zero-phase Butterworth filter of order ${report.filter.order} with a cutoff of ${report.filter.cutoff_hours} hours, which [The filter](#the-filter) estimates from the constants at ${FILTERED_FROM}° an hour and faster. Below that speed the gain is within ${percent(1 - zeroPhaseGain(FILTERED_FROM, report.filter.order, report.filter.cutoff_hours), 2)}% of one, and at four cycles a day it is within ${percent(1 - zeroPhaseGain(60, report.filter.order, report.filter.cutoff_hours), 2)}%, so the diurnal, semidiurnal and third-diurnal constants are compared very nearly as fitted.`,
@@ -347,7 +352,7 @@ export function render(report: Report): string {
 
   p("## Gauges");
   p(
-    "Each gauge's period as Kartverket gives it, the hourly values the fit read, how many constituents are compared and outside, the one furthest outside, and the seconds past one hour its phases ask Kartverket's to be moved by, from the constituents faster than ${CLOCK.speed}° an hour and of ${mm(CLOCK.amplitude, 0)} mm or more, weighted by amplitude squared, with the half-width of its 95% interval from the fit's phase intervals. The last four columns are the store's own fit of the gauge, with Schureman's corrections: its window, its held-out year, the share of the tidal band's variance it explains there and the tidal-band RMS left.",
+    `Each gauge's period as Kartverket gives it, the hourly values the fit read, how many constituents are compared and outside, the one furthest outside, and the seconds past one hour its phases ask Kartverket's to be moved by, from the constituents faster than ${CLOCK.speed}° an hour and of ${mm(CLOCK.amplitude, 0)} mm or more, weighted by amplitude squared, with the half-width of its 95% interval from the fit's phase intervals. The last four columns are the store's own fit of the gauge, with Schureman's corrections: its window, its held-out year, the share of the tidal band's variance it explains there and the tidal-band RMS left.`,
   );
   p(
     table(
@@ -455,6 +460,9 @@ export function render(report: Report): string {
     );
     for (const r of results.filter((x) => x.probe)) {
       const base = r.rows.filter((row) => !isLong(row) && outside(row)).length;
+      const largest = out1
+        .filter((x) => x.result === r)
+        .sort((a, b) => b.row.kartverket.amplitude - a.row.kartverket.amplitude)[0]!;
       const say = (years: number) => {
         const found = r.probe!.filter((x) => x.years === years);
         const [counts, vectors] = [found.map((x) => x.outside), found.map((x) => x.vector)];
@@ -462,7 +470,7 @@ export function render(report: Report): string {
       };
       const least = Math.min(...r.probe!.map((x) => x.vector));
       p(
-        `${r.name} has ${base} outside and a mean vector difference of ${mm(r.vector, 3)} mm, so it was fitted again with each year of the period left out in turn, and with each two years running. One year out leaves ${say(1)}; two leave ${say(2)}.${least < r.vector / 2 ? "" : " No year or pair of years accounts for the difference."} Kartverket's protocol says some constants come from a nearby station without saying which, so that can't be tested here. This report doesn't find why ${r.name}'s constants differ.`,
+        `${r.name} has ${base} outside and a mean vector difference of ${mm(r.vector, 3)} mm, so it was fitted again with each year of the period left out in turn, and with each two years running. One year out leaves ${say(1)}; two leave ${say(2)}.${least < r.vector / 2 ? "" : " No year or pair of years accounts for the difference."} The largest of its constants outside is ${largest.row.name}, of ${mm(largest.row.kartverket.amplitude, 1)} mm, which the fit of ${r.name}'s own record is ${mm(largest.ours.d.vector, 2)} mm from. Kartverket's protocol says some constants come from a nearby station without saying which, and whether any of these do is asked of Kartverket ([questions](../../src/sources/kartverket/errata.ts)). This report doesn't find why ${r.name}'s constants differ.`,
       );
     }
   }
