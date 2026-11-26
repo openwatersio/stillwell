@@ -18,7 +18,7 @@
  *   node scripts/ingest.ts years <source> [--rebuild-years]
  *   node scripts/ingest.ts analyze <source> [--all] [--requalify [--budget 120]]
  *   node scripts/ingest.ts fit <source> [<station,...>] [--all] [--shard 1/4] [--concurrency 4] [--budget 120]
- *       [--only-fitted]
+ *       [--only-fitted] [--accept-matches]
  *
  * `stations` refreshes each source's list in the store, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
@@ -73,8 +73,10 @@
  * first verdict, over every year, starting stations for `--budget` minutes.
  * `fit` fits harmonic constants to the source's stations whose fit is due, from their
  * final values in the store, into fits/<source>.parquet and constituents/<source>.parquet
- * (src/fit/store.ts); `--all` fits every station again, station IDs or `--shard` limit the run, and
- * `--budget` starts stations only for that many minutes, the largest tides first, leaving the rest due.
+ * (src/fit/store.ts), and scores slackwater-database's constants for each gauge on the fit's
+ * held-out year, into fits/references/<source>.parquet (src/fit/reference-links.ts); `--all` fits
+ * every station again, station IDs or `--shard` limit the run, and `--budget` starts stations
+ * only for that many minutes, the largest tides first, leaving the rest due.
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -145,6 +147,7 @@ import {
   type YearStats,
 } from "../src/store/parquet.ts";
 import { commitYears, markYears, readYears, reconcileYears } from "../src/store/years.ts";
+import { loadReferences } from "../src/fit/reference-links.ts";
 import { fitSource, readFits } from "../src/fit/store.ts";
 import { requalifyInWorker, WorkerDied } from "../src/store/requalify.ts";
 import {
@@ -1300,6 +1303,7 @@ async function fitStations(sourceId: string, ids?: string): Promise<void> {
     errata,
     all: values.all,
     ...(only ? { only } : {}),
+    references: await loadReferences(store, sourceId, shown, values["accept-matches"]),
     // A millisecond short, so a budget of 0 is already past when the run looks.
     ...(values.budget !== undefined
       ? { until: Date.now() + Number(values.budget) * 60_000 - 1 }
@@ -1309,7 +1313,7 @@ async function fitStations(sourceId: string, ids?: string): Promise<void> {
     log: (line) => console.log(line),
   });
   const lines = [
-    `fit ${sourceId}: ${report.fitted.length} fitted, ${report.none.length} without constants, ${report.current} current, ${report.waiting.length} being written, ${report.left} left for the next run, ${report.failed.length} failed`,
+    `fit ${sourceId}: ${report.fitted.length} fitted, ${report.none.length} without constants, ${report.rescored.length} scored again, ${report.current} current, ${report.waiting.length} being written, ${report.left} left for the next run, ${report.failed.length} failed`,
     ...report.failed.map((f) => `  failed ${f}`),
   ];
   for (const line of lines) console.log(line);
@@ -1498,7 +1502,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] [--prune] | matches [--concurrency N] [--accept-matches] [--prune] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | delete-years <source> <station> <epoch> <year,...> | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]] | fit <source> [station,...] [--all] [--shard I/N] [--concurrency N] [--budget MINUTES] [--only-fitted]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] [--prune] | matches [--concurrency N] [--accept-matches] [--prune] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | delete-years <source> <station> <epoch> <year,...> | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]] | fit <source> [station,...] [--all] [--shard I/N] [--concurrency N] [--budget MINUTES] [--only-fitted] [--accept-matches]",
   );
   process.exit(1);
 }

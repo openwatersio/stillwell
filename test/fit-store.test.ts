@@ -413,6 +413,7 @@ describe("fitSource", () => {
         return {
           fit: { ...fit({ id: s.id, reason: "x", version: null }) } as Fit,
           constituents: [],
+          references: [],
         };
       },
     });
@@ -589,6 +590,7 @@ describe("fitSource", () => {
     const stub = async (s: StoredStation) => ({
       fit: { ...fit({ id: s.id, reason: "x", version: null }) } as Fit,
       constituents: [],
+      references: [],
     });
     // A years file from a short listing: 2024's row is gone, with the file still there.
     await writeFits(dir, "test", [read], [ca]);

@@ -50,8 +50,8 @@ jobs:
       stopped: ${{ steps.next.outputs.stopped }}
       stopped_since: ${{ steps.next.outputs.stopped_since }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -143,8 +143,8 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -181,8 +181,8 @@ jobs:
       issues: write
       actions: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm

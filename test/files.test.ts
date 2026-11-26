@@ -33,7 +33,8 @@ import {
 } from "../src/store/parquet.ts";
 import { writeYears } from "../src/store/years.ts";
 import type { Fit, FittedCandidate } from "../src/fit/fit.ts";
-import { readConstituents, readFits, writeFits } from "../src/fit/store.ts";
+import type { ReferenceScore } from "../src/fit/references.ts";
+import { readConstituents, readFits, readReferences, writeFits } from "../src/fit/store.ts";
 import { analysisPath } from "../src/store/paths.ts";
 
 // Every field set, so a field added to the type must be added here, where the test below checks that the definition has it.
@@ -144,6 +145,41 @@ const CANDIDATE: FittedCandidate = {
   yearly_se_m: null,
 };
 
+const REFERENCE: ReferenceScore = {
+  id: "test/a",
+  version: "0123456789abcdef",
+  fitted: "2026-11-25T00:00:00.000Z",
+  reference: "ticon/a-1-xxx-test",
+  reference_source: "TICON-4",
+  reference_license: "CC-BY-4.0",
+  reference_commercial_use: true,
+  reference_attribution: "Slackwater database",
+  release: "@slackwater/database@1.0.0",
+  digest: "fedcba9876543210",
+  link: "levels",
+  linked: "gesla/a-1-xxx-test",
+  node_corrections: "iho",
+  node_corrections_assumed: false,
+  seen: null,
+  constituents: 50,
+  unpredicted: 0,
+  scored: "2026-11-25T00:00:00.000Z",
+  held_out: 2025,
+  held_out_hours: 8689,
+  held_out_rms_m: 0.06,
+  variance_difference_se_m2: 0.00001,
+  d1_rms_m: 0.01,
+  d2_rms_m: 0.02,
+  d4_rms_m: 0.003,
+  d6_rms_m: 0.001,
+  turns: 1400,
+  turns_missed: 10,
+  turn_time_mean_min: -1.5,
+  turn_time_rms_min: 20,
+  turn_height_mean_m: 0.001,
+  turn_height_rms_m: 0.05,
+};
+
 describe("published file definitions", () => {
   let store: string;
   before(async () => {
@@ -212,6 +248,7 @@ describe("published file definitions", () => {
       ]),
     fits: () => writeFits(store, "test", [FIT], [CANDIDATE]),
     constituents: () => writeFits(store, "test", [FIT], [CANDIDATE]),
+    references: () => writeFits(store, "test", [FIT], [CANDIDATE], [REFERENCE]),
     recent: (path) =>
       writeRecent(path, [
         [
@@ -337,10 +374,11 @@ describe("published file definitions", () => {
       ]);
   });
 
-  it("reads a fit and its candidates back as written", async () => {
-    await writeFits(store, "test", [FIT], [CANDIDATE]);
+  it("reads a fit, its candidates and its records' scores back as written", async () => {
+    await writeFits(store, "test", [FIT], [CANDIDATE], [REFERENCE]);
     assert.deepEqual([...(await readFits(store, "test")).values()], [FIT]);
     assert.deepEqual(await readConstituents(store, "test"), [CANDIDATE]);
+    assert.deepEqual(await readReferences(store, "test"), [REFERENCE]);
   });
 
   it("lists every handling an erratum can have", () => {
