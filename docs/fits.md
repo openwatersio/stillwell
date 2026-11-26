@@ -83,17 +83,17 @@ Five gauges, each fitted on 19 years under each family and scored on a held-out 
 | Cuxhaven (`pegelonline/5990020`) | 53.9°N   | Semidiurnal, M2 1.38 m      |
 | Kungsvik (`smhi/2130`)           | 59.0°N   | Semidiurnal, M2 0.12 m      |
 
-Sa, Ssa and S1 were left out, since t_tide defines SA and S1 on lines that include the solar perigee. Every family's fit held the two shared lines as NO1 and MO3. Under Schureman's corrections the fits hold them as M1 and 2MK3, which moves a held-out score by up to 2.0 mm, more than any difference between families below, so Schureman's column understates what the fits do.
+Sa, Ssa and S1 were left out, since t_tide defines SA and S1 on lines that include the solar perigee. Each family's fit chose from the candidates in its own order, so the two shared lines were held as M1 and 2MK3 under Schureman's corrections, M1 and MO3 under the IHO's, and NO1 and MO3 under Foreman's.
 
 **No family predicts best everywhere, and the differences are about 1% of the residual at most.** Tidal-band RMS of observed minus predicted levels on the held-out year, fitted and predicted under the same family:
 
 | Gauge     | Schureman | IHO       | Foreman   |
 | --------- | --------- | --------- | --------- |
-| Kwajalein | 24.66 mm  | 24.57 mm  | 24.57 mm  |
-| Honolulu  | 23.28 mm  | 23.18 mm  | 23.05 mm  |
-| Pensacola | 30.68 mm  | 30.65 mm  | 30.36 mm  |
-| Cuxhaven  | 180.73 mm | 180.64 mm | 181.23 mm |
-| Kungsvik  | 59.03 mm  | 59.03 mm  | 58.97 mm  |
+| Kwajalein | 24.57 mm  | 24.48 mm  | 24.57 mm  |
+| Honolulu  | 23.23 mm  | 23.13 mm  | 23.05 mm  |
+| Pensacola | 30.46 mm  | 30.43 mm  | 30.36 mm  |
+| Cuxhaven  | 180.72 mm | 180.64 mm | 181.29 mm |
+| Kungsvik  | 59.03 mm  | 59.03 mm  | 58.98 mm  |
 
 Whether a difference is more than one year's noise was tested by the difference of the two residual variances against twice its standard error, taken from 30-day blocks:
 
@@ -101,13 +101,13 @@ Whether a difference is more than one year's noise was tested by the difference 
 | --------- | --------------------- | ------------------------- |
 | Kwajalein | within noise          | within noise              |
 | Honolulu  | IHO better            | Foreman better            |
-| Pensacola | within noise          | Foreman better            |
+| Pensacola | within noise          | within noise              |
 | Cuxhaven  | IHO better            | Schureman better          |
 | Kungsvik  | within noise          | within noise              |
 
-Foreman's corrections fit the two gauges with a large diurnal tide measurably better than Schureman's, and Schureman's fit Cuxhaven measurably better than Foreman's. IHO's are measurably better than Schureman's at two gauges and never worse. The largest of these differences is 0.5 mm of RMS, at Cuxhaven, on a residual of 181 mm. What weather, seiches and river flow leave in the residual is a hundred times any difference between the families, or more.
+Foreman's corrections fit Honolulu measurably better than Schureman's, and Schureman's fit Cuxhaven measurably better than Foreman's. IHO's are measurably better than Schureman's at two gauges and never worse. The largest of these differences is 0.6 mm of RMS, at Cuxhaven, on a residual of 181 mm. What weather, seiches and river flow leave in the residual is a hundred times any difference between the families, or more. The name a shared line is held under matters as much as the family: with those lines as NO1 and MO3 under Schureman's corrections, its residual is 0.2 mm higher at Pensacola and 0.1 mm at Kwajalein, and Foreman's fit of Pensacola is then measurably better.
 
-**Using the constants under another family.** RMS difference between the curve predicted under the fit's family and the curve the same constants give under another, over the held-out year:
+**Using the constants under another family.** RMS difference between the curve predicted under the fit's family and the curve the same constants give under another, over the held-out year, from fits that held the shared lines as NO1 and MO3 under every family:
 
 | Fitted under | Predicted under | Kwajalein | Honolulu | Pensacola | Cuxhaven | Kungsvik |
 | ------------ | --------------- | --------- | -------- | --------- | -------- | -------- |
@@ -133,7 +133,7 @@ Prediction skill doesn't settle the choice: each family is measurably best somew
 ### What it costs
 
 - **Comparison with TICON.** TICON's constants were fitted under IHO factors ([Piccioni et al. 2019](https://doi.org/10.1002/gdj3.72)), so a fit's O1 reads 0.8% above TICON's for the same tide, and its Mf 4% above. A comparison of constants across the two has to allow for the family.
-- **Diurnal gauges.** At Honolulu and Pensacola, Foreman's corrections leave 0.2 to 0.3 mm less RMS in the held-out residual than Schureman's, about 1% of it.
+- **Honolulu.** Foreman's corrections leave 0.2 mm less RMS in the held-out residual there than Schureman's, about 1% of it.
 - **Use in t_tide or UTide.** Those predict under Foreman's set, and a Schureman fit used there differs by 3 to 8 mm RMS at these gauges. Direct reuse there would also need t_tide's own definitions of SA, S1 and M1, and only the constituents in its table. A user who needs exact agreement refits the series under Foreman's set, which the store's levels allow.
 - **A limit every family shares.** All three assume the nodal modulation the equilibrium tide has. Observed modulation departs from it in shallow water ([Amin 1985](https://doi.org/10.1111/j.1365-246X.1985.tb05138.x); [Feng, Tsimplis and Woodworth 2015](https://doi.org/10.1002/2014JC010312)). A 19-year window averages the modulation out of the fitted amplitude, but a prediction for one year carries the assumption.
 - **M1 and L2.** M1 is several lines, defined and corrected differently in each family ([Woodworth 2019](https://os.copernicus.org/articles/15/431/2019/)), and L2 shares its frequency with 2MN2, whose node factor differs ([Parker 2007](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf), pp. 59–60). Their constants depend on the family more than any others.
