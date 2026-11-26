@@ -126,8 +126,8 @@ export interface Leak {
 
 export interface Report {
   engine: string;
-  /** `candidatesDigest` when the fits ran: the candidate list isn't counted in `method`. */
-  candidates: string;
+  /** `calibrationDigest` when the fits ran: the lists and spellings the comparison rests on, which `method` doesn't count. */
+  inputs: string;
   leak: Leak;
   method: number;
   node_corrections: string;
@@ -667,7 +667,7 @@ function tierFinding(results: Result[]): string {
     const higher = changes.filter((x) => x.change >= 0.0001);
     const lower = changes.filter((x) => x.change <= -0.0001);
     const most = [...changes].sort((a, b) => a.change - b.change)[0]!;
-    return `the RMS is lower at ${lower.length} and higher at ${higher.length} of ${changes.length} stations${higher.length ? ` (${higher.map((x) => `${x.r.name} ${signed(x.change * 1000)} mm`).join(", ")})` : ""}, and falls most at ${most.r.name}, by ${mm(-most.change)} mm`;
+    return `the RMS is lower at ${lower.length} and higher at ${higher.length} of ${changes.length} stations${higher.length ? ` (${higher.map((x) => `${x.r.name} ${signed(x.change * 1000)} mm`).join(", ")})` : ""}${lower.length ? `, and falls most at ${most.r.name}, by ${mm(-most.change)} mm` : ""}`;
   };
   return `With the compounds, over the standard window and on the held-out year, ${say("held")}. On the year before the window ${say("before")}. Over NOAA's years, which are five or six, on the held-out year ${say("window")}. A change under 0.1 mm counts as neither.`;
 }
@@ -712,7 +712,7 @@ function findings(report: Report, w: Stats, s: Stats): string {
   const change = (i: number) => unseen.map((r) => chain(r)[i]! - chain(r)[i - 1]!);
   const tally = (xs: number[]) => {
     const [lower, higher] = [xs.filter((x) => x <= -0.0001), xs.filter((x) => x >= 0.0001)];
-    return `lower at ${lower.length} and higher at ${higher.length} of ${xs.length}, from ${signed(Math.min(...xs) * 1000)} to ${signed(max(xs) * 1000)} mm`;
+    return `lower at ${lower.length} and higher at ${higher.length} of ${xs.length}, from ${signed(Math.min(...xs) * 1000)} to ${signed(max(xs) * 1000)} mm, a change under 0.1 mm counting as neither`;
   };
   const versus = (a: (r: Result) => Score, b: (r: Result) => Score) =>
     unseen.filter((r) => a(r).rms! < b(r).rms!).length;
@@ -821,11 +821,11 @@ function findings(report: Report, w: Stats, s: Stats): string {
   p("### What agrees");
   p(
     `- **NOAA's method on the store's values${agrees ? " gives NOAA's constants" : ""}.** Fitted NOAA's way, ${within(0.0005)} of ${short.length} short-period constants are within 0.5 mm of NOAA's as vectors, which is half of NOAA's last digit, and ${within(0.001)} are within 1 mm. The major constituents of 1 cm or more differ by a median of ${percent(median(relative), 2)}% in amplitude and ${median(phase)!.toFixed(2)}° in phase, and at most by ${percent(max(relative), 2)}% and ${max(phase).toFixed(2)}°. Those constants score within ${mm(reproduces)} mm RMS of NOAA's own on the held-out year at each of the ${results.length} stations. The comparison reads the store's hourly values with Schureman's corrections as the engine has them and Greenwich phase lags in UTC, so an error in any of the three would show here as a difference from NOAA.`,
-    `- **The store's method over NOAA's years is close to NOAA on the major constituents.** Their amplitudes differ by a median of ${percent(median(pairsOf(results, "window", MAJOR).relative), 2)}% and their phases by ${median(pairsOf(results, "window", MAJOR).phase)!.toFixed(2)}°. ${w.majorOutside} of ${w.major} are outside the fit's interval, and the next section says which steps of the method move them.`,
+    `- **The store's method over NOAA's years, on the major constituents.** Their amplitudes differ by a median of ${percent(median(pairsOf(results, "window", MAJOR).relative), 2)}% and their phases by ${median(pairsOf(results, "window", MAJOR).phase)!.toFixed(2)}°. ${w.majorOutside} of ${w.major} are outside the fit's interval, and the next section says which steps of the method move them.`,
     `- **The standard fit predicts the held-out year better than NOAA's constants at ${better} of ${unseen.length} stations** whose NOAA analysis didn't read that year${behind.length ? `; the rest: ${behind.map((r) => r.name).join(", ")}` : ""}. It explains ${percent(Math.min(...variances), 1)}% to ${percent(max(variances), 1)}% of the tidal band's variance, the least at ${lowest.name}.`,
   );
   p(
-    `- **The shallow-water compounds would help the standard fit.** ${tierFinding(results)} [The shallow-water compounds](#the-shallow-water-compounds) has each station.`,
+    `- **The shallow-water compounds.** ${tierFinding(results)} [The shallow-water compounds](#the-shallow-water-compounds) has each station.`,
   );
   p("### What differs, and why");
   p(

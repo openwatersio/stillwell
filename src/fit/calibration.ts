@@ -6,7 +6,7 @@ import type { StoredStation } from "../schema.ts";
 import { EMPTY_YEAR, readYearStats } from "../store/parquet.ts";
 import { seriesDir } from "../store/paths.ts";
 import type { YearRow } from "../store/years.ts";
-import { CANDIDATES, type Candidate } from "./candidates.ts";
+import { CANDIDATES, SHALLOW, type Candidate } from "./candidates.ts";
 import type { Verdict } from "./window.ts";
 
 /**
@@ -19,13 +19,18 @@ import type { Verdict } from "./window.ts";
 const RAD = Math.PI / 180;
 
 /**
- * A digest of the candidate list, its names and Doodson numbers in order, as
- * `inputsDigest` takes them. The calibration report records it, since a
- * change to the list moves fits without a new `METHOD`.
+ * A digest of what the calibration's comparison rests on besides the fit's
+ * `METHOD`: the candidate list and the shallow-water compounds, each with its
+ * Doodson numbers, spellings and lists, in order, and the names not read
+ * through the catalog. The report records it, and is of other inputs when it
+ * changes. It is wider than what `inputsDigest` takes of the candidates, so a
+ * new spelling makes the report due without making any stored fit due.
  */
-export function candidatesDigest(): string {
+export function calibrationDigest(): string {
+  const list = (candidates: readonly Candidate[]) =>
+    candidates.map((c) => [c.name, c.doodson, c.spellings ?? [], c.from]);
   return createHash("sha256")
-    .update(JSON.stringify(CANDIDATES.map((c) => [c.name, c.doodson])))
+    .update(JSON.stringify([list(CANDIDATES), list(SHALLOW), MISNAMED]))
     .digest("hex")
     .slice(0, 16);
 }

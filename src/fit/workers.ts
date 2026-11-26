@@ -27,7 +27,7 @@ export type Reply = { id: number } & ({ result: Result } | { busy: string } | { 
 /** The memory each worker's DuckDB may use, in MB. */
 export const DUCKDB_MB = 512;
 /** A worker's heap, in MB: a 19-year fit peaks near 600 MB. */
-const HEAP_MB = 2048;
+export const HEAP_MB = 2048;
 
 /**
  * A station failed because its worker ended before answering. A worker past

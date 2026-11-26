@@ -24,7 +24,7 @@
  * `--report` rewrites the Markdown from the JSON without fitting.
  */
 import "./threadpool.ts";
-import { existsSync, statSync } from "node:fs";
+import { existsSync, realpathSync, statSync } from "node:fs";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -42,7 +42,7 @@ import {
   difference,
   fittedFor,
   analysisYears,
-  candidatesDigest,
+  calibrationDigest,
   checkCopy,
   MISNAMED,
   noaaConstants,
@@ -64,7 +64,7 @@ import {
   type Step,
 } from "../src/fit/calibration-report.ts";
 import { engineVersion, FIT_OPTIONS, fitStation, varianceExplained } from "../src/fit/fit.ts";
-import { workerCount } from "../src/fit/workers.ts";
+import { DUCKDB_MB, HEAP_MB, workerCount } from "../src/fit/workers.ts";
 import {
   harmonicSamples,
   NODE_CORRECTIONS,
@@ -140,7 +140,7 @@ const isSeasonal = (name: string) => (SEASONAL as readonly string[]).includes(na
 
 /** A worker fits one station at a time, as `src/fit/worker.ts` does. */
 function work(): void {
-  limitDuckDb({ threads: "1", memory_limit: "512MB" });
+  limitDuckDb({ threads: "1", memory_limit: `${DUCKDB_MB}MB` });
   parentPort!.on("message", async (task: Task) => {
     let reply: Reply;
     try {
@@ -444,6 +444,7 @@ async function main(): Promise<void> {
     /^[a-z0-9]+:\/\//i.test(STORE) ||
     !existsSync(STORE) ||
     !statSync(STORE).isDirectory() ||
+    (existsSync("data") && realpathSync(STORE) === realpathSync("data")) ||
     resolve(STORE) === resolve("data")
   )
     throw new Error(
@@ -520,7 +521,7 @@ async function main(): Promise<void> {
     lanes,
     async () => {
       const worker = new Worker(new URL(import.meta.url), {
-        resourceLimits: { maxOldGenerationSizeMb: 2048 },
+        resourceLimits: { maxOldGenerationSizeMb: HEAP_MB },
       });
       // One set of listeners for the worker's life: whichever station it is on gets the answer.
       let answer: (reply: Reply) => void = () => {};
@@ -566,7 +567,7 @@ async function main(): Promise<void> {
 
   const report: Report = {
     engine,
-    candidates: candidatesDigest(),
+    inputs: calibrationDigest(),
     leak: {
       K1: leak("K1", ["S1", "P1"]),
       K2: leak("K2", ["R2"]),
