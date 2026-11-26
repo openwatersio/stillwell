@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { NAMES, ROUNDING } from "../sources/kartverket/constants.ts";
 import { zeroPhaseGain } from "./butterworth.ts";
 import { mm, ratio, signed, table, percent } from "./calibration-report.ts";
@@ -12,12 +13,26 @@ import { median, type Difference } from "./calibration.ts";
 
 /** Slower than this, in degrees an hour, a constituent is long-period and compared apart. */
 export const LONG_PERIOD = 2.5;
+/** The cutoffs the filter's estimate searches, in hours. */
+const SEARCH: [number, number] = [1.5, 5];
+/** The constituents the summary gives apart. */
+const MAJOR = ["M2", "S2", "N2", "K2", "K1", "O1", "P1", "Q1"];
 /** From this speed up, 4.5 cycles a day, the filter's gain is far enough from one to be estimated. */
 export const FILTERED_FROM = 67.5;
 /** A year is whole where the store holds this share of its hours. */
 export const YEAR_SHARE = 2 / 3;
-/** A gauge with this many constants outside is fitted again with each year left out. */
+/** A gauge with this many constants outside is fitted again with each year, and each two years running, left out. */
 export const PROBE_FROM = 5;
+/** The constituents a gauge's clock is read from: this fast, in degrees an hour, and this large, in meters. */
+export const CLOCK = { speed: 10, amplitude: 0.005 };
+/** The years Kartverket's SA is fitted over again, from the first to the last. */
+export const SA_YEARS = [1991, 2020] as const;
+/**
+ * How the series is filtered in time: gaps of up to `gap_hours` are filled in
+ * a straight line, a run of values shorter than `run_days` is left out, and
+ * `trim_days` are dropped from each end of a run.
+ */
+export const IN_TIME = { gap_hours: 1, run_days: 4, trim_days: 1 };
 
 /**
  * The gauges: every one whose constants Kartverket analyzed from a period
@@ -76,6 +91,8 @@ export interface Result {
   marked: boolean;
   /** The seconds past one hour the fitted phases ask Kartverket's to be moved by; null where no constituent is large enough to say. */
   phase_seconds: number | null;
+  /** The half-width of that figure's 95% interval, from the fit's phase intervals. */
+  phase_seconds_ci: number | null;
   /** Terrestrial time minus UTC over the period, which the comparison moves them by. */
   tt_seconds: number;
   /** SA fitted over 1991 to 2020 against Kartverket's, in meters, where the store holds every year whole. */
@@ -93,17 +110,24 @@ export interface Result {
   robust: { outside: number; vector: number };
   /** The fit compared: its mean vector difference over the short-period constituents, in meters. */
   vector: number;
-  /** With each year left out in turn: the constants outside and the mean vector difference. */
-  probe: { year: number; outside: number; vector: number }[] | null;
+  /** With each year, and each two years running from `year`, left out in turn: the constants outside and the mean vector difference. */
+  probe: { year: number; years: number; outside: number; vector: number }[] | null;
   rows: Row[];
 }
 
 /**
  * A digest of what the comparison rests on besides the fit's `METHOD`: the
- * gauges, the names, the fit's options, the filter and the limits above. The
- * report records it, and is of other inputs when it changes.
+ * gauges, the names, the fit's options, the filter, the limits above, and the
+ * script and parser that fit and convert, byte for byte. The report records
+ * it, and is of other inputs when it changes.
  */
 export function kartverketDigest(): string {
+  // The files that fit and convert, as they are: a rule changed in them is a report of other inputs.
+  const code = [
+    "scripts/calibrate-kartverket.ts",
+    "src/sources/kartverket/constants.ts",
+    "src/fit/butterworth.ts",
+  ].map((path) => createHash("sha256").update(readFileSync(path)).digest("hex"));
   return createHash("sha256")
     .update(
       JSON.stringify([
@@ -112,10 +136,18 @@ export function kartverketDigest(): string {
         FIT,
         FILTER,
         ROUNDING,
-        LONG_PERIOD,
-        FILTERED_FROM,
-        YEAR_SHARE,
-        PROBE_FROM,
+        [
+          LONG_PERIOD,
+          FILTERED_FROM,
+          YEAR_SHARE,
+          PROBE_FROM,
+          CLOCK,
+          SA_YEARS,
+          IN_TIME,
+          SEARCH,
+          MAJOR,
+        ],
+        code,
       ]),
     )
     .digest("hex")
@@ -156,9 +188,6 @@ function pairs(results: Result[]) {
  * constituents at 4.5 cycles a day and faster: for each even order, the
  * cutoff with the least RMS misfit, in meters.
  */
-/** The cutoffs searched, in hours. */
-const SEARCH: [number, number] = [1.5, 5];
-
 export function estimateFilter(results: Result[]) {
   const used = pairs(results).filter(
     (x) => x.row.speed >= FILTERED_FROM && x.row.kartverket.amplitude >= 0.0005,
@@ -186,7 +215,10 @@ export function estimateFilter(results: Result[]) {
   return {
     constants: used.length,
     orders,
-    best: orders.filter((o) => !o.edge).reduce((a, b) => (b.misfit < a.misfit ? b : a)),
+    // Null where every order's least is at an end of the search, as with no filter to find.
+    best: orders
+      .filter((o) => !o.edge)
+      .reduce<(typeof orders)[number] | null>((a, b) => (!a || b.misfit < a.misfit ? b : a), null),
     none: misfit(4, 1e-9),
     pinned: misfit(FILTER.order, FILTER.cutoff_hours),
   };
@@ -204,7 +236,6 @@ export function render(report: Report): string {
   const share = (n: number, of: number) =>
     of ? `${n} of ${of} (${((100 * n) / of).toFixed(1)}%)` : "none";
   const abs = (xs: (number | null)[]) => xs.flatMap((x) => (x === null ? [] : [Math.abs(x)]));
-  const MAJOR = ["M2", "S2", "N2", "K2", "K1", "O1", "P1", "Q1"];
   const majors = all.filter(
     (x) => MAJOR.includes(x.row.name) && x.row.kartverket.amplitude >= 0.01,
   );
@@ -231,8 +262,8 @@ export function render(report: Report): string {
     `Two things about Kartverket's analysis aren't documented and are taken from the comparison itself, so on them it shows consistency and is no independent check:`,
   );
   p(
-    `- **The filter.** Kartverket's constants are smaller than the fit's above four cycles a day, by the gain of a low-pass filter: its analysis read a series filtered beyond the 10-minute values its API serves. The fit's amplitudes and their intervals are scaled by the gain of a zero-phase Butterworth filter of order ${report.filter.order} with a cutoff of ${report.filter.cutoff_hours} hours, which [The filter](#the-filter) estimates from the constants at ${FILTERED_FROM}° an hour and faster. Below that speed the gain is within ${percent(1 - zeroPhaseGain(FILTERED_FROM, report.filter.order, report.filter.cutoff_hours), 2)}% of one, and at M4's it is within ${percent(1 - zeroPhaseGain(57.9682085, report.filter.order, report.filter.cutoff_hours), 2)}%, so the diurnal, semidiurnal and third-diurnal constants are compared very nearly as fitted.`,
-    `- **The clock.** Kartverket's phases are moved to UTC by the constituent's speed over one hour and over terrestrial time minus UTC, about 67 s. [Gauges](#gauges) gives the seconds each gauge's fitted phases ask for.`,
+    `- **The filter.** Kartverket's constants are smaller than the fit's above four cycles a day, as the gain of a low-pass filter would make them, which they would be if its analysis read a series filtered beyond the 10-minute values its API serves. The fit's amplitudes and their intervals are scaled by the gain of a zero-phase Butterworth filter of order ${report.filter.order} with a cutoff of ${report.filter.cutoff_hours} hours, which [The filter](#the-filter) estimates from the constants at ${FILTERED_FROM}° an hour and faster. Below that speed the gain is within ${percent(1 - zeroPhaseGain(FILTERED_FROM, report.filter.order, report.filter.cutoff_hours), 2)}% of one, and at four cycles a day it is within ${percent(1 - zeroPhaseGain(60, report.filter.order, report.filter.cutoff_hours), 2)}%, so the diurnal, semidiurnal and third-diurnal constants are compared very nearly as fitted.`,
+    `- **The clock.** Kartverket's phases are moved to UTC by the constituent's speed over one hour, which Kartverket states, and over terrestrial time minus UTC, ${Math.min(...results.map((r) => r.tt_seconds)).toFixed(1)} to ${Math.max(...results.map((r) => r.tt_seconds)).toFixed(1)} s in these periods, which it doesn't. [Gauges](#gauges) gives the seconds each gauge's fitted phases ask for, with their intervals.`,
   );
   p(
     `A constituent is **outside** where its amplitude or phase differs from Kartverket's by more than the fit's 95% interval, widened in quadrature by half of Kartverket's last digit (${mm(ROUNDING.amplitude, 2)} mm and ${ROUNDING.phase}°). Constituents slower than ${LONG_PERIOD}° an hour are counted apart.`,
@@ -295,7 +326,7 @@ export function render(report: Report): string {
     ),
   );
   p(
-    `The comparison uses order ${report.filter.order} and ${report.filter.cutoff_hours} hours, which leaves ${mm(estimate.pinned, 4)} mm.${estimate.best.order === report.filter.order && estimate.best.cutoff_hours === report.filter.cutoff_hours ? " That is the least of all." : ` The least is order ${estimate.best.order} at ${estimate.best.cutoff_hours.toFixed(2)} hours.`} The filter is estimated from the constants it is then used to compare, so agreement at these speeds says the constants are consistent with one such filter at every gauge, and nothing more.`,
+    `The comparison uses order ${report.filter.order} and ${report.filter.cutoff_hours} hours, which leaves ${mm(estimate.pinned, 4)} mm.${!estimate.best ? " No order has a least inside the search, so the constants don't show a filter." : estimate.best.order === report.filter.order && estimate.best.cutoff_hours === report.filter.cutoff_hours ? " That is the least of all." : ` The least is order ${estimate.best.order} at ${estimate.best.cutoff_hours.toFixed(2)} hours.`} The filter is estimated from the constants it is then used to compare, so agreement at these speeds says the constants are consistent with one such filter at every gauge, and nothing more.`,
   );
   const timed = results.filter((r) => r.rows.some((row) => row.filtered !== null));
   if (timed.length) {
@@ -310,13 +341,13 @@ export function render(report: Report): string {
     const of = (xs: typeof both) =>
       `${mm(median(xs.map((x) => x.gain)), 3)} mm by the gain and ${mm(median(xs.map((x) => x.time)), 3)} mm by the filter in time`;
     p(
-      `The other way to allow for the filter is to run the store's 10-minute values through it and fit what comes out. That was done for ${timed.length} of the ${results.length} gauges, each with one datum epoch, with gaps of up to an hour filled in a straight line, a day dropped at each end of a run of values, and the result read on the hour. The median vector difference from Kartverket's constants is ${of(both)} over all short-period constituents, and ${of(both.filter((x) => x.row.speed >= FILTERED_FROM))} at ${FILTERED_FROM}° an hour and faster. The two ways differ by ${mm(Math.abs((median(both.map((x) => x.gain)) ?? 0) - (median(both.map((x) => x.time)) ?? 0)), 3)} mm in that median. The comparison scales by the gain, which needs no rule for gaps and keeps the fit's intervals.`,
+      `The other way to allow for the filter is to run the store's 10-minute values through it and fit what comes out. That was done for ${timed.length} of the ${results.length} gauges, each with one datum epoch, with gaps of up to ${IN_TIME.gap_hours} hour filled in a straight line, ${IN_TIME.trim_days} day dropped at each end of a run of values, and the result read on the hour. The median vector difference from Kartverket's constants is ${of(both)} over all short-period constituents, and ${of(both.filter((x) => x.row.speed >= FILTERED_FROM))} at ${FILTERED_FROM}° an hour and faster. The two ways differ by ${mm(Math.abs((median(both.map((x) => x.gain)) ?? 0) - (median(both.map((x) => x.time)) ?? 0)), 3)} mm in that median. The comparison scales by the gain, which needs no rule for gaps and keeps the fit's intervals.`,
     );
   }
 
   p("## Gauges");
   p(
-    "Each gauge's period as Kartverket gives it, the hourly values the fit read, how many constituents are compared and outside, the one furthest outside, and the seconds past one hour its phases ask Kartverket's to be moved by, from the constituents faster than 10° an hour and of 5 mm or more, weighted by amplitude squared. The last four columns are the store's own fit of the gauge, with Schureman's corrections: its window, its held-out year, the share of the tidal band's variance it explains there and the tidal-band RMS left.",
+    "Each gauge's period as Kartverket gives it, the hourly values the fit read, how many constituents are compared and outside, the one furthest outside, and the seconds past one hour its phases ask Kartverket's to be moved by, from the constituents faster than ${CLOCK.speed}° an hour and of ${mm(CLOCK.amplitude, 0)} mm or more, weighted by amplitude squared, with the half-width of its 95% interval from the fit's phase intervals. The last four columns are the store's own fit of the gauge, with Schureman's corrections: its window, its held-out year, the share of the tidal band's variance it explains there and the tidal-band RMS left.",
   );
   p(
     table(
@@ -349,7 +380,9 @@ export function render(report: Report): string {
           String(rows.length),
           String(rows.filter(outside).length),
           top ? `${top.name} ${fitted(top)!.d.ratio?.toFixed(2)}` : "",
-          r.phase_seconds === null ? "" : r.phase_seconds.toFixed(1),
+          r.phase_seconds === null
+            ? ""
+            : `${r.phase_seconds.toFixed(1)} ± ${r.phase_seconds_ci?.toFixed(1) ?? "?"}`,
           `${r.standard.since.slice(0, 4)}–${+r.standard.until.slice(0, 4) - 1}`,
           String(r.standard.held_out),
           r.standard.variance === null ? "" : `${percent(r.standard.variance, 2)}%`,
@@ -367,7 +400,7 @@ export function render(report: Report): string {
         Math.abs(b.phase_seconds! - b.tt_seconds) - Math.abs(a.phase_seconds! - a.tt_seconds),
     )[0];
   p(
-    `Terrestrial time minus UTC over these periods is ${Math.min(...results.map((r) => r.tt_seconds)).toFixed(1)} to ${Math.max(...results.map((r) => r.tt_seconds)).toFixed(1)} s. The fitted phases ask for a median of ${median(asked)?.toFixed(1)} s, from ${Math.min(...asked).toFixed(1)} to ${Math.max(...asked).toFixed(1)} s${furthest ? `, the furthest from it at ${furthest.name}` : ""}.`,
+    `Terrestrial time minus UTC over these periods is ${Math.min(...results.map((r) => r.tt_seconds)).toFixed(1)} to ${Math.max(...results.map((r) => r.tt_seconds)).toFixed(1)} s. The fitted phases ask for a median of ${median(asked)?.toFixed(1)} s, from ${Math.min(...asked).toFixed(1)} to ${Math.max(...asked).toFixed(1)} s${furthest ? `, the furthest from it at ${furthest.name}` : ""}. Terrestrial time minus UTC is inside the interval at ${results.filter((r) => r.phase_seconds !== null && r.phase_seconds_ci !== null && Math.abs(r.phase_seconds - r.tt_seconds) <= r.phase_seconds_ci).length} of the ${asked.length} gauges.`,
   );
   const lacking = results.flatMap((r) => {
     const missing = MAJOR.filter((name) => !r.rows.some((row) => row.name === name));
@@ -422,10 +455,14 @@ export function render(report: Report): string {
     );
     for (const r of results.filter((x) => x.probe)) {
       const base = r.rows.filter((row) => !isLong(row) && outside(row)).length;
-      const counts = r.probe!.map((x) => x.outside);
-      const vectors = r.probe!.map((x) => x.vector);
+      const say = (years: number) => {
+        const found = r.probe!.filter((x) => x.years === years);
+        const [counts, vectors] = [found.map((x) => x.outside), found.map((x) => x.vector)];
+        return `${Math.min(...counts)} to ${Math.max(...counts)} outside and a mean vector difference of ${mm(Math.min(...vectors), 3)} to ${mm(Math.max(...vectors), 3)} mm`;
+      };
+      const least = Math.min(...r.probe!.map((x) => x.vector));
       p(
-        `${r.name} has ${base} outside and a mean vector difference of ${mm(r.vector, 3)} mm, so it was fitted again with each year of the period left out in turn. That leaves ${Math.min(...counts)} to ${Math.max(...counts)} outside and a mean vector difference of ${mm(Math.min(...vectors), 3)} to ${mm(Math.max(...vectors), 3)} mm${Math.min(...vectors) < r.vector / 2 ? "" : ", so no one year accounts for the difference"}. This report doesn't find why ${r.name}'s constants differ.`,
+        `${r.name} has ${base} outside and a mean vector difference of ${mm(r.vector, 3)} mm, so it was fitted again with each year of the period left out in turn, and with each two years running. One year out leaves ${say(1)}; two leave ${say(2)}.${least < r.vector / 2 ? "" : " No year or pair of years accounts for the difference."} Kartverket's protocol says some constants come from a nearby station without saying which, so that can't be tested here. This report doesn't find why ${r.name}'s constants differ.`,
       );
     }
   }
@@ -479,7 +516,7 @@ export function render(report: Report): string {
     return row && ours && r.sa_long ? [{ period: ours.d.vector, long: r.sa_long.vector }] : [];
   });
   p(
-    `Kartverket doesn't say which years its long-period constants are from.${sa.length ? ` SA fitted over the gauge's period is a median ${mm(median(sa.map((x) => x.period)), 1)} mm from Kartverket's, and fitted over 1991 to 2020, at the ${sa.length} gauges the store holds each of those years whole for, ${mm(median(sa.map((x) => x.long)), 1)} mm.` : ""} The long-period constituents are in each gauge's table and in no count.`,
+    `Kartverket doesn't say which years its long-period constants are from.${sa.length ? ` SA fitted over the gauge's period is a median ${mm(median(sa.map((x) => x.period)), 1)} mm from Kartverket's, and fitted over ${SA_YEARS[0]} to ${SA_YEARS[1]}, at the ${sa.length} gauges the store holds each of those years whole for, ${mm(median(sa.map((x) => x.long)), 1)} mm.` : ""} The long-period constituents are in each gauge's table and in no count.`,
   );
 
   p("## Each gauge");
@@ -489,7 +526,7 @@ export function render(report: Report): string {
   for (const r of results) {
     p(`### ${r.name} (\`${r.id}\`)`);
     p(
-      `${years(r)}: ${r.hours.toLocaleString("en-US")} hourly values.${r.sa_long ? ` SA over 1991 to 2020 is ${mm(r.sa_long.amplitude, 1)} mm at ${r.sa_long.phase.toFixed(1)}°, ${mm(r.sa_long.vector, 1)} mm from Kartverket's.` : ""}`,
+      `${years(r)}: ${r.hours.toLocaleString("en-US")} hourly values.${r.sa_long ? ` SA over ${SA_YEARS[0]} to ${SA_YEARS[1]} is ${mm(r.sa_long.amplitude, 1)} mm at ${r.sa_long.phase.toFixed(1)}°, ${mm(r.sa_long.vector, 1)} mm from Kartverket's.` : ""}`,
     );
     p(
       table(

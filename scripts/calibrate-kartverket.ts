@@ -2,9 +2,9 @@
  * How closely does Kartverket's own method, on the store's values, give
  * Kartverket's constants?
  *
- * Kartverket publishes harmonic constants for its gauges, analyzed with UTide
- * from the observations the store holds as `kartverket`. For each gauge below
- * this fits the store's series the way Kartverket analyzes it: one plain
+ * Kartverket publishes harmonic constants for its gauges, analyzed from its
+ * own observations of them, which the store holds as `kartverket`. For each
+ * gauge this fits the store's series the way that reproduces its analysis: one plain
  * least-squares fit over Kartverket's period of Kartverket's constituents,
  * with Foreman's nodal corrections at the gauge's latitude. It compares the
  * constants with Kartverket's, name for name, with the fit's amplitudes
@@ -44,14 +44,17 @@ import { yearSpan } from "../src/fit/calibration-report.ts";
 import { fitStation } from "../src/fit/fit.ts";
 import {
   chosen,
+  CLOCK,
   estimateFilter,
   FILTER,
   FIT,
   GAUGES,
+  IN_TIME,
   kartverketDigest,
   LONG_PERIOD,
   PROBE_FROM,
   render,
+  SA_YEARS,
   YEAR_SHARE,
   type Report,
   type Result,
@@ -168,21 +171,21 @@ async function calibrate(task: Task): Promise<Result> {
     const out: Sample[] = [];
     let run: Sample[] = [];
     const flush = () => {
-      if (run.length > 4 * 144) {
+      if (run.length > IN_TIME.run_days * 144) {
         const smooth = lowPass(
           run.map((s) => s.level),
           FILTER.order,
           FILTER.cutoff_hours,
           1 / 6,
         );
-        for (let i = 144; i < run.length - 144; i++)
+        for (let i = IN_TIME.trim_days * 144; i < run.length - IN_TIME.trim_days * 144; i++)
           if (run[i]!.time % HOUR_MS === 0) out.push({ time: run[i]!.time, level: smooth[i]! });
       }
       run = [];
     };
     for (const s of tenMinute) {
       const last = run.at(-1);
-      if (last && s.time - last.time > HOUR_MS) flush();
+      if (last && s.time - last.time > IN_TIME.gap_hours * HOUR_MS) flush();
       else if (last)
         for (let t = last.time + STEP_MS; t < s.time; t += STEP_MS)
           run.push({
@@ -222,18 +225,22 @@ async function calibrate(task: Task): Promise<Result> {
   // The seconds past one hour the phases ask for: the slope of the phase differences against
   // speed, weighted by amplitude squared, over the constituents faster than 10° an hour.
   const tt = ttMinusUtc(period.start, period.end);
-  let [num, den] = [0, 0];
+  let [num, den, spread] = [0, 0, 0];
   for (const theirs of published.constants) {
     const c = ours.find((x) => x.name === theirs.name);
-    if (!c || theirs.speed < 10 || theirs.amplitude < 0.005) continue;
-    num += theirs.amplitude ** 2 * theirs.speed * phaseDifference(c.phase, theirs.phase);
-    den += theirs.amplitude ** 2 * theirs.speed ** 2;
+    if (!c || theirs.speed < CLOCK.speed || theirs.amplitude < CLOCK.amplitude) continue;
+    const weight = theirs.amplitude ** 2 * theirs.speed;
+    num += weight * phaseDifference(c.phase, theirs.phase);
+    den += weight * theirs.speed;
+    // Each phase's 95% half-width carried through the weighted slope.
+    spread += (weight * (c.phaseInterval ?? NaN)) ** 2;
   }
   const phaseSeconds = den ? tt - (num / den) * 3600 : null;
+  const phaseSecondsCi = den && Number.isFinite(spread) ? (Math.sqrt(spread) / den) * 3600 : null;
 
   // Kartverket doesn't say which years its long-period constants are from: SA again over 1991 to
   // 2020, where the store holds each of those years whole.
-  const long = { start: Date.UTC(1991, 0, 1), end: Date.UTC(2021, 0, 1) };
+  const long = { start: Date.UTC(SA_YEARS[0], 0, 1), end: Date.UTC(SA_YEARS[1] + 1, 0, 1) };
   const longSamples = await read(long);
   const hoursOf = new Map<number, number>();
   for (const s of longSamples) {
@@ -244,7 +251,10 @@ async function calibrate(task: Task): Promise<Result> {
     (hoursOf.get(y) ?? 0) >= (YEAR_SHARE * (yearSpan(y).end - yearSpan(y).start)) / HOUR_MS;
   const theirSa = published.constants.find((c) => c.name === "SA_KV");
   let saLong: Result["sa_long"] = null;
-  if (theirSa && Array.from({ length: 30 }, (_, i) => 1991 + i).every(whole)) {
+  if (
+    theirSa &&
+    Array.from({ length: SA_YEARS[1] - SA_YEARS[0] + 1 }, (_, i) => SA_YEARS[0] + i).every(whole)
+  ) {
     const sa = engineFit(harmonicSamples(longSamples), names, options).constituents.find(
       (c) => c.name === "SA_KV",
     );
@@ -277,10 +287,15 @@ async function calibrate(task: Task): Promise<Result> {
   );
   let probe: Result["probe"] = null;
   if (outsideOf(ours).outside >= PROBE_FROM)
-    probe = periodYears.map((year) => ({
-      year,
-      ...outsideOf(fitted(samples.filter((s) => yearOf(s.time) !== year))),
-    }));
+    probe = [1, 2].flatMap((years) =>
+      periodYears.slice(0, periodYears.length - years + 1).map((year) => ({
+        year,
+        years,
+        ...outsideOf(
+          fitted(samples.filter((s) => yearOf(s.time) < year || yearOf(s.time) >= year + years)),
+        ),
+      })),
+    );
 
   const { fit, constituents } = await fitStation(station, {
     ...base,
@@ -303,6 +318,7 @@ async function calibrate(task: Task): Promise<Result> {
     short_years: shortYears,
     marked: task.marked,
     phase_seconds: phaseSeconds,
+    phase_seconds_ci: phaseSecondsCi,
     tt_seconds: tt,
     sa_long: saLong,
     standard: {
@@ -382,7 +398,7 @@ async function main(): Promise<void> {
   complete(parsed);
   const estimate = estimateFilter(parsed.results).best;
   console.error(
-    `the filter that fits best is order ${estimate.order} at ${estimate.cutoff_hours} hours; the comparison uses order ${FILTER.order} at ${FILTER.cutoff_hours}`,
+    `${estimate ? `the filter that fits best is order ${estimate.order} at ${estimate.cutoff_hours} hours` : "no filter fits"}; the comparison uses order ${FILTER.order} at ${FILTER.cutoff_hours}`,
   );
   await writePair(JSON_PATH, json, REPORT_PATH, render(parsed));
   console.error(`wrote ${JSON_PATH} and ${REPORT_PATH}`);

@@ -42,7 +42,7 @@ describe("the Kartverket calibration", () => {
 
   it("uses the filter its own constants estimate", () => {
     const { best } = estimateFilter(read().results);
-    assert.deepEqual({ order: best.order, cutoff_hours: best.cutoff_hours }, FILTER);
+    assert.deepEqual({ order: best?.order, cutoff_hours: best?.cutoff_hours }, FILTER);
   });
 });
 
@@ -56,10 +56,19 @@ describe("estimateFilter", () => {
           row.kartverket.amplitude = row.ours.amplitude / (1 + ((row.speed / 360) * 3.3) ** 8);
     const { best, none } = estimateFilter(report.results);
     assert.deepEqual(
-      { order: best.order, cutoff_hours: best.cutoff_hours },
+      { order: best?.order, cutoff_hours: best?.cutoff_hours },
       { order: 4, cutoff_hours: 3.3 },
     );
-    assert.ok(best.misfit < 1e-6 && none > best.misfit);
+    assert.ok(best!.misfit < 1e-6 && none > best!.misfit);
+  });
+
+  it("finds none where the fitted amplitudes are Kartverket's as they are", () => {
+    const report = read();
+    for (const result of report.results)
+      for (const row of result.rows)
+        if (!("reason" in row.ours)) row.kartverket.amplitude = row.ours.amplitude;
+    assert.equal(estimateFilter(report.results).best, null);
+    assert.match(render(report), /don't show a filter/);
   });
 });
 

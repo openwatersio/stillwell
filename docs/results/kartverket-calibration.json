@@ -1,6 +1,6 @@
 {
   "engine": "@slackwater/engine@1.0.0-beta.14",
-  "inputs": "de8f57b1c974e510",
+  "inputs": "7eb842253370c30b",
   "method": 1,
   "final_year": 2024,
   "filter": {
@@ -21,6 +21,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.756805,
+      "phase_seconds_ci": 2.784819,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.140289,
@@ -1457,6 +1458,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.225342,
+      "phase_seconds_ci": 2.410964,
       "tt_seconds": 67.18451,
       "sa_long": null,
       "standard": {
@@ -2964,6 +2966,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.042833,
+      "phase_seconds_ci": 4.641683,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.107791,
@@ -4375,6 +4378,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 67.69048,
+      "phase_seconds_ci": 2.730778,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.147869,
@@ -5836,6 +5840,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 67.986621,
+      "phase_seconds_ci": 2.450864,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.128077,
@@ -7372,6 +7377,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.34056,
+      "phase_seconds_ci": 2.476984,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.137366,
@@ -8783,6 +8789,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 67.787461,
+      "phase_seconds_ci": 2.829368,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.13051,
@@ -8805,78 +8812,177 @@
       "probe": [
         {
           "year": 2006,
+          "years": 1,
           "outside": 11,
           "vector": 0.000294
         },
         {
           "year": 2007,
+          "years": 1,
           "outside": 8,
           "vector": 0.000277
         },
         {
           "year": 2008,
+          "years": 1,
           "outside": 9,
           "vector": 0.000257
         },
         {
           "year": 2009,
+          "years": 1,
           "outside": 7,
           "vector": 0.000253
         },
         {
           "year": 2010,
+          "years": 1,
           "outside": 9,
           "vector": 0.000259
         },
         {
           "year": 2011,
+          "years": 1,
           "outside": 6,
           "vector": 0.000249
         },
         {
           "year": 2012,
+          "years": 1,
           "outside": 9,
           "vector": 0.00026
         },
         {
           "year": 2013,
+          "years": 1,
           "outside": 11,
           "vector": 0.000268
         },
         {
           "year": 2014,
+          "years": 1,
           "outside": 14,
           "vector": 0.000275
         },
         {
           "year": 2015,
+          "years": 1,
           "outside": 10,
           "vector": 0.000278
         },
         {
           "year": 2016,
+          "years": 1,
           "outside": 9,
           "vector": 0.000261
         },
         {
           "year": 2017,
+          "years": 1,
           "outside": 7,
           "vector": 0.000262
         },
         {
           "year": 2018,
+          "years": 1,
           "outside": 8,
           "vector": 0.000263
         },
         {
           "year": 2019,
+          "years": 1,
           "outside": 5,
           "vector": 0.00024
         },
         {
           "year": 2020,
+          "years": 1,
           "outside": 9,
           "vector": 0.000257
+        },
+        {
+          "year": 2006,
+          "years": 2,
+          "outside": 18,
+          "vector": 0.00034
+        },
+        {
+          "year": 2007,
+          "years": 2,
+          "outside": 14,
+          "vector": 0.000296
+        },
+        {
+          "year": 2008,
+          "years": 2,
+          "outside": 10,
+          "vector": 0.000267
+        },
+        {
+          "year": 2009,
+          "years": 2,
+          "outside": 8,
+          "vector": 0.000274
+        },
+        {
+          "year": 2010,
+          "years": 2,
+          "outside": 7,
+          "vector": 0.000281
+        },
+        {
+          "year": 2011,
+          "years": 2,
+          "outside": 9,
+          "vector": 0.000283
+        },
+        {
+          "year": 2012,
+          "years": 2,
+          "outside": 9,
+          "vector": 0.000289
+        },
+        {
+          "year": 2013,
+          "years": 2,
+          "outside": 15,
+          "vector": 0.000308
+        },
+        {
+          "year": 2014,
+          "years": 2,
+          "outside": 15,
+          "vector": 0.000314
+        },
+        {
+          "year": 2015,
+          "years": 2,
+          "outside": 9,
+          "vector": 0.000299
+        },
+        {
+          "year": 2016,
+          "years": 2,
+          "outside": 8,
+          "vector": 0.00028
+        },
+        {
+          "year": 2017,
+          "years": 2,
+          "outside": 6,
+          "vector": 0.000276
+        },
+        {
+          "year": 2018,
+          "years": 2,
+          "outside": 8,
+          "vector": 0.000259
+        },
+        {
+          "year": 2019,
+          "years": 2,
+          "outside": 13,
+          "vector": 0.000271
         }
       ],
       "rows": [
@@ -10395,6 +10501,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 67.961314,
+      "phase_seconds_ci": 50.011612,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.082844,
@@ -11631,6 +11738,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 67.99601,
+      "phase_seconds_ci": 2.967174,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.123653,
@@ -13217,6 +13325,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.175369,
+      "phase_seconds_ci": 2.715423,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.15273,
@@ -14728,6 +14837,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.242219,
+      "phase_seconds_ci": 2.548094,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.141102,
@@ -16164,6 +16274,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 69.058291,
+      "phase_seconds_ci": 2.805055,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.132906,
@@ -17600,6 +17711,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 69.478262,
+      "phase_seconds_ci": 2.801628,
       "tt_seconds": 67.949774,
       "sa_long": null,
       "standard": {
@@ -19032,6 +19144,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.30362,
+      "phase_seconds_ci": 2.618885,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.144443,
@@ -20518,6 +20631,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.059098,
+      "phase_seconds_ci": 2.237169,
       "tt_seconds": 67.18451,
       "sa_long": null,
       "standard": {
@@ -22000,6 +22114,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.150413,
+      "phase_seconds_ci": 46.916247,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.087886,
@@ -23238,6 +23353,7 @@
       ],
       "marked": false,
       "phase_seconds": 79.472153,
+      "phase_seconds_ci": 45.705081,
       "tt_seconds": 67.18451,
       "sa_long": null,
       "standard": {
@@ -24420,6 +24536,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.35166,
+      "phase_seconds_ci": 2.77223,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.137161,
@@ -25856,6 +25973,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.673989,
+      "phase_seconds_ci": 11.556381,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.101794,
@@ -27192,6 +27310,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 68.013654,
+      "phase_seconds_ci": 2.932512,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.128963,
@@ -28703,6 +28822,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 67.712232,
+      "phase_seconds_ci": 2.599203,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.117269,
@@ -30164,6 +30284,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 66.321166,
+      "phase_seconds_ci": 51.769596,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.083179,
@@ -31325,6 +31446,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 67.84048,
+      "phase_seconds_ci": 3.06291,
       "tt_seconds": 67.18451,
       "sa_long": null,
       "standard": {
@@ -32882,6 +33004,7 @@
       "short_years": [],
       "marked": false,
       "phase_seconds": 67.305341,
+      "phase_seconds_ci": 48.326438,
       "tt_seconds": 67.18451,
       "sa_long": {
         "amplitude": 0.082376,

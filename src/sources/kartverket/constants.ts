@@ -92,6 +92,11 @@ export interface PublishedConstants {
  * isn't one: `Date.parse` rolls 31 February over into March.
  */
 export function periodOf(code: string, xml: string): { start: number; end: number } | null {
+  // Only a whole answer can say it names none.
+  if (!/<\/constituents>\s*<\/tide>\s*$/.test(xml))
+    throw new Error(`kartverket/${code}: its constants end before the answer does`);
+  if (/<observations\b/.test(xml) && !/<observations\b[^>]*\/>/.test(xml))
+    throw new Error(`kartverket/${code}: its constants' period can't be read`);
   const tag = /<observations\b([^>]*)\/>/.exec(xml)?.[1];
   if (tag === undefined) return null;
   const instant = (name: string) => {
@@ -115,6 +120,8 @@ export function parseConstants(code: string, xml: string): PublishedConstants {
   const fail = (why: string) => new Error(`kartverket/${code}: its constants ${why}`);
   const head = /<constituents\b([^>]*)>/.exec(xml)?.[1];
   if (!head) throw fail("aren't a <constituents> answer");
+  // An answer cut short would read as one with fewer constituents.
+  if (!/<\/constituents>\s*<\/tide>\s*$/.test(xml)) throw fail("end before the answer does");
   if (!/\bunit="cm"/.test(head) || !/\butcoffset="\+01:00"/.test(head))
     throw fail("aren't in centimeters against UTC+1");
   const attribute = (tag: string, name: string) =>
@@ -122,8 +129,12 @@ export function parseConstants(code: string, xml: string): PublishedConstants {
   const period = periodOf(code, xml);
   if (!period) throw fail("name no period of observations");
   const { start, end } = period;
-  const latitude = Number(attribute(/<location\b([^>]*)\/>/.exec(xml)?.[1] ?? "", "latitude"));
-  if (!Number.isFinite(latitude)) throw fail("give no latitude");
+  const location = /<location\b([^>]*)\/>/.exec(xml)?.[1] ?? "";
+  if (attribute(location, "code") !== code)
+    throw fail(`are for ${attribute(location, "code") ?? "no gauge"}`);
+  const latitudeText = attribute(location, "latitude") ?? "";
+  const latitude = /^-?\d+(\.\d+)?$/.test(latitudeText) ? Number(latitudeText) : NaN;
+  if (!Number.isFinite(latitude) || Math.abs(latitude) > 90) throw fail("give no latitude");
   let hours: number;
   try {
     hours = 1 + ttMinusUtc(start, end) / 3600;
@@ -138,8 +149,10 @@ export function parseConstants(code: string, xml: string): PublishedConstants {
       const text = attribute(tag!, name);
       return text && /^-?\d+(\.\d+)?$/.test(text) ? Number(text) : NaN;
     }) as [number, number, number];
-    if (![amplitude, phase, speed].every(Number.isFinite) || amplitude < 0)
+    if (![amplitude, phase, speed].every(Number.isFinite))
       throw fail(`hold a value that isn't a number for ${published}`);
+    if (amplitude < 0 || phase < 0 || phase > 360)
+      throw fail(`hold an amplitude under zero or a phase outside 0 to 360 for ${published}`);
     const entry = catalog[NAMES[published] ?? published];
     if (!entry || Math.abs(entry.speed - speed) > 1e-4)
       throw fail(`name ${published} at ${speed}° an hour, which the catalog doesn't have`);

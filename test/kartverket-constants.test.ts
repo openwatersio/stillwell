@@ -92,6 +92,15 @@ describe("parseConstants", () => {
     const open =
       '<constituent name="S2" amplitude="5.00" phaseangle="5.00" speed="30.0"></constituent>';
     assert.throws(() => parseConstants("SVG", answer(M2 + open)), /can't be read/);
+    // Cut off after a constituent, the answer would read as one with fewer.
+    const cut = answer(M2 + H1).split('<constituent name="H1"')[0]!;
+    assert.throws(() => parseConstants("SVG", cut), /end before/);
+    assert.throws(() => periodOf("SVG", cut), /end before/);
+    assert.throws(() => parseConstants("VIK", answer(M2)), /are for SVG/);
+    const nowhere = answer(M2).replace('latitude="58.974339"', 'latitude=""');
+    assert.throws(() => parseConstants("SVG", nowhere), /latitude/);
+    const turned = M2.replace('phaseangle="270.00"', 'phaseangle="999.00"');
+    assert.throws(() => parseConstants("SVG", answer(turned)), /outside 0 to 360/);
   });
 
   it("refuses an answer it can't compare", () => {
