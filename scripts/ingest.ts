@@ -73,8 +73,9 @@
  * `fit` fits harmonic constants to the source's stations whose fit is due, from their
  * final values in the store, into fits/<source>.parquet and constituents/<source>.parquet
  * (src/fit/store.ts), and scores slackwater-database's constants for each gauge on the fit's
- * held-out year, into fits/references/<source>.parquet (src/fit/reference-links.ts); `--all` fits
- * every station again, and station IDs or `--shard` limit the run.
+ * held-out year, into fits/references/<source>.parquet (src/fit/reference-links.ts), then reduces
+ * the tidal datums of each fit whose datums are due, into fits/datums/<source>.parquet
+ * (src/fit/datums.ts); `--all` fits every station again, and station IDs or `--shard` limit the run.
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -146,6 +147,7 @@ import {
 } from "../src/store/parquet.ts";
 import { commitYears, markYears, readYears, reconcileYears } from "../src/store/years.ts";
 import { loadReferences } from "../src/fit/reference-links.ts";
+import { datumsSource } from "../src/fit/datums-store.ts";
 import { fitSource } from "../src/fit/store.ts";
 import { requalifyInWorker, WorkerDied } from "../src/store/requalify.ts";
 import {
@@ -1293,10 +1295,28 @@ async function fitStations(sourceId: string, ids?: string): Promise<void> {
     `fit ${sourceId}: ${report.fitted.length} fitted, ${report.none.length} without constants, ${report.rescored.length} scored again, ${report.current} current, ${report.waiting.length} being written, ${report.failed.length} failed`,
     ...report.failed.map((f) => `  failed ${f}`),
   ];
-  for (const line of lines) console.log(line);
-  const file = process.env.GITHUB_STEP_SUMMARY;
-  if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
+  const summary = async (out: string[]) => {
+    for (const line of out) console.log(line);
+    const file = process.env.GITHUB_STEP_SUMMARY;
+    if (file) await appendFile(file, ["```", ...out, "```", ""].join("\n"));
+  };
+  // The fit's report first, so a datums step that throws doesn't hide it.
+  await summary(lines);
   if (report.failed.length) process.exitCode = 1;
+  // From the fits just written, so a station fitted in this run has its datums reduced in it too.
+  const datums = await datumsSource(store, source, list, {
+    now: new Date(),
+    errata,
+    all: values.all,
+    ...(only ? { only } : {}),
+    concurrency: positive("concurrency"),
+    log: (line) => console.log(line),
+  });
+  await summary([
+    `datums ${sourceId}: ${datums.reduced.length} reduced, ${datums.none.length} of them without observed datums, ${datums.current} current, ${datums.waiting.length} being written, ${datums.stale.length} waiting for a fit, ${datums.failed.length} failed`,
+    ...datums.failed.map((f) => `  failed ${f}`),
+  ]);
+  if (datums.failed.length) process.exitCode = 1;
 }
 
 async function analyzeSource(sourceId: string): Promise<void> {

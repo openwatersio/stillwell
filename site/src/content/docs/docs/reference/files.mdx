@@ -34,6 +34,7 @@ Every file is under `https://stillwell.openwaters.io/`, readable over HTTPS with
 
 - [`fits/<source>.parquet`](#harmonic-fits): each station's harmonic fit, with its window, its scores on a year it didn't read, and what it read.
 - [`constituents/<source>.parquet`](#harmonic-fits): the constants of each fit, a row per candidate constituent.
+- [`fits/datums/<source>.parquet`](#tidal-datums): the tidal datums of each fit, observed from the station's levels and predicted from its constants.
 
 ## Reading one station
 
@@ -79,3 +80,9 @@ LIMIT 10`}
 To predict from a fit, sum its kept constituents and add the fit's `z0_m`, the window's mean level in the station's datum. Phases are Greenwich lags with time in UTC. The amplitudes and phases were fitted under the nodal corrections the fit's `node_corrections` names, Schureman's (1958), and a prediction has to apply the same ones: constants fitted under one family of corrections predict slightly differently under another. The constituent's name is needed with its Doodson numbers, since NO1 and M1, and MO3 and 2MK3, share numbers and differ in their correction.
 
 <Schema resource="constituents" />
+
+## Tidal datums
+
+`fits/datums/<source>.parquet` has a row for each station with constants: tidal datums reduced from the station's own measured levels, and the datums of a 19-year prediction from its constants, each as a height in meters above the station's `datum` in its current epoch. The observed datums, MHHW, MHW, MSL, MTL, MLW and MLLW, are NOAA's first reduction over the longest run of whole years of complete months the station has from the start of the fit's window to the end of its held-out year, and `reason` says why a station has none. The predicted ones, HAT and LAT among them, cover 2007 through 2025 for every station. Join a row to its fit on `id`, `version` and `fitted`. [Tidal datums](https://github.com/openwatersio/stillwell/blob/main/docs/fits.md#tidal-datums) in the repository gives the method, and [`src/store/files.ts`](https://github.com/openwatersio/stillwell/blob/main/src/store/files.ts) each column.
+
+These datums aren't the station's `datums` in `stations.parquet`, which come from the source, slackwater-database or a linked series, and which of them is the station's chart datum is slackwater-database's choice.

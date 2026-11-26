@@ -1,6 +1,6 @@
 # Harmonic fits
 
-How the store fits harmonic constants to a station's water levels, and why each choice was made. [Running ingest](contributing/ingest.md) covers the `fit` command, [`src/store/files.ts`](../src/store/files.ts) defines every column of the three files it writes, and the code is in [`src/fit/`](../src/fit/).
+How the store fits harmonic constants to a station's water levels, and why each choice was made. [Running ingest](contributing/ingest.md) covers the `fit` command, [`src/store/files.ts`](../src/store/files.ts) defines every column of the four files it writes, and the code is in [`src/fit/`](../src/fit/).
 
 A fit is a measurement. It is published whatever its size, with what a reader needs to judge it: the window, the files read, each constituent's confidence interval and signal-to-noise ratio, the scatter between years, and a score on a year the fit didn't read. Nothing here decides whether a gauge has enough tide to predict.
 
@@ -183,6 +183,47 @@ O1, Q1 and Mf come back under Schureman's corrections and J1 under the IHO's. M1
 **What a row carries.** The record's ID and source, the `@slackwater/database` release its constants were read from, a digest of those constants, how the record is linked, the corrections it was predicted under, and whether the span it says it was analyzed over includes the held-out year (`seen`), which then favors it over the fit. A score describes a record only while its constants have the row's digest. It holds none of the record's values, and is measured against them, so each row also carries the record's license, whether its terms allow commercial use, and its credit.
 
 **When they are taken again.** With the fit, whenever the station is fitted. Without fitting, when a release changes a linked record's constants, its terms or whether its analysis covers the held-out year, a record joins or leaves the gauge, or the link to one changes: the held-out year is read as the fit read it, and the scoring stops if the fit's own score no longer comes out as its row says. Each row carries its fit's `version` and `fitted`, a reader joins on both with `id`, and rows that don't match the fit's are taken again.
+
+## Tidal datums
+
+Each fit with constants has a row of tidal datums in `fits/datums/<source>.parquet`, reduced by [`@slackwater/datums`](https://www.npmjs.com/package/@slackwater/datums) ([`src/fit/datums.ts`](../src/fit/datums.ts)). A row joins its fit on `id`, `version` and `fitted`, and gives every datum as a height in meters above the station's zero: its `datum` in its current epoch, which the fit moved every epoch's levels into. The package's README lists what it computes, which of its rules are its own and which are an agency's, and its limitations. Which datum is a station's chart datum stays with slackwater-database, and `stations.parquet` doesn't read the file.
+
+**Observed datums** are NOAA's first reduction ([Computational Techniques for Tidal Datums Handbook](https://tidesandcurrents.noaa.gov/publications/Computational_Techniques_for_Tidal_Datums_handbook.pdf), §2.6 and §3.1): MHHW, MHW, MSL, MTL, MLW and MLLW, each a mean over one window, with high and low waters tabulated by the method of NOAA's Tidal Analysis Datum Calculator ([NOAA Technical Report NOS CO-OPS 085](https://tidesandcurrents.noaa.gov/publications/techrpt085.pdf), §2.2).
+
+- **What it reads.** Every measured value from the start of the fit's window to the end of its held-out year, final or not: values flagged good or preliminary. Interpolated, suspect and bad values stay out, so a gap a source filled is a gap here, and the package fills it or not by its own bounds rather than counting the source's fill as observed. Flags combine to the worse of the source's and QC's, and preliminary is worse than interpolated, so a value a source marks both provisional and estimated, as USGS can, is stored as preliminary and read as measured, outside the package's bounds.
+- **At what spacing.** Every value at least 4½ minutes after the one before it in its year file, which leaves a 5-, 6- or 10-minute series whole, with each stamp within 15 seconds of its mark, and thins a 1-minute one to every fifth value. Each epoch's files are thinned on their own, so where a rejected epoch's values overlap another's, as they rarely do, both can be read. NOAA tabulates from 6-minute values, and the package takes a tide's height from a cubic over 2.5 to 6.5 hours of a series finer than 15 minutes. Thinning keeps 19 years of a 1-minute gauge within a fit's worker, where the whole series would take about 4 GB.
+- **Window.** The longest run of complete UTC calendar months that is a whole number of years, the latest on a tie, within the 19 years up to the last complete month read. A month is complete when every hour has a value, measured or filled. The row gives the window, its months, and its observed and filled hours. The store has no shared epoch: each gauge's window is its own, and none is brought to a National Tidal Datum Epoch through a control station, as NOAA does for a series shorter than 19 years.
+- **Gaps.** The fit's constants, predicted under the corrections they were fitted with, fill gaps of up to 23 hours from the prediction plus the residual interpolated across the gap, within the package's bounds: the residual at the two edges agreeing within 0.1 m, and no more than 72 such hours a month.
+- **Too little record.** A station with no whole year of complete months, or none with a high and a low water, has a row with its `reason` and no observed datums. That is the package's rule, and no other threshold applies.
+
+**Predicted datums** come from the fit's constants predicted over 19 years, the epoch the package pins (`DATUM_EPOCH`, 2007 through 2025), on top of the fit's `z0_m`, under Schureman's corrections: HAT and LAT, the Large Tide levels HHWLT and LLWLT, MHHW to MLLW of the predicted turns, MHWS and MLWS, NLLW and ALLW, and TLT. Those are the datums slackwater-database chooses a station's chart datum among, by country. Another 19 years gives other extremes, so the epoch is the same for every station, and the row records it. The prediction rides on the fit window's mean level, so its MSL is `z0_m`, which differs from the observed MSL by the change in mean level between the two windows.
+
+**When they are reduced again.** With the fit, whenever the station is fitted, since a row belongs to one fit. Without fitting, when the version of `@slackwater/datums` or the step's method changes. A fit read under other epochs than the station has now, as one whose refit failed after the source moved the station's zero, has its datums wait for the next fit, since its mean level was read under the old conversions. Reducing a station's 19 years of 6-minute values takes a few seconds, and its heap peaks between 400 and 600 MB.
+
+### What was measured
+
+Twenty CO-OPS gauges, fitted on 2006 through 2024 and held out on 2025, from Kwajalein and Honolulu to Anchorage and Eastport.
+
+**Against NOAA on the same months.** NOAA publishes each month's MHHW, MHW, MSL, MTL, MLW and MLLW from its own tabulation of the same gauge. Averaged over each station's observed window, the reduction here agrees with them as follows, in millimeters (here minus NOAA):
+
+| Datum | Mean | RMS | Largest |
+| ----- | ---- | --- | ------- |
+| MHHW  | 0    | 4   | 10      |
+| MHW   | 0    | 4   | 8       |
+| MSL   | 0    | 1   | 1       |
+| MTL   | 1    | 4   | 11      |
+| MLW   | 1    | 9   | 30      |
+| MLLW  | 2    | 9   | 34      |
+
+The largest are at Anchorage (`coops/9455920`), whose mean range is about 8 m, with MLW and MLLW 30 and 34 mm high, and Galveston's Pier 21 (`coops/8771450`), with MLW 18 mm low. Neither is explained. Every other datum at every other gauge is within 10 mm. The windows run from 7 to 19 years.
+
+**Against NOAA's National Tidal Datum Epoch.** NOAA's published datums are for 1983 through 2001, and each gauge's window here is its own latest years, so they differ mostly by the change in mean level: MSL is 3 to 156 mm higher at 18 of the gauges, and 46 and 9 mm lower at Anchorage and Unalaska (`coops/9462620`). The mean range, MHW minus MLW, is within 20 mm of NOAA's at 16 gauges; it is 118 and 121 mm larger at Eastport (`coops/8410140`) and Anchorage, 47 mm larger at Philadelphia (`coops/8545240`) and 36 mm smaller at Boston (`coops/8443970`).
+
+**HAT and LAT.** Predicted from NOAA's own constants over the same 19 years with the same code, HAT and LAT fall within 25 mm of those predicted from the fit's constants at 12 of the 20 gauges. Seven differ by 26 to 70 mm, the most at Eastport, Philadelphia and Boston, where the fit's M2 is 20, 16 and 5 mm larger than NOAA's. At Anchorage the fit's LAT is 176 mm higher; NOAA's constants there have 120 constituents and the fit's 75, and which difference accounts for it isn't measured.
+
+**Against Kartverket.** Twenty-four Kartverket gauges, fitted on up to 19 years before 2025 and held out on 2025, against the datums Kartverket publishes for 2006 through 2020, as heights above chart datum. MSL is within 33 mm at 23 of them (RMS 21 mm), the windows here differing from Kartverket's by up to nine years. HAT, LAT, MHWS and MLWS from the prediction differ by an RMS of 23, 24, 18 and 17 mm. Ny-Ålesund (`kartverket/NYA`) is the exception, 59 to 85 mm below Kartverket on every datum. Its window here, April 2007 to April 2018, is centered within a year of Kartverket's, so a trend in sea level of under 10 mm a year doesn't explain it. Kartverket's MHW and MLW are MSL plus and minus the M2 amplitude, to within 1 mm at every gauge, rather than means of high and low waters, so they aren't compared.
+
+**Thinning.** At two LINZ gauges recorded every minute, Port Chalmers and Wellington, four years read whole and thinned to every 5 minutes give the same window and the same observed datums within 1 mm.
 
 ## What the IHO asks a publisher to state
 
