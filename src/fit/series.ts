@@ -5,7 +5,8 @@ import { listFiles, readObservationsBetween } from "../store/parquet.ts";
 import { seriesPath } from "../store/paths.ts";
 import type { YearRow } from "../store/years.ts";
 import type { Sample } from "../types.ts";
-import { CANDIDATES } from "./candidates.ts";
+import { candidatesFor } from "./candidates.ts";
+import { NODE_CORRECTIONS } from "./scores.ts";
 
 /**
  * The levels a harmonic fit or a tidal datum reads from a station's year
@@ -94,7 +95,7 @@ export function inputsDigest(
         finalizes: metadata.finalizes,
         settles_after_months: metadata.settles_after_months ?? null,
         method: METHOD,
-        candidates: CANDIDATES.map((c) => [c.name, c.doodson]),
+        candidates: candidatesFor(NODE_CORRECTIONS).map((c) => [c.name, c.doodson]),
       }),
     )
     .digest("hex")

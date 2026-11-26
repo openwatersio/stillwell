@@ -37,6 +37,17 @@ Every fit starts from the same candidates in the same priority order, defined in
 
 Starting from one list makes fits comparable between gauges, and including NOAA's and TICON's names lets a fit be compared with either name for name.
 
+**Names that share a line.** NO1 and M1 are one line, as are MO3 and 2MK3: the same Doodson numbers under two names, each with its own nodal correction. A line has one constant, so the two names can't both be kept, and the name decides the correction. The list keeps one order, and each set of nodal formulas names the lines it holds under the other name (`PREFERRED` in [`src/fit/candidates.ts`](../src/fit/candidates.ts)), which then takes the first name's place in the order:
+
+- **M1 for NO1, under Schureman's and the IHO's formulas.** Both define a correction for M1 and none for NO1, which they treat as a compound of N2 and O1. Foreman's define NO1's line and call it NO1.
+- **2MK3 for MO3, under Schureman's.** Neither name has a formula of its own there: each takes its correction from its members, M2 twice less K1, or M2 and O1. NOAA publishes the line as 2MK3.
+
+The [calibration against NOAA's constants](results/fit-calibration.md) measured the two together, on fits of the years NOAA analyzed: with NOAA's names and nothing else changed, the held-out year is predicted better at 9 and worse at none of the 18 stations whose NOAA analysis didn't read that year, counting a change of 0.1 mm or more, from −2.0 to +0.1 mm. The gain is in the prediction. M1's own constant is no closer to NOAA's under its name, since NOAA's comes from node factors held for a year at a time. The preference for M1 under the IHO's formulas follows from the formulas and hasn't been measured.
+
+The preferred name gets the first chance to be kept. Where it fails the signal-to-noise test, neither name is kept, and the other's row names it as the conflict.
+
+Holding the line as M1 has a cost for anyone predicting with other software. M1's Doodson numbers include the lunar perigee, p, and so does Schureman's correction for M1 as he writes it for the argument without p (his equation 202). The constants here are on the argument with p (equation 194), whose correction is u = −ν − Qa (equation 196). Applying equation 202's correction to these Doodson numbers counts p twice, and the phase drifts about 40° a year. 2MK3 isn't among the shallow-water lines t_tide and UTide define, while MO3 is, so those can't predict it. slackwater-database's stored constituent definitions can't carry M1's correction either ([slackwater-database#238](https://github.com/openwatersio/slackwater-database/issues/238)), so it predicts a fit that keeps M1 only with an engine that has it.
+
 A candidate is kept when it passes two tests:
 
 - **Rayleigh criterion.** The record separates it from every stronger candidate already kept by at least one cycle ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf), §2.1.2, p. 17). Where a record can't separate two candidates, the one earlier in the list stays.
@@ -72,7 +83,7 @@ Five gauges, each fitted on 19 years under each family and scored on a held-out 
 | Cuxhaven (`pegelonline/5990020`) | 53.9°N   | Semidiurnal, M2 1.38 m      |
 | Kungsvik (`smhi/2130`)           | 59.0°N   | Semidiurnal, M2 0.12 m      |
 
-Sa, Ssa and S1 were left out, since t_tide defines SA and S1 on lines that include the solar perigee.
+Sa, Ssa and S1 were left out, since t_tide defines SA and S1 on lines that include the solar perigee. Every family's fit held the two shared lines as NO1 and MO3. Under Schureman's corrections the fits hold them as M1 and 2MK3, which moves a held-out score by up to 2.0 mm, more than any difference between families below, so Schureman's column understates what the fits do.
 
 **No family predicts best everywhere, and the differences are about 1% of the residual at most.** Tidal-band RMS of observed minus predicted levels on the held-out year, fitted and predicted under the same family:
 

@@ -10,6 +10,8 @@
  * multiples of τ, s, h, p, N′ and p′, then the phase constant in quarter
  * cycles. `spellings` are the other names the three lists use for the line.
  *
+ * Two pairs of names share a line, and `candidatesFor` gives the order for a set of nodal formulas.
+ *
  * Foreman's H1 and H2 are left out under those names: they are M2's neighbors
  * one cycle a year either side, the lines TICON's MA2 and MB2 name.
  */
@@ -106,3 +108,36 @@ export const CANDIDATES: Candidate[] = [
   { name: "3N2", doodson: [2, -1, 0, 0, 0, 0, 1], speed: 28.4350877, from: ["ticon"] },
   { name: "2MO5", doodson: [5, -1, 0, 0, 0, 0, 1], speed: 71.911244, from: ["ticon"] },
 ];
+
+/** A set of nodal correction formulas, as `@slackwater/engine` names them. */
+export type NodeCorrections = "iho" | "schureman" | "foreman";
+
+/**
+ * Where two names in the list share a line, the name a set of nodal formulas holds it under, by the
+ * name that comes first in the list. docs/fits.md, under Constituents, says why each is here. A set
+ * with no entry keeps the list's own order.
+ */
+export const PREFERRED: Partial<Record<NodeCorrections, Record<string, string>>> = {
+  schureman: { NO1: "M1", MO3: "2MK3" },
+  iho: { NO1: "M1" },
+};
+
+/**
+ * The candidates in priority order for fits under `corrections`: the list, with each preferred
+ * name in the place of the name it shares a line with, and that name where the preferred one was.
+ */
+export function candidatesFor(corrections: NodeCorrections): Candidate[] {
+  const list = [...CANDIDATES];
+  for (const [name, preferred] of Object.entries(PREFERRED[corrections] ?? {})) {
+    const [i, j] = [
+      list.findIndex((c) => c.name === name),
+      list.findIndex((c) => c.name === preferred),
+    ];
+    if (i < 0 || j < 0) throw new Error(`the candidate list has no ${i < 0 ? name : preferred}`);
+    const [a, b] = [list[i]!, list[j]!];
+    if (a.speed !== b.speed || a.doodson.join() !== b.doodson.join())
+      throw new Error(`${name} and ${preferred} aren't one line`);
+    if (i < j) [list[i], list[j]] = [b, a];
+  }
+  return list;
+}
