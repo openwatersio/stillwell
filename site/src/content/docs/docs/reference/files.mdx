@@ -34,7 +34,6 @@ Every file is under `https://stillwell.openwaters.io/`, readable over HTTPS with
 
 - [`fits/<source>.parquet`](#harmonic-fits): each station's harmonic fit, with its window, its scores on a year it didn't read, and what it read.
 - [`constituents/<source>.parquet`](#harmonic-fits): the constants of each fit, a row per candidate constituent.
-- [`fits/references/<source>.parquet`](#reference-scores): the tide database's constants for each fitted gauge, scored on the fit's held-out year.
 
 ## Reading one station
 
@@ -79,11 +78,3 @@ LIMIT 10`}
 To predict from a fit, sum its kept constituents and add the fit's `z0_m`, the window's mean level in the station's datum. Phases are Greenwich lags with time in UTC. The amplitudes and phases were fitted under the nodal corrections the fit's `node_corrections` names, Schureman's (1958), and a prediction has to apply the same ones: constants fitted under one family of corrections predict slightly differently under another. The constituent's name is needed with its Doodson numbers, since NO1 and M1, and MO3 and 2MK3, share numbers and differ in their correction.
 
 <Schema resource="constituents" />
-
-## Reference scores
-
-`fits/references/<source>.parquet` has a row for each fit and each record of the same gauge in [slackwater-database](https://github.com/openwatersio/slackwater-database), the tide prediction database. The record's constants are scored on the fit's held-out year by the code that scores the fit, on the same hours, so `held_out_rms_m` here compares with the fit's `held_out_rms_m`. `variance_difference_se_m2` is the standard error of the difference of the two residual variances, for judging whether a difference is more than one year's chance. No row says which constants are better.
-
-A record is scored where it carries the station's own ID, or the ID of a linked station whose hourly levels agree with this one's within 1 cm ([Links](/docs/reference/links/)). Each is predicted under the nodal corrections `node_corrections` names. Join the rows to the fits on `id`, `version` and `fitted`. A row follows its record's terms as well as its station's: filter on `reference_commercial_use` for a use that needs it.
-
-<Schema resource="references" />
