@@ -124,6 +124,29 @@
           }
         }
       },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.984353,
+            "rms": 0.023567,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 71,
+          "held": {
+            "variance": 0.985674,
+            "rms": 0.023031,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.984606,
+            "rms": 0.023375,
+            "seen": false
+          }
+        }
+      },
       "yearly": [
         2014,
         2015,
@@ -2459,6 +2482,29 @@
           }
         }
       },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.995963,
+            "rms": 0.024831,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 67,
+          "held": {
+            "variance": 0.996117,
+            "rms": 0.024422,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.995914,
+            "rms": 0.02498,
+            "seen": false
+          }
+        }
+      },
       "yearly": [
         2014,
         2015,
@@ -4730,6 +4776,29 @@
           }
         }
       },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.993796,
+            "rms": 0.020894,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 66,
+          "held": {
+            "variance": 0.996081,
+            "rms": 0.017284,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.993822,
+            "rms": 0.02085,
+            "seen": false
+          }
+        }
+      },
       "yearly": [
         2016,
         2017,
@@ -6966,6 +7035,29 @@
               "vector": 0.000297,
               "ratio": 0.5567
             }
+          }
+        }
+      },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.998338,
+            "rms": 0.078536,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 70,
+          "held": {
+            "variance": 0.998094,
+            "rms": 0.083148,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.998232,
+            "rms": 0.081009,
+            "seen": false
           }
         }
       },
@@ -9328,6 +9420,29 @@
           }
         }
       },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.996354,
+            "rms": 0.060675,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 73,
+          "held": {
+            "variance": 0.99617,
+            "rms": 0.061087,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.996195,
+            "rms": 0.061984,
+            "seen": false
+          }
+        }
+      },
       "yearly": [
         2015,
         2016,
@@ -11660,6 +11775,29 @@
               "vector": 0.000641,
               "ratio": 0.799777
             }
+          }
+        }
+      },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.97704,
+            "rms": 0.073402,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 74,
+          "held": {
+            "variance": 0.978951,
+            "rms": 0.072424,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.976675,
+            "rms": 0.073983,
+            "seen": false
           }
         }
       },
@@ -13998,6 +14136,29 @@
           }
         }
       },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.974577,
+            "rms": 0.098631,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 71,
+          "held": {
+            "variance": 0.973271,
+            "rms": 0.103871,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.971717,
+            "rms": 0.104031,
+            "seen": false
+          }
+        }
+      },
       "yearly": [
         2016,
         2017,
@@ -16294,6 +16455,29 @@
               "vector": 0.000505,
               "ratio": 0.833297
             }
+          }
+        }
+      },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.721004,
+            "rms": 0.081051,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 65,
+          "held": {
+            "variance": 0.719489,
+            "rms": 0.077452,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.720605,
+            "rms": 0.081109,
+            "seen": false
           }
         }
       },
@@ -18605,6 +18789,29 @@
               "vector": 0.000128,
               "ratio": 0.180247
             }
+          }
+        }
+      },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.966401,
+            "rms": 0.048146,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 69,
+          "held": {
+            "variance": 0.971332,
+            "rms": 0.044369,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.966433,
+            "rms": 0.048123,
+            "seen": false
           }
         }
       },
@@ -20931,6 +21138,29 @@
           }
         }
       },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.988946,
+            "rms": 0.059415,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 71,
+          "held": {
+            "variance": 0.990205,
+            "rms": 0.055508,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.988724,
+            "rms": 0.060008,
+            "seen": false
+          }
+        }
+      },
       "yearly": [
         2017,
         2018,
@@ -23239,6 +23469,29 @@
               "vector": 0.000662,
               "ratio": 1.259549
             }
+          }
+        }
+      },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.980262,
+            "rms": 0.023188,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 73,
+          "held": {
+            "variance": 0.98601,
+            "rms": 0.020098,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.98001,
+            "rms": 0.023336,
+            "seen": false
           }
         }
       },
@@ -25589,6 +25842,29 @@
           }
         }
       },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.92908,
+            "rms": 0.040951,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 73,
+          "held": {
+            "variance": 0.95608,
+            "rms": 0.030788,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.928814,
+            "rms": 0.041028,
+            "seen": false
+          }
+        }
+      },
       "yearly": [
         2018,
         2019,
@@ -27900,6 +28176,29 @@
           }
         }
       },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.941285,
+            "rms": 0.033206,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 67,
+          "held": {
+            "variance": 0.961422,
+            "rms": 0.028854,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.941261,
+            "rms": 0.033213,
+            "seen": false
+          }
+        }
+      },
       "yearly": [
         2021,
         2022,
@@ -30172,6 +30471,29 @@
               "vector": 0.000551,
               "ratio": 0.838499
             }
+          }
+        }
+      },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.898041,
+            "rms": 0.053638,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 68,
+          "held": {
+            "variance": 0.912997,
+            "rms": 0.050469,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.898067,
+            "rms": 0.053631,
+            "seen": false
           }
         }
       },
@@ -32483,6 +32805,29 @@
               "vector": 0.000115,
               "ratio": 0.320372
             }
+          }
+        }
+      },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.998785,
+            "rms": 0.018728,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 72,
+          "held": {
+            "variance": 0.998776,
+            "rms": 0.018589,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.998742,
+            "rms": 0.019056,
+            "seen": false
           }
         }
       },
@@ -34808,6 +35153,29 @@
               "vector": 0.000231,
               "ratio": 1.095548
             }
+          }
+        }
+      },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.998412,
+            "rms": 0.030585,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 73,
+          "held": {
+            "variance": 0.998261,
+            "rms": 0.03171,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.998329,
+            "rms": 0.031374,
+            "seen": false
           }
         }
       },
@@ -37161,6 +37529,29 @@
           }
         }
       },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.997377,
+            "rms": 0.042447,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 73,
+          "held": {
+            "variance": 0.997115,
+            "rms": 0.044649,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.997286,
+            "rms": 0.043176,
+            "seen": false
+          }
+        }
+      },
       "yearly": [
         2011,
         2012,
@@ -39398,15 +39789,16 @@
       "unlisted": [
         "SIGMA1",
         "MP1",
-        "CHI1",
         "MNS2",
+        "4MSL12",
         "TK1",
         "RP1",
         "KP1",
-        "THETA1",
         "KJ2"
       ],
-      "unknown": [],
+      "unknown": [
+        "4MSL12"
+      ],
       "held_out": 2025,
       "scores": {
         "standard": {
@@ -39420,29 +39812,29 @@
           "seen": false
         },
         "noaa": {
-          "variance": 0.995668,
-          "rms": 0.175666,
+          "variance": 0.995675,
+          "rms": 0.175505,
           "seen": false
         },
         "steps": {
           "yearly": {
-            "variance": 0.99568,
-            "rms": 0.175411,
+            "variance": 0.995678,
+            "rms": 0.175464,
             "seen": false
           },
           "exact": {
-            "variance": 0.995767,
-            "rms": 0.17364,
+            "variance": 0.995764,
+            "rms": 0.173693,
             "seen": false
           },
           "joint": {
-            "variance": 0.995827,
-            "rms": 0.172408,
+            "variance": 0.995824,
+            "rms": 0.17246,
             "seen": false
           },
           "robust": {
-            "variance": 0.995869,
-            "rms": 0.171524,
+            "variance": 0.995868,
+            "rms": 0.17156,
             "seen": false
           }
         }
@@ -39507,6 +39899,29 @@
           }
         }
       },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.996493,
+            "rms": 0.160952,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 75,
+          "held": {
+            "variance": 0.994253,
+            "rms": 0.202323,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.99424,
+            "rms": 0.206255,
+            "seen": false
+          }
+        }
+      },
       "yearly": [
         2012,
         2013,
@@ -39555,24 +39970,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 3.505033,
-              "phase": 105.221887,
-              "vector": 0.001339
+              "amplitude": 3.505034,
+              "phase": 105.22191,
+              "vector": 0.001341
             },
             "exact": {
-              "amplitude": 3.505722,
-              "phase": 105.21922,
-              "vector": 0.00138
+              "amplitude": 3.505723,
+              "phase": 105.219244,
+              "vector": 0.001382
             },
             "joint": {
               "amplitude": 3.505217,
-              "phase": 105.215688,
-              "vector": 0.000984
+              "phase": 105.215711,
+              "vector": 0.000985
             },
             "robust": {
-              "amplitude": 3.510553,
-              "phase": 105.275934,
-              "vector": 0.007242
+              "amplitude": 3.510512,
+              "phase": 105.275765,
+              "vector": 0.007204
             }
           }
         },
@@ -39617,23 +40032,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.976738,
-              "phase": 147.333405,
-              "vector": 0.001165
+              "phase": 147.333359,
+              "vector": 0.001166
             },
             "exact": {
               "amplitude": 0.97507,
-              "phase": 147.35039,
+              "phase": 147.350344,
               "vector": 0.002107
             },
             "joint": {
-              "amplitude": 0.974835,
-              "phase": 147.34799,
+              "amplitude": 0.974836,
+              "phase": 147.347936,
               "vector": 0.002339
             },
             "robust": {
-              "amplitude": 0.974722,
-              "phase": 147.508384,
-              "vector": 0.002932
+              "amplitude": 0.974699,
+              "phase": 147.504681,
+              "vector": 0.002911
             }
           }
         },
@@ -39677,24 +40092,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.596687,
-              "phase": 79.224651,
-              "vector": 0.000405
+              "amplitude": 0.596689,
+              "phase": 79.224636,
+              "vector": 0.000403
             },
             "exact": {
-              "amplitude": 0.596606,
-              "phase": 79.204986,
-              "vector": 0.000398
+              "amplitude": 0.596608,
+              "phase": 79.204971,
+              "vector": 0.000396
             },
             "joint": {
-              "amplitude": 0.596481,
-              "phase": 79.232913,
-              "vector": 0.000622
+              "amplitude": 0.596483,
+              "phase": 79.232869,
+              "vector": 0.00062
             },
             "robust": {
-              "amplitude": 0.596289,
-              "phase": 79.314041,
-              "vector": 0.001384
+              "amplitude": 0.596283,
+              "phase": 79.313597,
+              "vector": 0.001383
             }
           }
         },
@@ -39738,24 +40153,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.671044,
-              "phase": 342.131042,
+              "amplitude": 0.671043,
+              "phase": 342.131038,
               "vector": 0.000366
             },
             "exact": {
               "amplitude": 0.670735,
-              "phase": 342.110179,
-              "vector": 0.00029
+              "phase": 342.11018,
+              "vector": 0.000291
             },
             "joint": {
               "amplitude": 0.671007,
-              "phase": 342.086682,
+              "phase": 342.086653,
               "vector": 0.000156
             },
             "robust": {
-              "amplitude": 0.670365,
-              "phase": 341.998733,
-              "vector": 0.001345
+              "amplitude": 0.670402,
+              "phase": 341.995851,
+              "vector": 0.001358
             }
           }
         },
@@ -39799,24 +40214,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.270601,
-              "phase": 80.769353,
-              "vector": 0.000517
+              "amplitude": 0.270599,
+              "phase": 80.769551,
+              "vector": 0.000518
             },
             "exact": {
-              "amplitude": 0.270558,
-              "phase": 80.757363,
-              "vector": 0.000519
+              "amplitude": 0.270557,
+              "phase": 80.75757,
+              "vector": 0.00052
             },
             "joint": {
-              "amplitude": 0.270375,
-              "phase": 80.719272,
-              "vector": 0.000631
+              "amplitude": 0.270374,
+              "phase": 80.719275,
+              "vector": 0.000632
             },
             "robust": {
-              "amplitude": 0.270904,
-              "phase": 80.238319,
-              "vector": 0.002185
+              "amplitude": 0.27087,
+              "phase": 80.246477,
+              "vector": 0.002149
             }
           }
         },
@@ -39860,24 +40275,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.370656,
-              "phase": 325.065382,
+              "amplitude": 0.370655,
+              "phase": 325.065206,
               "vector": 0.000545
             },
             "exact": {
-              "amplitude": 0.370427,
-              "phase": 325.097281,
-              "vector": 0.000852
+              "amplitude": 0.370426,
+              "phase": 325.09712,
+              "vector": 0.000851
             },
             "joint": {
-              "amplitude": 0.371151,
-              "phase": 325.028011,
-              "vector": 0.000236
+              "amplitude": 0.37115,
+              "phase": 325.027898,
+              "vector": 0.000235
             },
             "robust": {
-              "amplitude": 0.371008,
-              "phase": 325.041679,
-              "vector": 0.00027
+              "amplitude": 0.371058,
+              "phase": 325.048822,
+              "vector": 0.000321
             }
           }
         },
@@ -39921,24 +40336,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.153867,
-              "phase": 18.328398,
+              "amplitude": 0.153866,
+              "phase": 18.328237,
               "vector": 0.00037
             },
             "exact": {
-              "amplitude": 0.153971,
-              "phase": 18.294763,
+              "amplitude": 0.15397,
+              "phase": 18.29459,
               "vector": 0.000256
             },
             "joint": {
-              "amplitude": 0.154078,
-              "phase": 18.271106,
+              "amplitude": 0.154077,
+              "phase": 18.271167,
               "vector": 0.000206
             },
             "robust": {
-              "amplitude": 0.155207,
-              "phase": 18.365915,
-              "vector": 0.001287
+              "amplitude": 0.155221,
+              "phase": 18.370264,
+              "vector": 0.001305
             }
           }
         },
@@ -39982,24 +40397,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.082118,
-              "phase": 8.809946,
-              "vector": 0.000119
+              "amplitude": 0.082121,
+              "phase": 8.811136,
+              "vector": 0.000122
             },
             "exact": {
-              "amplitude": 0.082356,
-              "phase": 8.84859,
-              "vector": 0.000363
+              "amplitude": 0.082359,
+              "phase": 8.849738,
+              "vector": 0.000366
             },
             "joint": {
-              "amplitude": 0.08242,
-              "phase": 8.796549,
-              "vector": 0.000421
+              "amplitude": 0.082422,
+              "phase": 8.797515,
+              "vector": 0.000422
             },
             "robust": {
-              "amplitude": 0.08067,
-              "phase": 10.256616,
-              "vector": 0.002459
+              "amplitude": 0.080655,
+              "phase": 10.23068,
+              "vector": 0.002436
             }
           }
         },
@@ -40043,24 +40458,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.020051,
-              "phase": 207.049011,
-              "vector": 0.000053
+              "amplitude": 0.020048,
+              "phase": 207.048537,
+              "vector": 0.000051
             },
             "exact": {
-              "amplitude": 0.020071,
-              "phase": 207.009153,
-              "vector": 0.000072
+              "amplitude": 0.020069,
+              "phase": 207.008636,
+              "vector": 0.000069
             },
             "joint": {
-              "amplitude": 0.020086,
-              "phase": 207.181725,
-              "vector": 0.000107
+              "amplitude": 0.020084,
+              "phase": 207.181176,
+              "vector": 0.000105
             },
             "robust": {
-              "amplitude": 0.019707,
-              "phase": 208.181482,
-              "vector": 0.000503
+              "amplitude": 0.019696,
+              "phase": 208.000655,
+              "vector": 0.000461
             }
           }
         },
@@ -40104,24 +40519,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.096285,
-              "phase": 60.007414,
+              "amplitude": 0.096286,
+              "phase": 60.00798,
               "vector": 0.000286
             },
             "exact": {
               "amplitude": 0.095957,
-              "phase": 60.217727,
-              "vector": 0.000367
+              "phase": 60.218284,
+              "vector": 0.000368
             },
             "joint": {
               "amplitude": 0.096494,
-              "phase": 60.058489,
+              "phase": 60.059063,
               "vector": 0.000504
             },
             "robust": {
-              "amplitude": 0.096497,
-              "phase": 59.731612,
-              "vector": 0.000671
+              "amplitude": 0.09651,
+              "phase": 59.741498,
+              "vector": 0.00067
             }
           }
         },
@@ -40165,24 +40580,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.172229,
-              "phase": 82.297319,
-              "vector": 0.00023
+              "amplitude": 0.172231,
+              "phase": 82.29681,
+              "vector": 0.000231
             },
             "exact": {
-              "amplitude": 0.172595,
-              "phase": 82.340817,
-              "vector": 0.000607
+              "amplitude": 0.172596,
+              "phase": 82.34032,
+              "vector": 0.000608
             },
             "joint": {
-              "amplitude": 0.172239,
-              "phase": 82.295837,
-              "vector": 0.000239
+              "amplitude": 0.17224,
+              "phase": 82.295409,
+              "vector": 0.000241
             },
             "robust": {
-              "amplitude": 0.172961,
-              "phase": 82.697257,
-              "vector": 0.001534
+              "amplitude": 0.173027,
+              "phase": 82.681454,
+              "vector": 0.001541
             }
           }
         },
@@ -40226,24 +40641,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.002112,
-              "phase": 279.186541,
-              "vector": 0.000116
+              "amplitude": 0.002111,
+              "phase": 279.173447,
+              "vector": 0.000114
             },
             "exact": {
-              "amplitude": 0.002119,
-              "phase": 278.145764,
-              "vector": 0.000119
+              "amplitude": 0.002118,
+              "phase": 278.130689,
+              "vector": 0.000118
             },
             "joint": {
-              "amplitude": 0.002136,
-              "phase": 279.111141,
-              "vector": 0.000138
+              "amplitude": 0.002135,
+              "phase": 279.104799,
+              "vector": 0.000137
             },
             "robust": {
-              "amplitude": 0.001924,
-              "phase": 288.477318,
-              "vector": 0.000353
+              "amplitude": 0.001946,
+              "phase": 288.42972,
+              "vector": 0.000349
             }
           }
         },
@@ -40287,24 +40702,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.212345,
-              "phase": 234.081495,
-              "vector": 0.000458
+              "amplitude": 0.212342,
+              "phase": 234.081617,
+              "vector": 0.000457
             },
             "exact": {
-              "amplitude": 0.212462,
-              "phase": 234.095722,
-              "vector": 0.000582
+              "amplitude": 0.21246,
+              "phase": 234.095863,
+              "vector": 0.000581
             },
             "joint": {
-              "amplitude": 0.21692,
-              "phase": 235.010576,
-              "vector": 0.006206
+              "amplitude": 0.216918,
+              "phase": 235.010472,
+              "vector": 0.006204
             },
             "robust": {
-              "amplitude": 0.215007,
-              "phase": 234.970638,
-              "vector": 0.004704
+              "amplitude": 0.215055,
+              "phase": 234.968879,
+              "vector": 0.00473
             }
           }
         },
@@ -40348,24 +40763,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.057275,
-              "phase": 48.150373,
-              "vector": 0.000279
+              "amplitude": 0.057277,
+              "phase": 48.151464,
+              "vector": 0.000282
             },
             "exact": {
-              "amplitude": 0.05735,
-              "phase": 48.412686,
-              "vector": 0.000469
+              "amplitude": 0.057353,
+              "phase": 48.413753,
+              "vector": 0.000472
             },
             "joint": {
-              "amplitude": 0.056926,
-              "phase": 47.866824,
-              "vector": 0.000243
+              "amplitude": 0.056928,
+              "phase": 47.868133,
+              "vector": 0.000242
             },
             "robust": {
-              "amplitude": 0.057445,
-              "phase": 48.355174,
-              "vector": 0.000512
+              "amplitude": 0.057452,
+              "phase": 48.343081,
+              "vector": 0.000513
             }
           }
         },
@@ -40409,24 +40824,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.018077,
-              "phase": 79.312209,
-              "vector": 0.000077
+              "amplitude": 0.018081,
+              "phase": 79.304057,
+              "vector": 0.000081
             },
             "exact": {
-              "amplitude": 0.017874,
-              "phase": 80.762984,
-              "vector": 0.000475
+              "amplitude": 0.017878,
+              "phase": 80.753154,
+              "vector": 0.000471
             },
             "joint": {
-              "amplitude": 0.016173,
-              "phase": 80.866674,
-              "vector": 0.001886
+              "amplitude": 0.016176,
+              "phase": 80.859052,
+              "vector": 0.001882
             },
             "robust": {
-              "amplitude": 0.016191,
-              "phase": 78.667829,
-              "vector": 0.001818
+              "amplitude": 0.016245,
+              "phase": 78.673567,
+              "vector": 0.001765
             }
           }
         },
@@ -40471,23 +40886,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.092537,
-              "phase": 111.132795,
+              "phase": 111.131916,
               "vector": 0.000466
             },
             "exact": {
-              "amplitude": 0.089118,
-              "phase": 111.921374,
+              "amplitude": 0.089119,
+              "phase": 111.920475,
               "vector": 0.004095
             },
             "joint": {
               "amplitude": 0.092923,
-              "phase": 111.131964,
-              "vector": 0.000093
+              "phase": 111.131095,
+              "vector": 0.000092
             },
             "robust": {
-              "amplitude": 0.091667,
-              "phase": 110.294385,
-              "vector": 0.001861
+              "amplitude": 0.091702,
+              "phase": 110.283093,
+              "vector": 0.001849
             }
           }
         },
@@ -40532,23 +40947,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.002922,
-              "phase": 72.751688,
+              "phase": 72.751618,
               "vector": 0.000108
             },
             "exact": {
               "amplitude": 0.005195,
-              "phase": 136.802587,
+              "phase": 136.800514,
               "vector": 0.004653
             },
             "joint": {
               "amplitude": 0.005261,
-              "phase": 136.621991,
+              "phase": 136.622864,
               "vector": 0.004697
             },
             "robust": {
-              "amplitude": 0.005956,
-              "phase": 129.856818,
-              "vector": 0.004931
+              "amplitude": 0.005959,
+              "phase": 129.782139,
+              "vector": 0.00493
             }
           }
         },
@@ -40593,22 +41008,22 @@
           "steps": {
             "yearly": {
               "amplitude": 0.029751,
-              "phase": 40.452948,
-              "vector": 0.000281
+              "phase": 40.453526,
+              "vector": 0.000282
             },
             "exact": {
-              "amplitude": 0.029737,
-              "phase": 18.346636,
+              "amplitude": 0.029736,
+              "phase": 18.347026,
               "vector": 0.011326
             },
             "joint": {
-              "amplitude": 0.031874,
-              "phase": 12.228435,
-              "vector": 0.015064
+              "amplitude": 0.031873,
+              "phase": 12.22919,
+              "vector": 0.015063
             },
             "robust": {
-              "amplitude": 0.032258,
-              "phase": 14.069891,
+              "amplitude": 0.03226,
+              "phase": 14.071743,
               "vector": 0.014245
             }
           }
@@ -40653,24 +41068,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.024726,
-              "phase": 65.259705,
-              "vector": 0.000276
+              "amplitude": 0.024727,
+              "phase": 65.261179,
+              "vector": 0.000275
             },
             "exact": {
-              "amplitude": 0.024679,
-              "phase": 64.998942,
-              "vector": 0.000333
+              "amplitude": 0.02468,
+              "phase": 65.000229,
+              "vector": 0.000332
             },
             "joint": {
               "amplitude": 0.024928,
-              "phase": 63.505183,
-              "vector": 0.000742
+              "phase": 63.506894,
+              "vector": 0.000741
             },
             "robust": {
-              "amplitude": 0.023671,
-              "phase": 62.85482,
-              "vector": 0.00166
+              "amplitude": 0.023675,
+              "phase": 62.87679,
+              "vector": 0.001652
             }
           }
         },
@@ -40714,24 +41129,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.044507,
-              "phase": 31.504303,
-              "vector": 0.007533
+              "amplitude": 0.044508,
+              "phase": 31.50617,
+              "vector": 0.007532
             },
             "exact": {
               "amplitude": 0.044521,
-              "phase": 31.520625,
-              "vector": 0.007515
+              "phase": 31.522518,
+              "vector": 0.007514
             },
             "joint": {
               "amplitude": 0.043816,
-              "phase": 32.215936,
+              "phase": 32.217357,
               "vector": 0.007866
             },
             "robust": {
-              "amplitude": 0.046703,
-              "phase": 31.961763,
-              "vector": 0.005557
+              "amplitude": 0.046699,
+              "phase": 31.98988,
+              "vector": 0.005545
             }
           }
         },
@@ -40764,23 +41179,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.020063,
-              "phase": 297.880623,
-              "vector": 0.006913
+              "phase": 297.881628,
+              "vector": 0.006914
             },
             "exact": {
               "amplitude": 0.020054,
-              "phase": 297.760595,
-              "vector": 0.00688
+              "phase": 297.761796,
+              "vector": 0.006881
             },
             "joint": {
               "amplitude": 0.020091,
-              "phase": 299.592926,
+              "phase": 299.593363,
               "vector": 0.007446
             },
             "robust": {
-              "amplitude": 0.018429,
-              "phase": 305.734888,
-              "vector": 0.009988
+              "amplitude": 0.018451,
+              "phase": 305.766438,
+              "vector": 0.009989
             }
           }
         },
@@ -40825,23 +41240,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.086088,
-              "phase": 210.852026,
-              "vector": 0.014355
+              "phase": 210.85259,
+              "vector": 0.014354
             },
             "exact": {
               "amplitude": 0.086106,
-              "phase": 210.879659,
-              "vector": 0.014312
+              "phase": 210.880182,
+              "vector": 0.014311
             },
             "joint": {
               "amplitude": 0.085908,
-              "phase": 210.492125,
+              "phase": 210.492745,
               "vector": 0.014885
             },
             "robust": {
-              "amplitude": 0.085789,
-              "phase": 207.135114,
-              "vector": 0.019181
+              "amplitude": 0.085753,
+              "phase": 207.133567,
+              "vector": 0.019199
             }
           }
         },
@@ -40886,23 +41301,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.138987,
-              "phase": 39.279454,
+              "phase": 39.279355,
               "vector": 0.00406
             },
             "exact": {
-              "amplitude": 0.138856,
-              "phase": 39.275049,
+              "amplitude": 0.138857,
+              "phase": 39.274912,
               "vector": 0.003934
             },
             "joint": {
-              "amplitude": 0.139328,
-              "phase": 39.190341,
+              "amplitude": 0.139329,
+              "phase": 39.190194,
               "vector": 0.004438
             },
             "robust": {
-              "amplitude": 0.137307,
-              "phase": 39.656193,
-              "vector": 0.002311
+              "amplitude": 0.137348,
+              "phase": 39.669652,
+              "vector": 0.002354
             }
           }
         },
@@ -40946,24 +41361,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.029004,
-              "phase": 70.944254,
-              "vector": 0.011786
+              "amplitude": 0.029005,
+              "phase": 70.946125,
+              "vector": 0.011785
             },
             "exact": {
-              "amplitude": 0.028778,
-              "phase": 69.837864,
+              "amplitude": 0.028779,
+              "phase": 69.839737,
               "vector": 0.01215
             },
             "joint": {
-              "amplitude": 0.02282,
-              "phase": 79.268018,
+              "amplitude": 0.022821,
+              "phase": 79.268552,
               "vector": 0.006774
             },
             "robust": {
-              "amplitude": 0.022873,
-              "phase": 86.848376,
-              "vector": 0.003905
+              "amplitude": 0.022907,
+              "phase": 86.921617,
+              "vector": 0.003863
             }
           }
         },
@@ -41007,24 +41422,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.014044,
-              "phase": 296.685566,
+              "amplitude": 0.014043,
+              "phase": 296.68952,
               "vector": 0.000127
             },
             "exact": {
-              "amplitude": 0.014047,
-              "phase": 296.195753,
-              "vector": 0.000047
+              "amplitude": 0.014046,
+              "phase": 296.199895,
+              "vector": 0.000046
             },
             "joint": {
-              "amplitude": 0.01353,
-              "phase": 296.882262,
-              "vector": 0.000498
+              "amplitude": 0.013528,
+              "phase": 296.886222,
+              "vector": 0.0005
             },
             "robust": {
-              "amplitude": 0.014142,
-              "phase": 299.714277,
-              "vector": 0.000875
+              "amplitude": 0.01415,
+              "phase": 299.69882,
+              "vector": 0.000872
             }
           }
         },
@@ -41068,24 +41483,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.059623,
-              "phase": 330.668667,
+              "amplitude": 0.059624,
+              "phase": 330.671499,
               "vector": 0.000384
             },
             "exact": {
-              "amplitude": 0.059773,
-              "phase": 330.812651,
-              "vector": 0.000318
+              "amplitude": 0.059774,
+              "phase": 330.815488,
+              "vector": 0.000319
             },
             "joint": {
-              "amplitude": 0.059784,
-              "phase": 329.963262,
-              "vector": 0.0007
+              "amplitude": 0.059785,
+              "phase": 329.965882,
+              "vector": 0.000697
             },
             "robust": {
-              "amplitude": 0.058947,
-              "phase": 330.37657,
-              "vector": 0.001079
+              "amplitude": 0.058964,
+              "phase": 330.393026,
+              "vector": 0.001058
             }
           }
         },
@@ -41129,24 +41544,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.053638,
-              "phase": 128.732388,
+              "amplitude": 0.053639,
+              "phase": 128.734022,
               "vector": 0.000363
             },
             "exact": {
-              "amplitude": 0.052534,
-              "phase": 128.466492,
-              "vector": 0.001482
+              "amplitude": 0.052535,
+              "phase": 128.468134,
+              "vector": 0.001481
             },
             "joint": {
               "amplitude": 0.052317,
-              "phase": 128.283018,
-              "vector": 0.001727
+              "phase": 128.28474,
+              "vector": 0.001726
             },
             "robust": {
               "amplitude": 0.051039,
-              "phase": 129.961554,
-              "vector": 0.003179
+              "phase": 129.97048,
+              "vector": 0.003182
             }
           }
         },
@@ -41190,24 +41605,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.010735,
-              "phase": 234.333947,
-              "vector": 0.000309
+              "amplitude": 0.010736,
+              "phase": 234.334662,
+              "vector": 0.000308
             },
             "exact": {
-              "amplitude": 0.010655,
-              "phase": 216.484508,
+              "amplitude": 0.010656,
+              "phase": 216.486126,
               "vector": 0.003222
             },
             "joint": {
               "amplitude": 0.010772,
-              "phase": 215.597857,
+              "phase": 215.600017,
               "vector": 0.003395
             },
             "robust": {
-              "amplitude": 0.011748,
-              "phase": 224.303766,
-              "vector": 0.00197
+              "amplitude": 0.011747,
+              "phase": 224.360467,
+              "vector": 0.001959
             }
           }
         },
@@ -41251,24 +41666,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.005061,
-              "phase": 329.681496,
-              "vector": 0.000128
+              "amplitude": 0.005058,
+              "phase": 329.665805,
+              "vector": 0.000126
             },
             "exact": {
-              "amplitude": 0.004998,
-              "phase": 329.636005,
-              "vector": 0.000108
+              "amplitude": 0.004996,
+              "phase": 329.619847,
+              "vector": 0.000106
             },
             "joint": {
-              "amplitude": 0.004973,
-              "phase": 324.167924,
-              "vector": 0.000369
+              "amplitude": 0.004971,
+              "phase": 324.15561,
+              "vector": 0.00037
             },
             "robust": {
-              "amplitude": 0.003567,
-              "phase": 333.562419,
-              "vector": 0.001482
+              "amplitude": 0.00357,
+              "phase": 333.396295,
+              "vector": 0.001476
             }
           }
         },
@@ -41313,23 +41728,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.175634,
-              "phase": 340.910333,
+              "phase": 340.909924,
               "vector": 0.000367
             },
             "exact": {
-              "amplitude": 0.178114,
-              "phase": 340.899775,
-              "vector": 0.002114
+              "amplitude": 0.178115,
+              "phase": 340.899384,
+              "vector": 0.002115
             },
             "joint": {
-              "amplitude": 0.178166,
-              "phase": 340.879815,
+              "amplitude": 0.178167,
+              "phase": 340.879456,
               "vector": 0.002167
             },
             "robust": {
-              "amplitude": 0.178484,
-              "phase": 341.03586,
-              "vector": 0.002519
+              "amplitude": 0.178471,
+              "phase": 341.034479,
+              "vector": 0.002505
             }
           }
         },
@@ -41373,24 +41788,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.056568,
-              "phase": 348.464019,
-              "vector": 0.000453
+              "amplitude": 0.056567,
+              "phase": 348.46377,
+              "vector": 0.000454
             },
             "exact": {
               "amplitude": 0.056363,
-              "phase": 348.301467,
-              "vector": 0.000702
+              "phase": 348.301207,
+              "vector": 0.000703
             },
             "joint": {
               "amplitude": 0.056457,
-              "phase": 348.536318,
-              "vector": 0.000546
+              "phase": 348.53646,
+              "vector": 0.000547
             },
             "robust": {
-              "amplitude": 0.055437,
-              "phase": 347.947804,
-              "vector": 0.001688
+              "amplitude": 0.055388,
+              "phase": 347.964657,
+              "vector": 0.001728
             }
           }
         },
@@ -41434,24 +41849,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.017873,
-              "phase": 147.999402,
-              "vector": 0.000127
+              "amplitude": 0.017874,
+              "phase": 148.004274,
+              "vector": 0.000126
             },
             "exact": {
               "amplitude": 0.017897,
-              "phase": 148.005102,
+              "phase": 148.009754,
               "vector": 0.000103
             },
             "joint": {
               "amplitude": 0.017778,
-              "phase": 147.535679,
-              "vector": 0.000265
+              "phase": 147.541644,
+              "vector": 0.000264
             },
             "robust": {
-              "amplitude": 0.019753,
-              "phase": 145.423181,
-              "vector": 0.001948
+              "amplitude": 0.019777,
+              "phase": 145.316839,
+              "vector": 0.001985
             }
           }
         },
@@ -41495,24 +41910,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.210979,
-              "phase": 125.239158,
-              "vector": 0.000146
+              "amplitude": 0.210977,
+              "phase": 125.238946,
+              "vector": 0.000145
             },
             "exact": {
-              "amplitude": 0.210187,
-              "phase": 125.286355,
-              "vector": 0.000873
+              "amplitude": 0.210185,
+              "phase": 125.286172,
+              "vector": 0.000875
             },
             "joint": {
-              "amplitude": 0.203843,
-              "phase": 125.095073,
-              "vector": 0.007167
+              "amplitude": 0.203841,
+              "phase": 125.09483,
+              "vector": 0.00717
             },
             "robust": {
-              "amplitude": 0.203922,
-              "phase": 125.093664,
-              "vector": 0.007089
+              "amplitude": 0.203864,
+              "phase": 125.094123,
+              "vector": 0.007146
             }
           }
         },
@@ -41556,24 +41971,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.098401,
-              "phase": 21.251629,
+              "amplitude": 0.0984,
+              "phase": 21.25028,
               "vector": 0.000606
             },
             "exact": {
               "amplitude": 0.098315,
-              "phase": 21.244204,
+              "phase": 21.242807,
               "vector": 0.000689
             },
             "joint": {
               "amplitude": 0.098397,
-              "phase": 21.204459,
+              "phase": 21.20344,
               "vector": 0.000603
             },
             "robust": {
-              "amplitude": 0.097276,
-              "phase": 22.076208,
-              "vector": 0.002286
+              "amplitude": 0.097296,
+              "phase": 22.061218,
+              "vector": 0.002254
             }
           }
         },
@@ -41617,24 +42032,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.270535,
-              "phase": 138.148977,
+              "amplitude": 0.270536,
+              "phase": 138.149025,
               "vector": 0.000519
             },
             "exact": {
-              "amplitude": 0.270271,
-              "phase": 138.109166,
-              "vector": 0.00073
+              "amplitude": 0.270272,
+              "phase": 138.109223,
+              "vector": 0.000729
             },
             "joint": {
-              "amplitude": 0.270723,
-              "phase": 138.046162,
-              "vector": 0.000376
+              "amplitude": 0.270724,
+              "phase": 138.046166,
+              "vector": 0.000375
             },
             "robust": {
-              "amplitude": 0.270065,
-              "phase": 139.016658,
-              "vector": 0.004428
+              "amplitude": 0.270086,
+              "phase": 139.004659,
+              "vector": 0.004368
             }
           }
         },
@@ -41678,24 +42093,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.045116,
-              "phase": 346.333476,
-              "vector": 0.000157
+              "amplitude": 0.045117,
+              "phase": 346.332581,
+              "vector": 0.000156
             },
             "exact": {
               "amplitude": 0.045136,
-              "phase": 346.256177,
+              "phase": 346.255233,
               "vector": 0.000143
             },
             "joint": {
               "amplitude": 0.045234,
-              "phase": 346.247572,
+              "phase": 346.247234,
               "vector": 0.000237
             },
             "robust": {
-              "amplitude": 0.04549,
-              "phase": 345.472487,
-              "vector": 0.000755
+              "amplitude": 0.045519,
+              "phase": 345.478745,
+              "vector": 0.000771
             }
           }
         },
@@ -41739,24 +42154,85 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.174793,
-              "phase": 128.214683,
-              "vector": 0.000211
+              "amplitude": 0.174792,
+              "phase": 128.214889,
+              "vector": 0.000213
             },
             "exact": {
-              "amplitude": 0.174453,
-              "phase": 128.230606,
-              "vector": 0.000555
+              "amplitude": 0.174451,
+              "phase": 128.230814,
+              "vector": 0.000557
             },
             "joint": {
-              "amplitude": 0.17443,
-              "phase": 128.202503,
-              "vector": 0.00057
+              "amplitude": 0.174428,
+              "phase": 128.202681,
+              "vector": 0.000572
             },
             "robust": {
-              "amplitude": 0.175043,
-              "phase": 127.933906,
-              "vector": 0.000814
+              "amplitude": 0.174994,
+              "phase": 127.928483,
+              "vector": 0.000829
+            }
+          }
+        },
+        {
+          "name": "CHI1",
+          "candidate": "chi1",
+          "speed": 14.569548,
+          "noaa": {
+            "amplitude": 0.007,
+            "phase": 278.4
+          },
+          "window": {
+            "as": null,
+            "amplitude": 0.009177,
+            "phase": 296.587835,
+            "amplitude_ci": 0.002534,
+            "phase_ci": 15.812983,
+            "snr": 50.39162,
+            "d": {
+              "amplitude": 0.002177,
+              "relative": 0.31099,
+              "phase": 18.187835,
+              "vector": 0.00334,
+              "ratio": 1.150178
+            }
+          },
+          "standard": {
+            "as": null,
+            "amplitude": 0.009268,
+            "phase": 300.688988,
+            "amplitude_ci": 0.000809,
+            "phase_ci": 4.991495,
+            "snr": 504.787437,
+            "d": {
+              "amplitude": 0.002268,
+              "relative": 0.324009,
+              "phase": 22.288988,
+              "vector": 0.003852,
+              "ratio": 4.46517
+            }
+          },
+          "steps": {
+            "yearly": {
+              "amplitude": 0.007247,
+              "phase": 278.307261,
+              "vector": 0.000248
+            },
+            "exact": {
+              "amplitude": 0.00647,
+              "phase": 289.679365,
+              "vector": 0.001425
+            },
+            "joint": {
+              "amplitude": 0.008716,
+              "phase": 302.813371,
+              "vector": 0.003722
+            },
+            "robust": {
+              "amplitude": 0.008708,
+              "phase": 300.315082,
+              "vector": 0.003425
             }
           }
         },
@@ -41800,24 +42276,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.018243,
-              "phase": 143.059063,
-              "vector": 0.000244
+              "amplitude": 0.018244,
+              "phase": 143.055992,
+              "vector": 0.000245
             },
             "exact": {
               "amplitude": 0.018499,
-              "phase": 143.735351,
+              "phase": 143.732677,
               "vector": 0.000551
             },
             "joint": {
-              "amplitude": 0.018226,
-              "phase": 144.34295,
+              "amplitude": 0.018227,
+              "phase": 144.339846,
               "vector": 0.000481
             },
             "robust": {
-              "amplitude": 0.01702,
-              "phase": 151.240856,
-              "vector": 0.0027
+              "amplitude": 0.017008,
+              "phase": 151.247197,
+              "vector": 0.002705
             }
           }
         },
@@ -41861,24 +42337,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.073751,
-              "phase": 151.11403,
+              "amplitude": 0.073752,
+              "phase": 151.114693,
               "vector": 0.000249
             },
             "exact": {
-              "amplitude": 0.073496,
-              "phase": 151.237579,
+              "amplitude": 0.073497,
+              "phase": 151.238329,
               "vector": 0.000534
             },
             "joint": {
               "amplitude": 0.073122,
-              "phase": 151.351504,
+              "phase": 151.352114,
               "vector": 0.000936
             },
             "robust": {
-              "amplitude": 0.073707,
-              "phase": 153.24197,
-              "vector": 0.002776
+              "amplitude": 0.073703,
+              "phase": 153.212553,
+              "vector": 0.002739
             }
           }
         },
@@ -41923,23 +42399,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.049853,
-              "phase": 335.080002,
+              "phase": 335.079639,
               "vector": 0.000148
             },
             "exact": {
               "amplitude": 0.049835,
-              "phase": 334.905341,
+              "phase": 334.905024,
               "vector": 0.000237
             },
             "joint": {
               "amplitude": 0.04977,
-              "phase": 334.916224,
+              "phase": 334.915742,
               "vector": 0.00028
             },
             "robust": {
-              "amplitude": 0.049188,
-              "phase": 334.725534,
-              "vector": 0.000874
+              "amplitude": 0.049111,
+              "phase": 334.697313,
+              "vector": 0.000955
             }
           }
         },
@@ -41983,24 +42459,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.007292,
-              "phase": 98.878996,
-              "vector": 0.000355
+              "amplitude": 0.007294,
+              "phase": 98.89387,
+              "vector": 0.000356
             },
             "exact": {
-              "amplitude": 0.010808,
-              "phase": 87.595024,
-              "vector": 0.00428
+              "amplitude": 0.010809,
+              "phase": 87.60719,
+              "vector": 0.004281
             },
             "joint": {
-              "amplitude": 0.008725,
-              "phase": 82.10415,
-              "vector": 0.003036
+              "amplitude": 0.008727,
+              "phase": 82.119707,
+              "vector": 0.003035
             },
             "robust": {
-              "amplitude": 0.012864,
-              "phase": 81.941395,
-              "vector": 0.006614
+              "amplitude": 0.012882,
+              "phase": 82.018814,
+              "vector": 0.006625
             }
           }
         },
@@ -42044,24 +42520,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.016517,
-              "phase": 299.822999,
-              "vector": 0.000523
+              "amplitude": 0.016519,
+              "phase": 299.823689,
+              "vector": 0.000525
             },
             "exact": {
-              "amplitude": 0.012948,
-              "phase": 305.921476,
-              "vector": 0.003384
+              "amplitude": 0.01295,
+              "phase": 305.921054,
+              "vector": 0.003382
             },
             "joint": {
-              "amplitude": 0.012516,
-              "phase": 308.836058,
-              "vector": 0.004097
+              "amplitude": 0.012518,
+              "phase": 308.838113,
+              "vector": 0.004096
             },
             "robust": {
-              "amplitude": 0.011088,
-              "phase": 313.971791,
-              "vector": 0.005872
+              "amplitude": 0.011068,
+              "phase": 314.034325,
+              "vector": 0.005895
             }
           }
         },
@@ -42105,24 +42581,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.008479,
-              "phase": 166.418086,
-              "vector": 0.000535
+              "amplitude": 0.008478,
+              "phase": 166.417278,
+              "vector": 0.000536
             },
             "exact": {
-              "amplitude": 0.009127,
-              "phase": 166.218522,
-              "vector": 0.000201
+              "amplitude": 0.009126,
+              "phase": 166.217896,
+              "vector": 0.0002
             },
             "joint": {
-              "amplitude": 0.008363,
-              "phase": 165.018072,
-              "vector": 0.000718
+              "amplitude": 0.008362,
+              "phase": 165.014081,
+              "vector": 0.000719
             },
             "robust": {
-              "amplitude": 0.007999,
-              "phase": 159.437253,
-              "vector": 0.001524
+              "amplitude": 0.008008,
+              "phase": 159.640185,
+              "vector": 0.001495
             }
           }
         },
@@ -42166,24 +42642,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.039012,
-              "phase": 201.674483,
+              "amplitude": 0.039011,
+              "phase": 201.673636,
               "vector": 0.000119
             },
             "exact": {
-              "amplitude": 0.038947,
-              "phase": 201.782764,
-              "vector": 0.0002
+              "amplitude": 0.038946,
+              "phase": 201.78192,
+              "vector": 0.000199
             },
             "joint": {
               "amplitude": 0.039807,
-              "phase": 202.920806,
+              "phase": 202.920116,
               "vector": 0.001267
             },
             "robust": {
-              "amplitude": 0.039168,
-              "phase": 201.631297,
-              "vector": 0.000191
+              "amplitude": 0.039154,
+              "phase": 201.656221,
+              "vector": 0.000187
             }
           }
         },
@@ -42228,23 +42704,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.025213,
-              "phase": 43.520272,
-              "vector": 0.00022
+              "phase": 43.521359,
+              "vector": 0.000219
             },
             "exact": {
-              "amplitude": 0.025181,
-              "phase": 44.032858,
+              "amplitude": 0.02518,
+              "phase": 44.034031,
               "vector": 0.000331
             },
             "joint": {
               "amplitude": 0.025134,
-              "phase": 44.497891,
+              "phase": 44.497808,
               "vector": 0.000499
             },
             "robust": {
-              "amplitude": 0.025009,
-              "phase": 43.67369,
-              "vector": 0.00012
+              "amplitude": 0.025007,
+              "phase": 43.695753,
+              "vector": 0.000129
             }
           }
         },
@@ -42288,24 +42764,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.024481,
-              "phase": 340.793477,
-              "vector": 0.000482
+              "amplitude": 0.024483,
+              "phase": 340.79122,
+              "vector": 0.000485
             },
             "exact": {
-              "amplitude": 0.024414,
-              "phase": 341.01906,
-              "vector": 0.000436
+              "amplitude": 0.024417,
+              "phase": 341.016703,
+              "vector": 0.000438
             },
             "joint": {
-              "amplitude": 0.024492,
-              "phase": 339.776919,
-              "vector": 0.000628
+              "amplitude": 0.024494,
+              "phase": 339.774707,
+              "vector": 0.000631
             },
             "robust": {
-              "amplitude": 0.024124,
-              "phase": 342.28326,
-              "vector": 0.000676
+              "amplitude": 0.024144,
+              "phase": 342.249875,
+              "vector": 0.000667
             }
           }
         },
@@ -42337,24 +42813,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.004852,
-              "phase": 247.857918,
-              "vector": 0.000287
+              "amplitude": 0.004849,
+              "phase": 247.858255,
+              "vector": 0.000288
             },
             "exact": {
-              "amplitude": 0.005332,
-              "phase": 245.566626,
-              "vector": 0.000336
+              "amplitude": 0.00533,
+              "phase": 245.566049,
+              "vector": 0.000334
             },
             "joint": {
-              "amplitude": 0.002957,
-              "phase": 324.790089,
-              "vector": 0.005339
+              "amplitude": 0.002956,
+              "phase": 324.831453,
+              "vector": 0.00534
             },
             "robust": {
-              "amplitude": 0.002526,
-              "phase": 315.7916,
-              "vector": 0.004803
+              "amplitude": 0.002517,
+              "phase": 315.614585,
+              "vector": 0.004794
             }
           }
         },
@@ -42386,24 +42862,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.00324,
-              "phase": 105.967819,
-              "vector": 0.000277
+              "amplitude": 0.003241,
+              "phase": 105.965562,
+              "vector": 0.000278
             },
             "exact": {
               "amplitude": 0.00335,
-              "phase": 105.609262,
-              "vector": 0.000384
+              "phase": 105.608642,
+              "vector": 0.000385
             },
             "joint": {
               "amplitude": 0.00195,
-              "phase": 76.319982,
+              "phase": 76.327581,
               "vector": 0.001703
             },
             "robust": {
-              "amplitude": 0.002895,
-              "phase": 128.148683,
-              "vector": 0.001011
+              "amplitude": 0.002899,
+              "phase": 128.290037,
+              "vector": 0.001019
             }
           }
         },
@@ -42447,24 +42923,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.006674,
-              "phase": 126.710886,
-              "vector": 0.000327
+              "amplitude": 0.006673,
+              "phase": 126.704036,
+              "vector": 0.000328
             },
             "exact": {
-              "amplitude": 0.004545,
-              "phase": 130.511269,
-              "vector": 0.00248
+              "amplitude": 0.004544,
+              "phase": 130.503643,
+              "vector": 0.002481
             },
             "joint": {
-              "amplitude": 0.00396,
-              "phase": 127.593891,
-              "vector": 0.003041
+              "amplitude": 0.003959,
+              "phase": 127.580365,
+              "vector": 0.003042
             },
             "robust": {
-              "amplitude": 0.004928,
-              "phase": 135.282892,
-              "vector": 0.002243
+              "amplitude": 0.00493,
+              "phase": 135.27279,
+              "vector": 0.002241
             }
           }
         },
@@ -42484,24 +42960,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.001388,
-              "phase": 141.738778,
-              "vector": 0.000396
+              "amplitude": 0.001386,
+              "phase": 141.834798,
+              "vector": 0.000395
             },
             "exact": {
-              "amplitude": 0.002092,
-              "phase": 204.416353,
-              "vector": 0.001929
+              "amplitude": 0.002093,
+              "phase": 204.491466,
+              "vector": 0.001931
             },
             "joint": {
-              "amplitude": 0.001481,
-              "phase": 126.049902,
-              "vector": 0.000541
+              "amplitude": 0.001478,
+              "phase": 126.120056,
+              "vector": 0.000538
             },
             "robust": {
-              "amplitude": 0.001338,
-              "phase": 111.156769,
-              "vector": 0.00063
+              "amplitude": 0.001331,
+              "phase": 110.309011,
+              "vector": 0.000639
             }
           }
         },
@@ -42521,24 +42997,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.002188,
-              "phase": 167.488068,
-              "vector": 0.000188
+              "amplitude": 0.00219,
+              "phase": 167.517837,
+              "vector": 0.00019
             },
             "exact": {
-              "amplitude": 0.002262,
-              "phase": 175.155805,
-              "vector": 0.000386
+              "amplitude": 0.002263,
+              "phase": 175.175351,
+              "vector": 0.000388
             },
             "joint": {
-              "amplitude": 0.001896,
-              "phase": 163.195249,
-              "vector": 0.00018
+              "amplitude": 0.001897,
+              "phase": 163.222108,
+              "vector": 0.000178
             },
             "robust": {
-              "amplitude": 0.001853,
-              "phase": 210.227696,
-              "vector": 0.00141
+              "amplitude": 0.001867,
+              "phase": 210.472822,
+              "vector": 0.001422
             }
           }
         },
@@ -42582,24 +43058,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.053389,
-              "phase": 31.412508,
-              "vector": 0.00039
+              "amplitude": 0.053392,
+              "phase": 31.41285,
+              "vector": 0.000393
             },
             "exact": {
-              "amplitude": 0.053683,
-              "phase": 31.158575,
-              "vector": 0.000719
+              "amplitude": 0.053686,
+              "phase": 31.159026,
+              "vector": 0.000722
             },
             "joint": {
-              "amplitude": 0.053398,
-              "phase": 30.974635,
-              "vector": 0.000561
+              "amplitude": 0.0534,
+              "phase": 30.974584,
+              "vector": 0.000562
             },
             "robust": {
-              "amplitude": 0.052545,
-              "phase": 30.752808,
-              "vector": 0.00075
+              "amplitude": 0.052546,
+              "phase": 30.780043,
+              "vector": 0.00073
             }
           }
         },
@@ -42643,24 +43119,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.042374,
-              "phase": 67.604079,
-              "vector": 0.000374
+              "amplitude": 0.042375,
+              "phase": 67.604738,
+              "vector": 0.000375
             },
             "exact": {
               "amplitude": 0.042307,
-              "phase": 67.70431,
-              "vector": 0.000316
+              "phase": 67.704942,
+              "vector": 0.000317
             },
             "joint": {
               "amplitude": 0.042449,
-              "phase": 67.678109,
+              "phase": 67.678818,
               "vector": 0.000453
             },
             "robust": {
-              "amplitude": 0.04214,
-              "phase": 68.044747,
-              "vector": 0.000355
+              "amplitude": 0.042165,
+              "phase": 68.008761,
+              "vector": 0.000343
             }
           }
         },
@@ -42704,24 +43180,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.040616,
-              "phase": 353.762961,
-              "vector": 0.000387
+              "amplitude": 0.040615,
+              "phase": 353.763376,
+              "vector": 0.000388
             },
             "exact": {
-              "amplitude": 0.040577,
-              "phase": 353.671523,
-              "vector": 0.000424
+              "amplitude": 0.040576,
+              "phase": 353.671924,
+              "vector": 0.000425
             },
             "joint": {
               "amplitude": 0.04051,
-              "phase": 353.55493,
+              "phase": 353.554858,
               "vector": 0.000501
             },
             "robust": {
-              "amplitude": 0.040924,
-              "phase": 353.770082,
-              "vector": 0.000091
+              "amplitude": 0.040942,
+              "phase": 353.780154,
+              "vector": 0.000082
             }
           }
         },
@@ -42765,24 +43241,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.042883,
-              "phase": 122.204819,
-              "vector": 0.000117
+              "amplitude": 0.042882,
+              "phase": 122.204122,
+              "vector": 0.000118
             },
             "exact": {
-              "amplitude": 0.043016,
-              "phase": 122.52518,
-              "vector": 0.000245
+              "amplitude": 0.043015,
+              "phase": 122.524467,
+              "vector": 0.000244
             },
             "joint": {
-              "amplitude": 0.04314,
-              "phase": 122.670624,
-              "vector": 0.000381
+              "amplitude": 0.043139,
+              "phase": 122.670042,
+              "vector": 0.00038
             },
             "robust": {
-              "amplitude": 0.043496,
-              "phase": 123.077423,
-              "vector": 0.000827
+              "amplitude": 0.043512,
+              "phase": 123.038889,
+              "vector": 0.000814
             }
           }
         },
@@ -42827,23 +43303,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.022039,
-              "phase": 146.845087,
+              "phase": 146.844382,
               "vector": 0.000044
             },
             "exact": {
               "amplitude": 0.021905,
-              "phase": 145.608522,
+              "phase": 145.607946,
               "vector": 0.000504
             },
             "joint": {
               "amplitude": 0.02229,
-              "phase": 145.032249,
+              "phase": 145.031043,
               "vector": 0.000778
             },
             "robust": {
-              "amplitude": 0.022361,
-              "phase": 144.400141,
-              "vector": 0.001033
+              "amplitude": 0.022412,
+              "phase": 144.48331,
+              "vector": 0.001023
             }
           }
         },
@@ -42888,23 +43364,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.027786,
-              "phase": 221.025442,
+              "phase": 221.027247,
               "vector": 0.000241
             },
             "exact": {
-              "amplitude": 0.027541,
-              "phase": 221.160377,
+              "amplitude": 0.027542,
+              "phase": 221.162239,
               "vector": 0.000491
             },
             "joint": {
-              "amplitude": 0.027081,
-              "phase": 220.337965,
-              "vector": 0.000946
+              "amplitude": 0.027082,
+              "phase": 220.339787,
+              "vector": 0.000945
             },
             "robust": {
-              "amplitude": 0.028423,
-              "phase": 222.353815,
-              "vector": 0.000874
+              "amplitude": 0.028484,
+              "phase": 222.256886,
+              "vector": 0.000866
             }
           }
         },
@@ -42948,24 +43424,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.0365,
-              "phase": 161.295493,
-              "vector": 0.000504
+              "amplitude": 0.036501,
+              "phase": 161.293023,
+              "vector": 0.000502
             },
             "exact": {
-              "amplitude": 0.036554,
-              "phase": 161.280566,
-              "vector": 0.000449
+              "amplitude": 0.036555,
+              "phase": 161.278055,
+              "vector": 0.000447
             },
             "joint": {
-              "amplitude": 0.036893,
-              "phase": 162.711862,
-              "vector": 0.000981
+              "amplitude": 0.036895,
+              "phase": 162.711088,
+              "vector": 0.00098
             },
             "robust": {
-              "amplitude": 0.035654,
-              "phase": 162.987438,
-              "vector": 0.00176
+              "amplitude": 0.035701,
+              "phase": 162.990398,
+              "vector": 0.001726
             }
           }
         },
@@ -43009,24 +43485,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.028441,
-              "phase": 72.639984,
-              "vector": 0.000441
+              "amplitude": 0.02844,
+              "phase": 72.637599,
+              "vector": 0.00044
             },
             "exact": {
-              "amplitude": 0.028501,
-              "phase": 72.76193,
-              "vector": 0.000507
+              "amplitude": 0.0285,
+              "phase": 72.759626,
+              "vector": 0.000506
             },
             "joint": {
-              "amplitude": 0.028026,
-              "phase": 74.121694,
-              "vector": 0.000744
+              "amplitude": 0.028025,
+              "phase": 74.119569,
+              "vector": 0.000743
             },
             "robust": {
-              "amplitude": 0.027606,
-              "phase": 73.292325,
-              "vector": 0.000517
+              "amplitude": 0.027535,
+              "phase": 73.305853,
+              "vector": 0.000577
             }
           }
         },
@@ -43070,24 +43546,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.017926,
-              "phase": 36.579293,
-              "vector": 0.000093
+              "amplitude": 0.017925,
+              "phase": 36.586357,
+              "vector": 0.000095
             },
             "exact": {
-              "amplitude": 0.017968,
-              "phase": 36.586744,
-              "vector": 0.000067
+              "amplitude": 0.017967,
+              "phase": 36.594071,
+              "vector": 0.000069
             },
             "joint": {
-              "amplitude": 0.017864,
-              "phase": 36.469883,
-              "vector": 0.000138
+              "amplitude": 0.017863,
+              "phase": 36.471854,
+              "vector": 0.000139
             },
             "robust": {
-              "amplitude": 0.018505,
-              "phase": 36.213508,
-              "vector": 0.000508
+              "amplitude": 0.018498,
+              "phase": 36.202448,
+              "vector": 0.000502
             }
           }
         },
@@ -43132,23 +43608,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.020917,
-              "phase": 117.437745,
+              "phase": 117.436334,
               "vector": 0.000084
             },
             "exact": {
-              "amplitude": 0.020919,
-              "phase": 117.528376,
+              "amplitude": 0.020918,
+              "phase": 117.527687,
               "vector": 0.000094
             },
             "joint": {
-              "amplitude": 0.020351,
-              "phase": 117.300473,
-              "vector": 0.00065
+              "amplitude": 0.02035,
+              "phase": 117.299615,
+              "vector": 0.000651
             },
             "robust": {
-              "amplitude": 0.020119,
-              "phase": 114.193943,
-              "vector": 0.001449
+              "amplitude": 0.019994,
+              "phase": 114.118282,
+              "vector": 0.001546
             }
           }
         },
@@ -43192,24 +43668,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.01871,
-              "phase": 249.715559,
-              "vector": 0.00029
-            },
-            "exact": {
-              "amplitude": 0.018709,
-              "phase": 249.616019,
+              "amplitude": 0.018708,
+              "phase": 249.718313,
               "vector": 0.000292
             },
+            "exact": {
+              "amplitude": 0.018707,
+              "phase": 249.618981,
+              "vector": 0.000294
+            },
             "joint": {
-              "amplitude": 0.018696,
-              "phase": 249.585354,
-              "vector": 0.000306
+              "amplitude": 0.018694,
+              "phase": 249.588122,
+              "vector": 0.000308
             },
             "robust": {
               "amplitude": 0.018086,
-              "phase": 246.676385,
-              "vector": 0.001339
+              "phase": 246.699607,
+              "vector": 0.001334
             }
           }
         },
@@ -43253,24 +43729,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.035121,
-              "phase": 268.510951,
+              "amplitude": 0.03512,
+              "phase": 268.512718,
               "vector": 0.000177
             },
             "exact": {
               "amplitude": 0.035135,
-              "phase": 268.633749,
-              "vector": 0.000245
+              "phase": 268.635642,
+              "vector": 0.000246
             },
             "joint": {
               "amplitude": 0.035302,
-              "phase": 268.383463,
+              "phase": 268.383275,
               "vector": 0.000306
             },
             "robust": {
-              "amplitude": 0.033691,
-              "phase": 268.151198,
-              "vector": 0.001312
+              "amplitude": 0.033732,
+              "phase": 268.222717,
+              "vector": 0.001269
             }
           }
         },
@@ -43314,24 +43790,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.06083,
-              "phase": 256.384702,
-              "vector": 0.000192
+              "amplitude": 0.060829,
+              "phase": 256.383237,
+              "vector": 0.000193
             },
             "exact": {
-              "amplitude": 0.06078,
-              "phase": 256.283589,
-              "vector": 0.000221
+              "amplitude": 0.060778,
+              "phase": 256.282132,
+              "vector": 0.000222
             },
             "joint": {
-              "amplitude": 0.060802,
-              "phase": 256.268193,
-              "vector": 0.000201
+              "amplitude": 0.060801,
+              "phase": 256.267141,
+              "vector": 0.000202
             },
             "robust": {
-              "amplitude": 0.059941,
-              "phase": 256.122416,
-              "vector": 0.001075
+              "amplitude": 0.059951,
+              "phase": 256.107806,
+              "vector": 0.001068
             }
           }
         },
@@ -43375,24 +43851,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.029243,
-              "phase": 324.649742,
+              "amplitude": 0.029242,
+              "phase": 324.650901,
               "vector": 0.000244
             },
             "exact": {
-              "amplitude": 0.029109,
-              "phase": 324.646026,
+              "amplitude": 0.029108,
+              "phase": 324.647215,
               "vector": 0.000111
             },
             "joint": {
-              "amplitude": 0.029099,
-              "phase": 324.704588,
+              "amplitude": 0.0291,
+              "phase": 324.705729,
               "vector": 0.000113
             },
             "robust": {
-              "amplitude": 0.029002,
-              "phase": 325.240205,
-              "vector": 0.000324
+              "amplitude": 0.029045,
+              "phase": 325.163385,
+              "vector": 0.000289
             }
           }
         },
@@ -43436,24 +43912,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.009827,
-              "phase": 306.00215,
-              "vector": 0.000194
+              "amplitude": 0.009829,
+              "phase": 306.004021,
+              "vector": 0.000192
             },
             "exact": {
-              "amplitude": 0.009965,
-              "phase": 306.339812,
-              "vector": 0.000151
+              "amplitude": 0.009966,
+              "phase": 306.34117,
+              "vector": 0.00015
             },
             "joint": {
-              "amplitude": 0.009884,
-              "phase": 305.95457,
-              "vector": 0.00014
+              "amplitude": 0.009885,
+              "phase": 305.956047,
+              "vector": 0.000139
             },
             "robust": {
-              "amplitude": 0.01014,
-              "phase": 301.074821,
-              "vector": 0.00079
+              "amplitude": 0.010175,
+              "phase": 301.501834,
+              "vector": 0.000725
             }
           }
         },
@@ -43497,24 +43973,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.02759,
-              "phase": 285.230111,
-              "vector": 0.000415
+              "amplitude": 0.027589,
+              "phase": 285.229734,
+              "vector": 0.000416
             },
             "exact": {
-              "amplitude": 0.027796,
-              "phase": 284.751557,
-              "vector": 0.000266
+              "amplitude": 0.027794,
+              "phase": 284.751286,
+              "vector": 0.000267
             },
             "joint": {
-              "amplitude": 0.02782,
-              "phase": 284.581361,
-              "vector": 0.00031
+              "amplitude": 0.027819,
+              "phase": 284.580751,
+              "vector": 0.000311
             },
             "robust": {
-              "amplitude": 0.027408,
-              "phase": 284.148253,
-              "vector": 0.000749
+              "amplitude": 0.027414,
+              "phase": 284.154699,
+              "vector": 0.000743
             }
           }
         },
@@ -43558,24 +44034,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.02212,
-              "phase": 357.560171,
-              "vector": 0.000135
+              "amplitude": 0.022122,
+              "phase": 357.559025,
+              "vector": 0.000137
             },
             "exact": {
-              "amplitude": 0.02215,
-              "phase": 357.290114,
-              "vector": 0.000156
+              "amplitude": 0.022152,
+              "phase": 357.288765,
+              "vector": 0.000158
             },
             "joint": {
-              "amplitude": 0.022079,
-              "phase": 357.35905,
-              "vector": 0.000081
+              "amplitude": 0.022081,
+              "phase": 357.35832,
+              "vector": 0.000083
             },
             "robust": {
-              "amplitude": 0.020732,
-              "phase": 359.501207,
-              "vector": 0.00149
+              "amplitude": 0.02074,
+              "phase": 359.527222,
+              "vector": 0.001489
             }
           }
         },
@@ -43620,23 +44096,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.021301,
-              "phase": 239.081225,
+              "phase": 239.079041,
               "vector": 0.000301
             },
             "exact": {
               "amplitude": 0.021264,
-              "phase": 238.975497,
+              "phase": 238.973301,
               "vector": 0.000268
             },
             "joint": {
               "amplitude": 0.021124,
-              "phase": 239.013586,
+              "phase": 239.012748,
               "vector": 0.000128
             },
             "robust": {
-              "amplitude": 0.020887,
-              "phase": 237.614218,
-              "vector": 0.000555
+              "amplitude": 0.020895,
+              "phase": 237.622594,
+              "vector": 0.00055
             }
           }
         },
@@ -43680,24 +44156,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.027352,
-              "phase": 114.666154,
-              "vector": 0.000354
+              "amplitude": 0.027354,
+              "phase": 114.664615,
+              "vector": 0.000355
             },
             "exact": {
-              "amplitude": 0.027278,
-              "phase": 114.767354,
-              "vector": 0.000289
+              "amplitude": 0.02728,
+              "phase": 114.765703,
+              "vector": 0.00029
             },
             "joint": {
-              "amplitude": 0.027272,
-              "phase": 114.82234,
+              "amplitude": 0.027273,
+              "phase": 114.821975,
               "vector": 0.000292
             },
             "robust": {
-              "amplitude": 0.026984,
-              "phase": 115.646636,
-              "vector": 0.000493
+              "amplitude": 0.027025,
+              "phase": 115.546055,
+              "vector": 0.000447
             }
           }
         },
@@ -43742,23 +44218,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.080555,
-              "phase": 352.788512,
+              "phase": 352.789063,
               "vector": 0.000462
             },
             "exact": {
               "amplitude": 0.080122,
-              "phase": 352.933115,
+              "phase": 352.933712,
               "vector": 0.000937
             },
             "joint": {
               "amplitude": 0.080441,
-              "phase": 352.898543,
+              "phase": 352.898791,
               "vector": 0.000625
             },
             "robust": {
-              "amplitude": 0.081055,
-              "phase": 352.67076,
-              "vector": 0.000069
+              "amplitude": 0.081053,
+              "phase": 352.683016,
+              "vector": 0.000058
             }
           }
         },
@@ -43802,24 +44278,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.026845,
-              "phase": 48.334077,
+              "amplitude": 0.026846,
+              "phase": 48.336496,
               "vector": 0.00019
             },
             "exact": {
               "amplitude": 0.027163,
-              "phase": 47.673763,
+              "phase": 47.676152,
               "vector": 0.000259
             },
             "joint": {
               "amplitude": 0.02746,
-              "phase": 46.157775,
-              "vector": 0.001031
+              "phase": 46.160735,
+              "vector": 0.00103
             },
             "robust": {
-              "amplitude": 0.027778,
-              "phase": 48.619033,
-              "vector": 0.000816
+              "amplitude": 0.027785,
+              "phase": 48.707223,
+              "vector": 0.000837
             }
           }
         },
@@ -43863,24 +44339,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.143641,
-              "phase": 59.486865,
-              "vector": 0.00042
+              "amplitude": 0.143642,
+              "phase": 59.486437,
+              "vector": 0.000419
             },
             "exact": {
-              "amplitude": 0.143415,
-              "phase": 59.507503,
-              "vector": 0.000644
+              "amplitude": 0.143416,
+              "phase": 59.507041,
+              "vector": 0.000643
             },
             "joint": {
               "amplitude": 0.143411,
-              "phase": 59.469564,
+              "phase": 59.469219,
               "vector": 0.000614
             },
             "robust": {
-              "amplitude": 0.143084,
-              "phase": 59.75721,
-              "vector": 0.001281
+              "amplitude": 0.143085,
+              "phase": 59.738946,
+              "vector": 0.001248
             }
           }
         },
@@ -43924,24 +44400,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.024508,
-              "phase": 297.787952,
+              "amplitude": 0.024507,
+              "phase": 297.786952,
               "vector": 0.000509
             },
             "exact": {
-              "amplitude": 0.024412,
-              "phase": 297.766403,
-              "vector": 0.000413
+              "amplitude": 0.024411,
+              "phase": 297.765275,
+              "vector": 0.000412
             },
             "joint": {
               "amplitude": 0.023641,
-              "phase": 297.848503,
+              "phase": 297.847532,
               "vector": 0.000364
             },
             "robust": {
-              "amplitude": 0.021661,
-              "phase": 296.396321,
-              "vector": 0.002395
+              "amplitude": 0.021689,
+              "phase": 296.369771,
+              "vector": 0.002371
             }
           }
         },
@@ -43985,24 +44461,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.021225,
-              "phase": 325.583897,
-              "vector": 0.000235
+              "amplitude": 0.021223,
+              "phase": 325.585071,
+              "vector": 0.000234
             },
             "exact": {
-              "amplitude": 0.021728,
-              "phase": 324.84089,
-              "vector": 0.000758
+              "amplitude": 0.021727,
+              "phase": 324.842124,
+              "vector": 0.000756
             },
             "joint": {
-              "amplitude": 0.021082,
-              "phase": 325.758775,
+              "amplitude": 0.021081,
+              "phase": 325.760037,
               "vector": 0.000155
             },
             "robust": {
-              "amplitude": 0.021353,
-              "phase": 326.036804,
-              "vector": 0.000424
+              "amplitude": 0.021346,
+              "phase": 326.011197,
+              "vector": 0.000413
             }
           }
         },
@@ -44047,23 +44523,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.033533,
-              "phase": 70.20373,
+              "phase": 70.203293,
               "vector": 0.000533
             },
             "exact": {
               "amplitude": 0.033601,
-              "phase": 70.206579,
+              "phase": 70.206062,
               "vector": 0.000601
             },
             "joint": {
-              "amplitude": 0.032778,
-              "phase": 70.35263,
+              "amplitude": 0.032779,
+              "phase": 70.351708,
               "vector": 0.000238
             },
             "robust": {
-              "amplitude": 0.031778,
-              "phase": 70.048882,
-              "vector": 0.001225
+              "amplitude": 0.031537,
+              "phase": 69.887608,
+              "vector": 0.001473
             }
           }
         },
@@ -44108,23 +44584,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.025114,
-              "phase": 34.370595,
+              "phase": 34.37019,
               "vector": 0.000118
             },
             "exact": {
-              "amplitude": 0.025196,
-              "phase": 34.563286,
+              "amplitude": 0.025195,
+              "phase": 34.562847,
               "vector": 0.000227
             },
             "joint": {
               "amplitude": 0.025537,
-              "phase": 33.749706,
+              "phase": 33.748843,
               "vector": 0.000589
             },
             "robust": {
-              "amplitude": 0.025864,
-              "phase": 34.194428,
-              "vector": 0.000865
+              "amplitude": 0.02577,
+              "phase": 34.106776,
+              "vector": 0.000775
             }
           }
         },
@@ -44168,24 +44644,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.017149,
-              "phase": 91.647176,
-              "vector": 0.000156
+              "amplitude": 0.017147,
+              "phase": 91.6498,
+              "vector": 0.000153
             },
             "exact": {
-              "amplitude": 0.017162,
-              "phase": 91.626247,
-              "vector": 0.00017
+              "amplitude": 0.017159,
+              "phase": 91.629098,
+              "vector": 0.000167
             },
             "joint": {
-              "amplitude": 0.016994,
-              "phase": 92.102763,
-              "vector": 0.00009
+              "amplitude": 0.016991,
+              "phase": 92.105536,
+              "vector": 0.000091
             },
             "robust": {
-              "amplitude": 0.016065,
-              "phase": 90.556914,
-              "vector": 0.001001
+              "amplitude": 0.016045,
+              "phase": 90.680194,
+              "vector": 0.001008
             }
           }
         },
@@ -44229,24 +44705,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.031157,
-              "phase": 325.191534,
+              "amplitude": 0.031158,
+              "phase": 325.189709,
               "vector": 0.000165
             },
             "exact": {
-              "amplitude": 0.03116,
-              "phase": 325.141024,
+              "amplitude": 0.031161,
+              "phase": 325.139297,
               "vector": 0.000162
             },
             "joint": {
-              "amplitude": 0.031177,
-              "phase": 325.739382,
-              "vector": 0.00039
+              "amplitude": 0.031178,
+              "phase": 325.738442,
+              "vector": 0.000389
             },
             "robust": {
-              "amplitude": 0.029948,
-              "phase": 326.768572,
-              "vector": 0.001376
+              "amplitude": 0.029955,
+              "phase": 326.735408,
+              "vector": 0.001359
             }
           }
         },
@@ -44290,24 +44766,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.029993,
-              "phase": 176.263334,
+              "amplitude": 0.029995,
+              "phase": 176.264428,
               "vector": 0.000086
             },
             "exact": {
-              "amplitude": 0.030095,
-              "phase": 176.25378,
-              "vector": 0.000125
+              "amplitude": 0.030097,
+              "phase": 176.255111,
+              "vector": 0.000127
             },
             "joint": {
-              "amplitude": 0.029721,
-              "phase": 175.827115,
-              "vector": 0.000313
+              "amplitude": 0.029722,
+              "phase": 175.827823,
+              "vector": 0.000312
             },
             "robust": {
-              "amplitude": 0.030246,
-              "phase": 175.95523,
-              "vector": 0.000258
+              "amplitude": 0.030301,
+              "phase": 175.913742,
+              "vector": 0.000316
             }
           }
         },
@@ -44351,24 +44827,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.037598,
-              "phase": 46.771326,
+              "amplitude": 0.037597,
+              "phase": 46.773116,
               "vector": 0.000405
             },
             "exact": {
               "amplitude": 0.038014,
-              "phase": 46.756131,
-              "vector": 0.00004
+              "phase": 46.757887,
+              "vector": 0.000041
             },
             "joint": {
               "amplitude": 0.037809,
-              "phase": 46.754978,
-              "vector": 0.000194
+              "phase": 46.75658,
+              "vector": 0.000195
             },
             "robust": {
-              "amplitude": 0.037973,
-              "phase": 47.432745,
-              "vector": 0.000487
+              "amplitude": 0.038001,
+              "phase": 47.42324,
+              "vector": 0.00048
             }
           }
         },
@@ -44413,23 +44889,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.015461,
-              "phase": 245.882178,
+              "phase": 245.881127,
               "vector": 0.000464
             },
             "exact": {
-              "amplitude": 0.015448,
-              "phase": 245.770638,
+              "amplitude": 0.015449,
+              "phase": 245.769674,
               "vector": 0.000449
             },
             "joint": {
               "amplitude": 0.015338,
-              "phase": 245.68689,
+              "phase": 245.683036,
               "vector": 0.000338
             },
             "robust": {
-              "amplitude": 0.014504,
-              "phase": 245.245656,
-              "vector": 0.000509
+              "amplitude": 0.014507,
+              "phase": 245.244876,
+              "vector": 0.000507
             }
           }
         },
@@ -44474,23 +44950,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.004238,
-              "phase": 202.671662,
-              "vector": 0.000268
+              "phase": 202.654916,
+              "vector": 0.000269
             },
             "exact": {
-              "amplitude": 0.004249,
-              "phase": 202.043525,
+              "amplitude": 0.004248,
+              "phase": 202.026684,
               "vector": 0.000301
             },
             "joint": {
               "amplitude": 0.004404,
-              "phase": 203.499202,
-              "vector": 0.000409
+              "phase": 203.492151,
+              "vector": 0.00041
             },
             "robust": {
-              "amplitude": 0.003851,
-              "phase": 202.595231,
-              "vector": 0.000194
+              "amplitude": 0.00381,
+              "phase": 202.2982,
+              "vector": 0.000238
             }
           }
         },
@@ -44534,24 +45010,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.025168,
-              "phase": 293.448428,
-              "vector": 0.0002
+              "amplitude": 0.025166,
+              "phase": 293.4528,
+              "vector": 0.000199
             },
             "exact": {
-              "amplitude": 0.025109,
-              "phase": 293.572139,
+              "amplitude": 0.025106,
+              "phase": 293.576586,
               "vector": 0.000196
             },
             "joint": {
-              "amplitude": 0.025074,
-              "phase": 293.445948,
-              "vector": 0.000131
+              "amplitude": 0.025071,
+              "phase": 293.449143,
+              "vector": 0.00013
             },
             "robust": {
-              "amplitude": 0.024586,
-              "phase": 295.180361,
-              "vector": 0.000952
+              "amplitude": 0.024592,
+              "phase": 295.195537,
+              "vector": 0.000955
             }
           }
         },
@@ -44595,24 +45071,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.031282,
-              "phase": 122.645178,
-              "vector": 0.000293
+              "amplitude": 0.031281,
+              "phase": 122.642591,
+              "vector": 0.000291
             },
             "exact": {
-              "amplitude": 0.031123,
-              "phase": 122.752642,
-              "vector": 0.000184
+              "amplitude": 0.031121,
+              "phase": 122.750288,
+              "vector": 0.000182
             },
             "joint": {
-              "amplitude": 0.030378,
-              "phase": 122.524149,
-              "vector": 0.000623
+              "amplitude": 0.030377,
+              "phase": 122.521785,
+              "vector": 0.000624
             },
             "robust": {
-              "amplitude": 0.030636,
-              "phase": 122.742498,
-              "vector": 0.000387
+              "amplitude": 0.03061,
+              "phase": 122.626689,
+              "vector": 0.000396
             }
           }
         },
@@ -44657,23 +45133,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.02399,
-              "phase": 14.243273,
-              "vector": 0.000102
+              "phase": 14.244316,
+              "vector": 0.000103
             },
             "exact": {
-              "amplitude": 0.024062,
-              "phase": 13.98937,
-              "vector": 0.000062
+              "amplitude": 0.024061,
+              "phase": 13.990248,
+              "vector": 0.000061
             },
             "joint": {
-              "amplitude": 0.024444,
-              "phase": 12.777266,
-              "vector": 0.000681
+              "amplitude": 0.024443,
+              "phase": 12.778299,
+              "vector": 0.00068
             },
             "robust": {
-              "amplitude": 0.024477,
-              "phase": 13.974442,
-              "vector": 0.000478
+              "amplitude": 0.024442,
+              "phase": 14.005589,
+              "vector": 0.000442
             }
           }
         },
@@ -44717,24 +45193,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.064383,
-              "phase": 26.076749,
-              "vector": 0.000392
+              "amplitude": 0.064384,
+              "phase": 26.075087,
+              "vector": 0.000393
             },
             "exact": {
-              "amplitude": 0.064291,
-              "phase": 26.077526,
-              "vector": 0.000303
+              "amplitude": 0.064292,
+              "phase": 26.075779,
+              "vector": 0.000304
             },
             "joint": {
-              "amplitude": 0.064326,
-              "phase": 26.055616,
-              "vector": 0.000332
+              "amplitude": 0.064327,
+              "phase": 26.055368,
+              "vector": 0.000333
             },
             "robust": {
-              "amplitude": 0.064309,
-              "phase": 26.239158,
-              "vector": 0.000409
+              "amplitude": 0.064313,
+              "phase": 26.232274,
+              "vector": 0.000407
             }
           }
         },
@@ -44778,24 +45254,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.023568,
-              "phase": 80.355273,
-              "vector": 0.000568
+              "amplitude": 0.02357,
+              "phase": 80.358524,
+              "vector": 0.000571
             },
             "exact": {
-              "amplitude": 0.023496,
-              "phase": 80.46774,
-              "vector": 0.000501
+              "amplitude": 0.023499,
+              "phase": 80.470833,
+              "vector": 0.000503
             },
             "joint": {
-              "amplitude": 0.023534,
-              "phase": 80.562904,
-              "vector": 0.000544
+              "amplitude": 0.023535,
+              "phase": 80.566793,
+              "vector": 0.000546
             },
             "robust": {
-              "amplitude": 0.022976,
-              "phase": 81.054224,
-              "vector": 0.000304
+              "amplitude": 0.022995,
+              "phase": 80.811356,
+              "vector": 0.000205
             }
           }
         },
@@ -44839,24 +45315,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.011632,
-              "phase": 293.1018,
-              "vector": 0.000633
+              "amplitude": 0.011633,
+              "phase": 293.096972,
+              "vector": 0.000634
             },
             "exact": {
-              "amplitude": 0.01166,
-              "phase": 293.054406,
-              "vector": 0.00066
+              "amplitude": 0.011661,
+              "phase": 293.04919,
+              "vector": 0.000661
             },
             "joint": {
               "amplitude": 0.01162,
-              "phase": 293.631019,
+              "phase": 293.628096,
               "vector": 0.000637
             },
             "robust": {
-              "amplitude": 0.01176,
-              "phase": 294.708463,
-              "vector": 0.00084
+              "amplitude": 0.011759,
+              "phase": 294.579819,
+              "vector": 0.000829
             }
           }
         },
@@ -44901,23 +45377,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.032854,
-              "phase": 319.460751,
-              "vector": 0.000173
+              "phase": 319.463825,
+              "vector": 0.000174
             },
             "exact": {
-              "amplitude": 0.032688,
-              "phase": 319.70497,
+              "amplitude": 0.032689,
+              "phase": 319.707843,
               "vector": 0.000389
             },
             "joint": {
-              "amplitude": 0.0329,
-              "phase": 319.818913,
-              "vector": 0.000315
+              "amplitude": 0.032899,
+              "phase": 319.821999,
+              "vector": 0.000317
             },
             "robust": {
-              "amplitude": 0.032937,
-              "phase": 319.880974,
-              "vector": 0.00034
+              "amplitude": 0.03292,
+              "phase": 319.905067,
+              "vector": 0.000357
             }
           }
         },
@@ -44961,24 +45437,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.019943,
-              "phase": 30.237526,
-              "vector": 0.000074
+              "amplitude": 0.019941,
+              "phase": 30.238301,
+              "vector": 0.000076
             },
             "exact": {
-              "amplitude": 0.019996,
-              "phase": 30.128162,
-              "vector": 0.000011
+              "amplitude": 0.019994,
+              "phase": 30.128857,
+              "vector": 0.000012
             },
             "joint": {
-              "amplitude": 0.019688,
-              "phase": 30.599035,
-              "vector": 0.000357
+              "amplitude": 0.019686,
+              "phase": 30.59916,
+              "vector": 0.000358
             },
             "robust": {
-              "amplitude": 0.019557,
-              "phase": 29.879124,
-              "vector": 0.000449
+              "amplitude": 0.019168,
+              "phase": 29.922817,
+              "vector": 0.000834
             }
           }
         },
@@ -45023,23 +45499,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.013965,
-              "phase": 128.511929,
-              "vector": 0.000044
+              "phase": 128.515989,
+              "vector": 0.000045
             },
             "exact": {
-              "amplitude": 0.014018,
-              "phase": 128.237603,
-              "vector": 0.000044
+              "amplitude": 0.014017,
+              "phase": 128.242102,
+              "vector": 0.000042
             },
             "joint": {
               "amplitude": 0.013899,
-              "phase": 127.529652,
-              "vector": 0.000235
+              "phase": 127.533732,
+              "vector": 0.000234
             },
             "robust": {
-              "amplitude": 0.014449,
-              "phase": 126.717072,
-              "vector": 0.000613
+              "amplitude": 0.014519,
+              "phase": 126.562412,
+              "vector": 0.000691
             }
           }
         },
@@ -45083,24 +45559,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.007675,
-              "phase": 350.322157,
+              "amplitude": 0.007674,
+              "phase": 350.320747,
               "vector": 0.000328
             },
             "exact": {
               "amplitude": 0.007732,
-              "phase": 350.757994,
+              "phase": 350.756476,
               "vector": 0.000269
             },
             "joint": {
               "amplitude": 0.007981,
-              "phase": 350.364206,
+              "phase": 350.36313,
               "vector": 0.000038
             },
             "robust": {
-              "amplitude": 0.007695,
-              "phase": 348.074447,
-              "vector": 0.000461
+              "amplitude": 0.007589,
+              "phase": 347.80623,
+              "vector": 0.000559
             }
           }
         },
@@ -45144,24 +45620,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.014162,
-              "phase": 17.155598,
-              "vector": 0.000184
+              "amplitude": 0.01416,
+              "phase": 17.155023,
+              "vector": 0.000182
             },
             "exact": {
-              "amplitude": 0.014415,
-              "phase": 17.02371,
-              "vector": 0.000419
+              "amplitude": 0.014413,
+              "phase": 17.02319,
+              "vector": 0.000417
             },
             "joint": {
-              "amplitude": 0.014417,
-              "phase": 16.541517,
-              "vector": 0.000422
+              "amplitude": 0.014415,
+              "phase": 16.53968,
+              "vector": 0.00042
             },
             "robust": {
-              "amplitude": 0.014733,
-              "phase": 18.401091,
-              "vector": 0.000836
+              "amplitude": 0.014735,
+              "phase": 18.483838,
+              "vector": 0.000848
             }
           }
         },
@@ -45205,24 +45681,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.013485,
-              "phase": 62.702403,
-              "vector": 0.000517
+              "amplitude": 0.013484,
+              "phase": 62.695037,
+              "vector": 0.000518
             },
             "exact": {
-              "amplitude": 0.013537,
-              "phase": 62.641417,
-              "vector": 0.000465
+              "amplitude": 0.013535,
+              "phase": 62.634017,
+              "vector": 0.000466
             },
             "joint": {
-              "amplitude": 0.01344,
-              "phase": 62.971036,
+              "amplitude": 0.013439,
+              "phase": 62.962483,
               "vector": 0.000571
             },
             "robust": {
-              "amplitude": 0.012279,
-              "phase": 62.077107,
-              "vector": 0.001723
+              "amplitude": 0.012245,
+              "phase": 62.050395,
+              "vector": 0.001758
             }
           }
         },
@@ -45266,24 +45742,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.003053,
-              "phase": 145.484921,
+              "amplitude": 0.003054,
+              "phase": 145.452928,
               "vector": 0.000078
             },
             "exact": {
-              "amplitude": 0.00307,
-              "phase": 144.972681,
+              "amplitude": 0.003071,
+              "phase": 144.941272,
               "vector": 0.000076
             },
             "joint": {
-              "amplitude": 0.00308,
-              "phase": 144.785494,
+              "amplitude": 0.003081,
+              "phase": 144.746591,
               "vector": 0.000083
             },
             "robust": {
-              "amplitude": 0.001641,
-              "phase": 146.981025,
-              "vector": 0.001363
+              "amplitude": 0.001635,
+              "phase": 146.528155,
+              "vector": 0.001368
             }
           }
         },
@@ -45327,24 +45803,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.006778,
-              "phase": 171.643894,
-              "vector": 0.000224
+              "amplitude": 0.006777,
+              "phase": 171.639403,
+              "vector": 0.000225
             },
             "exact": {
-              "amplitude": 0.006766,
-              "phase": 171.05435,
-              "vector": 0.000238
+              "amplitude": 0.006765,
+              "phase": 171.050534,
+              "vector": 0.000239
             },
             "joint": {
               "amplitude": 0.00674,
-              "phase": 171.08036,
+              "phase": 171.071195,
               "vector": 0.000263
             },
             "robust": {
-              "amplitude": 0.006079,
-              "phase": 163.864622,
-              "vector": 0.001258
+              "amplitude": 0.006095,
+              "phase": 163.924757,
+              "vector": 0.001243
             }
           }
         },
@@ -45388,24 +45864,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.00885,
-              "phase": 201.677239,
-              "vector": 0.000168
+              "amplitude": 0.008849,
+              "phase": 201.670209,
+              "vector": 0.000167
             },
             "exact": {
               "amplitude": 0.008838,
-              "phase": 200.930996,
-              "vector": 0.000167
+              "phase": 200.923675,
+              "vector": 0.000168
             },
             "joint": {
-              "amplitude": 0.008856,
-              "phase": 200.991379,
+              "amplitude": 0.008855,
+              "phase": 200.982285,
               "vector": 0.000148
             },
             "robust": {
-              "amplitude": 0.007363,
-              "phase": 198.23663,
-              "vector": 0.00169
+              "amplitude": 0.007337,
+              "phase": 198.248153,
+              "vector": 0.001715
             }
           }
         },
@@ -45449,24 +45925,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.013581,
-              "phase": 244.958323,
-              "vector": 0.000423
+              "amplitude": 0.013583,
+              "phase": 244.961899,
+              "vector": 0.000422
             },
             "exact": {
-              "amplitude": 0.013541,
-              "phase": 244.843298,
-              "vector": 0.00046
+              "amplitude": 0.013542,
+              "phase": 244.846831,
+              "vector": 0.000459
             },
             "joint": {
               "amplitude": 0.013508,
-              "phase": 244.92024,
-              "vector": 0.000495
+              "phase": 244.916997,
+              "vector": 0.000494
             },
             "robust": {
-              "amplitude": 0.013396,
-              "phase": 244.355317,
-              "vector": 0.00061
+              "amplitude": 0.013427,
+              "phase": 244.395693,
+              "vector": 0.000577
             }
           }
         },
@@ -45510,24 +45986,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.01576,
-              "phase": 273.238821,
-              "vector": 0.000243
+              "amplitude": 0.015759,
+              "phase": 273.237044,
+              "vector": 0.000244
             },
             "exact": {
-              "amplitude": 0.015779,
-              "phase": 273.173995,
-              "vector": 0.000222
+              "amplitude": 0.015778,
+              "phase": 273.172068,
+              "vector": 0.000223
             },
             "joint": {
               "amplitude": 0.015825,
-              "phase": 273.182028,
+              "phase": 273.183094,
               "vector": 0.000176
             },
             "robust": {
-              "amplitude": 0.015712,
-              "phase": 271.496101,
-              "vector": 0.000529
+              "amplitude": 0.015738,
+              "phase": 271.480809,
+              "vector": 0.000519
             }
           }
         },
@@ -45571,24 +46047,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.017087,
-              "phase": 299.585387,
-              "vector": 0.000144
+              "amplitude": 0.017088,
+              "phase": 299.587669,
+              "vector": 0.000145
             },
             "exact": {
-              "amplitude": 0.017108,
-              "phase": 299.484122,
-              "vector": 0.000137
+              "amplitude": 0.017109,
+              "phase": 299.486715,
+              "vector": 0.000138
             },
             "joint": {
-              "amplitude": 0.017222,
-              "phase": 299.550199,
-              "vector": 0.000245
+              "amplitude": 0.017223,
+              "phase": 299.553357,
+              "vector": 0.000246
             },
             "robust": {
-              "amplitude": 0.017088,
-              "phase": 298.869355,
-              "vector": 0.000132
+              "amplitude": 0.017046,
+              "phase": 298.686134,
+              "vector": 0.000159
             }
           }
         },
@@ -45632,24 +46108,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.019431,
-              "phase": 315.350319,
+              "amplitude": 0.019432,
+              "phase": 315.349795,
               "vector": 0.000571
             },
             "exact": {
               "amplitude": 0.019428,
-              "phase": 315.313998,
+              "phase": 315.312892,
               "vector": 0.000573
             },
             "joint": {
               "amplitude": 0.019504,
-              "phase": 315.255664,
+              "phase": 315.257757,
               "vector": 0.000496
             },
             "robust": {
-              "amplitude": 0.018742,
-              "phase": 316.299895,
-              "vector": 0.001311
+              "amplitude": 0.018712,
+              "phase": 316.262571,
+              "vector": 0.001337
             }
           }
         },
@@ -45693,24 +46169,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.034042,
-              "phase": 336.520089,
-              "vector": 0.000137
+              "amplitude": 0.034043,
+              "phase": 336.524698,
+              "vector": 0.00014
             },
             "exact": {
-              "amplitude": 0.034029,
-              "phase": 336.493606,
-              "vector": 0.000119
+              "amplitude": 0.03403,
+              "phase": 336.498335,
+              "vector": 0.000122
             },
             "joint": {
-              "amplitude": 0.034035,
-              "phase": 336.582327,
-              "vector": 0.000171
+              "amplitude": 0.034036,
+              "phase": 336.586515,
+              "vector": 0.000174
             },
             "robust": {
-              "amplitude": 0.033315,
-              "phase": 335.870542,
-              "vector": 0.00073
+              "amplitude": 0.033416,
+              "phase": 336.059665,
+              "vector": 0.000601
             }
           }
         },
@@ -45754,24 +46230,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.012707,
-              "phase": 346.526696,
+              "amplitude": 0.012708,
+              "phase": 346.531088,
               "vector": 0.000297
             },
             "exact": {
-              "amplitude": 0.012719,
-              "phase": 346.346625,
+              "amplitude": 0.01272,
+              "phase": 346.35108,
               "vector": 0.000281
             },
             "joint": {
-              "amplitude": 0.01282,
-              "phase": 346.427904,
-              "vector": 0.000183
+              "amplitude": 0.012821,
+              "phase": 346.42947,
+              "vector": 0.000182
             },
             "robust": {
-              "amplitude": 0.012801,
-              "phase": 344.356176,
-              "vector": 0.000481
+              "amplitude": 0.012415,
+              "phase": 343.991449,
+              "vector": 0.000777
             }
           }
         },
@@ -45815,24 +46291,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.018725,
-              "phase": 22.561488,
-              "vector": 0.000276
+              "amplitude": 0.018724,
+              "phase": 22.558242,
+              "vector": 0.000277
             },
             "exact": {
-              "amplitude": 0.018701,
-              "phase": 22.560498,
-              "vector": 0.000299
+              "amplitude": 0.0187,
+              "phase": 22.557133,
+              "vector": 0.000301
             },
             "joint": {
               "amplitude": 0.018719,
-              "phase": 22.62304,
-              "vector": 0.000283
+              "phase": 22.625995,
+              "vector": 0.000284
             },
             "robust": {
-              "amplitude": 0.017945,
-              "phase": 22.989924,
-              "vector": 0.001066
+              "amplitude": 0.018029,
+              "phase": 22.988021,
+              "vector": 0.000983
             }
           }
         },
@@ -45876,24 +46352,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.009601,
-              "phase": 204.198167,
-              "vector": 0.000602
+              "amplitude": 0.0096,
+              "phase": 204.202252,
+              "vector": 0.0006
             },
             "exact": {
-              "amplitude": 0.00958,
-              "phase": 203.972527,
-              "vector": 0.00058
+              "amplitude": 0.009578,
+              "phase": 203.976198,
+              "vector": 0.000578
             },
             "joint": {
-              "amplitude": 0.009577,
-              "phase": 203.9067,
-              "vector": 0.000577
+              "amplitude": 0.009576,
+              "phase": 203.907754,
+              "vector": 0.000576
             },
             "robust": {
-              "amplitude": 0.009235,
-              "phase": 201.098491,
-              "vector": 0.000518
+              "amplitude": 0.009216,
+              "phase": 201.247813,
+              "vector": 0.000488
             }
           }
         },
@@ -45937,24 +46413,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.014514,
-              "phase": 276.557905,
-              "vector": 0.000521
+              "amplitude": 0.014499,
+              "phase": 276.555675,
+              "vector": 0.000507
             },
             "exact": {
-              "amplitude": 0.014513,
-              "phase": 276.576223,
-              "vector": 0.000521
+              "amplitude": 0.014498,
+              "phase": 276.575453,
+              "vector": 0.000507
             },
             "joint": {
-              "amplitude": 0.014531,
-              "phase": 276.471102,
-              "vector": 0.000535
+              "amplitude": 0.014519,
+              "phase": 276.506234,
+              "vector": 0.000525
             },
             "robust": {
-              "amplitude": 0.013919,
-              "phase": 278.405885,
-              "vector": 0.000543
+              "amplitude": 0.01392,
+              "phase": 278.613233,
+              "vector": 0.000593
             }
           }
         },
@@ -45998,85 +46474,24 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.018293,
-              "phase": 298.687154,
-              "vector": 0.000318
+              "amplitude": 0.018324,
+              "phase": 298.699338,
+              "vector": 0.000347
             },
             "exact": {
-              "amplitude": 0.018283,
-              "phase": 298.695849,
-              "vector": 0.00031
+              "amplitude": 0.018314,
+              "phase": 298.709524,
+              "vector": 0.00034
             },
             "joint": {
-              "amplitude": 0.018292,
-              "phase": 298.787296,
-              "vector": 0.00033
+              "amplitude": 0.018321,
+              "phase": 298.765,
+              "vector": 0.000354
             },
             "robust": {
-              "amplitude": 0.01751,
-              "phase": 297.977946,
-              "vector": 0.0005
-            }
-          }
-        },
-        {
-          "name": "4MSL12",
-          "candidate": "6MSN12",
-          "speed": 175.464896,
-          "noaa": {
-            "amplitude": 0.008,
-            "phase": 307
-          },
-          "window": {
-            "as": null,
-            "amplitude": 0.008169,
-            "phase": 126.508473,
-            "amplitude_ci": 0.000536,
-            "phase_ci": 3.757959,
-            "snr": 892.713651,
-            "d": {
-              "amplitude": 0.000169,
-              "relative": 0.021091,
-              "phase": 179.508473,
-              "vector": 0.016169,
-              "ratio": 47.763312
-            }
-          },
-          "standard": {
-            "as": null,
-            "amplitude": 0.008742,
-            "phase": 124.092085,
-            "amplitude_ci": 0.000312,
-            "phase_ci": 2.046111,
-            "snr": 3015.583074,
-            "d": {
-              "amplitude": 0.000742,
-              "relative": 0.092711,
-              "phase": 177.092085,
-              "vector": 0.016736,
-              "ratio": 86.524764
-            }
-          },
-          "steps": {
-            "yearly": {
-              "amplitude": 0.008076,
-              "phase": 128.029027,
-              "vector": 0.016076
-            },
-            "exact": {
-              "amplitude": 0.008072,
-              "phase": 127.98213,
-              "vector": 0.016071
-            },
-            "joint": {
-              "amplitude": 0.007964,
-              "phase": 127.043857,
-              "vector": 0.015964
-            },
-            "robust": {
-              "amplitude": 0.008363,
-              "phase": 125.860983,
-              "vector": 0.016362
+              "amplitude": 0.017589,
+              "phase": 297.956692,
+              "vector": 0.000425
             }
           }
         },
@@ -46120,24 +46535,85 @@
           },
           "steps": {
             "yearly": {
-              "amplitude": 0.013977,
-              "phase": 343.163448,
-              "vector": 0.000046
+              "amplitude": 0.01397,
+              "phase": 342.978674,
+              "vector": 0.00003
             },
             "exact": {
-              "amplitude": 0.013949,
-              "phase": 343.221046,
-              "vector": 0.000074
+              "amplitude": 0.013942,
+              "phase": 343.03727,
+              "vector": 0.000059
             },
             "joint": {
-              "amplitude": 0.013961,
-              "phase": 343.335561,
-              "vector": 0.000091
+              "amplitude": 0.013936,
+              "phase": 343.177398,
+              "vector": 0.000077
             },
             "robust": {
-              "amplitude": 0.013347,
-              "phase": 343.985732,
-              "vector": 0.000694
+              "amplitude": 0.013378,
+              "phase": 343.224234,
+              "vector": 0.000624
+            }
+          }
+        },
+        {
+          "name": "THETA1",
+          "candidate": "theta1",
+          "speed": 15.51259,
+          "noaa": {
+            "amplitude": 0.012,
+            "phase": 310.7
+          },
+          "window": {
+            "as": null,
+            "amplitude": 0.011128,
+            "phase": 314.589164,
+            "amplitude_ci": 0.002533,
+            "phase_ci": 13.043418,
+            "snr": 74.132139,
+            "d": {
+              "amplitude": -0.000872,
+              "relative": -0.072653,
+              "phase": 3.889164,
+              "vector": 0.001173,
+              "ratio": 0.337644
+            }
+          },
+          "standard": {
+            "as": null,
+            "amplitude": 0.009908,
+            "phase": 291.671951,
+            "amplitude_ci": 0.000808,
+            "phase_ci": 4.672627,
+            "snr": 577.780781,
+            "d": {
+              "amplitude": -0.002092,
+              "relative": -0.17435,
+              "phase": -19.028049,
+              "vector": 0.004168,
+              "ratio": 4.072005
+            }
+          },
+          "steps": {
+            "yearly": {
+              "amplitude": 0.011754,
+              "phase": 310.793189,
+              "vector": 0.000247
+            },
+            "exact": {
+              "amplitude": 0.01174,
+              "phase": 311.423067,
+              "vector": 0.0003
+            },
+            "joint": {
+              "amplitude": 0.01138,
+              "phase": 312.046601,
+              "vector": 0.000678
+            },
+            "robust": {
+              "amplitude": 0.011151,
+              "phase": 313.92542,
+              "vector": 0.00107
             }
           }
         },
@@ -46182,23 +46658,23 @@
           "steps": {
             "yearly": {
               "amplitude": 0.025072,
-              "phase": 31.026206,
+              "phase": 31.022801,
               "vector": 0.000073
             },
             "exact": {
               "amplitude": 0.025016,
-              "phase": 31.289273,
-              "vector": 0.000127
+              "phase": 31.285911,
+              "vector": 0.000126
             },
             "joint": {
               "amplitude": 0.024956,
-              "phase": 30.983793,
+              "phase": 30.981086,
               "vector": 0.000045
             },
             "robust": {
-              "amplitude": 0.023559,
-              "phase": 27.299024,
-              "vector": 0.002129
+              "amplitude": 0.023589,
+              "phase": 27.402186,
+              "vector": 0.002078
             }
           }
         }
@@ -46317,6 +46793,29 @@
               "vector": 0.000405,
               "ratio": 0.735913
             }
+          }
+        }
+      },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.992945,
+            "rms": 0.032738,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 73,
+          "held": {
+            "variance": 0.992343,
+            "rms": 0.034153,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.992889,
+            "rms": 0.032868,
+            "seen": false
           }
         }
       },
@@ -48678,6 +49177,29 @@
               "vector": 0.000334,
               "ratio": 0.643421
             }
+          }
+        }
+      },
+      "tier": {
+        "year_before": 2005,
+        "with": {
+          "before": {
+            "variance": 0.963054,
+            "rms": 0.017049,
+            "seen": false
+          }
+        },
+        "without": {
+          "kept": 74,
+          "held": {
+            "variance": 0.966233,
+            "rms": 0.016644,
+            "seen": false
+          },
+          "before": {
+            "variance": 0.96325,
+            "rms": 0.017003,
+            "seen": false
           }
         }
       },

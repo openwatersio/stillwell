@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { constituents } from "@slackwater/engine";
 import { CANDIDATES } from "../src/fit/candidates.ts";
 import { Flag, type StoredStation } from "../src/schema.ts";
 import { readYearStats, writeObservations } from "../src/store/parquet.ts";
@@ -15,6 +16,7 @@ import {
   median,
   analysisYears,
   checkCopy,
+  MISNAMED,
   noaaConstants,
   phaseDifference,
   vectorAverage,
@@ -31,7 +33,19 @@ describe("candidateOf", () => {
     assert.equal(candidateOf("RHO")?.name, "rho1");
     assert.equal(candidateOf("SSA")?.name, "Ssa");
     assert.equal(candidateOf("m2"), undefined);
+    assert.equal(candidateOf("CHI1")?.name, "chi1");
+    // NOAA's SIGMA1 and 4MSL12 aren't the lines the catalog gives those names.
     assert.equal(candidateOf("SIGMA1"), undefined);
+    assert.equal(candidateOf("4MSL12"), undefined);
+  });
+
+  it("gives no candidate a spelling the catalog reads as another constituent", () => {
+    for (const c of CANDIDATES)
+      for (const spelling of c.spellings ?? []) {
+        const entry = constituents[spelling];
+        if (entry) assert.equal(entry.name, c.name, `${spelling} of ${c.name}`);
+        assert.ok(!MISNAMED.includes(spelling), `${spelling} is misnamed in the catalog`);
+      }
   });
 
   it("has 37 candidates from NOAA's standard list", () => {
@@ -186,6 +200,16 @@ describe("noaaConstants", () => {
     const broken = answer();
     broken.HarmonicConstituents[3]!.amplitude = NaN;
     assert.throws(() => noaaConstants("coops/1", broken), /isn't a number/);
+    const negative = answer();
+    negative.HarmonicConstituents[3]!.amplitude = -1;
+    assert.throws(() => noaaConstants("coops/1", negative), /under zero/);
+    const turned = answer();
+    turned.HarmonicConstituents[3]!.phase_GMT = 999;
+    assert.throws(() => noaaConstants("coops/1", turned), /outside 0 to 360/);
+    // NOAA publishes a phase of 360.0.
+    const full = answer();
+    full.HarmonicConstituents[3]!.phase_GMT = 360;
+    assert.equal(noaaConstants("coops/1", full).constants[3]!.phase, 360);
   });
 });
 

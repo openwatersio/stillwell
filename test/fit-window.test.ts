@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import { createTidePredictor } from "@slackwater/engine";
+import { CANDIDATES } from "../src/fit/candidates.ts";
 import { engineVersion, fitStation, type FitContext } from "../src/fit/fit.ts";
 import { emptyInputs, readSeries, Unfit } from "../src/fit/series.ts";
 import { fitSamples } from "../src/fit/window.ts";
@@ -114,6 +115,20 @@ describe("fitSamples", () => {
       window.verdicts.map(({ name, kept, reason, conflict }) => ({ name, kept, reason, conflict })),
       rows.map((r) => ({ name: r.name, kept: r.kept, reason: r.reason, conflict: r.conflict })),
     );
+  });
+
+  it("starts from the candidates it is given, with a verdict for each in their order", () => {
+    const samples = [2021, 2022].flatMap((year) =>
+      yearOfValues(year).map(({ time, level }) => ({ time, level })),
+    );
+    const list = CANDIDATES.filter((c) => ["M2", "K1", "Sa", "M4"].includes(c.name));
+    const window = fitSamples(samples, list);
+    assert.deepEqual(
+      window.verdicts.map((v) => v.name),
+      list.map((c) => c.name),
+    );
+    assert.ok(window.constituents.every((c) => list.some((x) => x.name === c.name)));
+    assert.ok(window.constituents.some((c) => c.name === "M2"));
   });
 
   it("refuses a record under half a year", () => {

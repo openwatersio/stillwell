@@ -36,7 +36,7 @@ Every fit starts from the same candidates in the same priority order, defined in
 3. The constituents TICON-4's 50 add ([TICON-4 manual](https://doi.org/10.17882/109129)).
 4. The 59 shallow-water compounds NOAA publishes for Anchorage beyond its 37 that fall on a line none of the three lists has, largest at Anchorage first.
 
-Starting from one list makes fits comparable between gauges, and including NOAA's and TICON's names lets a fit be compared with either name for name. The shallow-water compounds are there because a large tide in shallow water has energy on them: with the first three lists alone, the 19-year fit at Anchorage left 202 mm RMS in the held-out year's tidal band, against 176 mm for NOAA's constants, and with them it leaves 159 mm. Over the [calibration](results/fit-calibration.md)'s 20 gauges they lower that RMS by 0.1 mm or more at 12 and raise it at none. A window of five years keeps more of them than it should: they raise the held-out RMS by about 0.5 mm at Honolulu and Pago Pago in fits of NOAA's five analysis years.
+Starting from one list makes fits comparable between gauges, and including NOAA's and TICON's names lets a fit be compared with either name for name. The shallow-water compounds are there because a large tide in shallow water has energy on them, and selection drops them where a gauge has none. The [calibration](results/fit-calibration.md#the-shallow-water-candidates) fits each of its gauges with and without them and scores both, on the held-out year and on a year neither fit read. They about double the time a fit takes, and a window of five years keeps more of them than a gauge has, which shows in the calibration's fits of NOAA's analysis years.
 
 A candidate is kept when it passes two tests:
 

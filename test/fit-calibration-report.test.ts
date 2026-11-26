@@ -53,14 +53,17 @@ describe("render", () => {
     const report = read();
     assert.match(
       section(render(report), "### Defects"),
-      /the candidate list predicts worse than NOAA's constituents at/,
+      /the candidate list and its selection predict worse than NOAA's constituents at/,
     );
     for (const result of report.results) result.scores.window.rms = result.scores.steps.robust.rms;
     const defects = section(render(report), "### Defects");
-    assert.doesNotMatch(defects, /the candidate list predicts worse than NOAA's constituents at/);
+    assert.doesNotMatch(
+      defects,
+      /the candidate list and its selection predict worse than NOAA's constituents at/,
+    );
     assert.match(
       defects,
-      /the candidate list predicts no worse than NOAA's constituents at any station/,
+      /the candidate list and its selection predict no worse than NOAA's constituents at any station/,
     );
   });
 

@@ -25,7 +25,7 @@
  */
 import "./threadpool.ts";
 import { existsSync, statSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { isMainThread, parentPort, Worker } from "node:worker_threads";
@@ -36,6 +36,7 @@ import {
   type FittedConstituent,
 } from "@slackwater/engine";
 import type { Erratum } from "../src/errata.ts";
+import { CANDIDATES } from "../src/fit/candidates.ts";
 import {
   candidateOf,
   difference,
@@ -43,6 +44,7 @@ import {
   analysisYears,
   candidatesDigest,
   checkCopy,
+  MISNAMED,
   noaaConstants,
   vectorAverage,
 } from "../src/fit/calibration.ts";
@@ -92,10 +94,11 @@ const REPORT_PATH = "docs/results/fit-calibration.md";
  * from 0.2 m to 8 m and latitudes from 14°S to 61°N. `comment` is NOAA's own
  * note on the constants, and `years` the analysis years it names. A run stops
  * where NOAA's comment no longer reads the same, since its constants are then
- * from another analysis.
+ * from another analysis, and where NOAA sends another number of constituents
+ * than `constituents`, 37 where not given.
  */
 // prettier-ignore
-const STATIONS: { id: string; why: string; years: number[]; comment: string }[] = [
+const STATIONS: { id: string; why: string; years: number[]; comment: string; constituents?: number }[] = [
   { id: "1612340", why: "Mixed tide in the open Pacific at 21°N; a gauge of the nodal comparison in docs/fits.md", years: [2014, 2015, 2016, 2017, 2018], comment: "Vector Average of 5 years, 2014-2018.  Sa, Mm, and Mf from 17 years (1998-2018)." },
   { id: "1820000", why: "Semidiurnal tide on an atoll at 9°N, the lowest latitude; a gauge of the nodal comparison", years: [2014, 2015, 2016, 2017, 2018], comment: "Vector Averaged from 5 years 2014-2018.  Sa, Mm, and Mf from average of 15 years (2000-2018)" },
   { id: "1770000", why: "The only gauge south of the equator, at 14°S; NOAA's years aren't consecutive", years: [2016, 2017, 2018, 2019, 2022], comment: "Vector Averaged of 5 years (2016-2019, 2022).  MM, MF from 18 year average (2000-2022)  Sa and SSa from 20 year monthly means" },
@@ -113,7 +116,7 @@ const STATIONS: { id: string; why: string; years: number[]; comment: string }[] 
   { id: "9410170", why: "Mixed tide on the Pacific coast at 33°N, on a record from 1906", years: [2017, 2018, 2019, 2020, 2021], comment: "Vector Average of 5 years (2017-2021). Sa from average of 20 years (2002-2021), other long period constituents are unstable." },
   { id: "9435380", why: "Mixed tide on the open Pacific coast at 45°N; an earlier analysis, of six years", years: [2007, 2008, 2009, 2010, 2011, 2012], comment: "Mean of six 1-year LSQHA (2007-2012).  Sa and Ssa from 20 years of MSL (1994-2013). Mf from mean of six LSQHA (2007-2012)." },
   { id: "9449880", why: "Mixed, mainly diurnal tide in the Salish Sea, K1 0.76 m", years: [2011, 2012, 2013, 2014, 2015, 2016], comment: "6 Year Vector Averaged (2011-2016).  Sa, SSa, and MF from 20 years (1997-2016)." },
-  { id: "9455920", why: "The largest tide, M2 3.5 m at 61°N, with ice in winter; NOAA publishes 120 constituents", years: [2012, 2013, 2014, 2015, 2016], comment: "5-year (2012-2016) Vector Averaged.  Mm, Msf, Mf from average of 20 years (1996-2016).  Sa and SSa from 20year analysis." },
+  { id: "9455920", why: "The largest tide, M2 3.5 m at 61°N, with ice in winter; NOAA publishes 120 constituents", years: [2012, 2013, 2014, 2015, 2016], comment: "5-year (2012-2016) Vector Averaged.  Mm, Msf, Mf from average of 20 years (1996-2016).  Sa and SSa from 20year analysis.", constituents: 120 },
   { id: "9462620", why: "Mixed, mainly diurnal tide in the Aleutians at 54°N", years: [2020, 2021, 2022, 2023, 2024], comment: "Vector Average of 5 years (2020-2024).  Sa and Mf from mean of 18 years (2005-2024)." },
   { id: "9751639", why: "Small mixed, mainly diurnal tide in the Caribbean, K1 0.08 m", years: [2007, 2008, 2009, 2010, 2011, 2012], comment: "Average of 6 LSQHA (2007-2012).  Sa and SSa from 20 year analyses (1993-2012).  Mm and Msf are not used." },
 ];
@@ -211,6 +214,7 @@ async function calibrate(task: Task): Promise<Result> {
   const names = [
     ...new Set(
       noaa.flatMap((c) => {
+        if (MISNAMED.includes(c.name)) return [];
         const name = candidateOf(c.name)?.name ?? catalog[c.name]?.name;
         return name ? [name] : [];
       }),
@@ -292,6 +296,34 @@ async function calibrate(task: Task): Promise<Result> {
   });
   const seen = pinned.years.includes(fit.held_out);
 
+  // The standard window again without the shallow-water tier, and both scored on a second year.
+  const since = Date.parse(fit.since!);
+  const standardSamples = await read({ start: since, end: Date.parse(fit.until!) });
+  const without = fitSamples(
+    standardSamples,
+    CANDIDATES.filter((c) => c.from.some((list) => list !== "shallow")),
+  );
+  const yearBefore = new Date(since).getUTCFullYear() - 1;
+  const before = await read(yearSpan(yearBefore));
+  const half = (yearSpan(yearBefore).end - yearSpan(yearBefore).start) / 3_600_000 / 2;
+  const scoreBefore = (constants: Constant[]): Score | null =>
+    before.length >= half && tidalResiduals([], before).size >= half
+      ? {
+          variance: varianceExplained(constants, before),
+          rms: rmsOf(tidalResiduals(constants, before)).rms,
+          seen: false,
+        }
+      : null;
+  const tier: Result["tier"] = {
+    year_before: yearBefore,
+    with: { before: scoreBefore(standard.constituents) },
+    without: {
+      kept: without.constituents.length,
+      held: score(without.constituents, false),
+      before: scoreBefore(without.constituents),
+    },
+  };
+
   const held = new Map(
     rows.flatMap((row) => {
       const s = fittedSide(row.window);
@@ -346,14 +378,18 @@ async function calibrate(task: Task): Promise<Result> {
     years: pinned.years,
     marked: task.marked,
     unlisted: noaa.filter((c) => !candidateOf(c.name)).map((c) => c.name),
-    unknown: noaa.filter((c) => !candidateOf(c.name) && !catalog[c.name]).map((c) => c.name),
+    unknown: noaa
+      .filter((c) => !candidateOf(c.name) && (!catalog[c.name] || MISNAMED.includes(c.name)))
+      .map((c) => c.name),
     held_out: fit.held_out,
     scores: {
       standard: score(standard.constituents, false),
       window: score(window.constituents, seen),
       // A name the candidate list doesn't have goes to the predictor as NOAA spells it.
       noaa: score(
-        noaa.map((c) => ({ ...c, name: candidateOf(c.name)?.name ?? c.name })),
+        noaa
+          .filter((c) => !MISNAMED.includes(c.name))
+          .map((c) => ({ ...c, name: candidateOf(c.name)?.name ?? c.name })),
         seen,
       ),
       steps: Object.fromEntries(STEPS.map((k) => [k, score(steps[k], seen)])) as Record<
@@ -373,9 +409,17 @@ async function calibrate(task: Task): Promise<Result> {
       kept: window.constituents.length,
     },
     renamed,
+    tier,
     yearly: whole.map(([y]) => y),
     rows,
   };
+}
+
+/** Throws unless `report` holds every calibration station once, in the list's order. */
+function complete(report: Report): void {
+  const ids = report.results.map((r) => r.id).join();
+  if (ids !== STATIONS.map((s) => `${SOURCE}/${s.id}`).join())
+    throw new Error(`${JSON_PATH} doesn't hold the calibration's stations, each once`);
 }
 
 async function main(): Promise<void> {
@@ -387,6 +431,7 @@ async function main(): Promise<void> {
     : null;
   if (values.report) {
     if (!previous) throw new Error(`no ${JSON_PATH} to write the report from`);
+    complete(previous);
     await writeFile(REPORT_PATH, render(previous));
     return;
   }
@@ -444,6 +489,10 @@ async function main(): Promise<void> {
     if (!station) throw new Error(`${STORE} lists no ${SOURCE}/${pin.id}`);
     await checkCopy(STORE, station, all);
     const { comment, constants } = noaaConstants(station.id, await harmonicConstants(pin.id));
+    if (constants.length !== (pin.constituents ?? 37))
+      throw new Error(
+        `${station.id}: NOAA sent ${constants.length} constituents where ${pin.constituents ?? 37} are expected`,
+      );
     if (comment !== pin.comment)
       throw new Error(
         `${station.id}: NOAA's comment on its constants read "${pin.comment}" and now reads "${comment}"; set its years from that`,
@@ -533,9 +582,13 @@ async function main(): Promise<void> {
   // Both files from the numbers as the JSON holds them, and neither written unless both can be.
   const json = JSON.stringify(report, rounded, 2) + "\n";
   const markdown = render(JSON.parse(json) as Report);
+  complete(report);
+  // Both written beside their places first, so a write that fails leaves the pair as it was.
   await mkdir("docs/results", { recursive: true });
-  await writeFile(JSON_PATH, json);
-  await writeFile(REPORT_PATH, markdown);
+  await writeFile(`${JSON_PATH}.tmp`, json);
+  await writeFile(`${REPORT_PATH}.tmp`, markdown);
+  await rename(`${JSON_PATH}.tmp`, JSON_PATH);
+  await rename(`${REPORT_PATH}.tmp`, REPORT_PATH);
   console.error(`wrote ${JSON_PATH} and ${REPORT_PATH}`);
   // The workers wait for another station.
   process.exit(0);

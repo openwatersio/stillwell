@@ -5,7 +5,7 @@ import {
   type FittedConstituent,
 } from "@slackwater/engine";
 import type { Sample } from "../types.ts";
-import { CANDIDATES } from "./candidates.ts";
+import { CANDIDATES, type Candidate } from "./candidates.ts";
 import {
   harmonicSamples,
   NODE_CORRECTIONS,
@@ -68,15 +68,20 @@ export function tooShort(samples: readonly Sample[]): boolean {
  * It is the fit `fitStation` makes of the 19 years before its held-out year,
  * and fits whatever window a caller read, such as the years an agency
  * analyzed, so the two are one method. The samples needn't be contiguous.
+ * `list` is the candidates to start from, in priority order, where they
+ * aren't the whole list; the verdicts are in its order.
  * Throws `Unfit` for a record too short to fit.
  */
-export function fitSamples(samples: readonly Sample[]): WindowFit {
+export function fitSamples(
+  samples: readonly Sample[],
+  list: readonly Candidate[] = CANDIDATES,
+): WindowFit {
   if (tooShort(samples)) throw new Unfit(`under ${MIN_FIT_DAYS} days of values`);
 
   // Sa and Ssa leave the selection and are judged by their yearly spread. Selection tests each
   // candidate in a plain fit; the robust weights enter with the fit of those it keeps.
   const seasonal: readonly string[] = SEASONAL;
-  const candidates = CANDIDATES.filter((c) => !seasonal.includes(c.name));
+  const candidates = list.filter((c) => !seasonal.includes(c.name));
   const engineSamples = harmonicSamples(samples);
   const { selection } = selectConstituents(engineSamples, {
     candidates: candidates.map(({ name }) => ({ name })),
@@ -118,7 +123,7 @@ export function fitSamples(samples: readonly Sample[]): WindowFit {
     constituents: kept,
     fitted: fitted.constituents,
     yearly,
-    verdicts: CANDIDATES.map(({ name }) => {
+    verdicts: list.map(({ name }) => {
       const verdict = verdicts.get(name);
       const isKept = names.has(name);
       return {

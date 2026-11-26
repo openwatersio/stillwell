@@ -100,6 +100,17 @@ export interface Result {
    * `rows` those constituents against NOAA's. Null where the fit holds every line under NOAA's name.
    */
   renamed: { held: Record<string, string>; score: Score; rows: Record<string, Side> } | null;
+  /**
+   * The standard window fitted again without the candidates only the shallow-water tier has, and
+   * both fits scored on the held-out year and on `year_before`, the year before the window, which
+   * the choice of candidates was never judged on. `before` is null where the store holds under half
+   * of that year.
+   */
+  tier: {
+    year_before: number;
+    with: { before: Score | null };
+    without: { kept: number; held: Score; before: Score | null };
+  };
   /** The years of NOAA's fitted by themselves. */
   yearly: number[];
   rows: Row[];
@@ -180,6 +191,7 @@ export function render(report: Report): string {
   // The findings compare scores, so a report without one, or with no station to compare on, isn't written.
   for (const r of results)
     for (const score of [
+      r.tier.without.held,
       r.scores.standard,
       r.scores.window,
       r.scores.noaa,
@@ -504,6 +516,37 @@ export function render(report: Report): string {
     `From each step to the next, over the ${unseen.length} stations whose NOAA years don't include the held-out one, the RMS is: with node factors at each sample, ${tally(1)}; with one fit of all years, ${tally(2)}; with robust weights, ${tally(3)}; and with the store's constituents, ${tally(4)}. A change under 0.1 mm counts as neither.`,
   );
 
+  p("## The shallow-water candidates");
+  p(
+    "The candidate list's last tier is the shallow-water compounds NOAA publishes for Anchorage ([Constituents](../fits.md#constituents)). The standard window is fitted here with the whole list and again without the candidates only that tier has, and both sets of constants are scored on the held-out year and on the year before the window. The tier was added on the evidence of the held-out year, so that year can't also test it. The year before the window was read by neither fit and judged no choice of candidates.",
+  );
+  const side = (x: Score | null) => (x ? mm(x.rms) : "");
+  p(
+    table(
+      [
+        "Station",
+        "Kept without",
+        "Kept with",
+        "Held-out year: without (mm)",
+        "With (mm)",
+        "Year before",
+        "Without (mm)",
+        "With (mm)",
+      ],
+      results.map((r) => [
+        `\`${r.id}\` ${r.name}`,
+        String(r.tier.without.kept),
+        String(r.standard.kept),
+        mm(r.tier.without.held.rms),
+        mm(r.scores.standard.rms),
+        String(r.tier.year_before),
+        side(r.tier.without.before),
+        side(r.tier.with.before),
+      ]),
+    ),
+  );
+  p(tierFinding(results));
+
   p("## Each station");
   p(
     "NOAA's constants, then each fit's difference from them, the fit's minus NOAA's. ±A and ±g are the half-widths of the fit's 95% intervals. A ratio in bold is outside the interval. Where a fit holds a line under another name, the name is in brackets. A fit without the constituent says why: `snr` is under the signal-to-noise limit, `rayleigh` names the constituent the record can't separate it from, and `seasonal` is Sa or Ssa under twice the standard error of its yearly fits.",
@@ -516,7 +559,7 @@ export function render(report: Report): string {
         `NOAA's years, ${spans(r.years)}: ${r.window.hours.toLocaleString("en-US")} hourly values, ${r.window.kept} constituents kept.`,
         `Standard, ${r.standard.since.slice(0, 4)} to ${+r.standard.until.slice(0, 4) - 1}: ${r.standard.hours.toLocaleString("en-US")} hourly values, ${r.standard.kept} kept.`,
         r.unknown.length
-          ? `The engine's catalog lacks ${r.unknown.join(", ")} of them, which no fit or prediction here holds.`
+          ? `The engine's catalog has no line that is NOAA's ${r.unknown.join(", ")}, which no fit or prediction here holds as NOAA's.`
           : "",
         r.unlisted.length
           ? `NOAA also publishes ${r.unlisted.length} constituents the candidate list doesn't have, which aren't compared.`
@@ -591,6 +634,33 @@ function spans(years: number[]): string {
     i = j + 1;
   }
   return out.join(", ");
+}
+
+/** Counts of stations where the shallow-water tier lowers and raises a score by 0.1 mm or more. */
+function tierCounts(results: Result[], which: "held" | "before") {
+  const changes = results.flatMap((r) => {
+    const [a, b] =
+      which === "held"
+        ? [r.tier.without.held.rms, r.scores.standard.rms]
+        : [r.tier.without.before?.rms ?? null, r.tier.with.before?.rms ?? null];
+    return a === null || b === null || a === undefined ? [] : [{ r, change: b - a }];
+  });
+  return {
+    of: changes.length,
+    lower: changes.filter((x) => x.change <= -0.0001),
+    higher: changes.filter((x) => x.change >= 0.0001),
+    changes,
+  };
+}
+
+function tierFinding(results: Result[]): string {
+  const say = (which: "held" | "before") => {
+    const c = tierCounts(results, which);
+    if (!c.of) return "no station can be scored";
+    const most = [...c.changes].sort((a, b) => a.change - b.change)[0]!;
+    return `the RMS is lower at ${c.lower.length} and higher at ${c.higher.length} of ${c.of} stations${c.higher.length ? ` (${c.higher.map((x) => `${x.r.name} ${signed(x.change * 1000)} mm`).join(", ")})` : ""}, and falls most at ${most.r.name}, by ${mm(-most.change)} mm`;
+  };
+  return `With the tier, on the held-out year ${say("held")}. On the year before the window ${say("before")}. A change under 0.1 mm counts as neither.`;
 }
 
 type Stats = { compared: number; outside: number; major: number; majorOutside: number };
@@ -745,6 +815,9 @@ function findings(report: Report, w: Stats, s: Stats): string {
     `- **The store's method over NOAA's years is close to NOAA on the major constituents.** Their amplitudes differ by a median of ${percent(median(pairsOf(results, "window", MAJOR).relative), 2)}% and their phases by ${median(pairsOf(results, "window", MAJOR).phase)!.toFixed(2)}°. ${w.majorOutside} of ${w.major} are outside the fit's interval, and the next section says which steps of the method move them.`,
     `- **The standard fit predicts the held-out year better than NOAA's constants at ${better} of ${unseen.length} stations** whose NOAA analysis didn't read that year${behind.length ? `; the rest: ${behind.map((r) => r.name).join(", ")}` : ""}. It explains ${percent(Math.min(...variances), 1)}% to ${percent(max(variances), 1)}% of the tidal band's variance, the least at ${lowest.name}.`,
   );
+  p(
+    `- **The shallow-water candidates.** ${tierFinding(results)} [The shallow-water candidates](#the-shallow-water-candidates) has each station.`,
+  );
   p("### What differs, and why");
   p(
     `In the fit of NOAA's years, ${w.outside} of ${w.compared} short-period constants are outside the fit's interval. The constituents most often outside are ${often.map(([name, c]) => `${name} (${c})`).join(", ")}. [Where the differences come from](#where-the-differences-come-from) takes the method apart one step at a time, and the counts here are of the step that moves a constant furthest:`,
@@ -771,21 +844,21 @@ function findings(report: Report, w: Stats, s: Stats): string {
     `- **The standard fit reads other years.** ${s.outside} of ${s.compared} of its constants are outside the interval, which 19 years make narrow. [Constituents across stations](#constituents-across-stations) gives how far the standard fit is from the store's own fit of NOAA's years, which is what the two periods differ by under one method: M2 is a median ${mm(median(moved("M2")), 1)} mm from one period's fit to the other's and K1 ${mm(median(moved("K1")), 1)} mm.`,
     "- **Long-period constituents.** NOAA takes Sa, Ssa, Mm, Msf and Mf from other spans than its analysis years, as each station's comment says, or publishes zero for them. They are in each station's table and in no count.",
     over.length
-      ? `- **NOAA's method misses NOAA's constants by over 1 mm for ${n(over.length, "constant")}:** ${worst.map(([name, c]) => `${c} at ${name}`).join(", ")}.${unexplained.length ? ` At ${unexplained.join(" and ")}, where it is five or more, that points at the values or the years NOAA's analysis read, and this report doesn't find which. ${unexplainedYears}` : ""}`
+      ? `- **NOAA's method misses NOAA's constants by over 1 mm for ${n(over.length, "constant")}:** ${worst.map(([name, c]) => `${c} at ${name}`).join(", ")}.${unexplained.length ? ` At ${unexplained.join(" and ")} it is five or more, and this report doesn't find why. ${unexplainedYears}` : ""}`
       : "",
   );
   p("### Defects");
   p(
     ...short37.map(
       (r) =>
-        `- **Over NOAA's years the candidate list predicts worse than NOAA's constituents at ${r.name}.** ${r.unlisted.length ? `NOAA publishes ${r.rows.length + r.unlisted.length} constituents there, ${r.unlisted.length} of which the candidate list doesn't have. ` : ""}Fitted by the store's method with NOAA's constituents, NOAA's years predict the held-out year to ${mm(r.scores.steps.robust.rms)} mm RMS. With the candidate list they give ${mm(r.scores.window.rms)} mm, of ${r.window.kept} constituents kept. The standard fit, of 19 years, gives ${mm(r.scores.standard.rms)} mm, and NOAA's constants ${mm(r.scores.noaa.rms)} mm.`,
+        `- **Over NOAA's years the candidate list and its selection predict worse than NOAA's constituents at ${r.name}.** ${r.unlisted.length ? `NOAA publishes ${r.rows.length + r.unlisted.length} constituents there, ${r.unlisted.length} of which the candidate list doesn't have. ` : ""}Fitted by the store's method with NOAA's constituents, NOAA's years predict the held-out year to ${mm(r.scores.steps.robust.rms)} mm RMS. With the candidate list they give ${mm(r.scores.window.rms)} mm, of ${r.window.kept} constituents kept. The standard fit, of 19 years, gives ${mm(r.scores.standard.rms)} mm, and NOAA's constants ${mm(r.scores.noaa.rms)} mm.`,
     ),
     renames.length
       ? `- **Lines held under another name take that name's node factor.** ${renames.map(([name, as]) => `${name} is fitted as ${as}`).join(" and ")}, under Schureman's corrections as the engine gives them for those names. With NOAA's names in their place and nothing else changed, the fit of NOAA's years scores the held-out year ${tally(renamedChange)}.`
       : "",
     short37.length
       ? ""
-      : "- **Over NOAA's years the candidate list predicts no worse than NOAA's constituents at any station**, by 1 mm RMS or more on the held-out year.",
+      : "- **Over NOAA's years the candidate list and its selection predict no worse than NOAA's constituents at any station**, by 1 mm RMS or more on the held-out year.",
     agrees
       ? `- **None shown in the engine's solver, in Schureman's corrections for the names NOAA uses, or in the phase convention.** NOAA's method run through them gives NOAA's constants, as above${unexplained.length ? `, except at ${unexplained.join(" and ")}, which is open` : ""}. Each step from it to the store's method is a choice [Harmonic fits](../fits.md) makes, with its effect in the tables here.`
       : "- **NOAA's method doesn't give NOAA's constants.** Under 95% of the constants fitted NOAA's way are within 1 mm of NOAA's, so the engine, the corrections, the phases or the store's values differ from NOAA's.",

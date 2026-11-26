@@ -20,9 +20,9 @@ A constituent is **outside** where its amplitude or phase differs from NOAA's by
 
 |  | NOAA's years | Standard, 19 years |
 | --- | ---: | ---: |
-| Constituents compared | 694 | 702 |
-| Outside the fit's interval | 134 of 694 (19.3%) | 487 of 702 (69.4%) |
-| Outside and over 1 mm apart | 84 | 292 |
+| Constituents compared | 695 | 703 |
+| Outside the fit's interval | 134 of 695 (19.3%) | 488 of 703 (69.4%) |
+| Outside and over 1 mm apart | 84 | 293 |
 | Median vector difference | 0.50 mm | 0.80 mm |
 | Major constituents of 1 cm or more | 147, 30 outside | 147, 124 outside |
 | Their amplitude difference, median and largest | 0.50% and 13.81% | 1.05% and 12.17% |
@@ -32,26 +32,28 @@ The major constituents are M2, S2, N2, K2, K1, O1, P1, Q1. Long-period constitue
 
 ### What agrees
 
-- **NOAA's method on the store's values gives NOAA's constants.** Fitted NOAA's way, 569 of 674 short-period constants are within 0.5 mm of NOAA's as vectors, which is half of NOAA's last digit, and 659 are within 1 mm. The major constituents of 1 cm or more differ by a median of 0.28% in amplitude and 0.04° in phase, and at most by 4.75% and 1.13°. Those constants score within 0.3 mm RMS of NOAA's own on the held-out year at each of the 20 stations. The comparison reads the store's hourly values with Schureman's corrections as the engine has them and Greenwich phase lags in UTC, so an error in any of the three would show here as a difference from NOAA.
+- **NOAA's method on the store's values gives NOAA's constants.** Fitted NOAA's way, 571 of 675 short-period constants are within 0.5 mm of NOAA's as vectors, which is half of NOAA's last digit, and 661 are within 1 mm. The major constituents of 1 cm or more differ by a median of 0.28% in amplitude and 0.04° in phase, and at most by 4.75% and 1.13°. Those constants score within 0.1 mm RMS of NOAA's own on the held-out year at each of the 20 stations. The comparison reads the store's hourly values with Schureman's corrections as the engine has them and Greenwich phase lags in UTC, so an error in any of the three would show here as a difference from NOAA.
 - **The store's method over NOAA's years is close to NOAA on the major constituents.** Their amplitudes differ by a median of 0.50% and their phases by 0.23°. 30 of 147 are outside the fit's interval, and the next section says which steps of the method move them.
 - **The standard fit predicts the held-out year better than NOAA's constants at 18 of 18 stations** whose NOAA analysis didn't read that year. It explains 71.9% to 99.9% of the tidal band's variance, the least at Baltimore.
 
+- **The shallow-water candidates.** With the tier, on the held-out year the RMS is lower at 12 and higher at 0 of 20 stations, and falls most at Anchorage, by 43.0 mm. On the year before the window the RMS is lower at 12 and higher at 1 of 20 stations (Honolulu +0.2 mm), and falls most at Anchorage, by 45.3 mm. A change under 0.1 mm counts as neither. [The shallow-water candidates](#the-shallow-water-candidates) has each station.
+
 ### What differs, and why
 
-In the fit of NOAA's years, 134 of 694 short-period constants are outside the fit's interval. The constituents most often outside are M1 (17), S1 (11), M2 (11), L2 (8), M4 (7), 2MK3 (7), P1 (6). [Where the differences come from](#where-the-differences-come-from) takes the method apart one step at a time, and the counts here are of the step that moves a constant furthest:
+In the fit of NOAA's years, 134 of 695 short-period constants are outside the fit's interval. The constituents most often outside are M1 (17), S1 (11), M2 (11), L2 (8), M4 (7), 2MK3 (7), P1 (6). [Where the differences come from](#where-the-differences-come-from) takes the method apart one step at a time, and the counts here are of the step that moves a constant furthest:
 
-- **Robust weights.** They raise the amplitude of M2 at 15 of 20 (median +0.16%), S2 at 15 of 20 (median +0.16%), O1 at 15 of 20 (median +0.42%), M4 at 17 of 20 (median +2.79%), against the same fit without them. M2 moves most at Philadelphia (11.4 mm of 826), Anchorage (6.5 mm of 3505), The Battery (6.2 mm of 671). They are the largest of the four steps for 10 of M2's 11 outside and 6 of M4's 7 outside. On the held-out year they leave the tidal-band RMS lower at 7 and higher at 6 of 18, from −1.9 to +0.8 mm. NOAA's analysis has no such weights.
+- **Robust weights.** They raise the amplitude of M2 at 15 of 20 (median +0.16%), S2 at 15 of 20 (median +0.16%), O1 at 15 of 20 (median +0.42%), M4 at 17 of 20 (median +2.79%), against the same fit without them. M2 moves most at Philadelphia (11.4 mm of 826), Anchorage (6.4 mm of 3505), The Battery (6.2 mm of 671). They are the largest of the four steps for 10 of M2's 11 outside and 6 of M4's 7 outside. On the held-out year they leave the tidal-band RMS lower at 7 and higher at 6 of 18, from −1.9 to +0.8 mm. NOAA's analysis has no such weights.
 - **M1 is held as NO1.** The candidate list has the line under both names, and selection keeps the earlier one, with the node factor the engine gives that name and not NOAA's for M1. 17 of 20 are outside, and the step to the candidate list is the largest for 13 of M1's 17 outside. That step changes the rest of the list too, so the fit of NOAA's years was run again with only the name changed back: as M1, 18 of 20 are outside. The name doesn't account for the difference: evaluating the node factor at each sample is the largest step for 4 of M1's 17 outside, and NOAA's M1 is from factors held at mid-year.
 - **2MK3 is held as MO3.** The candidate list has the line under both names, and selection keeps the earlier one, with the node factor the engine gives that name and not NOAA's for 2MK3. 7 of 18 are outside, and the step to the candidate list is the largest for 6 of 2MK3's 7 outside. That step changes the rest of the list too, so the fit of NOAA's years was run again with only the name changed back: as 2MK3, 4 of 18 are outside. The name doesn't account for the difference: evaluating the node factor at each sample is the largest step for 0 of 2MK3's 7 outside, and NOAA's 2MK3 is from factors held at mid-year.
 - **Node factors at each sample: S1, P1 and R2.** K1's node factor changes within a year. Held at its mid-year value, as NOAA holds it, a K1 of 1 m alone leaves 5.7 to 8.3 mm in S1 and 3.0 to 4.2 mm in P1 in a one-year fit, over the years 2006 to 2024, and a K2 of 1 m leaves 12.7 to 18.9 mm in R2. With node factors at each sample the same fits leave at most 0.00 mm. A year fitted NOAA's way therefore puts that part of K1 and K2 into S1, P1 and R2. This step is the largest for 10 of S1's 11 outside, 3 of P1's 6 outside and 2 of R2's 4 outside.
 - **One fit of all years: L2.** Fitting the years together in place of averaging yearly fits is the largest step for 7 of L2's 8 outside. L2 shares its frequency with 2MN2, whose node factor differs ([M1 and L2](../fits.md#what-it-costs)), and a line that doesn't follow L2's factor from year to year would give this. The report doesn't measure 2MN2, so that cause isn't shown.
-- **The standard fit reads other years.** 487 of 702 of its constants are outside the interval, which 19 years make narrow. [Constituents across stations](#constituents-across-stations) gives how far the standard fit is from the store's own fit of NOAA's years, which is what the two periods differ by under one method: M2 is a median 2.5 mm from one period's fit to the other's and K1 1.4 mm.
+- **The standard fit reads other years.** 488 of 703 of its constants are outside the interval, which 19 years make narrow. [Constituents across stations](#constituents-across-stations) gives how far the standard fit is from the store's own fit of NOAA's years, which is what the two periods differ by under one method: M2 is a median 2.5 mm from one period's fit to the other's and K1 1.4 mm.
 - **Long-period constituents.** NOAA takes Sa, Ssa, Mm, Msf and Mf from other spans than its analysis years, as each station's comment says, or publishes zero for them. They are in each station's table and in no count.
-- **NOAA's method misses NOAA's constants by over 1 mm for 15 constants:** 11 at Boston, 3 at Anchorage, 1 at South Beach. At Boston, where it is five or more, that points at the values or the years NOAA's analysis read, and this report doesn't find which. The least complete of Boston's years in the store is 2017, with 8,580 of 8,760 hours.
+- **NOAA's method misses NOAA's constants by over 1 mm for 14 constants:** 11 at Boston, 2 at Anchorage, 1 at South Beach. At Boston it is five or more, and this report doesn't find why. The least complete of Boston's years in the store is 2017, with 8,580 of 8,760 hours.
 
 ### Defects
 
-- **Over NOAA's years the candidate list predicts worse than NOAA's constituents at Honolulu.** Fitted by the store's method with NOAA's constituents, NOAA's years predict the held-out year to 23.2 mm RMS. With the candidate list they give 24.4 mm, of 90 constituents kept. The standard fit, of 19 years, gives 23.1 mm, and NOAA's constants 23.6 mm.
+- **Over NOAA's years the candidate list and its selection predict worse than NOAA's constituents at Honolulu.** Fitted by the store's method with NOAA's constituents, NOAA's years predict the held-out year to 23.2 mm RMS. With the candidate list they give 24.4 mm, of 90 constituents kept. The standard fit, of 19 years, gives 23.1 mm, and NOAA's constants 23.6 mm.
 - **Lines held under another name take that name's node factor.** M1 is fitted as NO1 and 2MK3 is fitted as MO3, under Schureman's corrections as the engine gives them for those names. With NOAA's names in their place and nothing else changed, the fit of NOAA's years scores the held-out year lower at 9 and higher at 0 of 18, from −2.0 to +0.1 mm.
 - **None shown in the engine's solver, in Schureman's corrections for the names NOAA uses, or in the phase convention.** NOAA's method run through them gives NOAA's constants, as above, except at Boston, which is open. Each step from it to the store's method is a choice [Harmonic fits](../fits.md) makes, with its effect in the tables here.
 
@@ -107,7 +109,7 @@ The share of the tidal band's variance each set of constants explains on the sta
 | `coops/9410170` San Diego | 2025 | 99.88% | 99.87% | 99.80% | 18.2 | 19.0 | 23.5 |
 | `coops/9435380` South Beach | 2025 | 99.83% | 99.83% | 99.78% | 31.0 | 31.3 | 36.0 |
 | `coops/9449880` Friday Harbor | 2025 | 99.72% | 99.69% | 99.52% | 44.0 | 46.1 | 57.6 |
-| `coops/9455920` Anchorage | 2025 | 99.64% | 99.60% | 99.57% | 159.3 | 168.2 | 175.7 |
+| `coops/9455920` Anchorage | 2025 | 99.64% | 99.60% | 99.57% | 159.3 | 168.2 | 175.5 |
 | `coops/9462620` Unalaska | 2025 | 99.24% | 99.10% | 99.00% | 34.0 | 37.1 | 39.1 |
 | `coops/9751639` Charlotte Amalie | 2025 | 96.68% | 96.56% | 96.31% | 16.5 | 16.8 | 17.4 |
 
@@ -127,9 +129,11 @@ For each of NOAA's constituents, over the stations where NOAA's amplitude is abo
 | RHO | 20 | 0.35 | 7.2 | 4.19 | 0.57 | 0 | 20 | 0.61 | 10 | 0.33 | 0.30 |
 | O1 | 20 | 0.37 | 0.5 | 0.14 | 0.55 | 4 | 20 | 1.03 | 17 | 0.95 | 0.36 |
 | M1 (as NO1) | 20 | 2.00 | 41.2 | 17.70 | 2.91 | 17 | 20 | 3.14 | 20 | 1.07 | 0.28 |
+| CHI1 | 1 | 2.18 | 31.1 | 18.19 | 3.34 | 1 | 1 | 3.85 | 1 | 0.67 | 0.25 |
 | P1 | 20 | 0.48 | 1.4 | 0.52 | 0.84 | 6 | 20 | 0.85 | 13 | 0.79 | 0.38 |
 | S1 | 20 | 0.77 | 9.7 | 4.96 | 1.27 | 11 | 20 | 1.57 | 17 | 0.85 | 0.27 |
 | K1 | 20 | 0.27 | 0.2 | 0.20 | 0.66 | 1 | 20 | 1.62 | 17 | 1.42 | 0.26 |
+| THETA1 | 1 | 0.87 | 7.3 | 3.89 | 1.17 | 0 | 1 | 4.17 | 1 | 4.35 | 0.25 |
 | J1 | 20 | 0.41 | 6.3 | 1.85 | 0.48 | 0 | 20 | 0.72 | 13 | 0.65 | 0.26 |
 | 2PO1 | 1 | 0.96 | 5.3 | 5.24 | 1.87 | 0 | 1 | 4.96 | 1 | 3.66 | 0.24 |
 | SO1 | 1 | 0.51 | 0.7 | 2.31 | 3.02 | 1 | 1 | 2.53 | 1 | 4.79 | 0.25 |
@@ -144,9 +148,9 @@ For each of NOAA's constituents, over the stations where NOAA's amplitude is abo
 | N2 | 20 | 0.22 | 0.3 | 0.21 | 0.33 | 1 | 20 | 1.18 | 17 | 1.32 | 0.24 |
 | NU2 | 20 | 0.41 | 3.4 | 0.60 | 0.53 | 3 | 20 | 0.66 | 11 | 0.32 | 0.25 |
 | MKL2S2 | 1 | 0.43 | 14.4 | 15.17 | 0.95 | 0 | 0 |  | 0 |  | 0.28 |
-| OP2 | 1 | 0.63 | 9.0 | 15.17 | 2.03 | 0 | 1 | 7.47 | 1 | 5.88 | 0.35 |
+| OP2 | 1 | 0.63 | 9.0 | 15.17 | 2.03 | 0 | 1 | 7.47 | 1 | 5.88 | 0.36 |
 | M2 | 20 | 0.84 | 0.2 | 0.13 | 1.09 | 11 | 20 | 2.11 | 20 | 2.46 | 0.37 |
-| MKS2 | 1 | 2.53 | 15.8 | 0.68 | 2.53 | 0 | 1 | 2.84 | 1 | 5.14 | 0.52 |
+| MKS2 | 1 | 2.53 | 15.8 | 0.68 | 2.53 | 0 | 1 | 2.84 | 1 | 5.14 | 0.53 |
 | M2KS2 | 1 | 2.68 | 38.3 | 2.99 | 2.69 | 0 | 1 | 7.58 | 1 | 5.01 | 0.33 |
 | LAM2 | 19 | 0.28 | 4.7 | 2.73 | 0.53 | 2 | 19 | 0.51 | 12 | 0.49 | 0.18 |
 | L2 | 19 | 0.46 | 5.3 | 0.87 | 0.71 | 8 | 19 | 1.88 | 17 | 0.97 | 0.26 |
@@ -156,14 +160,14 @@ For each of NOAA's constituents, over the stations where NOAA's amplitude is abo
 | K2 | 20 | 0.31 | 1.1 | 0.67 | 0.43 | 2 | 20 | 1.12 | 15 | 0.90 | 0.27 |
 | MSN2 | 1 | 0.90 | 1.8 | 0.49 | 0.99 | 0 | 1 | 2.34 | 1 | 3.33 | 0.15 |
 | 2SM2 | 16 | 0.38 | 19.1 | 4.05 | 0.40 | 2 | 16 | 0.49 | 7 | 0.32 | 0.32 |
-| SKM2 | 1 | 0.38 | 1.6 | 1.61 | 0.78 | 0 | 1 | 1.50 | 0 | 0.94 | 0.48 |
+| SKM2 | 1 | 0.38 | 1.6 | 1.61 | 0.78 | 0 | 1 | 1.50 | 0 | 0.94 | 0.49 |
 | NO3 | 1 | 0.20 | 0.5 | 0.29 | 0.29 | 0 | 1 | 2.77 | 1 | 2.64 | 0.39 |
 | 2MK3 (as MO3) | 17 | 0.48 | 11.1 | 3.45 | 0.55 | 7 | 17 | 0.59 | 15 | 0.43 | 0.34 |
 | M3 | 17 | 0.31 | 11.8 | 2.55 | 0.35 | 2 | 17 | 0.62 | 13 | 0.47 | 0.26 |
 | SO3 | 1 | 0.44 | 0.8 | 0.36 | 0.56 | 0 | 1 | 6.80 | 1 | 6.34 | 0.39 |
 | MK3 | 18 | 0.33 | 11.5 | 1.55 | 0.33 | 4 | 18 | 0.36 | 9 | 0.30 | 0.21 |
-| SK3 | 1 | 0.10 | 0.2 | 0.23 | 0.20 | 0 | 1 | 1.80 | 1 | 1.63 | 0.37 |
-| N4 | 1 | 0.23 | 1.3 | 0.90 | 0.37 | 0 | 1 | 0.72 | 0 | 1.08 | 0.09 |
+| SK3 | 1 | 0.10 | 0.2 | 0.23 | 0.20 | 0 | 1 | 1.80 | 1 | 1.63 | 0.38 |
+| N4 | 1 | 0.23 | 1.3 | 0.90 | 0.37 | 0 | 1 | 0.72 | 0 | 1.08 | 0.10 |
 | 3MS4 | 1 | 1.12 | 3.0 | 2.11 | 1.75 | 0 | 1 | 1.97 | 0 | 2.58 | 0.50 |
 | MN4 | 19 | 0.26 | 5.4 | 0.95 | 0.31 | 2 | 19 | 0.36 | 11 | 0.28 | 0.15 |
 | 2MLS4 | 1 | 0.03 | 0.1 | 1.02 | 0.50 | 0 | 1 | 0.64 | 0 | 0.37 | 0.24 |
@@ -178,7 +182,7 @@ For each of NOAA's constituents, over the stations where NOAA's amplitude is abo
 | 2MO5 | 1 | 1.26 | 3.6 | 0.89 | 1.37 | 0 | 1 | 5.26 | 1 | 4.19 | 0.18 |
 | 3MP5 | 1 | 1.44 | 6.5 | 1.57 | 1.55 | 1 | 1 | 1.03 | 0 | 2.30 | 0.14 |
 | MNK5 | 1 | 0.29 | 1.4 | 0.24 | 0.30 | 0 | 1 | 2.83 | 1 | 2.96 | 0.30 |
-| 2MP5 | 1 | 0.82 | 2.9 | 0.52 | 0.86 | 0 | 1 | 4.47 | 1 | 5.23 | 0.41 |
+| 2MP5 | 1 | 0.82 | 2.9 | 0.52 | 0.86 | 0 | 1 | 4.47 | 1 | 5.23 | 0.42 |
 | 2MK5 | 1 | 0.13 | 0.2 | 0.51 | 0.56 | 0 | 1 | 2.42 | 1 | 2.97 | 0.19 |
 | MSK5 | 1 | 0.36 | 1.3 | 0.13 | 0.37 | 0 | 1 | 2.13 | 1 | 2.28 | 0.24 |
 | 3KM5 | 1 | 0.19 | 1.9 | 3.36 | 0.61 | 0 | 1 | 1.63 | 1 | 1.46 | 0.19 |
@@ -194,7 +198,7 @@ For each of NOAA's constituents, over the stations where NOAA's amplitude is abo
 | 2MK6 | 1 | 0.11 | 0.3 | 0.41 | 0.29 | 0 | 1 | 3.28 | 1 | 3.11 | 0.40 |
 | MSL6 | 1 | 1.18 | 3.6 | 0.17 | 1.19 | 0 | 1 | 0.54 | 0 | 1.24 | 0.53 |
 | 2SM6 | 1 | 0.27 | 1.0 | 0.90 | 0.50 | 0 | 1 | 2.35 | 1 | 2.81 | 0.35 |
-| MSK6 | 1 | 0.78 | 4.6 | 1.14 | 0.85 | 0 | 1 | 2.35 | 1 | 3.19 | 0.16 |
+| MSK6 | 1 | 0.78 | 4.6 | 1.14 | 0.85 | 0 | 1 | 2.35 | 1 | 3.19 | 0.15 |
 | S6 | 11 | 0.47 | 36.5 | 5.50 | 0.48 | 4 | 11 | 0.50 | 7 | 0.10 | 0.38 |
 | 2MNO7 | 1 | 0.10 | 0.6 | 0.52 | 0.17 | 0 | 1 | 1.79 | 1 | 1.69 | 0.46 |
 | 2NMK7 | 1 | 0.27 | 6.8 | 0.04 | 0.27 | 0 | 1 | 1.88 | 1 | 1.64 | 0.27 |
@@ -202,17 +206,17 @@ For each of NOAA's constituents, over the stations where NOAA's amplitude is abo
 | MSKO7 | 1 | 1.05 | 3.4 | 0.40 | 1.07 | 0 | 1 | 12.69 | 1 | 11.66 | 0.29 |
 | 2MN8 | 1 | 0.75 | 6.8 | 2.23 | 0.87 | 0 | 1 | 1.13 | 1 | 0.67 | 0.63 |
 | 3MN8 | 1 | 0.25 | 0.8 | 0.82 | 0.53 | 0 | 1 | 0.88 | 1 | 1.42 | 0.17 |
-| 4MLS8 | 1 | 0.15 | 1.1 | 1.85 | 0.48 | 0 | 1 | 0.72 | 1 | 0.29 | 0.04 |
+| 4MLS8 | 1 | 0.15 | 1.1 | 1.85 | 0.48 | 0 | 1 | 0.72 | 1 | 0.29 | 0.05 |
 | M8 | 11 | 0.40 | 18.1 | 2.36 | 0.41 | 2 | 11 | 0.35 | 7 | 0.11 | 0.23 |
 | 2MSN8 | 1 | 0.35 | 1.5 | 0.30 | 0.38 | 0 | 1 | 2.53 | 1 | 2.27 | 0.10 |
 | 3ML8 | 1 | 0.13 | 1.6 | 2.04 | 0.31 | 0 | 1 | 0.47 | 1 | 0.43 | 0.33 |
 | 3MS8 | 1 | 0.74 | 1.2 | 0.27 | 0.80 | 0 | 1 | 3.53 | 1 | 3.21 | 0.39 |
 | 3MK8 | 1 | 0.58 | 4.2 | 1.12 | 0.65 | 0 | 1 | 1.19 | 1 | 0.70 | 0.18 |
-| 2MSL8 | 1 | 0.31 | 1.6 | 0.93 | 0.45 | 0 | 1 | 0.23 | 0 | 0.67 | 0.07 |
+| 2MSL8 | 1 | 0.31 | 1.6 | 0.93 | 0.45 | 0 | 1 | 0.23 | 0 | 0.67 | 0.08 |
 | 2MS8 | 1 | 0.01 | 0.1 | 1.24 | 0.50 | 0 | 1 | 2.14 | 1 | 2.57 | 0.57 |
 | 2MSK8 | 1 | 1.53 | 11.0 | 1.77 | 1.59 | 1 | 1 | 0.56 | 1 | 1.31 | 0.52 |
 | 2M2NK9 | 1 | 0.95 | 31.5 | 1.63 | 0.95 | 1 | 1 | 1.17 | 1 | 0.69 | 0.08 |
-| 3MNK9 | 1 | 0.96 | 13.7 | 6.18 | 1.19 | 1 | 1 | 2.15 | 1 | 1.46 | 0.22 |
+| 3MNK9 | 1 | 0.96 | 13.7 | 6.18 | 1.19 | 1 | 1 | 2.15 | 1 | 1.46 | 0.23 |
 | 4MK9 | 1 | 0.55 | 6.1 | 2.78 | 0.69 | 0 | 1 | 1.64 | 1 | 1.24 | 0.17 |
 | 3MSK9 | 1 | 0.55 | 3.9 | 0.77 | 0.58 | 0 | 1 | 2.15 | 1 | 1.77 | 0.42 |
 | 4MN10 | 1 | 0.22 | 1.4 | 0.55 | 0.27 | 0 | 1 | 0.86 | 1 | 0.72 | 0.24 |
@@ -222,10 +226,9 @@ For each of NOAA's constituents, over the stations where NOAA's amplitude is abo
 | 3MSL10 | 1 | 0.17 | 1.3 | 1.23 | 0.33 | 0 | 1 | 0.78 | 1 | 0.73 | 0.30 |
 | 3M2S10 | 1 | 0.88 | 4.6 | 0.67 | 0.90 | 1 | 1 | 1.24 | 1 | 1.81 | 0.28 |
 | 4MSK11 | 1 | 0.43 | 4.8 | 2.99 | 0.64 | 0 | 1 | 1.78 | 1 | 1.20 | 0.60 |
-| 4MNS12 | 1 | 0.08 | 0.6 | 1.51 | 0.38 | 0 | 1 | 1.04 | 1 | 1.26 | 0.52 |
-| 5MS12 | 1 | 0.28 | 1.6 | 0.08 | 0.29 | 0 | 1 | 1.34 | 1 | 1.63 | 0.32 |
-| 4MSL12 | 1 | 0.17 | 2.1 | 179.51 | 16.17 | 1 | 1 | 16.74 | 1 | 0.67 | 16.08 |
-| 4M2S12 | 1 | 0.62 | 4.4 | 1.05 | 0.67 | 0 | 1 | 1.01 | 1 | 1.56 | 0.05 |
+| 4MNS12 | 1 | 0.08 | 0.6 | 1.51 | 0.38 | 0 | 1 | 1.04 | 1 | 1.26 | 0.51 |
+| 5MS12 | 1 | 0.28 | 1.6 | 0.08 | 0.29 | 0 | 1 | 1.34 | 1 | 1.63 | 0.35 |
+| 4M2S12 | 1 | 0.62 | 4.4 | 1.05 | 0.67 | 0 | 1 | 1.01 | 1 | 1.56 | 0.03 |
 
 ## Where the differences come from
 
@@ -236,112 +239,113 @@ The store's fit of NOAA's years differs from NOAA's method in four ways, taken h
 | SA | 17 | 11.76 | 0.01 | 0.23 | 5.03 | 0.32 | 13.78 |
 | SSA | 13 | 4.92 | 0.01 | 0.24 | 2.52 | 0.17 | 5.56 |
 | MM | 5 | 1.45 | 0.02 | 0.95 | 1.04 | 0.07 | 2.26 |
-| MSF | 2 | 5.17 | 0.10 | 0.71 | 4.32 | 0.60 | 4.27 |
+| MSF | 2 | 5.17 | 0.09 | 0.71 | 4.31 | 0.59 | 4.27 |
 | MF | 8 | 1.16 | 0.15 | 1.01 | 1.48 | 0.10 | 2.75 |
 | 2Q1 | 18 | 0.17 | 0.03 | 0.13 | 0.59 | 0.12 | 0.69 |
 | Q1 | 20 | 0.24 | 0.04 | 0.13 | 0.45 | 0.12 | 0.66 |
 | RHO | 20 | 0.30 | 0.02 | 0.13 | 0.27 | 0.11 | 0.57 |
 | O1 | 20 | 0.36 | 0.07 | 0.15 | 0.68 | 0.11 | 0.55 |
 | M1 | 20 | 0.28 | 1.63 | 0.32 | 0.27 | 1.86 | 2.91 |
+| CHI1 | 1 | 0.25 | 1.56 | 2.83 | 0.38 | 0.75 | 3.34 |
 | P1 | 20 | 0.38 | 0.39 | 0.03 | 0.55 | 0.31 | 0.84 |
 | S1 | 20 | 0.27 | 0.76 | 0.03 | 0.52 | 0.21 | 1.27 |
 | K1 | 20 | 0.26 | 0.06 | 0.16 | 0.43 | 0.20 | 0.66 |
+| THETA1 | 1 | 0.25 | 0.13 | 0.38 | 0.43 | 0.13 | 1.17 |
 | J1 | 20 | 0.26 | 0.03 | 0.11 | 0.39 | 0.14 | 0.48 |
-| 2PO1 | 1 | 0.24 | 0.34 | 0.34 | 2.44 | 0.89 | 1.87 |
-| SO1 | 1 | 0.25 | 0.30 | 0.40 | 2.49 | 0.31 | 3.02 |
+| 2PO1 | 1 | 0.24 | 0.33 | 0.33 | 2.45 | 0.89 | 1.87 |
+| SO1 | 1 | 0.25 | 0.30 | 0.40 | 2.45 | 0.33 | 3.02 |
 | OO1 | 20 | 0.31 | 0.07 | 0.30 | 0.26 | 0.13 | 0.52 |
-| 2NS2 | 1 | 0.54 | 0.65 | 0.79 | 0.88 | 0.45 | 1.14 |
-| MLN2S2 | 1 | 0.12 | 0.10 | 1.16 | 1.09 | 0.26 | 0.32 |
-| OO2 | 1 | 0.07 | 0.13 | 0.15 | 2.09 | 1.79 | 0.66 |
-| 2ML2S2 | 1 | 0.22 | 0.23 | 0.21 | 0.38 | 0.42 | 0.48 |
-| 2MS2K2 | 1 | 0.29 | 0.52 | 5.59 | 0.61 | 0.44 | 5.20 |
+| 2NS2 | 1 | 0.54 | 0.65 | 0.79 | 0.84 | 0.42 | 1.14 |
+| MLN2S2 | 1 | 0.12 | 0.10 | 1.16 | 1.09 | 0.28 | 0.32 |
+| OO2 | 1 | 0.07 | 0.13 | 0.15 | 2.04 | 1.75 | 0.66 |
+| 2ML2S2 | 1 | 0.22 | 0.23 | 0.21 | 0.37 | 0.41 | 0.48 |
+| 2MS2K2 | 1 | 0.29 | 0.52 | 5.59 | 0.62 | 0.45 | 5.20 |
 | 2N2 | 19 | 0.28 | 0.02 | 0.07 | 0.35 | 0.11 | 0.42 |
 | MU2 | 20 | 0.19 | 0.01 | 0.18 | 0.44 | 0.12 | 0.49 |
 | N2 | 20 | 0.24 | 0.01 | 0.10 | 0.39 | 0.08 | 0.33 |
 | NU2 | 20 | 0.25 | 0.04 | 0.15 | 0.47 | 0.09 | 0.53 |
-| MKL2S2 | 1 | 0.28 | 0.11 | 1.91 | 2.28 | 0.59 | 0.95 |
-| OP2 | 1 | 0.35 | 3.93 | 2.28 | 4.14 | 5.27 | 2.03 |
+| MKL2S2 | 1 | 0.28 | 0.11 | 1.91 | 2.29 | 0.59 | 0.95 |
+| OP2 | 1 | 0.36 | 3.92 | 2.28 | 4.16 | 5.29 | 2.03 |
 | M2 | 20 | 0.37 | 0.06 | 0.08 | 1.61 | 0.53 | 1.09 |
-| MKS2 | 1 | 0.52 | 3.89 | 0.78 | 1.78 | 3.91 | 2.53 |
-| M2KS2 | 1 | 0.33 | 2.16 | 0.62 | 1.13 | 0.75 | 2.69 |
+| MKS2 | 1 | 0.53 | 3.89 | 0.78 | 1.80 | 3.93 | 2.53 |
+| M2KS2 | 1 | 0.33 | 2.16 | 0.62 | 1.14 | 0.75 | 2.69 |
 | LAM2 | 19 | 0.18 | 0.28 | 0.32 | 0.32 | 0.08 | 0.53 |
 | L2 | 19 | 0.26 | 0.13 | 0.46 | 0.28 | 0.08 | 0.71 |
 | T2 | 20 | 0.25 | 0.08 | 0.04 | 0.29 | 0.12 | 0.39 |
 | S2 | 20 | 0.27 | 0.13 | 0.04 | 0.29 | 0.09 | 0.49 |
 | R2 | 18 | 0.33 | 0.34 | 0.03 | 0.27 | 0.10 | 0.59 |
 | K2 | 20 | 0.27 | 0.04 | 0.10 | 0.24 | 0.13 | 0.43 |
-| MSN2 | 1 | 0.15 | 0.15 | 0.07 | 0.60 | 0.13 | 0.99 |
+| MSN2 | 1 | 0.15 | 0.15 | 0.07 | 0.69 | 0.07 | 0.99 |
 | 2SM2 | 16 | 0.30 | 0.02 | 0.05 | 0.31 | 0.09 | 0.40 |
-| SKM2 | 1 | 0.48 | 0.12 | 0.54 | 1.13 | 0.25 | 0.78 |
-| NO3 | 1 | 0.39 | 0.08 | 0.11 | 0.44 | 0.29 | 0.29 |
+| SKM2 | 1 | 0.49 | 0.12 | 0.54 | 1.11 | 0.24 | 0.78 |
+| NO3 | 1 | 0.39 | 0.08 | 0.11 | 0.46 | 0.30 | 0.29 |
 | 2MK3 | 17 | 0.34 | 0.00 | 0.03 | 0.27 | 0.25 | 0.55 |
 | M3 | 17 | 0.26 | 0.00 | 0.02 | 0.13 | 0.06 | 0.35 |
-| SO3 | 1 | 0.39 | 0.38 | 0.33 | 0.88 | 0.93 | 0.56 |
+| SO3 | 1 | 0.39 | 0.38 | 0.33 | 0.87 | 0.90 | 0.56 |
 | MK3 | 18 | 0.21 | 0.01 | 0.02 | 0.21 | 0.08 | 0.33 |
-| SK3 | 1 | 0.37 | 0.10 | 0.14 | 0.41 | 0.16 | 0.20 |
-| N4 | 1 | 0.09 | 0.04 | 0.11 | 0.65 | 0.36 | 0.37 |
-| 3MS4 | 1 | 0.50 | 0.05 | 0.98 | 1.25 | 0.31 | 1.75 |
+| SK3 | 1 | 0.38 | 0.10 | 0.14 | 0.37 | 0.15 | 0.20 |
+| N4 | 1 | 0.10 | 0.04 | 0.11 | 0.64 | 0.35 | 0.37 |
+| 3MS4 | 1 | 0.50 | 0.05 | 0.98 | 1.21 | 0.27 | 1.75 |
 | MN4 | 19 | 0.15 | 0.00 | 0.02 | 0.23 | 0.07 | 0.31 |
-| 2MLS4 | 1 | 0.24 | 0.25 | 0.60 | 1.66 | 0.52 | 0.50 |
+| 2MLS4 | 1 | 0.24 | 0.25 | 0.60 | 1.68 | 0.56 | 0.50 |
 | M4 | 20 | 0.22 | 0.00 | 0.03 | 0.31 | 0.07 | 0.49 |
-| SN4 | 1 | 0.04 | 0.49 | 0.44 | 0.26 | 0.22 | 0.85 |
-| ML4 | 1 | 0.44 | 0.09 | 0.82 | 0.58 | 0.71 | 0.26 |
+| SN4 | 1 | 0.04 | 0.49 | 0.44 | 0.25 | 0.18 | 0.85 |
+| ML4 | 1 | 0.44 | 0.09 | 0.82 | 0.63 | 0.78 | 0.26 |
 | MS4 | 20 | 0.25 | 0.00 | 0.01 | 0.13 | 0.07 | 0.26 |
-| MK4 | 1 | 0.12 | 0.27 | 0.17 | 0.47 | 1.06 | 1.38 |
-| SL4 | 1 | 0.08 | 0.03 | 0.57 | 1.12 | 0.81 | 1.47 |
+| MK4 | 1 | 0.12 | 0.27 | 0.17 | 0.47 | 1.09 | 1.38 |
+| SL4 | 1 | 0.08 | 0.03 | 0.57 | 1.18 | 0.76 | 1.47 |
 | S4 | 17 | 0.26 | 0.00 | 0.01 | 0.15 | 0.03 | 0.38 |
-| MNO5 | 1 | 0.29 | 0.03 | 0.02 | 1.12 | 0.05 | 1.33 |
-| 2MO5 | 1 | 0.18 | 0.08 | 0.23 | 1.62 | 0.44 | 1.37 |
-| 3MP5 | 1 | 0.14 | 0.11 | 0.08 | 1.57 | 0.26 | 1.55 |
-| MNK5 | 1 | 0.30 | 0.05 | 0.14 | 0.57 | 0.49 | 0.30 |
-| 2MP5 | 1 | 0.41 | 0.31 | 0.09 | 0.46 | 0.31 | 0.86 |
+| MNO5 | 1 | 0.29 | 0.03 | 0.02 | 1.11 | 0.05 | 1.33 |
+| 2MO5 | 1 | 0.18 | 0.08 | 0.23 | 1.57 | 0.48 | 1.37 |
+| 3MP5 | 1 | 0.14 | 0.11 | 0.08 | 1.57 | 0.27 | 1.55 |
+| MNK5 | 1 | 0.30 | 0.05 | 0.14 | 0.56 | 0.49 | 0.30 |
+| 2MP5 | 1 | 0.42 | 0.31 | 0.09 | 0.45 | 0.31 | 0.86 |
 | 2MK5 | 1 | 0.19 | 0.12 | 0.03 | 0.87 | 1.17 | 0.56 |
-| MSK5 | 1 | 0.24 | 0.13 | 0.03 | 0.29 | 0.45 | 0.37 |
-| 3KM5 | 1 | 0.19 | 0.15 | 0.10 | 0.89 | 0.38 | 0.61 |
-| 2NMLS6 | 1 | 0.51 | 0.10 | 0.77 | 2.06 | 0.47 | 2.00 |
-| 2NM6 | 1 | 0.23 | 0.57 | 0.73 | 0.29 | 0.22 | 0.39 |
-| 2MLNS6 | 1 | 0.17 | 0.03 | 0.33 | 1.35 | 0.14 | 1.34 |
-| 2MN6 | 1 | 0.46 | 0.48 | 0.32 | 0.69 | 0.46 | 0.42 |
-| 3MLS6 | 1 | 0.09 | 0.10 | 0.44 | 0.53 | 0.22 | 0.31 |
+| MSK5 | 1 | 0.24 | 0.13 | 0.03 | 0.24 | 0.46 | 0.37 |
+| 3KM5 | 1 | 0.19 | 0.15 | 0.10 | 0.83 | 0.38 | 0.61 |
+| 2NMLS6 | 1 | 0.51 | 0.10 | 0.77 | 2.04 | 0.45 | 2.00 |
+| 2NM6 | 1 | 0.23 | 0.58 | 0.73 | 0.28 | 0.22 | 0.39 |
+| 2MLNS6 | 1 | 0.17 | 0.03 | 0.33 | 1.33 | 0.15 | 1.34 |
+| 2MN6 | 1 | 0.46 | 0.48 | 0.32 | 0.68 | 0.44 | 0.42 |
+| 3MLS6 | 1 | 0.09 | 0.10 | 0.44 | 0.58 | 0.23 | 0.31 |
 | M6 | 17 | 0.23 | 0.00 | 0.01 | 0.12 | 0.07 | 0.32 |
-| MSN6 | 1 | 0.19 | 0.44 | 0.78 | 1.23 | 0.79 | 0.63 |
-| 2ML6 | 1 | 0.12 | 0.12 | 0.50 | 0.38 | 0.36 | 1.22 |
-| 2MS6 | 1 | 0.42 | 0.23 | 0.10 | 0.79 | 0.47 | 0.95 |
-| 2MK6 | 1 | 0.40 | 0.42 | 0.21 | 0.48 | 0.26 | 0.29 |
-| MSL6 | 1 | 0.53 | 0.07 | 0.83 | 1.01 | 0.04 | 1.19 |
-| 2SM6 | 1 | 0.35 | 0.09 | 0.03 | 0.49 | 0.26 | 0.50 |
-| MSK6 | 1 | 0.16 | 0.01 | 0.22 | 1.03 | 0.16 | 0.85 |
+| MSN6 | 1 | 0.19 | 0.44 | 0.78 | 1.27 | 0.83 | 0.63 |
+| 2ML6 | 1 | 0.12 | 0.12 | 0.50 | 0.28 | 0.45 | 1.22 |
+| 2MS6 | 1 | 0.42 | 0.23 | 0.09 | 0.75 | 0.46 | 0.95 |
+| 2MK6 | 1 | 0.40 | 0.42 | 0.21 | 0.48 | 0.24 | 0.29 |
+| MSL6 | 1 | 0.53 | 0.07 | 0.83 | 1.27 | 0.29 | 1.19 |
+| 2SM6 | 1 | 0.35 | 0.09 | 0.03 | 0.42 | 0.29 | 0.50 |
+| MSK6 | 1 | 0.15 | 0.01 | 0.22 | 1.03 | 0.18 | 0.85 |
 | S6 | 11 | 0.38 | 0.00 | 0.01 | 0.14 | 0.12 | 0.48 |
 | 2MNO7 | 1 | 0.46 | 0.03 | 0.11 | 0.84 | 0.40 | 0.17 |
-| 2NMK7 | 1 | 0.27 | 0.05 | 0.19 | 0.56 | 0.17 | 0.27 |
-| 2MSO7 | 1 | 0.20 | 0.08 | 0.07 | 0.90 | 0.50 | 1.16 |
-| MSKO7 | 1 | 0.29 | 0.17 | 0.76 | 0.28 | 0.69 | 1.07 |
-| 2MN8 | 1 | 0.63 | 0.03 | 0.12 | 0.26 | 0.09 | 0.87 |
-| 3MN8 | 1 | 0.17 | 0.22 | 0.22 | 0.05 | 0.23 | 0.53 |
-| 4MLS8 | 1 | 0.04 | 0.09 | 0.21 | 0.59 | 0.30 | 0.48 |
+| 2NMK7 | 1 | 0.27 | 0.05 | 0.19 | 0.60 | 0.16 | 0.27 |
+| 2MSO7 | 1 | 0.20 | 0.08 | 0.07 | 0.90 | 0.51 | 1.16 |
+| MSKO7 | 1 | 0.29 | 0.17 | 0.75 | 0.24 | 0.68 | 1.07 |
+| 2MN8 | 1 | 0.63 | 0.03 | 0.12 | 0.24 | 0.11 | 0.87 |
+| 3MN8 | 1 | 0.17 | 0.22 | 0.22 | 0.05 | 0.21 | 0.53 |
+| 4MLS8 | 1 | 0.05 | 0.08 | 0.21 | 0.67 | 0.37 | 0.48 |
 | M8 | 11 | 0.23 | 0.01 | 0.02 | 0.15 | 0.05 | 0.41 |
-| 2MSN8 | 1 | 0.10 | 0.13 | 0.64 | 0.51 | 0.17 | 0.38 |
-| 3ML8 | 1 | 0.33 | 0.08 | 0.25 | 0.42 | 0.19 | 0.31 |
-| 3MS8 | 1 | 0.39 | 0.09 | 0.04 | 0.21 | 0.43 | 0.80 |
-| 3MK8 | 1 | 0.18 | 0.26 | 0.12 | 0.57 | 0.19 | 0.65 |
-| 2MSL8 | 1 | 0.07 | 0.07 | 0.35 | 0.28 | 0.42 | 0.45 |
-| 2MS8 | 1 | 0.57 | 0.09 | 0.05 | 0.59 | 0.19 | 0.50 |
-| 2MSK8 | 1 | 0.52 | 0.05 | 0.12 | 1.18 | 0.51 | 1.59 |
-| 2M2NK9 | 1 | 0.08 | 0.03 | 0.01 | 1.44 | 0.43 | 0.95 |
-| 3MNK9 | 1 | 0.22 | 0.07 | 0.03 | 1.04 | 0.15 | 1.19 |
-| 4MK9 | 1 | 0.17 | 0.12 | 0.02 | 1.54 | 1.09 | 0.69 |
-| 3MSK9 | 1 | 0.42 | 0.05 | 0.04 | 0.17 | 0.12 | 0.58 |
+| 2MSN8 | 1 | 0.10 | 0.13 | 0.64 | 0.52 | 0.16 | 0.38 |
+| 3ML8 | 1 | 0.33 | 0.08 | 0.25 | 0.52 | 0.30 | 0.31 |
+| 3MS8 | 1 | 0.39 | 0.09 | 0.04 | 0.20 | 0.43 | 0.80 |
+| 3MK8 | 1 | 0.18 | 0.26 | 0.12 | 0.59 | 0.21 | 0.65 |
+| 2MSL8 | 1 | 0.08 | 0.07 | 0.35 | 0.57 | 0.64 | 0.45 |
+| 2MS8 | 1 | 0.57 | 0.08 | 0.05 | 0.55 | 0.29 | 0.50 |
+| 2MSK8 | 1 | 0.52 | 0.05 | 0.12 | 1.21 | 0.53 | 1.59 |
+| 2M2NK9 | 1 | 0.08 | 0.03 | 0.01 | 1.45 | 0.44 | 0.95 |
+| 3MNK9 | 1 | 0.23 | 0.07 | 0.03 | 1.03 | 0.15 | 1.19 |
+| 4MK9 | 1 | 0.17 | 0.12 | 0.02 | 1.57 | 1.11 | 0.69 |
+| 3MSK9 | 1 | 0.42 | 0.05 | 0.04 | 0.15 | 0.11 | 0.58 |
 | 4MN10 | 1 | 0.24 | 0.03 | 0.05 | 0.48 | 0.30 | 0.27 |
-| M10 | 1 | 0.14 | 0.04 | 0.12 | 0.24 | 0.25 | 0.20 |
-| 3MNS10 | 1 | 0.57 | 0.01 | 0.08 | 0.84 | 0.26 | 1.07 |
-| 4MS10 | 1 | 0.14 | 0.02 | 0.05 | 0.83 | 0.44 | 0.34 |
-| 3MSL10 | 1 | 0.30 | 0.04 | 0.10 | 0.46 | 0.16 | 0.33 |
-| 3M2S10 | 1 | 0.28 | 0.02 | 0.03 | 0.78 | 0.19 | 0.90 |
-| 4MSK11 | 1 | 0.60 | 0.04 | 0.01 | 0.57 | 0.20 | 0.64 |
-| 4MNS12 | 1 | 0.52 | 0.00 | 0.03 | 0.78 | 0.17 | 0.38 |
-| 5MS12 | 1 | 0.32 | 0.01 | 0.03 | 0.82 | 0.22 | 0.29 |
-| 4MSL12 | 1 | 16.08 | 0.01 | 0.17 | 0.43 | 0.22 | 16.17 |
-| 4M2S12 | 1 | 0.05 | 0.03 | 0.03 | 0.63 | 0.04 | 0.67 |
+| M10 | 1 | 0.14 | 0.04 | 0.12 | 0.31 | 0.31 | 0.20 |
+| 3MNS10 | 1 | 0.57 | 0.01 | 0.08 | 0.86 | 0.28 | 1.07 |
+| 4MS10 | 1 | 0.14 | 0.02 | 0.05 | 0.69 | 0.36 | 0.34 |
+| 3MSL10 | 1 | 0.30 | 0.04 | 0.10 | 0.67 | 0.48 | 0.33 |
+| 3M2S10 | 1 | 0.28 | 0.02 | 0.03 | 0.70 | 0.11 | 0.90 |
+| 4MSK11 | 1 | 0.60 | 0.04 | 0.01 | 0.57 | 0.22 | 0.64 |
+| 4MNS12 | 1 | 0.51 | 0.01 | 0.03 | 0.80 | 0.22 | 0.38 |
+| 5MS12 | 1 | 0.35 | 0.01 | 0.02 | 0.77 | 0.15 | 0.29 |
+| 4M2S12 | 1 | 0.03 | 0.03 | 0.03 | 0.56 | 0.19 | 0.67 |
 
 The same steps scored on the held-out year: the tidal-band RMS of observed minus predicted, in millimeters, for the constants each step gives. The steps before the last hold every constituent NOAA publishes for the station that the engine's catalog has, and the last two columns hold the candidate list's. A figure in brackets is from constants fitted from years that include the held-out one.
 
@@ -364,11 +368,40 @@ The same steps scored on the held-out year: the tidal-band RMS of observed minus
 | `coops/9410170` San Diego | 23.5 | 23.5 | 22.3 | 22.2 | 22.2 | 19.0 | 18.2 |
 | `coops/9435380` South Beach | 36.0 | 35.8 | 34.7 | 34.7 | 35.0 | 31.3 | 31.0 |
 | `coops/9449880` Friday Harbor | 57.6 | 57.8 | 56.3 | 56.1 | 56.9 | 46.1 | 44.0 |
-| `coops/9455920` Anchorage | 175.7 | 175.4 | 173.6 | 172.4 | 171.5 | 168.2 | 159.3 |
+| `coops/9455920` Anchorage | 175.5 | 175.5 | 173.7 | 172.5 | 171.6 | 168.2 | 159.3 |
 | `coops/9462620` Unalaska | 39.1 | 39.1 | 38.4 | 38.6 | 38.6 | 37.1 | 34.0 |
 | `coops/9751639` Charlotte Amalie | 17.4 | 17.3 | 17.4 | 17.5 | 17.3 | 16.8 | 16.5 |
 
 From each step to the next, over the 18 stations whose NOAA years don't include the held-out one, the RMS is: with node factors at each sample, lower at 7 and higher at 1, from −1.8 to +0.1 mm; with one fit of all years, lower at 8 and higher at 1, from −1.2 to +0.2 mm; with robust weights, lower at 7 and higher at 6, from −1.9 to +0.8 mm; and with the store's constituents, lower at 16 and higher at 2, from −14.3 to +1.2 mm. A change under 0.1 mm counts as neither.
+
+## The shallow-water candidates
+
+The candidate list's last tier is the shallow-water compounds NOAA publishes for Anchorage ([Constituents](../fits.md#constituents)). The standard window is fitted here with the whole list and again without the candidates only that tier has, and both sets of constants are scored on the held-out year and on the year before the window. The tier was added on the evidence of the held-out year, so that year can't also test it. The year before the window was read by neither fit and judged no choice of candidates.
+
+| Station | Kept without | Kept with | Held-out year: without (mm) | With (mm) | Year before | Without (mm) | With (mm) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `coops/1612340` Honolulu | 71 | 112 | 23.0 | 23.1 | 2005 | 23.4 | 23.6 |
+| `coops/1820000` Kwajalein, Marshall Islands | 67 | 102 | 24.4 | 24.5 | 2005 | 25.0 | 24.8 |
+| `coops/1770000` Pago Pago, American Samoa | 66 | 98 | 17.3 | 17.2 | 2005 | 20.9 | 20.9 |
+| `coops/8410140` Eastport | 70 | 124 | 83.1 | 81.2 | 2005 | 81.0 | 78.5 |
+| `coops/8443970` Boston | 73 | 128 | 61.1 | 59.9 | 2005 | 62.0 | 60.7 |
+| `coops/8518750` The Battery | 74 | 127 | 72.4 | 71.8 | 2005 | 74.0 | 73.4 |
+| `coops/8545240` Philadelphia | 71 | 128 | 103.9 | 99.8 | 2005 | 104.0 | 98.6 |
+| `coops/8574680` Baltimore | 65 | 103 | 77.5 | 77.5 | 2005 | 81.1 | 81.1 |
+| `coops/8638610` Sewells Point | 69 | 120 | 44.4 | 44.3 | 2005 | 48.1 | 48.1 |
+| `coops/8665530` Charleston | 71 | 128 | 55.5 | 55.1 | 2005 | 60.0 | 59.4 |
+| `coops/8724580` Key West | 73 | 127 | 20.1 | 19.9 | 2005 | 23.3 | 23.2 |
+| `coops/8729840` Pensacola | 73 | 109 | 30.8 | 30.7 | 2005 | 41.0 | 41.0 |
+| `coops/8761724` Grand Isle | 67 | 102 | 28.9 | 28.9 | 2005 | 33.2 | 33.2 |
+| `coops/8771450` Galveston Pier 21 | 68 | 109 | 50.5 | 50.4 | 2005 | 53.6 | 53.6 |
+| `coops/9410170` San Diego | 72 | 124 | 18.6 | 18.2 | 2005 | 19.1 | 18.7 |
+| `coops/9435380` South Beach | 73 | 129 | 31.7 | 31.0 | 2005 | 31.4 | 30.6 |
+| `coops/9449880` Friday Harbor | 73 | 128 | 44.6 | 44.0 | 2005 | 43.2 | 42.4 |
+| `coops/9455920` Anchorage | 75 | 131 | 202.3 | 159.3 | 2005 | 206.3 | 161.0 |
+| `coops/9462620` Unalaska | 73 | 119 | 34.2 | 34.0 | 2005 | 32.9 | 32.7 |
+| `coops/9751639` Charlotte Amalie | 74 | 108 | 16.6 | 16.5 | 2005 | 17.0 | 17.0 |
+
+With the tier, on the held-out year the RMS is lower at 12 and higher at 0 of 20 stations, and falls most at Anchorage, by 43.0 mm. On the year before the window the RMS is lower at 12 and higher at 1 of 20 stations (Honolulu +0.2 mm), and falls most at Anchorage, by 45.3 mm. A change under 0.1 mm counts as neither.
 
 ## Each station
 
@@ -1124,7 +1157,7 @@ NOAA: "6 Year Vector Averaged (2011-2016). Sa, SSa, and MF from 20 years (1997-2
 
 ### Anchorage (`coops/9455920`)
 
-NOAA: "5-year (2012-2016) Vector Averaged. Mm, Msf, Mf from average of 20 years (1996-2016). Sa and SSa from 20year analysis." NOAA's years, 2012–2016: 43,825 hourly values, 129 constituents kept. Standard, 2006 to 2024: 164,045 hourly values, 131 kept. NOAA also publishes 9 constituents the candidate list doesn't have, which aren't compared.
+NOAA: "5-year (2012-2016) Vector Averaged. Mm, Msf, Mf from average of 20 years (1996-2016). Sa and SSa from 20year analysis." NOAA's years, 2012–2016: 43,825 hourly values, 129 constituents kept. Standard, 2006 to 2024: 164,045 hourly values, 131 kept. The engine's catalog has no line that is NOAA's 4MSL12, which no fit or prediction here holds as NOAA's. NOAA also publishes 8 constituents the candidate list doesn't have, which aren't compared.
 
 | Constituent | NOAA A (mm) | NOAA g (°) | NOAA's years: ΔA (mm) | ΔA (%) | Δg (°) | Vector (mm) | ±A (mm) | ±g (°) | Ratio | Standard: ΔA (mm) | Δg (°) | Vector (mm) | Ratio | NOAA's method: vector (mm) |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -1138,9 +1171,11 @@ NOAA: "5-year (2012-2016) Vector Averaged. Mm, Msf, Mf from average of 20 years 
 | RHO | 14 | 296.2 | −0.1 | −0.4 | +3.5 | 0.8 | 2.6 | 10.6 | 0.3 | +2.5 | −4.9 | 2.8 | **2.6** | 0.1 |
 | O1 | 371 | 325.0 | −0.1 | −0.0 | +0.1 | 0.6 | 2.6 | 0.4 | 0.2 | +6.1 | −2.0 | 14.2 | **14.8** | 0.5 |
 | M1 | 30 | 40.2 | +13.6 (NO1) | +45.4 | −15.9 | 16.9 | 2.5 | 3.3 | **5.3** | +12.9 (NO1) | −19.7 | 17.8 | **18.1** | 0.3 |
+| CHI1 | 7 | 278.4 | +2.2 | +31.1 | +18.2 | 3.3 | 2.5 | 15.8 | **1.2** | +2.3 | +22.3 | 3.9 | **4.5** | 0.2 |
 | P1 | 176 | 340.9 | +2.2 | +1.3 | +0.2 | 2.3 | 2.2 | 0.7 | 1.0 | −2.8 | +2.6 | 8.4 | **9.3** | 0.4 |
 | S1 | 3 | 74.2 | +2.4 | +79.3 | +49.2 | 4.1 | 2.2 | 23.6 | **2.1** | +2.6 | +60.5 | 4.9 | **7.1** | 0.1 |
 | K1 | 671 | 342.1 | −0.1 | −0.0 | −0.1 | 1.2 | 2.4 | 0.2 | 0.5 | +8.1 | −0.7 | 11.5 | **8.5** | 0.4 |
+| THETA1 | 12 | 310.7 | −0.9 | −7.3 | +3.9 | 1.2 | 2.5 | 13.0 | 0.3 | −2.1 | −19.0 | 4.2 | **4.1** | 0.2 |
 | J1 | 25 | 65.2 | −1.5 | −5.9 | −2.3 | 1.8 | 2.5 | 6.2 | 0.6 | −0.3 | −12.1 | 5.3 | **6.5** | 0.3 |
 | 2PO1 | 18 | 143.0 | −1.0 | −5.3 | +5.2 | 1.9 | 2.6 | 8.7 | 0.6 | −4.6 | +6.9 | 5.0 | **4.8** | 0.2 |
 | SO1 | 74 | 151.1 | −0.5 | −0.7 | +2.3 | 3.0 | 2.6 | 2.0 | **1.1** | −1.9 | −1.3 | 2.5 | **2.0** | 0.2 |
@@ -1237,7 +1272,6 @@ NOAA: "5-year (2012-2016) Vector Averaged. Mm, Msf, Mf from average of 20 years 
 | 4MSK11 | 9 | 204.0 | +0.4 | +4.8 | −3.0 | 0.6 | 0.6 | 3.9 | 0.8 | +0.7 | −10.0 | 1.8 | **5.3** | 0.6 |
 | 4MNS12 | 14 | 276.2 | −0.1 | −0.6 | +1.5 | 0.4 | 0.6 | 2.3 | 0.6 | +1.0 | −1.1 | 1.0 | **1.7** | 0.5 |
 | 5MS12 | 18 | 298.3 | −0.3 | −1.6 | −0.1 | 0.3 | 0.6 | 1.8 | 0.4 | +1.3 | −0.3 | 1.3 | **2.3** | 0.3 |
-| 4MSL12 | 8 | 307.0 | +0.2 | +2.1 | +179.5 | 16.2 | 0.5 | 3.8 | **47.8** | +0.7 | +177.1 | 16.7 | **86.5** | 16.1 |
 | 4M2S12 | 14 | 343.0 | −0.6 | −4.4 | +1.0 | 0.7 | 0.6 | 2.5 | 0.8 | +0.5 | −3.6 | 1.0 | **2.9** | 0.0 |
 
 ### Unalaska (`coops/9462620`)

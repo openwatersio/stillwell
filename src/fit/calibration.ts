@@ -30,6 +30,14 @@ export function candidatesDigest(): string {
     .slice(0, 16);
 }
 
+/**
+ * NOAA's names the engine's catalog resolves to another line than NOAA's, so a
+ * prediction or fit under the catalog's name isn't NOAA's constituent: 4MSL12
+ * resolves to 6MSN12, half a cycle away. They are left out of what is fitted
+ * and predicted as NOAA's, and reported.
+ */
+export const MISNAMED: readonly string[] = ["4MSL12"];
+
 /** The candidate an agency's name means: its own name, or one of the spellings the candidate lists. */
 export function candidateOf(name: string): Candidate | undefined {
   return CANDIDATES.find((c) => c.name === name || c.spellings?.includes(name));
@@ -182,6 +190,10 @@ export function noaaConstants(
   const constants = list.map((c) => ({ name: c.name, amplitude: c.amplitude, phase: c.phase_GMT }));
   if (constants.some((c) => !Number.isFinite(c.amplitude) || !Number.isFinite(c.phase)))
     throw new Error(`${id}: NOAA's constants hold a value that isn't a number`);
+  if (constants.some((c) => c.amplitude < 0 || c.phase < 0 || c.phase > 360))
+    throw new Error(
+      `${id}: NOAA's constants hold an amplitude under zero or a phase outside 0 to 360`,
+    );
   // Two spellings of one candidate would be compared with one fitted constant twice.
   if (new Set(constants.map((c) => candidateOf(c.name)?.name ?? c.name)).size !== constants.length)
     throw new Error(`${id}: NOAA's constants name a constituent twice`);

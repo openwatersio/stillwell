@@ -8,9 +8,18 @@
  * (`coops/9455920`) beyond its 37, largest there first. Those are the lines a
  * large tide in shallow water puts energy on that the three lists lack: at
  * Anchorage they carry 123 mm RMS. Selection drops them where a gauge has
- * none. Six more of NOAA's Anchorage names fall on a line the list already
- * has (MP1 on tau1's, MNS2 on eps2's, TK1 on pi1's, RP1 on psi1's, KP1 on
- * phi1's and KJ2 on eta2's) and aren't listed twice.
+ * none.
+ *
+ * Not every name NOAA uses at Anchorage is here under that name:
+ *
+ * - MP1, MNS2, TK1, RP1, KP1 and KJ2 have the speed of a candidate already
+ *   listed (tau1, eps2, pi1, psi1, phi1 and eta2) and aren't listed again.
+ *   RP1 and KJ2 are half a cycle from psi1 and eta2 in phase.
+ * - NOAA's SIGMA1 isn't `sigma1`: fitted NOAA's way, sigma1 is 7.8 mm from
+ *   NOAA's 47 mm constant, so it carries no such spelling.
+ * - NOAA's 4MSL12 has the speed of `6MSN12` and is half a cycle from it, with
+ *   other node factors. The line is listed as 6MSN12, which is what the
+ *   engine's catalog defines, and not as a spelling of NOAA's name.
  *
  * Each is defined here by its Doodson numbers and speed, so the list says
  * which line a name means whatever engine fits it. `doodson` holds the
@@ -50,14 +59,14 @@ export const CANDIDATES: Candidate[] = [
   { name: "tau1", doodson: [1, -1, 2, 0, 0, 0, -1], speed: 14.0251729, from: ["foreman"] },
   { name: "BET1", doodson: [1, 0, -2, 1, 0, 0, -1], speed: 14.41455671, from: ["foreman"] },
   { name: "NO1", doodson: [1, 0, 0, 1, 0, 0, -1], speed: 14.4966939, from: ["foreman"] },
-  { name: "chi1", doodson: [1, 0, 2, -1, 0, 0, -1], speed: 14.5695476, from: ["foreman"] },
+  { name: "chi1", doodson: [1, 0, 2, -1, 0, 0, -1], speed: 14.5695476, from: ["foreman"], spellings: ["CHI1"] },
   { name: "pi1", doodson: [1, 1, -3, 0, 0, 1, 1], speed: 14.9178647, from: ["foreman"] },
   { name: "P1", doodson: [1, 1, -2, 0, 0, 0, 1], speed: 14.9589314, from: ["foreman","noaa","ticon"] },
   { name: "S1", doodson: [1, 1, -1, 0, 0, 0, 0], speed: 15, from: ["foreman","noaa","ticon"] },
   { name: "K1", doodson: [1, 1, 0, 0, 0, 0, -1], speed: 15.0410686, from: ["foreman","noaa","ticon"] },
   { name: "psi1", doodson: [1, 1, 1, 0, 0, -1, -1], speed: 15.0821353, from: ["foreman"] },
   { name: "phi1", doodson: [1, 1, 2, 0, 0, 0, -1], speed: 15.123206, from: ["foreman"] },
-  { name: "theta1", doodson: [1, 2, -2, 1, 0, 0, -1], speed: 15.5125897, from: ["foreman"] },
+  { name: "theta1", doodson: [1, 2, -2, 1, 0, 0, -1], speed: 15.5125897, from: ["foreman"], spellings: ["THETA1"] },
   { name: "J1", doodson: [1, 2, 0, -1, 0, 0, -1], speed: 15.5854433, from: ["foreman","noaa","ticon"] },
   { name: "SO1", doodson: [1, 3, -2, 0, 0, 0, -1], speed: 16.0569644, from: ["foreman"] },
   { name: "OO1", doodson: [1, 3, 0, 0, 0, 0, -1], speed: 16.1391017, from: ["foreman","noaa","ticon"] },
@@ -163,7 +172,7 @@ export const CANDIDATES: Candidate[] = [
   { name: "4MK9", doodson: [9, 1, 0, 0, 0, 0, -1], speed: 130.9774856, from: ["shallow"] },
   { name: "4MSK11", doodson: [11, 3, -2, 0, 0, 0, -1], speed: 160.9774856, from: ["shallow"], compound: true },
   { name: "3ML8", doodson: [8, 1, 0, -1, 0, 0, -2], speed: 116.4807917, from: ["shallow"] },
-  { name: "6MSN12", doodson: [12, 3, -2, -1, 0, 0, 0], speed: 175.4648959, from: ["shallow"], spellings: ["4MSL12"], compound: true },
+  { name: "6MSN12", doodson: [12, 3, -2, -1, 0, 0, 0], speed: 175.4648959, from: ["shallow"], compound: true },
   { name: "OP2", doodson: [2, 0, -2, 0, 0, 0, -2], speed: 28.901967, from: ["shallow"] },
   { name: "M2(KS)2", doodson: [2, 0, 4, 0, 0, 0, 0], speed: 29.148378, from: ["shallow"], spellings: ["M2KS2"] },
   { name: "3MNK9", doodson: [9, 0, 0, 1, 0, 0, -1], speed: 130.4331109, from: ["shallow"] },
