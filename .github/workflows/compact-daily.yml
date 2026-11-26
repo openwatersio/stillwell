@@ -62,10 +62,10 @@ jobs:
       # The sources come from each adapter's metadata (src/sources/jobs.ts).
       # The registry imports no packages (test/jobs.test.ts checks), so it
       # needs Node but not npm ci.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
       - id: sources
@@ -95,8 +95,8 @@ jobs:
     # The environment holds the R2 credentials and only runs on main.
     environment: lake
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -142,10 +142,10 @@ jobs:
       # started, so a source registered since isn't dropped from
       # stations.parquet. The job's steps and settings stay the run's. The
       # lists it reads may come from older code, as any night's publish does.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           ref: main
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -176,7 +176,7 @@ jobs:
       contents: read
       issues: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       # Both, so a failure of one still alerts for the other. With no
       # compactions the gate couldn't pick the sources, and the publish's call
       # would close the issue the first one opens for that.
