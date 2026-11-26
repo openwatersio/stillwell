@@ -150,7 +150,9 @@ One year decides each score, so an unusual year can move it.
 
 The [fit calibration](results/fit-calibration.md) fits NOAA CO-OPS reference stations from the store and compares the constants with the ones NOAA publishes for the same gauges, which NOAA analyzed from its own observations of them under Schureman's corrections. It is the fits' independent reference, and it is run again whenever the method changes ([Checks](contributing/checks.md#fit-calibration)). It compares NOAA's own analysis years and the standard 19-year window, takes the method apart one step at a time between NOAA's and the store's, and scores every set of constants on the held-out year. Its summary says what agrees, which constituents differ and why, and what it found wrong.
 
-It also fits each gauge with the 59 shallow-water compounds NOAA publishes for Anchorage after the candidate list ([`SHALLOW`](../src/fit/candidates.ts)), which no fit starts from, and reports what they change on the held-out year and on a year neither fit read. A large tide in shallow water has energy on those lines that the candidates leave in the residual.
+The [Kartverket calibration](results/kartverket-calibration.md) does the same against the constants Kartverket publishes for its gauges, fitted Kartverket's way: Foreman's corrections at the gauge's latitude, without robust weights, over Kartverket's period. It is a second agency's constants and a second family of nodal corrections through the same engine.
+
+The calibration against NOAA also fits each gauge with the 59 shallow-water compounds NOAA publishes for Anchorage after the candidate list ([`SHALLOW`](../src/fit/candidates.ts)), which no fit starts from, and reports what they change on the held-out year and on a year neither fit read. A large tide in shallow water has energy on those lines that the candidates leave in the residual.
 
 ## What the IHO asks a publisher to state
 
