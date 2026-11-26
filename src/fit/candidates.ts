@@ -3,23 +3,7 @@
  * can't separate two of them, the earlier one is kept. Foreman's 45
  * astronomical and 24 shallow-water constituents in his order (Foreman 1977,
  * Manual for Tidal Heights Analysis and Prediction), then the lines NOAA's 37
- * and TICON-4's 50 add, so a fit can be compared with either name for name,
- * then the shallow-water compounds NOAA publishes for Anchorage
- * (`coops/9455920`) beyond its 37, largest there first. Those are the lines a
- * large tide in shallow water puts energy on that the three lists lack: at
- * Anchorage they carry 123 mm RMS. Selection drops them where a gauge has
- * none.
- *
- * Not every name NOAA uses at Anchorage is here under that name:
- *
- * - MP1, MNS2, TK1, RP1, KP1 and KJ2 have the speed of a candidate already
- *   listed (tau1, eps2, pi1, psi1, phi1 and eta2) and aren't listed again.
- *   RP1 and KJ2 are half a cycle from psi1 and eta2 in phase.
- * - NOAA's SIGMA1 isn't `sigma1`: fitted NOAA's way, sigma1 is 7.8 mm from
- *   NOAA's 47 mm constant, so it carries no such spelling.
- * - NOAA's 4MSL12 has the speed of `6MSN12` and is half a cycle from it, with
- *   other node factors. The line is listed as 6MSN12, which is what the
- *   engine's catalog defines, and not as a spelling of NOAA's name.
+ * and TICON-4's 50 add, so a fit can be compared with either name for name.
  *
  * Each is defined here by its Doodson numbers and speed, so the list says
  * which line a name means whatever engine fits it. `doodson` holds the
@@ -35,7 +19,7 @@ export interface Candidate {
   doodson: number[];
   /** Degrees per hour. */
   speed: number;
-  /** The lists that have the line; `shallow` is NOAA's constituents for Anchorage beyond its 37. */
+  /** The lists that have the line; `shallow` marks one of `SHALLOW`. */
   from: ("foreman" | "noaa" | "ticon" | "shallow")[];
   spellings?: string[];
   /** A shallow-water compound, whose Doodson numbers are its members' combined. */
@@ -52,7 +36,7 @@ export const CANDIDATES: Candidate[] = [
   { name: "Mf", doodson: [0, 2, 0, 0, 0, 0, 0], speed: 1.098033, from: ["foreman","noaa","ticon"], spellings: ["MF"] },
   { name: "ALP1", doodson: [1, -4, 2, 1, 0, 0, 1], speed: 12.38276516, from: ["foreman"] },
   { name: "2Q1", doodson: [1, -3, 0, 2, 0, 0, 1], speed: 12.8542862, from: ["foreman","noaa","ticon"] },
-  { name: "sigma1", doodson: [1, -3, 2, 0, 0, 0, 1], speed: 12.9271398, from: ["foreman","ticon"], spellings: ["SGM"] },
+  { name: "sigma1", doodson: [1, -3, 2, 0, 0, 0, 1], speed: 12.9271398, from: ["foreman","ticon"], spellings: ["SGM","SIGMA1"] },
   { name: "Q1", doodson: [1, -2, 0, 1, 0, 0, 1], speed: 13.3986609, from: ["foreman","noaa","ticon"] },
   { name: "rho1", doodson: [1, -2, 2, -1, 0, 0, 1], speed: 13.4715145, from: ["foreman","noaa","ticon"], spellings: ["RHO","RHO1"] },
   { name: "O1", doodson: [1, -1, 0, 0, 0, 0, 1], speed: 13.9430356, from: ["foreman","noaa","ticon"] },
@@ -123,6 +107,33 @@ export const CANDIDATES: Candidate[] = [
   { name: "3L2", doodson: [2, 1, 0, 0, 0, 0, 0], speed: 29.5331208, from: ["ticon"] },
   { name: "3N2", doodson: [2, -1, 0, 0, 0, 0, 1], speed: 28.4350877, from: ["ticon"] },
   { name: "2MO5", doodson: [5, -1, 0, 0, 0, 0, 1], speed: 71.911244, from: ["ticon"] },
+];
+
+/**
+ * The shallow-water compounds NOAA publishes for Anchorage (`coops/9455920`)
+ * beyond its 37, on lines `CANDIDATES` doesn't have, largest at Anchorage
+ * first. A large tide in shallow water puts energy on them: at Anchorage they
+ * carry 123 mm RMS. No fit starts from them. The calibration fits each of its
+ * gauges with them after `CANDIDATES` and reports what they change
+ * (docs/results/fit-calibration.md), which is the evidence for whether fits
+ * should.
+ *
+ * Not every name NOAA uses at Anchorage is here under that name:
+ *
+ * - MP1, MNS2, TK1, RP1, KP1 and KJ2 have the speed of a candidate already
+ *   listed (tau1, eps2, pi1, psi1, phi1 and eta2) and aren't listed again.
+ *   RP1 and KJ2 are half a cycle from psi1 and eta2 in phase.
+ * - NOAA's SIGMA1 is compared with `sigma1`, though fitted NOAA's way sigma1
+ *   is 7.8 mm from NOAA's 47 mm constant there: NOAA's constants predict
+ *   better with it read as sigma1 than without it.
+ * - NOAA's 4MSL12 has the speed of `6MSN12` and is half a cycle from it, with
+ *   other node factors. The line is here as 6MSN12, which is what the
+ *   engine's catalog defines, and not as a spelling of NOAA's name.
+ * - `OQ2` is the O1 + Q1 compound at 27.3416965° an hour, as NOAA's OO2 is.
+ *   Foreman's OQ2, which `CANDIDATES` leaves out, is another line.
+ */
+// prettier-ignore
+export const SHALLOW: Candidate[] = [
   { name: "3MS8", doodson: [8, 2, -2, 0, 0, 0, 0], speed: 116.9523127, from: ["shallow"] },
   { name: "NO3", doodson: [3, -2, 0, 1, 0, 0, 1], speed: 42.3827651, from: ["shallow"] },
   { name: "MLN2S2", doodson: [2, -4, 4, 0, 0, 0, -2], speed: 26.9523127, from: ["shallow"] },

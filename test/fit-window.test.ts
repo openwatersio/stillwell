@@ -55,7 +55,7 @@ function yearOfValues(year: number): Observation[] {
 }
 
 describe("fitSamples", () => {
-  it("gives the constants and verdicts fitStation publishes for the same window", async () => {
+  it("is the fit fitStation publishes: the same constants, intervals and verdicts in its rows", async () => {
     const root = mkdtempSync(join(tmpdir(), "stillwell-fit-window-"));
     const years = new Map<string, YearRow>();
     for (const year of [2021, 2022, 2023, 2024]) {

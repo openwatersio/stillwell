@@ -34,9 +34,8 @@ Every fit starts from the same candidates in the same priority order, defined in
 1. Foreman's standard set of 45 astronomical and 24 shallow-water constituents, in his order of selection, which follows decreasing amplitude in the tidal potential ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf), p. 16 and pp. 18–19). Of the 69, the mean (Z0) is fitted as `z0_m`, H1 and H2 enter under the IHO names of the same lines, MA2 and MB2, and OQ2 is left out, which leaves 65 under his names.
 2. The constituents NOAA's standard 37 add.
 3. The constituents TICON-4's 50 add ([TICON-4 manual](https://doi.org/10.17882/109129)).
-4. The 59 shallow-water compounds NOAA publishes for Anchorage beyond its 37 that fall on a line none of the three lists has, largest at Anchorage first.
 
-Starting from one list makes fits comparable between gauges, and including NOAA's and TICON's names lets a fit be compared with either name for name. The shallow-water compounds are there because a large tide in shallow water has energy on them, and selection drops them where a gauge has none. The [calibration](results/fit-calibration.md#the-shallow-water-candidates) fits each of its gauges with and without them and scores both, on the held-out year and on a year neither fit read. They about double the time a fit takes, and a window of five years keeps more of them than a gauge has, which shows in the calibration's fits of NOAA's analysis years.
+Starting from one list makes fits comparable between gauges, and including NOAA's and TICON's names lets a fit be compared with either name for name.
 
 A candidate is kept when it passes two tests:
 
@@ -150,6 +149,8 @@ One year decides each score, so an unusual year can move it.
 ## Calibration
 
 The [fit calibration](results/fit-calibration.md) fits NOAA CO-OPS reference stations from the store and compares the constants with the ones NOAA publishes for the same gauges, which NOAA analyzed from its own observations of them under Schureman's corrections. It is the fits' independent reference, and it is run again whenever the method changes ([Checks](contributing/checks.md#fit-calibration)). It compares NOAA's own analysis years and the standard 19-year window, takes the method apart one step at a time between NOAA's and the store's, and scores every set of constants on the held-out year. Its summary says what agrees, which constituents differ and why, and what it found wrong.
+
+It also fits each gauge with the 59 shallow-water compounds NOAA publishes for Anchorage after the candidate list ([`SHALLOW`](../src/fit/candidates.ts)), which no fit starts from, and reports what they change on the held-out year and on a year neither fit read. A large tide in shallow water has energy on those lines that the candidates leave in the residual.
 
 ## What the IHO asks a publisher to state
 

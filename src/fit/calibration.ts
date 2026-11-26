@@ -31,10 +31,10 @@ export function candidatesDigest(): string {
 }
 
 /**
- * NOAA's names the engine's catalog resolves to another line than NOAA's, so a
- * prediction or fit under the catalog's name isn't NOAA's constituent: 4MSL12
- * resolves to 6MSN12, half a cycle away. They are left out of what is fitted
- * and predicted as NOAA's, and reported.
+ * NOAA's names the engine's catalog resolves to another constituent than
+ * NOAA's, so a prediction or fit under the catalog's name isn't NOAA's:
+ * 4MSL12 resolves to 6MSN12, half a cycle away. They are left out of what is
+ * fitted and predicted as NOAA's, and reported.
  */
 export const MISNAMED: readonly string[] = ["4MSL12"];
 

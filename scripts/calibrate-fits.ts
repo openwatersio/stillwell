@@ -36,7 +36,7 @@ import {
   type FittedConstituent,
 } from "@slackwater/engine";
 import type { Erratum } from "../src/errata.ts";
-import { CANDIDATES } from "../src/fit/candidates.ts";
+import { CANDIDATES, SHALLOW } from "../src/fit/candidates.ts";
 import {
   candidateOf,
   difference,
@@ -296,13 +296,12 @@ async function calibrate(task: Task): Promise<Result> {
   });
   const seen = pinned.years.includes(fit.held_out);
 
-  // The standard window again without the shallow-water tier, and both scored on a second year.
+  // The standard window and NOAA's years again with the shallow-water compounds after the
+  // candidates, and the standard window's two fits scored on a second year.
   const since = Date.parse(fit.since!);
-  const standardSamples = await read({ start: since, end: Date.parse(fit.until!) });
-  const without = fitSamples(
-    standardSamples,
-    CANDIDATES.filter((c) => c.from.some((list) => list !== "shallow")),
-  );
+  const longer = [...CANDIDATES, ...SHALLOW];
+  const withTier = fitSamples(await read({ start: since, end: Date.parse(fit.until!) }), longer);
+  const windowWithTier = fitSamples(samples, longer);
   const yearBefore = new Date(since).getUTCFullYear() - 1;
   const before = await read(yearSpan(yearBefore));
   const half = (yearSpan(yearBefore).end - yearSpan(yearBefore).start) / 3_600_000 / 2;
@@ -316,11 +315,13 @@ async function calibrate(task: Task): Promise<Result> {
       : null;
   const tier: Result["tier"] = {
     year_before: yearBefore,
-    with: { before: scoreBefore(standard.constituents) },
-    without: {
-      kept: without.constituents.length,
-      held: score(without.constituents, false),
-      before: scoreBefore(without.constituents),
+    without: { before: scoreBefore(standard.constituents) },
+    with: {
+      kept: withTier.constituents.length,
+      held: score(withTier.constituents, false),
+      before: scoreBefore(withTier.constituents),
+      window_kept: windowWithTier.constituents.length,
+      window: score(windowWithTier.constituents, seen),
     },
   };
 

@@ -4,7 +4,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { constituents } from "@slackwater/engine";
-import { CANDIDATES } from "../src/fit/candidates.ts";
+import { CANDIDATES, SHALLOW } from "../src/fit/candidates.ts";
 import { Flag, type StoredStation } from "../src/schema.ts";
 import { readYearStats, writeObservations } from "../src/store/parquet.ts";
 import { seriesPath } from "../src/store/paths.ts";
@@ -34,18 +34,33 @@ describe("candidateOf", () => {
     assert.equal(candidateOf("SSA")?.name, "Ssa");
     assert.equal(candidateOf("m2"), undefined);
     assert.equal(candidateOf("CHI1")?.name, "chi1");
-    // NOAA's SIGMA1 and 4MSL12 aren't the lines the catalog gives those names.
-    assert.equal(candidateOf("SIGMA1"), undefined);
+    assert.equal(candidateOf("SIGMA1")?.name, "sigma1");
+    // NOAA's 4MSL12 isn't the line the catalog gives that name, and MP1 is on tau1's.
     assert.equal(candidateOf("4MSL12"), undefined);
+    assert.equal(candidateOf("MP1"), undefined);
   });
 
   it("gives no candidate a spelling the catalog reads as another constituent", () => {
-    for (const c of CANDIDATES)
+    for (const c of [...CANDIDATES, ...SHALLOW])
       for (const spelling of c.spellings ?? []) {
         const entry = constituents[spelling];
         if (entry) assert.equal(entry.name, c.name, `${spelling} of ${c.name}`);
         assert.ok(!MISNAMED.includes(spelling), `${spelling} is misnamed in the catalog`);
       }
+  });
+
+  it("keeps the shallow-water compounds off every line and name the candidates have", () => {
+    const line = (c: { doodson: number[] }) => c.doodson.slice(0, 6).join();
+    const lines = new Set(CANDIDATES.map(line));
+    const names = new Set(CANDIDATES.flatMap((c) => [c.name, ...(c.spellings ?? [])]));
+    for (const c of SHALLOW) {
+      assert.ok(!lines.has(line(c)), `${c.name} is on a candidate's line`);
+      assert.ok(!names.has(c.name), `${c.name} is a candidate's name`);
+      const entry = constituents[c.name];
+      assert.equal(entry?.name, c.name);
+      assert.ok(Math.abs(entry!.speed - c.speed) < 1e-6, c.name);
+    }
+    assert.equal(new Set(SHALLOW.map(line)).size, SHALLOW.length);
   });
 
   it("has 37 candidates from NOAA's standard list", () => {
@@ -77,7 +92,7 @@ describe("fittedFor", () => {
   it("gives no constituent for one dropped for another line, and says why", () => {
     assert.deepEqual(fittedFor("S2", fitted, verdicts), { reason: "rayleigh (M2)" });
     assert.deepEqual(fittedFor("M4", fitted, verdicts), { reason: "snr" });
-    assert.deepEqual(fittedFor("SIGMA1", fitted, verdicts), { reason: "not a candidate" });
+    assert.deepEqual(fittedFor("MP1", fitted, verdicts), { reason: "not a candidate" });
   });
 });
 

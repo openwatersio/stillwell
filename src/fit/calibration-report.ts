@@ -101,15 +101,15 @@ export interface Result {
    */
   renamed: { held: Record<string, string>; score: Score; rows: Record<string, Side> } | null;
   /**
-   * The standard window fitted again without the candidates only the shallow-water tier has, and
-   * both fits scored on the held-out year and on `year_before`, the year before the window, which
-   * the choice of candidates was never judged on. `before` is null where the store holds under half
-   * of that year.
+   * The fits again with the shallow-water compounds (`SHALLOW`) after the candidates: the standard
+   * window scored on the held-out year and on `year_before`, the year before the window, which
+   * neither fit read, and NOAA's years scored on the held-out year. `before` is null where the
+   * store holds under half of that year.
    */
   tier: {
     year_before: number;
-    with: { before: Score | null };
-    without: { kept: number; held: Score; before: Score | null };
+    without: { before: Score | null };
+    with: { kept: number; held: Score; before: Score | null; window_kept: number; window: Score };
   };
   /** The years of NOAA's fitted by themselves. */
   yearly: number[];
@@ -191,7 +191,8 @@ export function render(report: Report): string {
   // The findings compare scores, so a report without one, or with no station to compare on, isn't written.
   for (const r of results)
     for (const score of [
-      r.tier.without.held,
+      r.tier.with.held,
+      r.tier.with.window,
       r.scores.standard,
       r.scores.window,
       r.scores.noaa,
@@ -516,32 +517,40 @@ export function render(report: Report): string {
     `From each step to the next, over the ${unseen.length} stations whose NOAA years don't include the held-out one, the RMS is: with node factors at each sample, ${tally(1)}; with one fit of all years, ${tally(2)}; with robust weights, ${tally(3)}; and with the store's constituents, ${tally(4)}. A change under 0.1 mm counts as neither.`,
   );
 
-  p("## The shallow-water candidates");
+  p("## The shallow-water compounds");
   p(
-    "The candidate list's last tier is the shallow-water compounds NOAA publishes for Anchorage ([Constituents](../fits.md#constituents)). The standard window is fitted here with the whole list and again without the candidates only that tier has, and both sets of constants are scored on the held-out year and on the year before the window. The tier was added on the evidence of the held-out year, so that year can't also test it. The year before the window was read by neither fit and judged no choice of candidates.",
+    "No fit starts from the shallow-water compounds NOAA publishes for Anchorage beyond its 37 ([`SHALLOW`](../../src/fit/candidates.ts)). Here each gauge is fitted again with them after the candidate list, over the standard window and over NOAA's years, so the report shows what they would change. The held-out year is the evidence they were proposed on, so it can't also test them. The year before the window was read by neither fit and has judged no choice of candidates. A figure in brackets is from constants fitted from years that include the held-out one.",
   );
   const side = (x: Score | null) => (x ? mm(x.rms) : "");
   p(
     table(
       [
         "Station",
-        "Kept without",
+        "Standard: kept without",
         "Kept with",
         "Held-out year: without (mm)",
         "With (mm)",
         "Year before",
         "Without (mm)",
         "With (mm)",
+        "NOAA's years: kept without",
+        "Kept with",
+        "Held-out year: without (mm)",
+        "With (mm)",
       ],
       results.map((r) => [
         `\`${r.id}\` ${r.name}`,
-        String(r.tier.without.kept),
         String(r.standard.kept),
-        mm(r.tier.without.held.rms),
+        String(r.tier.with.kept),
         mm(r.scores.standard.rms),
+        mm(r.tier.with.held.rms),
         String(r.tier.year_before),
         side(r.tier.without.before),
         side(r.tier.with.before),
+        String(r.window.kept),
+        String(r.tier.with.window_kept),
+        scored(r.scores.window, (x) => mm(x.rms)),
+        scored(r.tier.with.window, (x) => mm(x.rms)),
       ]),
     ),
   );
@@ -636,31 +645,31 @@ function spans(years: number[]): string {
   return out.join(", ");
 }
 
-/** Counts of stations where the shallow-water tier lowers and raises a score by 0.1 mm or more. */
-function tierCounts(results: Result[], which: "held" | "before") {
-  const changes = results.flatMap((r) => {
+/** The change the shallow-water compounds make to one score at each station that has it, in meters. */
+function tierChanges(results: Result[], which: "held" | "before" | "window") {
+  return results.flatMap((r) => {
     const [a, b] =
       which === "held"
-        ? [r.tier.without.held.rms, r.scores.standard.rms]
-        : [r.tier.without.before?.rms ?? null, r.tier.with.before?.rms ?? null];
-    return a === null || b === null || a === undefined ? [] : [{ r, change: b - a }];
+        ? [r.scores.standard.rms, r.tier.with.held.rms]
+        : which === "before"
+          ? [r.tier.without.before?.rms ?? null, r.tier.with.before?.rms ?? null]
+          : r.scores.window.seen
+            ? [null, null]
+            : [r.scores.window.rms, r.tier.with.window.rms];
+    return a === null || b === null ? [] : [{ r, change: b - a }];
   });
-  return {
-    of: changes.length,
-    lower: changes.filter((x) => x.change <= -0.0001),
-    higher: changes.filter((x) => x.change >= 0.0001),
-    changes,
-  };
 }
 
 function tierFinding(results: Result[]): string {
-  const say = (which: "held" | "before") => {
-    const c = tierCounts(results, which);
-    if (!c.of) return "no station can be scored";
-    const most = [...c.changes].sort((a, b) => a.change - b.change)[0]!;
-    return `the RMS is lower at ${c.lower.length} and higher at ${c.higher.length} of ${c.of} stations${c.higher.length ? ` (${c.higher.map((x) => `${x.r.name} ${signed(x.change * 1000)} mm`).join(", ")})` : ""}, and falls most at ${most.r.name}, by ${mm(-most.change)} mm`;
+  const say = (which: "held" | "before" | "window") => {
+    const changes = tierChanges(results, which);
+    if (!changes.length) return "no station can be scored";
+    const higher = changes.filter((x) => x.change >= 0.0001);
+    const lower = changes.filter((x) => x.change <= -0.0001);
+    const most = [...changes].sort((a, b) => a.change - b.change)[0]!;
+    return `the RMS is lower at ${lower.length} and higher at ${higher.length} of ${changes.length} stations${higher.length ? ` (${higher.map((x) => `${x.r.name} ${signed(x.change * 1000)} mm`).join(", ")})` : ""}, and falls most at ${most.r.name}, by ${mm(-most.change)} mm`;
   };
-  return `With the tier, on the held-out year ${say("held")}. On the year before the window ${say("before")}. A change under 0.1 mm counts as neither.`;
+  return `With the compounds, over the standard window and on the held-out year, ${say("held")}. On the year before the window ${say("before")}. Over NOAA's years, which are five or six, on the held-out year ${say("window")}. A change under 0.1 mm counts as neither.`;
 }
 
 type Stats = { compared: number; outside: number; major: number; majorOutside: number };
@@ -816,7 +825,7 @@ function findings(report: Report, w: Stats, s: Stats): string {
     `- **The standard fit predicts the held-out year better than NOAA's constants at ${better} of ${unseen.length} stations** whose NOAA analysis didn't read that year${behind.length ? `; the rest: ${behind.map((r) => r.name).join(", ")}` : ""}. It explains ${percent(Math.min(...variances), 1)}% to ${percent(max(variances), 1)}% of the tidal band's variance, the least at ${lowest.name}.`,
   );
   p(
-    `- **The shallow-water candidates.** ${tierFinding(results)} [The shallow-water candidates](#the-shallow-water-candidates) has each station.`,
+    `- **The shallow-water compounds would help the standard fit.** ${tierFinding(results)} [The shallow-water compounds](#the-shallow-water-compounds) has each station.`,
   );
   p("### What differs, and why");
   p(
@@ -837,7 +846,7 @@ function findings(report: Report, w: Stats, s: Stats): string {
         return side && !("reason" in side) ? [side] : [];
       });
       const outsideAgain = again.filter((x) => (x.d.ratio ?? 0) > 1).length;
-      return `- **${name} is held as ${as.join(" or ")}.** The candidate list has the line under both names, and selection keeps the earlier one, with the node factor the engine gives that name and not NOAA's for ${name}. ${count(name)} of ${stations(name)} are outside, and the step to the candidate list is the largest for ${largest(name, 3)}. That step changes the rest of the list too, so the fit of NOAA's years was run again with only the name changed back: as ${name}, ${outsideAgain} of ${again.length} are outside. ${outsideAgain * 2 < count(name) ? "The name accounts for most of the difference." : `The name doesn't account for the difference: evaluating the node factor at each sample is the largest step for ${largest(name, 0)}, and NOAA's ${name} is from factors held at mid-year.`}`;
+      return `- **${name} is held as ${as.join(" or ")}.** The candidate list has the line under both names, and selection keeps the earlier one, with the node factor the engine gives that name and not NOAA's for ${name}. ${count(name)} of ${stations(name)} are outside, and the step to the candidate list is the largest for ${largest(name, 3)}. That step changes the rest of the list too, so the fit of NOAA's years was run again with only the name changed back: as ${name}, ${outsideAgain} of ${again.length} are outside. ${outsideAgain * 2 < count(name) ? "The name accounts for most of the difference." : "The name alone doesn't account for the difference."}`;
     }),
     `- **Node factors at each sample: S1, P1 and R2.** K1's node factor changes within a year. Held at its mid-year value, as NOAA holds it, a K1 of 1 m alone leaves ${perMeter(k1.S1!)} in S1 and ${perMeter(k1.P1!)} in P1 in a one-year fit, over the years 2006 to 2024, and a K2 of 1 m leaves ${perMeter(k2.R2!)} in R2. With node factors at each sample the same fits leave at most ${mm(exact, 2)} mm. A year fitted NOAA's way therefore puts that part of K1 and K2 into S1, P1 and R2. This step is the largest for ${largest("S1", 0)}, ${largest("P1", 0)} and ${largest("R2", 0)}.`,
     `- **One fit of all years: L2.** Fitting the years together in place of averaging yearly fits is the largest step for ${largest("L2", 1)}. L2 shares its frequency with 2MN2, whose node factor differs ([M1 and L2](../fits.md#what-it-costs)), and a line that doesn't follow L2's factor from year to year would give this. The report doesn't measure 2MN2, so that cause isn't shown.`,
@@ -851,7 +860,7 @@ function findings(report: Report, w: Stats, s: Stats): string {
   p(
     ...short37.map(
       (r) =>
-        `- **Over NOAA's years the candidate list and its selection predict worse than NOAA's constituents at ${r.name}.** ${r.unlisted.length ? `NOAA publishes ${r.rows.length + r.unlisted.length} constituents there, ${r.unlisted.length} of which the candidate list doesn't have. ` : ""}Fitted by the store's method with NOAA's constituents, NOAA's years predict the held-out year to ${mm(r.scores.steps.robust.rms)} mm RMS. With the candidate list they give ${mm(r.scores.window.rms)} mm, of ${r.window.kept} constituents kept. The standard fit, of 19 years, gives ${mm(r.scores.standard.rms)} mm, and NOAA's constants ${mm(r.scores.noaa.rms)} mm.`,
+        `- **Over NOAA's years the candidate list and its selection predict worse than NOAA's constituents at ${r.name}.** ${r.unlisted.length ? `NOAA publishes ${r.rows.length + r.unlisted.length} constituents there, ${r.unlisted.length} of which the candidate list doesn't have. ` : ""}Fitted by the store's method with NOAA's constituents, NOAA's years predict the held-out year to ${mm(r.scores.steps.robust.rms)} mm RMS. With the candidate list they give ${mm(r.scores.window.rms)} mm, of ${r.window.kept} constituents kept. The standard fit, of 19 years, gives ${mm(r.scores.standard.rms)} mm, and NOAA's constants ${mm(r.scores.noaa.rms)} mm. With the shallow-water compounds after the candidates the standard fit gives ${mm(r.tier.with.held.rms)} mm.`,
     ),
     renames.length
       ? `- **Lines held under another name take that name's node factor.** ${renames.map(([name, as]) => `${name} is fitted as ${as}`).join(" and ")}, under Schureman's corrections as the engine gives them for those names. With NOAA's names in their place and nothing else changed, the fit of NOAA's years scores the held-out year ${tally(renamedChange)}.`
