@@ -80,6 +80,18 @@ npm run evaluate:rws
 
 Each writes `docs/results/<source>.json` and prints a Markdown table for the [HRoI evaluation](../hroi-evaluation.md). The RWS one downloads about 50 years of 10-minute data in total the first time, which takes 20–30 minutes.
 
+## Fit calibration
+
+```bash
+STILLWELL_STORE=<copy> npm run calibrate:fits
+```
+
+Fits a fixed list of CO-OPS reference stations from the store and compares the constants with the ones NOAA publishes for the same gauges, into the [fit calibration](../results/fit-calibration.md) and its `docs/results/fit-calibration.json`. Run it again whenever a change to [`src/fit/`](../../src/fit/) or the engine could move a fit's constants, and commit both files. [`scripts/calibrate-fits.ts`](../../scripts/calibrate-fits.ts) holds the stations, why each is there and the years NOAA analyzed.
+
+It reads a copy of the store in a local directory and refuses any other, and it never writes to the store. The copy needs `stations/coops.parquet`, `stations/years/coops.parquet` and each listed station's year files, `obs/coops/<id>/<year>.parquet`, from 1990 on. A copy can mark a station as being written, if the store was when it was copied; the script drops that marker, which is sound only because nothing writes to the copy, and the report names the stations. NOAA's constants come from the CO-OPS metadata API at each run. Each station's entry pins NOAA's comment on its constants, which names the analysis years, and the run stops where the comment has changed, until the entry's years are set from the new one.
+
+One station takes about two minutes and 600 MB on one core. `--concurrency` sets how many are fitted at once, four by default. Station IDs after the command fit only those and keep the rest from the JSON, and `--report` rewrites the Markdown from the JSON without fitting. A run in which any station fails writes nothing.
+
 ## Published files
 
 [`src/store/files.ts`](../../src/store/files.ts) defines every file the store publishes: its path, each column's DuckDB type, whether it can be null, a one-line description, and the sort order, with JSON Schemas for `sources.json` and `errata.json`. The writers in [`src/store/parquet.ts`](../../src/store/parquet.ts) take their columns and types from it, [`test/files.test.ts`](../../test/files.test.ts) writes each file and compares it with its definition, and publish writes it to the store as `datapackage.json`, `sources.schema.json` and `errata.schema.json`. To add or change a column, change its definition there, and the docs that describe it. The site's reference pages render their schema tables from the published `datapackage.json`, so they follow once publish has run. The series files (`obs/`, `predictions/`, `extremes/`, `predicted-extremes/` and `recent/`) are copied out of a scratch table in `parquet.ts` (`createTable`, `appendRows`, `copyOut`), and their readers and the `version` hash (`YEAR_STATS`) name its columns too, so a change to one of those columns needs them changed as well. A column older files lack is `optional`, so readers know to use `union_by_name`. The weekly bucket check runs [`scripts/check-files.ts`](../../scripts/check-files.ts) against the public store, which you can run too:

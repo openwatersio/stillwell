@@ -65,7 +65,7 @@ export const MIN_FIT_DAYS = 183;
 export const SEASONAL_SIGNIFICANCE = 2;
 export { NODE_CORRECTIONS };
 
-const FIT_OPTIONS: FitOptions = { robust: true, nodeCorrections: NODE_CORRECTIONS };
+export const FIT_OPTIONS: FitOptions = { robust: true, nodeCorrections: NODE_CORRECTIONS };
 
 /** The package that fitted and its version, as the fit's provenance. */
 export function engineVersion(): string {
