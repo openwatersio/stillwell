@@ -53,12 +53,15 @@ describe("render", () => {
     const report = read();
     assert.match(
       section(render(report), "### Defects"),
-      /predicts worse than NOAA's constituents at/,
+      /the candidate list predicts worse than NOAA's constituents at/,
     );
     for (const result of report.results) result.scores.window.rms = result.scores.steps.robust.rms;
     const defects = section(render(report), "### Defects");
-    assert.doesNotMatch(defects, /predicts worse than NOAA's constituents at/);
-    assert.match(defects, /predicts no worse than NOAA's constituents at any station/);
+    assert.doesNotMatch(defects, /the candidate list predicts worse than NOAA's constituents at/);
+    assert.match(
+      defects,
+      /the candidate list predicts no worse than NOAA's constituents at any station/,
+    );
   });
 
   it("names a line held under another name only where a fit holds one", () => {

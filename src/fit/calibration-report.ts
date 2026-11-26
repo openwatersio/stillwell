@@ -778,14 +778,14 @@ function findings(report: Report, w: Stats, s: Stats): string {
   p(
     ...short37.map(
       (r) =>
-        `- **The candidate list predicts worse than NOAA's constituents at ${r.name}.** NOAA publishes ${r.rows.length + r.unlisted.length} constituents there, ${r.unlisted.length} of which the candidate list doesn't have. Fitted by the store's method with NOAA's constituents, NOAA's years predict the held-out year to ${mm(r.scores.steps.robust.rms)} mm RMS. With the candidate list they give ${mm(r.scores.window.rms)} mm, and the standard fit ${mm(r.scores.standard.rms)} mm, against ${mm(r.scores.noaa.rms)} mm for NOAA's constants.`,
+        `- **Over NOAA's years the candidate list predicts worse than NOAA's constituents at ${r.name}.** ${r.unlisted.length ? `NOAA publishes ${r.rows.length + r.unlisted.length} constituents there, ${r.unlisted.length} of which the candidate list doesn't have. ` : ""}Fitted by the store's method with NOAA's constituents, NOAA's years predict the held-out year to ${mm(r.scores.steps.robust.rms)} mm RMS. With the candidate list they give ${mm(r.scores.window.rms)} mm, of ${r.window.kept} constituents kept. The standard fit, of 19 years, gives ${mm(r.scores.standard.rms)} mm, and NOAA's constants ${mm(r.scores.noaa.rms)} mm.`,
     ),
     renames.length
       ? `- **Lines held under another name take that name's node factor.** ${renames.map(([name, as]) => `${name} is fitted as ${as}`).join(" and ")}, under Schureman's corrections as the engine gives them for those names. With NOAA's names in their place and nothing else changed, the fit of NOAA's years scores the held-out year ${tally(renamedChange)}.`
       : "",
     short37.length
       ? ""
-      : "- **The candidate list predicts no worse than NOAA's constituents at any station**, by 1 mm RMS or more on the held-out year.",
+      : "- **Over NOAA's years the candidate list predicts no worse than NOAA's constituents at any station**, by 1 mm RMS or more on the held-out year.",
     agrees
       ? `- **None shown in the engine's solver, in Schureman's corrections for the names NOAA uses, or in the phase convention.** NOAA's method run through them gives NOAA's constants, as above${unexplained.length ? `, except at ${unexplained.join(" and ")}, which is open` : ""}. Each step from it to the store's method is a choice [Harmonic fits](../fits.md) makes, with its effect in the tables here.`
       : "- **NOAA's method doesn't give NOAA's constants.** Under 95% of the constants fitted NOAA's way are within 1 mm of NOAA's, so the engine, the corrections, the phases or the store's values differ from NOAA's.",

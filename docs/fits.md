@@ -34,8 +34,9 @@ Every fit starts from the same candidates in the same priority order, defined in
 1. Foreman's standard set of 45 astronomical and 24 shallow-water constituents, in his order of selection, which follows decreasing amplitude in the tidal potential ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf), p. 16 and pp. 18–19). Of the 69, the mean (Z0) is fitted as `z0_m`, H1 and H2 enter under the IHO names of the same lines, MA2 and MB2, and OQ2 is left out, which leaves 65 under his names.
 2. The constituents NOAA's standard 37 add.
 3. The constituents TICON-4's 50 add ([TICON-4 manual](https://doi.org/10.17882/109129)).
+4. The 59 shallow-water compounds NOAA publishes for Anchorage beyond its 37 that fall on a line none of the three lists has, largest at Anchorage first.
 
-Starting from one list makes fits comparable between gauges, and including NOAA's and TICON's names lets a fit be compared with either name for name.
+Starting from one list makes fits comparable between gauges, and including NOAA's and TICON's names lets a fit be compared with either name for name. The shallow-water compounds are there because a large tide in shallow water has energy on them: with the first three lists alone, the 19-year fit at Anchorage left 202 mm RMS in the held-out year's tidal band, against 176 mm for NOAA's constants, and with them it leaves 159 mm. Over the [calibration](results/fit-calibration.md)'s 20 gauges they lower that RMS by 0.1 mm or more at 12 and raise it at none. A window of five years keeps more of them than it should: they raise the held-out RMS by about 0.5 mm at Honolulu and Pago Pago in fits of NOAA's five analysis years.
 
 A candidate is kept when it passes two tests:
 
