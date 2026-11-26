@@ -58,11 +58,11 @@ jobs:
           RUN_ID: ${{ github.event.workflow_run.id }}
           GH_TOKEN: ${{ github.token }}
       - if: steps.ran.outputs.run == 'true'
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - if: steps.ran.outputs.run == 'true'
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -126,7 +126,7 @@ jobs:
           # Problems in the errata files, or checks that couldn't read the store, mean some errata weren't checked; the report lists them.
           jq -e '(.problems | length) == 0 and ([.results[] | select(.unreadable)] | length) == 0' report.json > /dev/null
       - if: always() && steps.ran.outputs.run == 'true'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: errata report
           path: |
