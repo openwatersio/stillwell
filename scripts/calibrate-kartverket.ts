@@ -10,8 +10,9 @@
  * constants with Kartverket's, name for name, with the fit's amplitudes
  * scaled by the gain of the filter Kartverket's analysis is taken to have
  * used, and also fits the series run through that filter in time, so the two
- * ways of allowing for it can be compared. The store's own fit of each gauge
- * is scored on its held-out year.
+ * ways of allowing for it can be compared. Kartverket's constants, this fit's
+ * and the store's own fit of each gauge are scored on the store's held-out
+ * year.
  *
  * It reads a local copy of the store (STILLWELL_STORE) and Kartverket's
  * constants from its tide API, and writes
@@ -36,7 +37,7 @@ import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
 import { isMainThread } from "node:worker_threads";
-import { fit as engineFit, type FittedConstituent } from "@slackwater/engine";
+import { createTidePredictor, fit as engineFit, type FittedConstituent } from "@slackwater/engine";
 import type { Erratum } from "../src/errata.ts";
 import { lowPass, zeroPhaseGain } from "../src/fit/butterworth.ts";
 import { difference, phaseDifference } from "../src/fit/calibration.ts";
@@ -61,7 +62,7 @@ import {
   type Result,
   type Row,
 } from "../src/fit/kartverket-report.ts";
-import { harmonicSamples } from "../src/fit/scores.ts";
+import { harmonicSamples, rmsOf, tidalResiduals } from "../src/fit/scores.ts";
 import { emptyInputs, METHOD, readSeries } from "../src/fit/series.ts";
 import { Flag, type StoredStation } from "../src/schema.ts";
 import { sourceOf } from "../src/sources/index.ts";
@@ -306,6 +307,36 @@ async function calibrate(task: Task): Promise<Result> {
   if (fit.reason !== null || fit.held_out === null)
     throw new Error(`${station.id} has no fit: ${fit.reason}`);
 
+  // Kartverket's constants, and this fit's, predicted under Foreman's corrections over the store's
+  // held-out year, and scored as the store's own fit is: what the Godin filter leaves of observed
+  // minus predicted.
+  const held = await read(yearSpan(fit.held_out));
+  const total = [...tidalResiduals([], held).values()];
+  const varianceOf = (xs: number[]) => {
+    const mean = xs.reduce((a, x) => a + x, 0) / xs.length;
+    return xs.reduce((a, x) => a + (x - mean) ** 2, 0) / xs.length;
+  };
+  const scoreOf = (constants: readonly { name: string; amplitude: number; phase: number }[]) => {
+    const predictor = createTidePredictor([...constants], {
+      offset: false,
+      nodeCorrections: FIT.nodeCorrections,
+      latitude: published.latitude,
+    });
+    const left = tidalResiduals(
+      [],
+      held.map((s) => ({
+        time: s.time,
+        level: s.level - predictor.getWaterLevelAtTime({ time: new Date(s.time) }).level,
+      })),
+    );
+    const values = [...left.values()];
+    return {
+      variance:
+        values.length && varianceOf(total) > 0 ? 1 - varianceOf(values) / varianceOf(total) : null,
+      rms: values.length ? rmsOf(left).rms : null,
+    };
+  };
+
   return {
     id: station.id,
     name: station.name,
@@ -330,6 +361,7 @@ async function calibrate(task: Task): Promise<Result> {
       rms: fit.held_out_rms_m,
       kept: constituents.filter((c) => c.kept).length,
     },
+    scores: { kartverket: scoreOf(published.constants), method: scoreOf(ours) },
     robust,
     vector: outsideOf(ours).vector,
     probe,

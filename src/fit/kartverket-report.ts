@@ -106,6 +106,12 @@ export interface Result {
     rms: number | null;
     kept: number;
   };
+  /**
+   * Kartverket's constants, and the fit compared with them, predicted under Foreman's corrections
+   * and scored on the store's held-out year: the share of the tidal band's variance explained and
+   * the tidal-band RMS left, in meters.
+   */
+  scores: Record<"kartverket" | "method", { variance: number | null; rms: number | null }>;
   /** The same fit with robust weights: the constants outside and the mean vector difference, in meters. */
   robust: { outside: number; vector: number };
   /** The fit compared: its mean vector difference over the short-period constituents, in meters. */
@@ -261,7 +267,7 @@ export function render(report: Report): string {
 
   p("## What is compared");
   p(
-    `Kartverket's constants are from its tide API's \`constituents\` request, which gives amplitudes in centimeters, to a hundredth, and phases to a hundredth of a degree against UTC+1, with the period of observations analyzed ([Kartverket](../../src/sources/kartverket/README.md)). The API doesn't describe the analysis. The fit compared here is the one that reproduces it from the store's values: one least-squares fit over Kartverket's period, without robust weights, of Kartverket's own constituents, with Foreman's nodal corrections at the gauge's latitude evaluated at each sample. It reads the store's final values on the hour. With robust weights, as the store's own fits have, the same fit is a median ${mm(median(results.map((r) => r.robust.vector)), 3)} mm from Kartverket's constants over a gauge's short-period constituents, against ${mm(median(results.map((r) => r.vector)), 3)} mm without them.`,
+    `Kartverket's constants are from its tide API's \`constituents\` request, which gives amplitudes in centimeters, to a hundredth, and phases to a hundredth of a degree against UTC+1, with the period of observations analyzed ([Kartverket](../../src/sources/kartverket/README.md)). The API doesn't describe the analysis. The fit compared here is the one that reproduces it from the store's values: one least-squares fit over Kartverket's period, without robust weights, of Kartverket's own constituents, with Foreman's nodal corrections at the gauge's latitude evaluated at each sample. It reads the store's final values on the hour, which for Kartverket are every value a year old or more, since Kartverket marks none as checked. With robust weights, as the store's own fits have, the same fit is a median ${mm(median(results.map((r) => r.robust.vector)), 3)} mm from Kartverket's constants over a gauge's short-period constituents, against ${mm(median(results.map((r) => r.vector)), 3)} mm without them.`,
   );
   p(
     `Two things about Kartverket's analysis aren't documented and are taken from the comparison itself, so on them it shows consistency and is no independent check. Both are asked of Kartverket ([questions](../../src/sources/kartverket/errata.ts)):`,
@@ -274,7 +280,7 @@ export function render(report: Report): string {
     `A constituent is **outside** where its amplitude or phase differs from Kartverket's by more than the fit's 95% interval, widened in quadrature by half of Kartverket's last digit (${mm(ROUNDING.amplitude, 2)} mm and ${ROUNDING.phase}°). Constituents slower than ${LONG_PERIOD}° an hour are counted apart.`,
   );
   p(
-    "Kartverket's constants aren't scored on a held-out year here. Predicting from them needs Foreman's corrections, which the engine release these fits ran with fits under and doesn't predict under. The store's own fit of each gauge is scored, in [Gauges](#gauges).",
+    "Kartverket's constants, the fit compared with them and the store's own fit of each gauge are each scored on the store's held-out year, in [The held-out year](#the-held-out-year). Kartverket's and the compared fit's are predicted under Foreman's corrections at the gauge's latitude, and the store's own under Schureman's.",
   );
 
   p("## Summary");
@@ -352,7 +358,7 @@ export function render(report: Report): string {
 
   p("## Gauges");
   p(
-    `Each gauge's period as Kartverket gives it, the hourly values the fit read, how many constituents are compared and outside, the one furthest outside, and the seconds past one hour its phases ask Kartverket's to be moved by, from the constituents faster than ${CLOCK.speed}° an hour and of ${mm(CLOCK.amplitude, 0)} mm or more, weighted by amplitude squared, with the half-width of its 95% interval from the fit's phase intervals. The last four columns are the store's own fit of the gauge, with Schureman's corrections: its window, its held-out year, the share of the tidal band's variance it explains there and the tidal-band RMS left.`,
+    `Each gauge's period as Kartverket gives it, the hourly values the fit read, how many constituents are compared and outside, the one furthest outside, and the seconds past one hour its phases ask Kartverket's to be moved by, from the constituents faster than ${CLOCK.speed}° an hour and of ${mm(CLOCK.amplitude, 0)} mm or more, weighted by amplitude squared, with the half-width of its 95% interval from the fit's phase intervals. The last column is the window of the store's own fit of the gauge.`,
   );
   p(
     table(
@@ -367,9 +373,6 @@ export function render(report: Report): string {
         "Largest ratio",
         "Phases ask for (s)",
         "The store's fit",
-        "Held-out year",
-        "Variance explained",
-        "RMS (mm)",
       ],
       results.map((r) => {
         const rows = r.rows.filter((row) => fitted(row) && !isLong(row));
@@ -389,9 +392,6 @@ export function render(report: Report): string {
             ? ""
             : `${r.phase_seconds.toFixed(1)} ± ${r.phase_seconds_ci?.toFixed(1) ?? "?"}`,
           `${r.standard.since.slice(0, 4)}–${+r.standard.until.slice(0, 4) - 1}`,
-          String(r.standard.held_out),
-          r.standard.variance === null ? "" : `${percent(r.standard.variance, 2)}%`,
-          mm(r.standard.rms),
         ];
       }),
       2,
@@ -422,6 +422,55 @@ export function render(report: Report): string {
     p(
       `The copy of the store these fits read marked ${marked.map((r) => `\`${r.id}\``).join(", ")} as being written. The script checks that each year file in the copy has a row in the copy's years file with that file's version before it drops the marker.`,
     );
+
+  p("## The held-out year");
+  p(
+    "Three sets of constants for each gauge, scored on the year the store's own fit holds out: Kartverket's published constants; the fit compared with them above, which is Kartverket's method on the store's values over Kartverket's period, as fitted and without the filter's gain; and the store's own fit, of up to 19 years with Schureman's corrections and its own constituents. Each is predicted under the corrections it was fitted with. The score is the share of the tidal band's variance explained and the tidal-band RMS of what is left, both after the Godin filter ([Scores](../fits.md#scores)).",
+  );
+  const rmsOfScore = (x: { rms: number | null }) => mm(x.rms);
+  const varianceOf = (x: { variance: number | null }) =>
+    x.variance === null ? "" : `${percent(x.variance, 2)}%`;
+  p(
+    table(
+      [
+        "Gauge",
+        "Held-out year",
+        "Kartverket's constants",
+        "Kartverket's method",
+        "The store's fit",
+        "Kartverket's constants RMS (mm)",
+        "Kartverket's method RMS (mm)",
+        "The store's fit RMS (mm)",
+      ],
+      results.map((r) => [
+        `\`${r.id}\` ${r.name}`,
+        String(r.standard.held_out),
+        varianceOf(r.scores.kartverket),
+        varianceOf(r.scores.method),
+        varianceOf(r.standard),
+        rmsOfScore(r.scores.kartverket),
+        rmsOfScore(r.scores.method),
+        rmsOfScore(r.standard),
+      ]),
+    ),
+  );
+  const versus = (a: (r: Result) => number | null, b: (r: Result) => number | null) => {
+    const changes = results.flatMap((r) => {
+      const [x, y] = [a(r), b(r)];
+      return x === null || y === null ? [] : [x - y];
+    });
+    if (!changes.length) return "can't be compared";
+    return `is lower at ${changes.filter((d) => d <= -0.0001).length} and higher at ${changes.filter((d) => d >= 0.0001).length} of ${changes.length} gauges, from ${signed(Math.min(...changes) * 1000)} to ${signed(Math.max(...changes) * 1000)} mm`;
+  };
+  p(
+    `Against Kartverket's constants, the RMS of Kartverket's method on the store's values ${versus(
+      (r) => r.scores.method.rms,
+      (r) => r.scores.kartverket.rms,
+    )}, and the RMS of the store's own fit ${versus(
+      (r) => r.standard.rms,
+      (r) => r.scores.kartverket.rms,
+    )}. A change under 0.1 mm counts as neither.`,
+  );
 
   p("## Outside the interval");
   if (!out1.length) p("No constituent is outside the fit's interval.");

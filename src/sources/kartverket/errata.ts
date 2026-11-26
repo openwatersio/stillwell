@@ -37,5 +37,16 @@ export default {
       asked: null,
       answer: null,
     },
+    {
+      id: "kartverket-constants-viker-k1",
+      stations: ["kartverket/VIK"],
+      question:
+        "The tide API's `constituents` answer for Viker has no K1, though it has P1 and S1 and every other gauge's answer has K1. Was K1 left out of Viker's analysis, or out of the answer?",
+      why: "K1 is one of the constituents the store's comparison with the published constants gives apart, and at Viker there is none to compare.",
+      meanwhile:
+        "The calibration compares the constituents Viker's answer has and says that K1 isn't among them.",
+      asked: null,
+      answer: null,
+    },
   ],
 } satisfies ErrataFile;

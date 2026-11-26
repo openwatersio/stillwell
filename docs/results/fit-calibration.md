@@ -2,7 +2,7 @@
 
 NOAA CO-OPS publishes harmonic constants for its own gauges, analyzed from its own observations of them, which the store holds as `coops`, under Schureman's nodal corrections, which the [fits](../fits.md) use too. This report fits 20 of those gauges from the store and compares the constants with NOAA's, constituent by constituent. It is written by [`scripts/calibrate-fits.ts`](../../scripts/calibrate-fits.ts) (`npm run calibrate:fits`), with every number in [fit-calibration.json](fit-calibration.json), and is run again whenever the method changes. [Checks](../contributing/checks.md#fit-calibration) says how to run it.
 
-These fits ran with @slackwater/engine@1.0.0-beta.14, method 1 of [`src/fit/`](../../src/fit/), Schureman's nodal corrections, and 2025 as the source's last year of final values.
+These fits ran with @slackwater/engine@1.0.0-beta.15, method 1 of [`src/fit/`](../../src/fit/), Schureman's nodal corrections, and 2025 as the source's last year of final values.
 
 ## What is compared
 

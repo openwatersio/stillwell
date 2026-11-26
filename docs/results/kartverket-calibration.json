@@ -1,6 +1,6 @@
 {
-  "engine": "@slackwater/engine@1.0.0-beta.14",
-  "inputs": "ece9a16939abc4ce",
+  "engine": "@slackwater/engine@1.0.0-beta.15",
+  "inputs": "0fdd8309c5aea79a",
   "method": 1,
   "final_year": 2024,
   "filter": {
@@ -35,6 +35,16 @@
         "variance": 0.987075,
         "rms": 0.053441,
         "kept": 68
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.986965,
+          "rms": 0.053669
+        },
+        "method": {
+          "variance": 0.986961,
+          "rms": 0.053677
+        }
       },
       "robust": {
         "outside": 5,
@@ -1468,6 +1478,16 @@
         "variance": 0.995291,
         "rms": 0.034158,
         "kept": 72
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.995203,
+          "rms": 0.034476
+        },
+        "method": {
+          "variance": 0.995204,
+          "rms": 0.034471
+        }
       },
       "robust": {
         "outside": 3,
@@ -2981,6 +3001,16 @@
         "rms": 0.040466,
         "kept": 67
       },
+      "scores": {
+        "kartverket": {
+          "variance": 0.986035,
+          "rms": 0.040661
+        },
+        "method": {
+          "variance": 0.986038,
+          "rms": 0.040656
+        }
+      },
       "robust": {
         "outside": 6,
         "vector": 0.000184
@@ -4392,6 +4422,16 @@
         "variance": 0.992605,
         "rms": 0.056187,
         "kept": 72
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.992536,
+          "rms": 0.056447
+        },
+        "method": {
+          "variance": 0.992536,
+          "rms": 0.056449
+        }
       },
       "robust": {
         "outside": 5,
@@ -5854,6 +5894,16 @@
         "variance": 0.995894,
         "rms": 0.033671,
         "kept": 72
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.995807,
+          "rms": 0.034028
+        },
+        "method": {
+          "variance": 0.995813,
+          "rms": 0.034003
+        }
       },
       "robust": {
         "outside": 0,
@@ -7392,6 +7442,16 @@
         "rms": 0.044982,
         "kept": 68
       },
+      "scores": {
+        "kartverket": {
+          "variance": 0.993957,
+          "rms": 0.045397
+        },
+        "method": {
+          "variance": 0.993958,
+          "rms": 0.045394
+        }
+      },
       "robust": {
         "outside": 9,
         "vector": 0.000162
@@ -8803,6 +8863,16 @@
         "variance": 0.996602,
         "rms": 0.03835,
         "kept": 70
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.996536,
+          "rms": 0.038725
+        },
+        "method": {
+          "variance": 0.996546,
+          "rms": 0.038667
+        }
       },
       "robust": {
         "outside": 21,
@@ -10516,6 +10586,16 @@
         "rms": 0.068213,
         "kept": 65
       },
+      "scores": {
+        "kartverket": {
+          "variance": 0.652355,
+          "rms": 0.068514
+        },
+        "method": {
+          "variance": 0.652324,
+          "rms": 0.068517
+        }
+      },
       "robust": {
         "outside": 8,
         "vector": 0.000414
@@ -11752,6 +11832,16 @@
         "variance": 0.996883,
         "rms": 0.03531,
         "kept": 69
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.996785,
+          "rms": 0.035859
+        },
+        "method": {
+          "variance": 0.996785,
+          "rms": 0.035861
+        }
       },
       "robust": {
         "outside": 3,
@@ -13340,6 +13430,16 @@
         "rms": 0.060691,
         "kept": 71
       },
+      "scores": {
+        "kartverket": {
+          "variance": 0.992435,
+          "rms": 0.061055
+        },
+        "method": {
+          "variance": 0.992433,
+          "rms": 0.061063
+        }
+      },
       "robust": {
         "outside": 9,
         "vector": 0.000249
@@ -14852,6 +14952,16 @@
         "rms": 0.045266,
         "kept": 68
       },
+      "scores": {
+        "kartverket": {
+          "variance": 0.992035,
+          "rms": 0.045653
+        },
+        "method": {
+          "variance": 0.992035,
+          "rms": 0.045654
+        }
+      },
       "robust": {
         "outside": 5,
         "vector": 0.000147
@@ -16289,6 +16399,16 @@
         "rms": 0.046037,
         "kept": 66
       },
+      "scores": {
+        "kartverket": {
+          "variance": 0.988878,
+          "rms": 0.046313
+        },
+        "method": {
+          "variance": 0.988883,
+          "rms": 0.046302
+        }
+      },
       "robust": {
         "outside": 7,
         "vector": 0.00018
@@ -17721,6 +17841,16 @@
         "variance": 0.994156,
         "rms": 0.042236,
         "kept": 67
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.994001,
+          "rms": 0.042793
+        },
+        "method": {
+          "variance": 0.994004,
+          "rms": 0.042781
+        }
       },
       "robust": {
         "outside": 3,
@@ -19158,6 +19288,16 @@
         "variance": 0.99284,
         "rms": 0.063872,
         "kept": 71
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.992722,
+          "rms": 0.064395
+        },
+        "method": {
+          "variance": 0.992722,
+          "rms": 0.064397
+        }
       },
       "robust": {
         "outside": 7,
@@ -20641,6 +20781,16 @@
         "variance": 0.99523,
         "rms": 0.024015,
         "kept": 72
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.995104,
+          "rms": 0.024329
+        },
+        "method": {
+          "variance": 0.99511,
+          "rms": 0.024314
+        }
       },
       "robust": {
         "outside": 3,
@@ -22129,6 +22279,16 @@
         "rms": 0.075706,
         "kept": 65
       },
+      "scores": {
+        "kartverket": {
+          "variance": 0.684788,
+          "rms": 0.076104
+        },
+        "method": {
+          "variance": 0.684838,
+          "rms": 0.076098
+        }
+      },
       "robust": {
         "outside": 11,
         "vector": 0.000497
@@ -23364,6 +23524,16 @@
         "rms": 0.080191,
         "kept": 63
       },
+      "scores": {
+        "kartverket": {
+          "variance": 0.687079,
+          "rms": 0.080581
+        },
+        "method": {
+          "variance": 0.686178,
+          "rms": 0.080697
+        }
+      },
       "robust": {
         "outside": 13,
         "vector": 0.000578
@@ -24550,6 +24720,16 @@
         "variance": 0.993218,
         "rms": 0.04888,
         "kept": 69
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.993134,
+          "rms": 0.04918
+        },
+        "method": {
+          "variance": 0.993137,
+          "rms": 0.049169
+        }
       },
       "robust": {
         "outside": 4,
@@ -25988,6 +26168,16 @@
         "rms": 0.046805,
         "kept": 68
       },
+      "scores": {
+        "kartverket": {
+          "variance": 0.879236,
+          "rms": 0.046974
+        },
+        "method": {
+          "variance": 0.879836,
+          "rms": 0.046857
+        }
+      },
       "robust": {
         "outside": 7,
         "vector": 0.000199
@@ -27324,6 +27514,16 @@
         "variance": 0.996556,
         "rms": 0.036589,
         "kept": 71
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.996426,
+          "rms": 0.037272
+        },
+        "method": {
+          "variance": 0.996438,
+          "rms": 0.03721
+        }
       },
       "robust": {
         "outside": 2,
@@ -28837,6 +29037,16 @@
         "rms": 0.049598,
         "kept": 69
       },
+      "scores": {
+        "kartverket": {
+          "variance": 0.994688,
+          "rms": 0.050423
+        },
+        "method": {
+          "variance": 0.994689,
+          "rms": 0.050419
+        }
+      },
       "robust": {
         "outside": 7,
         "vector": 0.000241
@@ -30299,6 +30509,16 @@
         "rms": 0.058068,
         "kept": 65
       },
+      "scores": {
+        "kartverket": {
+          "variance": 0.614832,
+          "rms": 0.058298
+        },
+        "method": {
+          "variance": 0.614884,
+          "rms": 0.058294
+        }
+      },
       "robust": {
         "outside": 8,
         "vector": 0.000309
@@ -31456,6 +31676,16 @@
         "variance": 0.997033,
         "rms": 0.041091,
         "kept": 72
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.996926,
+          "rms": 0.041826
+        },
+        "method": {
+          "variance": 0.996927,
+          "rms": 0.041822
+        }
       },
       "robust": {
         "outside": 3,
@@ -33018,6 +33248,16 @@
         "variance": 0.659577,
         "rms": 0.069975,
         "kept": 64
+      },
+      "scores": {
+        "kartverket": {
+          "variance": 0.656628,
+          "rms": 0.070278
+        },
+        "method": {
+          "variance": 0.656654,
+          "rms": 0.070275
+        }
       },
       "robust": {
         "outside": 11,
