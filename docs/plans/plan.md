@@ -313,7 +313,7 @@ What BSH asked, in its emails of 2 and 3 November 2026 (recorded in slackwater-d
 - Predictions from those fits are Open Waters' own, and nothing names BSH as their source. Docs and comments describe HRoI as a published method.
 - BSH doesn't release its HRoI constants. Its tables are a yardstick: reference data in `predictions/bsh/` and `predicted-extremes/bsh/` that fits are scored against.
 
-The track covers gauges on the North Sea and its tidal rivers. The four Baltic gauges in BSH's tables keep harmonic fits: their tide is too small and weather-driven for one high and one low water per half lunar day to mean much, and at Kiel-Holtenau slackwater-database's event count already differs from BSH's by 18.
+The track covers German and Dutch gauges on the North Sea and its tidal rivers (Brandon, 2026-11-26). The Dutch gauges are the about 180 where the store holds RWS's observed high and low waters; HRoI timed those better there than the harmonic fit and RWS's own astronomical tide, and one event per cycle would settle [slackwater-database#152](https://github.com/openwatersio/slackwater-database/issues/152). The four Baltic gauges in BSH's tables keep harmonic fits: their tide is too small and weather-driven for one high and one low water per half lunar day to mean much, and at Kiel-Holtenau slackwater-database's event count already differs from BSH's by 18.
 
 Reference data:
 
@@ -324,11 +324,12 @@ Reference data:
 Observed extremes:
 
 - [ ] Observed high and low waters for PEGELONLINE's tidal gauges in `extremes/pegelonline/`, taken from the stored levels by a documented rule (smoothing, then a turning-point search), since PEGELONLINE publishes none. Every turning point is kept, both highs or lows of a double among them ([slackwater-database#152](https://github.com/openwatersio/slackwater-database/issues/152) shows they are real).
+- [ ] RWS's observed extremes are used as RWS selects them. Where a tide has a double low water, as at about a third of tides at Hoek van Holland, the store keeps both lows, and the choice of training events takes the deeper.
 - [ ] Training events chosen in a separate documented step: one high and one low water per half lunar day, assigned to transits as [`src/hroi`](../../src/hroi) does. Each fit records, per year, the share of half days where the choice dropped a turning point. A gauge where that share passes a limit set before the evaluation gets no HRoI fit, because forcing its events would bias one.
 
 Evaluation, as a section of [hroi-evaluation.md](../hroi-evaluation.md), first at the 15 gauges it already covers and then at every gauge with enough record:
 
-- [ ] Fit to observed extremes over 19 years (2005 to 2023 where the record allows, 9 years where it is shorter), and score on the observed extremes of 2024 and 2025 and on BSH's tables for 2026 and 2027.
+- [ ] Fit to observed extremes over 19 years (2005 to 2023 where the record allows, 9 years where it is shorter), and score on the observed extremes of 2024 and 2025. German fits are also scored on BSH's tables for 2026 and 2027, and Dutch fits beside RWS's astronomical extremes for the same held-out years.
 - [ ] Four predictors on the same held-out events: HRoI on the moon's true transits, HRoI on a uniform grid of mean transits, the gauge's harmonic fit (phase 6) and its TICON constants. Mean transits would spare each engine a lunar ephemeris accurate to seconds, if the long-period terms absorb the difference.
 - [ ] The curve between extremes, on held-out 1-minute levels: the harmonic curve warped in time and height to pass through the HRoI extremes, mean curves by tidal range or by event index (as BSH appears to use, and the gap at Husum, Büsum and Papenburg), and the single mean curve the evaluation has.
 - [ ] The measures are written into the evaluation before any fit is scored: RMS of event time in minutes and of event height in centimeters, each beside the gauge's own spread between its 2024 and 2025 scores, so a difference between methods can be told from year-to-year noise.
@@ -355,7 +356,6 @@ As the architecture estimates: about $7 a month in year one on R2 and Workers, p
 ## Open questions
 
 - BSH's answer on the 1 August rule.
-- Whether the HRoI track covers the Dutch gauges too. HRoI timed high and low waters better there than the harmonic fit and RWS's own prediction, the store already holds RWS's observed extremes, and it would settle [slackwater-database#152](https://github.com/openwatersio/slackwater-database/issues/152).
 - Which reference checks a gauge's clock where no other originator holds its record and no neighbor is close: an ocean tide model's constants at the gauge would share no gauge's clock, and the choice turns on which model's license allows it. EOT20 is the first to check; FES's and TPXO's terms are restrictive.
 - STOFS-2D station count and file sizes.
 - PSMSL's reply on commercial redistribution (request sent 2026-11-01).
