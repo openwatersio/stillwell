@@ -1,16 +1,16 @@
 # Calibration of the harmonic fits against Kartverket's constants
 
-Kartverket, the Norwegian Mapping Authority's Hydrographic Service, publishes harmonic constants for its gauges, analyzed with UTide from the observations the store holds as `kartverket`. This report fits 24 of those gauges from the store the way Kartverket analyzes them and compares the constants with Kartverket's, constituent by constituent. It is written by [`scripts/calibrate-kartverket.ts`](../../scripts/calibrate-kartverket.ts) (`npm run calibrate:kartverket`), with every number in [kartverket-calibration.json](kartverket-calibration.json), and is run again whenever the method changes. [Checks](../contributing/checks.md#fit-calibration) says how to run it, and the [calibration against NOAA](fit-calibration.md) is its companion.
+Kartverket, the Norwegian Mapping Authority's Hydrographic Service, publishes harmonic constants for its gauges, analyzed from its own observations of them, which the store holds as `kartverket`. This report fits 24 of those gauges from the store the way that reproduces Kartverket's analysis and compares the constants with Kartverket's, constituent by constituent. It is written by [`scripts/calibrate-kartverket.ts`](../../scripts/calibrate-kartverket.ts) (`npm run calibrate:kartverket`), with every number in [kartverket-calibration.json](kartverket-calibration.json), and is run again whenever the method changes. [Checks](../contributing/checks.md#kartverket) says how to run it, and the [calibration against NOAA](fit-calibration.md) is its companion. Kartverket's constants are © Kartverket, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), and the differences here are derived from them.
 
 These fits ran with @slackwater/engine@1.0.0-beta.14, method 1 of [`src/fit/`](../../src/fit/), and 2024 as the source's last year of final values.
 
 ## What is compared
 
-Kartverket's constants are from its tide API's `constituents` request, which gives amplitudes in centimeters, to a hundredth, and phases to a hundredth of a degree against UTC+1, with the period of observations analyzed ([Kartverket](../../src/sources/kartverket/README.md)). Kartverket analyzes with UTide. The fit compared here takes that method to the store's values: one least-squares fit over Kartverket's period, without robust weights, of Kartverket's own constituents, with Foreman's nodal corrections at the gauge's latitude evaluated at each sample. It reads the store's final values on the hour.
+Kartverket's constants are from its tide API's `constituents` request, which gives amplitudes in centimeters, to a hundredth, and phases to a hundredth of a degree against UTC+1, with the period of observations analyzed ([Kartverket](../../src/sources/kartverket/README.md)). The API doesn't describe the analysis. The fit compared here is the one that reproduces it from the store's values: one least-squares fit over Kartverket's period, without robust weights, of Kartverket's own constituents, with Foreman's nodal corrections at the gauge's latitude evaluated at each sample. It reads the store's final values on the hour. With robust weights, as the store's own fits have, the same fit is a median 0.190 mm from Kartverket's constants over a gauge's short-period constituents, against 0.036 mm without them.
 
 Two things about Kartverket's analysis aren't documented and are taken from the comparison itself, so on them it shows consistency and is no independent check:
 
-- **The filter.** Kartverket's constants are smaller than the fit's above four cycles a day, by the gain of a low-pass filter: its analysis read a series filtered beyond the 10-minute values its API serves. The fit's amplitudes and their intervals are scaled by the gain of a zero-phase Butterworth filter of order 4 with a cutoff of 2.98 hours, which [The filter](#the-filter) estimates from the constants at 67.5° an hour and faster. Below that speed the gain is within 0.37% of one, so the diurnal, semidiurnal, third- and fourth-diurnal constants are compared as fitted, to within that.
+- **The filter.** Kartverket's constants are smaller than the fit's above four cycles a day, by the gain of a low-pass filter: its analysis read a series filtered beyond the 10-minute values its API serves. The fit's amplitudes and their intervals are scaled by the gain of a zero-phase Butterworth filter of order 4 with a cutoff of 2.98 hours, which [The filter](#the-filter) estimates from the constants at 67.5° an hour and faster. Below that speed the gain is within 0.94% of one, and at M4's it is within 0.28%, so the diurnal, semidiurnal and third-diurnal constants are compared very nearly as fitted.
 - **The clock.** Kartverket's phases are moved to UTC by the constituent's speed over one hour and over terrestrial time minus UTC, about 67 s. [Gauges](#gauges) gives the seconds each gauge's fitted phases ask for.
 
 A constituent is **outside** where its amplitude or phase differs from Kartverket's by more than the fit's 95% interval, widened in quadrature by half of Kartverket's last digit (0.05 mm and 0.005°). Constituents slower than 2.5° an hour are counted apart.
@@ -33,53 +33,55 @@ Kartverket's constants aren't scored on a held-out year here. Predicting from th
 
 ## The filter
 
-Over the 165 constants at 67.5° an hour and faster of 0.5 mm or more, the RMS difference between the fit's amplitude and Kartverket's is 0.433 mm with no filter. For each even order, the cutoff that leaves the least, searched from 2.50 to 3.50 hours by hundredths:
+Over the 165 constants at 67.5° an hour and faster of 0.5 mm or more, the RMS difference between the fit's amplitude and Kartverket's is 0.433 mm with no filter. For each even order, the cutoff that leaves the least, searched from 1.50 to 5.00 hours by hundredths:
 
 | Order | Cutoff (hours) | RMS difference (mm) |
 | --- | ---: | ---: |
-| 2 | 2.50 | 0.2632 |
+| 2 | 2.21 | 0.1281 |
 | 4 | 2.98 | 0.0366 |
 | 6 | 3.27 | 0.1514 |
 | 8 | 3.46 | 0.2577 |
 
 The comparison uses order 4 and 2.98 hours, which leaves 0.0366 mm. That is the least of all. The filter is estimated from the constants it is then used to compare, so agreement at these speeds says the constants are consistent with one such filter at every gauge, and nothing more.
 
-The other way to allow for the filter is to run the store's 10-minute values through it and fit what comes out. That was done for each gauge, with gaps of up to an hour filled in a straight line, a day dropped at each end of a run of values, and the result read on the hour. The median vector difference from Kartverket's constants is 0.035 mm by the gain and 0.037 mm by the filter in time over all short-period constituents, and 0.030 mm by the gain and 0.028 mm by the filter in time at 67.5° an hour and faster. The filtered series loses the values around every gap, which the gain doesn't, so the comparison scales by the gain.
+The other way to allow for the filter is to run the store's 10-minute values through it and fit what comes out. That was done for 24 of the 24 gauges, each with one datum epoch, with gaps of up to an hour filled in a straight line, a day dropped at each end of a run of values, and the result read on the hour. The median vector difference from Kartverket's constants is 0.035 mm by the gain and 0.037 mm by the filter in time over all short-period constituents, and 0.030 mm by the gain and 0.028 mm by the filter in time at 67.5° an hour and faster. The two ways differ by 0.002 mm in that median. The comparison scales by the gain, which needs no rule for gaps and keeps the fit's intervals.
 
 ## Gauges
 
-Each gauge's period as Kartverket gives it, the hourly values the fit read, how many constituents are compared and outside, the one furthest outside, and the seconds past one hour its phases ask Kartverket's to be moved by, from the constituents faster than 10° an hour weighted by amplitude. The last three columns are the store's own fit of the gauge, of 19 years with Schureman's corrections: its held-out year, the share of the tidal band's variance it explains there and the tidal-band RMS left.
+Each gauge's period as Kartverket gives it, the hourly values the fit read, how many constituents are compared and outside, the one furthest outside, and the seconds past one hour its phases ask Kartverket's to be moved by, from the constituents faster than 10° an hour and of 5 mm or more, weighted by amplitude squared. The last four columns are the store's own fit of the gauge, with Schureman's corrections: its window, its held-out year, the share of the tidal band's variance it explains there and the tidal-band RMS left.
 
-| Gauge | Name | Latitude | Period | Hourly values | Compared | Outside | Largest ratio | Phases ask for (s) | Held-out year | Variance explained | RMS (mm) |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `kartverket/AES` | Ålesund | 62.5°N | 2006-01-01 to 2020-12-31 | 131,250 | 53 | 0 | M2 0.51 | 68.8 | 2024 | 98.71% | 53.4 |
-| `kartverket/ANX` | Andenes | 69.3°N | 2006-01-01 to 2020-12-31 | 131,459 | 56 | 0 | M8 0.91 | 68.2 | 2024 | 99.53% | 34.2 |
-| `kartverket/BGO` | Bergen | 60.4°N | 2006-01-01 to 2020-12-31 | 131,284 | 52 | 0 | M3 0.38 | 68.0 | 2024 | 98.62% | 40.5 |
-| `kartverket/BOO` | Bodø | 67.3°N | 2006-01-01 to 2020-12-31 | 131,133 | 53 | 0 | 2MK6 0.88 | 67.7 | 2024 | 99.26% | 56.2 |
-| `kartverket/HAR` | Harstad | 68.8°N | 2006-01-01 to 2020-12-31 | 131,338 | 56 | 0 | SO3 0.53 | 68.0 | 2024 | 99.59% | 33.7 |
-| `kartverket/HEI` | Heimsjøen | 63.4°N | 2006-01-01 to 2020-12-31 | 130,924 | 52 | 0 | 2MK5 0.79 | 68.3 | 2024 | 99.41% | 45.0 |
-| `kartverket/HFT` | Hammerfest | 70.7°N | 2006-01-01 to 2020-12-31 | 131,227 | 57 | 10 | OQ2 1.42 | 67.8 | 2024 | 99.66% | 38.4 |
-| `kartverket/HRO` | Helgeroa | 59.0°N | 2006-01-01 to 2020-12-31 | 131,356 | 44 | 0 | MSK6 0.41 | 68.0 | 2024 | 65.54% | 68.2 |
-| `kartverket/HVG` | Honningsvåg | 71.0°N | 2006-01-01 to 2020-12-31 | 131,222 | 59 | 0 | M6 0.59 | 68.0 | 2024 | 99.69% | 35.3 |
-| `kartverket/KAB` | Kabelvåg | 68.2°N | 2006-01-01 to 2020-12-31 | 131,434 | 55 | 0 | 2MK6 0.44 | 68.2 | 2024 | 99.25% | 60.7 |
-| `kartverket/KSU` | Kristiansund | 63.1°N | 2006-01-01 to 2020-12-31 | 131,375 | 53 | 0 | M8 0.93 | 68.2 | 2024 | 99.22% | 45.3 |
-| `kartverket/MAY` | Måløy | 61.9°N | 2006-01-01 to 2020-12-31 | 131,384 | 53 | 0 | M8 0.76 | 69.1 | 2024 | 98.90% | 46.0 |
-| `kartverket/MSU` | Mausund | 63.9°N | 2010-10-20 to 2020-12-31 | 89,284 | 53 | 0 | 3MK7 0.60 | 69.5 | 2024 | 99.42% | 42.2 |
-| `kartverket/NVK` | Narvik | 68.4°N | 2006-01-01 to 2020-12-31 | 130,414 | 54 | 0 | M2 0.39 | 68.3 | 2024 | 99.28% | 63.9 |
-| `kartverket/NYA` | Ny-Ålesund | 78.9°N | 2006-01-01 to 2020-12-31 | 131,232 | 54 | 0 | MSK6 0.93 | 68.1 | 2024 | 99.52% | 24.0 |
-| `kartverket/OSC` | Oscarsborg | 59.7°N | 2006-01-01 to 2020-12-31 | 131,060 | 44 | 0 | M8 0.45 | 68.2 | 2024 | 68.81% | 75.7 |
-| `kartverket/OSL` | Oslo | 59.9°N | 2006-01-01 to 2020-12-31 | 122,163 | 42 | 0 | SN4 0.51 | 79.5 | 2024 | 69.01% | 80.2 |
-| `kartverket/RVK` | Rørvik | 64.9°N | 2006-01-01 to 2020-12-31 | 130,905 | 53 | 0 | M6 0.95 | 68.4 | 2024 | 99.32% | 48.9 |
-| `kartverket/SVG` | Stavanger | 59.0°N | 2006-01-01 to 2020-12-31 | 131,246 | 49 | 1 | M8 1.04 | 68.7 | 2024 | 88.01% | 46.8 |
-| `kartverket/TOS` | Tromsø | 69.6°N | 2006-01-01 to 2020-12-31 | 131,027 | 55 | 0 | M8 0.87 | 68.0 | 2024 | 99.66% | 36.6 |
-| `kartverket/TRD` | Trondheim | 63.4°N | 2006-01-01 to 2020-12-31 | 131,138 | 53 | 0 | 2MK6 0.72 | 67.7 | 2024 | 99.49% | 49.6 |
-| `kartverket/TRG` | Tregde | 58.0°N | 2006-01-01 to 2020-12-31 | 131,203 | 41 | 0 | 2SM6 0.65 | 66.3 | 2024 | 61.79% | 58.1 |
-| `kartverket/VAW` | Vardø | 70.4°N | 2006-01-01 to 2020-12-31 | 131,386 | 58 | 0 | M6 0.83 | 67.8 | 2024 | 99.70% | 41.1 |
-| `kartverket/VIK` | Viker | 59.0°N | 2006-01-01 to 2020-12-31 | 131,222 | 42 | 0 | M8 0.98 | 67.3 | 2024 | 65.96% | 70.0 |
+| Gauge | Name | Latitude | Period | Hourly values | Compared | Outside | Largest ratio | Phases ask for (s) | The store's fit | Held-out year | Variance explained | RMS (mm) |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `kartverket/AES` | Ålesund | 62.5°N | 2006-01-01 to 2020-12-31 | 131,250 | 53 | 0 | M2 0.51 | 68.8 | 2005–2023 | 2024 | 98.71% | 53.4 |
+| `kartverket/ANX` | Andenes | 69.3°N | 2006-01-01 to 2020-12-31 | 131,459 | 56 | 0 | M8 0.91 | 68.2 | 2005–2023 | 2024 | 99.53% | 34.2 |
+| `kartverket/BGO` | Bergen | 60.4°N | 2006-01-01 to 2020-12-31 | 131,284 | 52 | 0 | M3 0.38 | 68.0 | 2005–2023 | 2024 | 98.62% | 40.5 |
+| `kartverket/BOO` | Bodø | 67.3°N | 2006-01-01 to 2020-12-31 | 131,133 | 53 | 0 | 2MK6 0.88 | 67.7 | 2005–2023 | 2024 | 99.26% | 56.2 |
+| `kartverket/HAR` | Harstad | 68.8°N | 2006-01-01 to 2020-12-31 | 131,338 | 56 | 0 | SO3 0.53 | 68.0 | 2005–2023 | 2024 | 99.59% | 33.7 |
+| `kartverket/HEI` | Heimsjøen | 63.4°N | 2006-01-01 to 2020-12-31 | 130,924 | 52 | 0 | 2MK5 0.79 | 68.3 | 2005–2023 | 2024 | 99.41% | 45.0 |
+| `kartverket/HFT` | Hammerfest | 70.7°N | 2006-01-01 to 2020-12-31 | 131,227 | 57 | 10 | OQ2 1.42 | 67.8 | 2005–2023 | 2024 | 99.66% | 38.4 |
+| `kartverket/HRO` | Helgeroa | 59.0°N | 2006-01-01 to 2020-12-31 | 131,356 | 44 | 0 | MSK6 0.41 | 68.0 | 2005–2023 | 2024 | 65.54% | 68.2 |
+| `kartverket/HVG` | Honningsvåg | 71.0°N | 2006-01-01 to 2020-12-31 | 131,222 | 59 | 0 | M6 0.59 | 68.0 | 2005–2023 | 2024 | 99.69% | 35.3 |
+| `kartverket/KAB` | Kabelvåg | 68.2°N | 2006-01-01 to 2020-12-31 | 131,434 | 55 | 0 | 2MK6 0.44 | 68.2 | 2005–2023 | 2024 | 99.25% | 60.7 |
+| `kartverket/KSU` | Kristiansund | 63.1°N | 2006-01-01 to 2020-12-31 | 131,375 | 53 | 0 | M8 0.93 | 68.2 | 2005–2023 | 2024 | 99.22% | 45.3 |
+| `kartverket/MAY` | Måløy | 61.9°N | 2006-01-01 to 2020-12-31 | 131,384 | 53 | 0 | M8 0.76 | 69.1 | 2005–2023 | 2024 | 98.90% | 46.0 |
+| `kartverket/MSU` | Mausund | 63.9°N | 2010-10-20 to 2020-12-31 | 89,284 | 53 | 0 | 3MK7 0.60 | 69.5 | 2010–2023 | 2024 | 99.42% | 42.2 |
+| `kartverket/NVK` | Narvik | 68.4°N | 2006-01-01 to 2020-12-31 | 130,414 | 54 | 0 | M2 0.39 | 68.3 | 2005–2023 | 2024 | 99.28% | 63.9 |
+| `kartverket/NYA` | Ny-Ålesund | 78.9°N | 2006-01-01 to 2020-12-31 | 131,232 | 54 | 0 | MSK6 0.93 | 68.1 | 2005–2023 | 2024 | 99.52% | 24.0 |
+| `kartverket/OSC` | Oscarsborg | 59.7°N | 2006-01-01 to 2020-12-31 | 131,060 | 44 | 0 | M8 0.45 | 68.2 | 2005–2023 | 2024 | 68.81% | 75.7 |
+| `kartverket/OSL` | Oslo | 59.9°N | 2006-01-01 to 2020-12-31 | 122,163 | 42 | 0 | SN4 0.51 | 79.5 | 2006–2023 | 2024 | 69.01% | 80.2 |
+| `kartverket/RVK` | Rørvik | 64.9°N | 2006-01-01 to 2020-12-31 | 130,905 | 53 | 0 | M6 0.95 | 68.4 | 2005–2023 | 2024 | 99.32% | 48.9 |
+| `kartverket/SVG` | Stavanger | 59.0°N | 2006-01-01 to 2020-12-31 | 131,246 | 49 | 1 | M8 1.04 | 68.7 | 2005–2023 | 2024 | 88.01% | 46.8 |
+| `kartverket/TOS` | Tromsø | 69.6°N | 2006-01-01 to 2020-12-31 | 131,027 | 55 | 0 | M8 0.87 | 68.0 | 2005–2023 | 2024 | 99.66% | 36.6 |
+| `kartverket/TRD` | Trondheim | 63.4°N | 2006-01-01 to 2020-12-31 | 131,138 | 53 | 0 | 2MK6 0.72 | 67.7 | 2005–2023 | 2024 | 99.49% | 49.6 |
+| `kartverket/TRG` | Tregde | 58.0°N | 2006-01-01 to 2020-12-31 | 131,203 | 41 | 0 | 2SM6 0.65 | 66.3 | 2005–2023 | 2024 | 61.79% | 58.1 |
+| `kartverket/VAW` | Vardø | 70.4°N | 2006-01-01 to 2020-12-31 | 131,386 | 58 | 0 | M6 0.83 | 67.8 | 2005–2023 | 2024 | 99.70% | 41.1 |
+| `kartverket/VIK` | Viker | 59.0°N | 2006-01-01 to 2020-12-31 | 131,222 | 42 | 0 | M8 0.98 | 67.3 | 2005–2023 | 2024 | 65.96% | 70.0 |
 
-Terrestrial time minus UTC over these periods is 67.2 to 67.9 s. The fitted phases ask for a median of 68.1 s, from 66.3 to 79.5 s.
+Terrestrial time minus UTC over these periods is 67.2 to 67.9 s. The fitted phases ask for a median of 68.1 s, from 66.3 to 79.5 s, the furthest from it at Oslo.
 
-The store holds under two thirds of the hours of 2010 at Mausund; 2006 at Oslo. The fit reads those years as they are, as one fit of the whole period does.
+Kartverket publishes no constant for K1 at Viker.
+
+Of the part of each year that is in the period, the store holds under two thirds of the hours of 2006 at Oslo. The fit reads those years as they are, as one fit of the whole period does.
 
 ## Outside the interval
 
@@ -99,18 +101,18 @@ Every short-period constant outside the fit's interval, with the differences the
 | `kartverket/HFT` | S2 | 275.20 | −0.24 | −0.08 | 0.46 | 0.38 | 0.08 | **1.0** |
 | `kartverket/HFT` | T2 | 13.70 | −0.10 | −1.63 | 0.40 | 0.38 | 1.61 | **1.0** |
 
-Hammerfest has 10 outside, so it was fitted again with each year of the period left out in turn. That leaves from 5 (without 2019) to 14 outside, so no one year accounts for it. This report doesn't find why Hammerfest's constants differ.
+Hammerfest has 10 outside and a mean vector difference of 0.250 mm, so it was fitted again with each year of the period left out in turn. That leaves 5 to 14 outside and a mean vector difference of 0.240 to 0.294 mm, so no one year accounts for the difference. This report doesn't find why Hammerfest's constants differ.
 
 ## Constituents across gauges
 
-For each of Kartverket's constituents, over the gauges where the fit has it: the filter's gain at its speed, the median differences from Kartverket's without sign, how many are outside, and the median vector difference without the gain.
+For each of Kartverket's constituents, over the gauges where the fit has it: the filter's gain at its speed, the median differences from Kartverket's without sign, how many are outside, for the short-period ones, and the median vector difference without the gain.
 
 | Constituent | Gauges | Gain | Amplitude (mm) | Amplitude (%) | Phase (°) | Vector (mm) | Outside | Without the gain: vector (mm) |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| SA | 24 | 1.0000 | 5.734 | 4.61 | 3.34 | 10.634 | 5 | 10.634 |
-| SSA | 12 | 1.0000 | 0.038 | 0.18 | 0.08 | 0.057 | 0 | 0.057 |
-| MM | 24 | 1.0000 | 0.034 | 0.12 | 0.10 | 0.055 | 0 | 0.055 |
-| MF | 24 | 1.0000 | 0.042 | 0.26 | 0.10 | 0.057 | 0 | 0.057 |
+| SA | 24 | 1.0000 | 5.734 | 4.61 | 3.34 | 10.634 |  | 10.634 |
+| SSA | 12 | 1.0000 | 0.038 | 0.18 | 0.08 | 0.057 |  | 0.057 |
+| MM | 24 | 1.0000 | 0.034 | 0.12 | 0.10 | 0.055 |  | 0.055 |
+| MF | 24 | 1.0000 | 0.042 | 0.26 | 0.10 | 0.057 |  | 0.057 |
 | ALP1 | 9 | 1.0000 | 0.014 | 1.60 | 0.52 | 0.023 | 0 | 0.023 |
 | 2Q1 | 18 | 1.0000 | 0.032 | 0.99 | 0.19 | 0.043 | 0 | 0.043 |
 | SIG1 | 23 | 1.0000 | 0.031 | 0.70 | 0.36 | 0.044 | 0 | 0.044 |

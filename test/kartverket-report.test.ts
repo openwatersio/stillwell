@@ -2,7 +2,14 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { engineVersion } from "../src/fit/fit.ts";
-import { estimateFilter, FILTER, render, type Report } from "../src/fit/kartverket-report.ts";
+import {
+  estimateFilter,
+  FILTER,
+  GAUGES,
+  kartverketDigest,
+  render,
+  type Report,
+} from "../src/fit/kartverket-report.ts";
 import { METHOD } from "../src/fit/series.ts";
 
 const read = () =>
@@ -15,6 +22,12 @@ describe("the Kartverket calibration", () => {
     const report = read();
     assert.equal(report.method, METHOD, rerun);
     assert.deepEqual(report.filter, FILTER, rerun);
+    assert.equal(report.inputs, kartverketDigest(), rerun);
+    assert.deepEqual(
+      report.results.map((r) => r.id),
+      GAUGES.map((code) => `kartverket/${code}`),
+      rerun,
+    );
     assert.match(report.engine, /^@slackwater\/engine@/);
     assert.ok(engineVersion());
   });

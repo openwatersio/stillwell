@@ -43,8 +43,12 @@ import { difference, phaseDifference } from "../src/fit/calibration.ts";
 import { yearSpan } from "../src/fit/calibration-report.ts";
 import { fitStation } from "../src/fit/fit.ts";
 import {
+  chosen,
   estimateFilter,
   FILTER,
+  FIT,
+  GAUGES,
+  kartverketDigest,
   LONG_PERIOD,
   PROBE_FROM,
   render,
@@ -59,6 +63,7 @@ import { Flag, type StoredStation } from "../src/schema.ts";
 import { sourceOf } from "../src/sources/index.ts";
 import {
   parseConstants,
+  periodOf,
   ROUNDING,
   ttMinusUtc,
   type PublishedConstants,
@@ -74,15 +79,6 @@ const JSON_PATH = "docs/results/kartverket-calibration.json";
 const REPORT_PATH = "docs/results/kartverket-calibration.md";
 const HOUR_MS = 3_600_000;
 const STEP_MS = 600_000;
-
-/**
- * The gauges: every one whose constants Kartverket analyzed from a period
- * that ends with 2020 and starts by the end of 2010, which is each gauge with
- * ten years or more in the analysis. A run stops where a gauge's period no
- * longer meets that, since its constants are then from another analysis.
- */
-// prettier-ignore
-const GAUGES = ["AES","ANX","BGO","BOO","HAR","HEI","HFT","HRO","HVG","KAB","KSU","MAY","MSU","NVK","NYA","OSC","OSL","RVK","SVG","TOS","TRD","TRG","VAW","VIK"];
 
 interface Task {
   station: StoredStation;
@@ -111,11 +107,7 @@ async function calibrate(task: Task): Promise<Result> {
   const names = published.constants.map((c) => c.name);
   // Kartverket's method: one plain fit of its own constituents, Foreman's corrections at the
   // gauge's latitude, f, u and the argument at each sample.
-  const options = {
-    nodeCorrections: "foreman" as const,
-    latitude: published.latitude,
-    dropDependent: true,
-  };
+  const options = { ...FIT, latitude: published.latitude };
   const fitted = (samples: readonly Sample[]) =>
     engineFit(harmonicSamples(samples), names, { ...options, confidence: true }).constituents;
   const gain = (speed: number) => zeroPhaseGain(speed, FILTER.order, FILTER.cutoff_hours);
@@ -237,7 +229,7 @@ async function calibrate(task: Task): Promise<Result> {
     num += theirs.amplitude ** 2 * theirs.speed * phaseDifference(c.phase, theirs.phase);
     den += theirs.amplitude ** 2 * theirs.speed ** 2;
   }
-  const phaseSeconds = tt - (den ? (num / den) * 3600 : 0);
+  const phaseSeconds = den ? tt - (num / den) * 3600 : null;
 
   // Kartverket doesn't say which years its long-period constants are from: SA again over 1991 to
   // 2020, where the store holds each of those years whole.
@@ -272,10 +264,17 @@ async function calibrate(task: Task): Promise<Result> {
   );
   const inPeriod = new Map<number, number>();
   for (const s of samples) inPeriod.set(yearOf(s.time), (inPeriod.get(yearOf(s.time)) ?? 0) + 1);
-  const shortYears = periodYears.filter(
-    (y) => (inPeriod.get(y) ?? 0) < (YEAR_SHARE * (yearSpan(y).end - yearSpan(y).start)) / HOUR_MS,
-  );
+  // A year against the part of it the period holds, so a period that starts in October isn't short of a year.
+  const shortYears = periodYears.filter((y) => {
+    const span = { start: yearSpan(y).start - HOUR_MS, end: yearSpan(y).end - HOUR_MS };
+    const within = Math.min(span.end, period.end) - Math.max(span.start, period.start);
+    return (inPeriod.get(y) ?? 0) < (YEAR_SHARE * within) / HOUR_MS;
+  });
 
+  const robust = outsideOf(
+    engineFit(harmonicSamples(samples), names, { ...options, robust: true, confidence: true })
+      .constituents,
+  );
   let probe: Result["probe"] = null;
   if (outsideOf(ours).outside >= PROBE_FROM)
     probe = periodYears.map((year) => ({
@@ -307,11 +306,15 @@ async function calibrate(task: Task): Promise<Result> {
     tt_seconds: tt,
     sa_long: saLong,
     standard: {
+      since: fit.since!,
+      until: fit.until!,
       held_out: fit.held_out,
       variance: fit.variance_explained,
       rms: fit.held_out_rms_m,
       kept: constituents.filter((c) => c.kept).length,
     },
+    robust,
+    vector: outsideOf(ours).vector,
     probe,
     rows,
   };
@@ -337,14 +340,22 @@ async function main(): Promise<void> {
   const concurrency = concurrencyOf(values.concurrency, GAUGES.length);
   const copy = await openCopy(SOURCE);
   const tasks: Task[] = [];
+  // Every gauge's constants are asked for, so the ones calibrated are shown to be all that meet the rule.
+  const meeting: string[] = [];
+  const answers = new Map<string, string>();
+  for (const s of copy.list) {
+    const xml = await harmonicConstants(s.source_id);
+    answers.set(s.source_id, xml);
+    const period = periodOf(s.source_id, xml);
+    if (period && chosen(period)) meeting.push(s.source_id);
+  }
+  if (meeting.sort().join() !== [...GAUGES].sort().join())
+    throw new Error(
+      `the gauges whose constants are from a period that ends with 2020 and starts before 2011 are now ${meeting.join(" ")}; set GAUGES from that`,
+    );
   for (const code of GAUGES) {
     const station = await stationOf(copy, `${SOURCE}/${code}`);
-    const published = parseConstants(code, await harmonicConstants(code));
-    if (
-      new Date(published.period.end - 1).toISOString().slice(0, 10) !== "2020-12-31" ||
-      published.period.start >= Date.UTC(2011, 0, 1)
-    )
-      throw new Error(`${station.id}: Kartverket's constants are now from another period`);
+    const published = parseConstants(code, answers.get(code)!);
     tasks.push({
       station,
       published,
@@ -360,6 +371,7 @@ async function main(): Promise<void> {
   const results = await inWorkers<Task, Result>(new URL(import.meta.url), copy, tasks, concurrency);
   const report: Report = {
     engine: copy.engine,
+    inputs: kartverketDigest(),
     method: METHOD,
     final_year: copy.final,
     filter: FILTER,

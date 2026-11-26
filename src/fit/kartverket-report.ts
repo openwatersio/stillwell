@@ -1,4 +1,5 @@
-import { ROUNDING } from "../sources/kartverket/constants.ts";
+import { createHash } from "node:crypto";
+import { NAMES, ROUNDING } from "../sources/kartverket/constants.ts";
 import { zeroPhaseGain } from "./butterworth.ts";
 import { mm, ratio, signed, table, percent } from "./calibration-report.ts";
 import { median, type Difference } from "./calibration.ts";
@@ -17,6 +18,22 @@ export const FILTERED_FROM = 67.5;
 export const YEAR_SHARE = 2 / 3;
 /** A gauge with this many constants outside is fitted again with each year left out. */
 export const PROBE_FROM = 5;
+
+/**
+ * The gauges: every one whose constants Kartverket analyzed from a period
+ * that ends with 2020 and starts before 2011, in its UTC+1, which is each
+ * gauge with ten years or more in the analysis. A run asks for every gauge's
+ * constants and stops where these aren't the ones that meet that.
+ */
+// prettier-ignore
+export const GAUGES = ["AES","ANX","BGO","BOO","HAR","HEI","HFT","HRO","HVG","KAB","KSU","MAY","MSU","NVK","NYA","OSC","OSL","RVK","SVG","TOS","TRD","TRG","VAW","VIK"];
+
+/** Whether a period, from `start` to before `end` (epoch ms), is one `GAUGES` are chosen by. */
+export const chosen = (period: { start: number; end: number }) =>
+  period.end === Date.UTC(2020, 11, 31, 23) && period.start < Date.UTC(2010, 11, 31, 23);
+
+/** How the gauges are fitted, Kartverket's way: one plain fit, Foreman's corrections at the gauge's latitude. */
+export const FIT = { nodeCorrections: "foreman", dropDependent: true } as const;
 
 /** The filter Kartverket's analysis is taken to have run its series through: a zero-phase Butterworth. */
 export const FILTER = { order: 4, cutoff_hours: 2.98 };
@@ -57,21 +74,58 @@ export interface Result {
   /** Calendar years of the period the store holds under two thirds of. */
   short_years: number[];
   marked: boolean;
-  /** The seconds past one hour the fitted phases ask Kartverket's to be moved by. */
-  phase_seconds: number;
+  /** The seconds past one hour the fitted phases ask Kartverket's to be moved by; null where no constituent is large enough to say. */
+  phase_seconds: number | null;
   /** Terrestrial time minus UTC over the period, which the comparison moves them by. */
   tt_seconds: number;
   /** SA fitted over 1991 to 2020 against Kartverket's, in meters, where the store holds every year whole. */
   sa_long: { amplitude: number; phase: number; vector: number } | null;
   /** The store's own fit: its held-out year and scores. */
-  standard: { held_out: number; variance: number | null; rms: number | null; kept: number };
+  standard: {
+    since: string;
+    until: string;
+    held_out: number;
+    variance: number | null;
+    rms: number | null;
+    kept: number;
+  };
+  /** The same fit with robust weights: the constants outside and the mean vector difference, in meters. */
+  robust: { outside: number; vector: number };
+  /** The fit compared: its mean vector difference over the short-period constituents, in meters. */
+  vector: number;
   /** With each year left out in turn: the constants outside and the mean vector difference. */
   probe: { year: number; outside: number; vector: number }[] | null;
   rows: Row[];
 }
 
+/**
+ * A digest of what the comparison rests on besides the fit's `METHOD`: the
+ * gauges, the names, the fit's options, the filter and the limits above. The
+ * report records it, and is of other inputs when it changes.
+ */
+export function kartverketDigest(): string {
+  return createHash("sha256")
+    .update(
+      JSON.stringify([
+        GAUGES,
+        NAMES,
+        FIT,
+        FILTER,
+        ROUNDING,
+        LONG_PERIOD,
+        FILTERED_FROM,
+        YEAR_SHARE,
+        PROBE_FROM,
+      ]),
+    )
+    .digest("hex")
+    .slice(0, 16);
+}
+
 export interface Report {
   engine: string;
+  /** `kartverketDigest` when the fits ran. */
+  inputs: string;
   method: number;
   final_year: number;
   filter: typeof FILTER;
@@ -81,7 +135,11 @@ export interface Report {
 type Fitted = Exclude<Row["ours"], { reason: string }>;
 const fitted = (row: Row): Fitted | null => ("reason" in row.ours ? null : row.ours);
 const isLong = (row: Row) => row.speed < LONG_PERIOD;
-const outside = (row: Row) => (fitted(row)?.d.ratio ?? 0) > 1;
+/** Outside the interval, or without one to be inside of. */
+const outside = (row: Row) => {
+  const ours = fitted(row);
+  return !!ours && (ours.d.ratio === null || ours.d.ratio > 1);
+};
 
 /** Every compared pair: short-period rows where the fit has the constituent. */
 function pairs(results: Result[]) {
@@ -98,6 +156,9 @@ function pairs(results: Result[]) {
  * constituents at 4.5 cycles a day and faster: for each even order, the
  * cutoff with the least RMS misfit, in meters.
  */
+/** The cutoffs searched, in hours. */
+const SEARCH: [number, number] = [1.5, 5];
+
 export function estimateFilter(results: Result[]) {
   const used = pairs(results).filter(
     (x) => x.row.speed >= FILTERED_FROM && x.row.kartverket.amplitude >= 0.0005,
@@ -114,17 +175,18 @@ export function estimateFilter(results: Result[]) {
       ) / Math.max(used.length, 1),
     );
   const orders = [2, 4, 6, 8].map((order) => {
-    let best = { order, cutoff_hours: 2.5, misfit: Infinity };
-    for (let c = 250; c <= 350; c++) {
+    let best = { order, cutoff_hours: SEARCH[0], misfit: Infinity, edge: false };
+    for (let c = SEARCH[0] * 100; c <= SEARCH[1] * 100; c++) {
       const m = misfit(order, c / 100);
-      if (m < best.misfit) best = { order, cutoff_hours: c / 100, misfit: m };
+      if (m < best.misfit) best = { order, cutoff_hours: c / 100, misfit: m, edge: false };
     }
-    return best;
+    // A least at an end of the search isn't a least found.
+    return { ...best, edge: best.cutoff_hours === SEARCH[0] || best.cutoff_hours === SEARCH[1] };
   });
   return {
     constants: used.length,
     orders,
-    best: orders.reduce((a, b) => (b.misfit < a.misfit ? b : a)),
+    best: orders.filter((o) => !o.edge).reduce((a, b) => (b.misfit < a.misfit ? b : a)),
     none: misfit(4, 1e-9),
     pinned: misfit(FILTER.order, FILTER.cutoff_hours),
   };
@@ -155,7 +217,7 @@ export function render(report: Report): string {
 
   p("# Calibration of the harmonic fits against Kartverket's constants");
   p(
-    `Kartverket, the Norwegian Mapping Authority's Hydrographic Service, publishes harmonic constants for its gauges, analyzed with UTide from the observations the store holds as \`kartverket\`. This report fits ${results.length} of those gauges from the store the way Kartverket analyzes them and compares the constants with Kartverket's, constituent by constituent. It is written by [\`scripts/calibrate-kartverket.ts\`](../../scripts/calibrate-kartverket.ts) (\`npm run calibrate:kartverket\`), with every number in [kartverket-calibration.json](kartverket-calibration.json), and is run again whenever the method changes. [Checks](../contributing/checks.md#fit-calibration) says how to run it, and the [calibration against NOAA](fit-calibration.md) is its companion.`,
+    `Kartverket, the Norwegian Mapping Authority's Hydrographic Service, publishes harmonic constants for its gauges, analyzed from its own observations of them, which the store holds as \`kartverket\`. This report fits ${results.length} of those gauges from the store the way that reproduces Kartverket's analysis and compares the constants with Kartverket's, constituent by constituent. It is written by [\`scripts/calibrate-kartverket.ts\`](../../scripts/calibrate-kartverket.ts) (\`npm run calibrate:kartverket\`), with every number in [kartverket-calibration.json](kartverket-calibration.json), and is run again whenever the method changes. [Checks](../contributing/checks.md#kartverket) says how to run it, and the [calibration against NOAA](fit-calibration.md) is its companion. Kartverket's constants are © Kartverket, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), and the differences here are derived from them.`,
   );
   p(
     `These fits ran with ${report.engine}, method ${report.method} of [\`src/fit/\`](../../src/fit/), and ${report.final_year} as the source's last year of final values.`,
@@ -163,13 +225,13 @@ export function render(report: Report): string {
 
   p("## What is compared");
   p(
-    "Kartverket's constants are from its tide API's `constituents` request, which gives amplitudes in centimeters, to a hundredth, and phases to a hundredth of a degree against UTC+1, with the period of observations analyzed ([Kartverket](../../src/sources/kartverket/README.md)). Kartverket analyzes with UTide. The fit compared here takes that method to the store's values: one least-squares fit over Kartverket's period, without robust weights, of Kartverket's own constituents, with Foreman's nodal corrections at the gauge's latitude evaluated at each sample. It reads the store's final values on the hour.",
+    `Kartverket's constants are from its tide API's \`constituents\` request, which gives amplitudes in centimeters, to a hundredth, and phases to a hundredth of a degree against UTC+1, with the period of observations analyzed ([Kartverket](../../src/sources/kartverket/README.md)). The API doesn't describe the analysis. The fit compared here is the one that reproduces it from the store's values: one least-squares fit over Kartverket's period, without robust weights, of Kartverket's own constituents, with Foreman's nodal corrections at the gauge's latitude evaluated at each sample. It reads the store's final values on the hour. With robust weights, as the store's own fits have, the same fit is a median ${mm(median(results.map((r) => r.robust.vector)), 3)} mm from Kartverket's constants over a gauge's short-period constituents, against ${mm(median(results.map((r) => r.vector)), 3)} mm without them.`,
   );
   p(
     `Two things about Kartverket's analysis aren't documented and are taken from the comparison itself, so on them it shows consistency and is no independent check:`,
   );
   p(
-    `- **The filter.** Kartverket's constants are smaller than the fit's above four cycles a day, by the gain of a low-pass filter: its analysis read a series filtered beyond the 10-minute values its API serves. The fit's amplitudes and their intervals are scaled by the gain of a zero-phase Butterworth filter of order ${report.filter.order} with a cutoff of ${report.filter.cutoff_hours} hours, which [The filter](#the-filter) estimates from the constants at ${FILTERED_FROM}° an hour and faster. Below that speed the gain is within ${percent(1 - zeroPhaseGain(FILTERED_FROM - 7.5, report.filter.order, report.filter.cutoff_hours), 2)}% of one, so the diurnal, semidiurnal, third- and fourth-diurnal constants are compared as fitted, to within that.`,
+    `- **The filter.** Kartverket's constants are smaller than the fit's above four cycles a day, by the gain of a low-pass filter: its analysis read a series filtered beyond the 10-minute values its API serves. The fit's amplitudes and their intervals are scaled by the gain of a zero-phase Butterworth filter of order ${report.filter.order} with a cutoff of ${report.filter.cutoff_hours} hours, which [The filter](#the-filter) estimates from the constants at ${FILTERED_FROM}° an hour and faster. Below that speed the gain is within ${percent(1 - zeroPhaseGain(FILTERED_FROM, report.filter.order, report.filter.cutoff_hours), 2)}% of one, and at M4's it is within ${percent(1 - zeroPhaseGain(57.9682085, report.filter.order, report.filter.cutoff_hours), 2)}%, so the diurnal, semidiurnal and third-diurnal constants are compared very nearly as fitted.`,
     `- **The clock.** Kartverket's phases are moved to UTC by the constituent's speed over one hour and over terrestrial time minus UTC, about 67 s. [Gauges](#gauges) gives the seconds each gauge's fitted phases ask for.`,
   );
   p(
@@ -220,12 +282,16 @@ export function render(report: Report): string {
 
   p("## The filter");
   p(
-    `Over the ${estimate.constants} constants at ${FILTERED_FROM}° an hour and faster of 0.5 mm or more, the RMS difference between the fit's amplitude and Kartverket's is ${mm(estimate.none, 3)} mm with no filter. For each even order, the cutoff that leaves the least, searched from 2.50 to 3.50 hours by hundredths:`,
+    `Over the ${estimate.constants} constants at ${FILTERED_FROM}° an hour and faster of 0.5 mm or more, the RMS difference between the fit's amplitude and Kartverket's is ${mm(estimate.none, 3)} mm with no filter. For each even order, the cutoff that leaves the least, searched from ${SEARCH[0].toFixed(2)} to ${SEARCH[1].toFixed(2)} hours by hundredths:`,
   );
   p(
     table(
       ["Order", "Cutoff (hours)", "RMS difference (mm)"],
-      estimate.orders.map((o) => [String(o.order), o.cutoff_hours.toFixed(2), mm(o.misfit, 4)]),
+      estimate.orders.map((o) => [
+        String(o.order),
+        o.edge ? `${o.cutoff_hours.toFixed(2)} (the search's end)` : o.cutoff_hours.toFixed(2),
+        mm(o.misfit, 4),
+      ]),
     ),
   );
   p(
@@ -244,13 +310,13 @@ export function render(report: Report): string {
     const of = (xs: typeof both) =>
       `${mm(median(xs.map((x) => x.gain)), 3)} mm by the gain and ${mm(median(xs.map((x) => x.time)), 3)} mm by the filter in time`;
     p(
-      `The other way to allow for the filter is to run the store's 10-minute values through it and fit what comes out. That was done for each gauge, with gaps of up to an hour filled in a straight line, a day dropped at each end of a run of values, and the result read on the hour. The median vector difference from Kartverket's constants is ${of(both)} over all short-period constituents, and ${of(both.filter((x) => x.row.speed >= FILTERED_FROM))} at ${FILTERED_FROM}° an hour and faster. The filtered series loses the values around every gap, which the gain doesn't, so the comparison scales by the gain.`,
+      `The other way to allow for the filter is to run the store's 10-minute values through it and fit what comes out. That was done for ${timed.length} of the ${results.length} gauges, each with one datum epoch, with gaps of up to an hour filled in a straight line, a day dropped at each end of a run of values, and the result read on the hour. The median vector difference from Kartverket's constants is ${of(both)} over all short-period constituents, and ${of(both.filter((x) => x.row.speed >= FILTERED_FROM))} at ${FILTERED_FROM}° an hour and faster. The two ways differ by ${mm(Math.abs((median(both.map((x) => x.gain)) ?? 0) - (median(both.map((x) => x.time)) ?? 0)), 3)} mm in that median. The comparison scales by the gain, which needs no rule for gaps and keeps the fit's intervals.`,
     );
   }
 
   p("## Gauges");
   p(
-    "Each gauge's period as Kartverket gives it, the hourly values the fit read, how many constituents are compared and outside, the one furthest outside, and the seconds past one hour its phases ask Kartverket's to be moved by, from the constituents faster than 10° an hour weighted by amplitude. The last three columns are the store's own fit of the gauge, of 19 years with Schureman's corrections: its held-out year, the share of the tidal band's variance it explains there and the tidal-band RMS left.",
+    "Each gauge's period as Kartverket gives it, the hourly values the fit read, how many constituents are compared and outside, the one furthest outside, and the seconds past one hour its phases ask Kartverket's to be moved by, from the constituents faster than 10° an hour and of 5 mm or more, weighted by amplitude squared. The last four columns are the store's own fit of the gauge, with Schureman's corrections: its window, its held-out year, the share of the tidal band's variance it explains there and the tidal-band RMS left.",
   );
   p(
     table(
@@ -264,6 +330,7 @@ export function render(report: Report): string {
         "Outside",
         "Largest ratio",
         "Phases ask for (s)",
+        "The store's fit",
         "Held-out year",
         "Variance explained",
         "RMS (mm)",
@@ -282,7 +349,8 @@ export function render(report: Report): string {
           String(rows.length),
           String(rows.filter(outside).length),
           top ? `${top.name} ${fitted(top)!.d.ratio?.toFixed(2)}` : "",
-          r.phase_seconds.toFixed(1),
+          r.phase_seconds === null ? "" : r.phase_seconds.toFixed(1),
+          `${r.standard.since.slice(0, 4)}–${+r.standard.until.slice(0, 4) - 1}`,
           String(r.standard.held_out),
           r.standard.variance === null ? "" : `${percent(r.standard.variance, 2)}%`,
           mm(r.standard.rms),
@@ -291,14 +359,25 @@ export function render(report: Report): string {
       2,
     ),
   );
-  const asked = results.map((r) => r.phase_seconds);
+  const asked = results.flatMap((r) => (r.phase_seconds === null ? [] : [r.phase_seconds]));
+  const furthest = [...results]
+    .filter((r) => r.phase_seconds !== null)
+    .sort(
+      (a, b) =>
+        Math.abs(b.phase_seconds! - b.tt_seconds) - Math.abs(a.phase_seconds! - a.tt_seconds),
+    )[0];
   p(
-    `Terrestrial time minus UTC over these periods is ${Math.min(...results.map((r) => r.tt_seconds)).toFixed(1)} to ${Math.max(...results.map((r) => r.tt_seconds)).toFixed(1)} s. The fitted phases ask for a median of ${median(asked)?.toFixed(1)} s, from ${Math.min(...asked).toFixed(1)} to ${Math.max(...asked).toFixed(1)} s.`,
+    `Terrestrial time minus UTC over these periods is ${Math.min(...results.map((r) => r.tt_seconds)).toFixed(1)} to ${Math.max(...results.map((r) => r.tt_seconds)).toFixed(1)} s. The fitted phases ask for a median of ${median(asked)?.toFixed(1)} s, from ${Math.min(...asked).toFixed(1)} to ${Math.max(...asked).toFixed(1)} s${furthest ? `, the furthest from it at ${furthest.name}` : ""}.`,
   );
+  const lacking = results.flatMap((r) => {
+    const missing = MAJOR.filter((name) => !r.rows.some((row) => row.name === name));
+    return missing.length ? [`${missing.join(", ")} at ${r.name}`] : [];
+  });
+  if (lacking.length) p(`Kartverket publishes no constant for ${lacking.join("; ")}.`);
   const short = results.filter((r) => r.short_years.length);
   if (short.length)
     p(
-      `The store holds under two thirds of the hours of ${short.map((r) => `${r.short_years.join(", ")} at ${r.name}`).join("; ")}. The fit reads those years as they are, as one fit of the whole period does.`,
+      `Of the part of each year that is in the period, the store holds under two thirds of the hours of ${short.map((r) => `${r.short_years.join(", ")} at ${r.name}`).join("; ")}. The fit reads those years as they are, as one fit of the whole period does.`,
     );
   const marked = results.filter((r) => r.marked);
   if (marked.length)
@@ -343,16 +422,17 @@ export function render(report: Report): string {
     );
     for (const r of results.filter((x) => x.probe)) {
       const base = r.rows.filter((row) => !isLong(row) && outside(row)).length;
-      const best = [...r.probe!].sort((a, b) => a.outside - b.outside)[0]!;
+      const counts = r.probe!.map((x) => x.outside);
+      const vectors = r.probe!.map((x) => x.vector);
       p(
-        `${r.name} has ${base} outside, so it was fitted again with each year of the period left out in turn. That leaves from ${best.outside} (without ${best.year}) to ${Math.max(...r.probe!.map((x) => x.outside))} outside${best.outside * 2 < base ? ", so the year left out accounts for most of it" : ", so no one year accounts for it"}. This report doesn't find why ${r.name}'s constants differ.`,
+        `${r.name} has ${base} outside and a mean vector difference of ${mm(r.vector, 3)} mm, so it was fitted again with each year of the period left out in turn. That leaves ${Math.min(...counts)} to ${Math.max(...counts)} outside and a mean vector difference of ${mm(Math.min(...vectors), 3)} to ${mm(Math.max(...vectors), 3)} mm${Math.min(...vectors) < r.vector / 2 ? "" : ", so no one year accounts for the difference"}. This report doesn't find why ${r.name}'s constants differ.`,
       );
     }
   }
 
   p("## Constituents across gauges");
   p(
-    "For each of Kartverket's constituents, over the gauges where the fit has it: the filter's gain at its speed, the median differences from Kartverket's without sign, how many are outside, and the median vector difference without the gain.",
+    "For each of Kartverket's constituents, over the gauges where the fit has it: the filter's gain at its speed, the median differences from Kartverket's without sign, how many are outside, for the short-period ones, and the median vector difference without the gain.",
   );
   const names = [
     ...new Map(results.flatMap((r) => r.rows.map((row) => [row.name, row.speed]))),
@@ -386,7 +466,7 @@ export function render(report: Report): string {
             percent(median(abs(rows.map((x) => x.ours.d.relative))), 2),
             median(abs(rows.map((x) => x.ours.d.phase)))?.toFixed(2) ?? "",
             mm(median(rows.map((x) => x.ours.d.vector)), 3),
-            String(rows.filter((x) => outside(x.row)).length),
+            speed < LONG_PERIOD ? "" : String(rows.filter((x) => outside(x.row)).length),
             mm(median(rows.map((x) => x.ours.unscaled)), 3),
           ],
         ];

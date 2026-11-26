@@ -12,7 +12,7 @@ import { constituents as catalog } from "@slackwater/engine";
  * OQ2 are Kartverket's own definitions of those names, which the catalog
  * holds apart from the lines other sources call the same.
  */
-const NAMES: Record<string, string> = {
+export const NAMES: Record<string, string> = {
   SA: "SA_KV",
   S1: "S1_KV",
   OQ2: "OQ2_KV",
@@ -78,16 +78,39 @@ export interface PublishedConstants {
  * Kartverket's constants from a `constituents` answer. Amplitudes come in
  * centimeters. Phases come against UTC+1, and a phase is moved by the
  * constituent's speed over one hour and over the mean of terrestrial time
- * minus UTC in the period, about 67 s. Kartverket documents the hour and not
- * the rest: fitted from the store's values, the phases of every gauge ask
- * for about 68 s beyond the hour (docs/results/kartverket-calibration.md),
- * which is what an analysis that takes the astronomical arguments on clock
- * time differs by from the catalog's, taken in terrestrial time.
+ * minus UTC in the period. The README's Constants entry has why.
  *
  * Throws on an answer in another unit or offset, without a period, with a
- * name twice, or with a constituent the catalog doesn't have at that speed,
- * so nothing is compared under a wrong name.
+ * date that isn't one, a constituent it can't read whole, a name twice, or a
+ * constituent the catalog doesn't have at that speed, so nothing is compared
+ * under a wrong name and no part of an answer is taken for the whole.
  */
+/**
+ * The period of observations an answer names, from `start` to before `end`
+ * (epoch ms), or null where it names none, as a gauge without an analysis of
+ * its own does. The end names the period's last hour. Throws on a date that
+ * isn't one: `Date.parse` rolls 31 February over into March.
+ */
+export function periodOf(code: string, xml: string): { start: number; end: number } | null {
+  const tag = /<observations\b([^>]*)\/>/.exec(xml)?.[1];
+  if (tag === undefined) return null;
+  const instant = (name: string) => {
+    const text = new RegExp(`\\b${name}="([^"]*)"`).exec(tag)?.[1] ?? "";
+    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\+01:00$/.exec(text);
+    const time = m ? Date.UTC(+m[1]!, +m[2]! - 1, +m[3]!, +m[4]!, +m[5]!, +m[6]!) - 3_600_000 : NaN;
+    // Turned back into text, a date that rolled over differs.
+    if (!m || new Date(time + 3_600_000).toISOString().slice(0, 19) + "+01:00" !== text)
+      throw new Error(
+        `kartverket/${code}: its constants give ${name} as "${text}", which isn't a time in UTC+1`,
+      );
+    return time;
+  };
+  const [start, end] = [instant("start"), instant("end") + 3_600_000];
+  if (!(start < end))
+    throw new Error(`kartverket/${code}: its constants' period ends before it starts`);
+  return { start, end };
+}
+
 export function parseConstants(code: string, xml: string): PublishedConstants {
   const fail = (why: string) => new Error(`kartverket/${code}: its constants ${why}`);
   const head = /<constituents\b([^>]*)>/.exec(xml)?.[1];
@@ -96,22 +119,25 @@ export function parseConstants(code: string, xml: string): PublishedConstants {
     throw fail("aren't in centimeters against UTC+1");
   const attribute = (tag: string, name: string) =>
     new RegExp(`\\b${name}="([^"]*)"`).exec(tag)?.[1];
-  const observations = /<observations\b([^>]*)\/>/.exec(xml)?.[1];
-  const start = Date.parse(attribute(observations ?? "", "start") ?? "");
-  const last = Date.parse(attribute(observations ?? "", "end") ?? "");
-  // The period's end names its last hour.
-  const end = last + 3_600_000;
-  if (!Number.isFinite(start) || !Number.isFinite(end) || !(start < end))
-    throw fail("name no period of observations");
+  const period = periodOf(code, xml);
+  if (!period) throw fail("name no period of observations");
+  const { start, end } = period;
   const latitude = Number(attribute(/<location\b([^>]*)\/>/.exec(xml)?.[1] ?? "", "latitude"));
   if (!Number.isFinite(latitude)) throw fail("give no latitude");
-  const hours = 1 + ttMinusUtc(start, end) / 3600;
+  let hours: number;
+  try {
+    hours = 1 + ttMinusUtc(start, end) / 3600;
+  } catch {
+    throw fail("are from a period before the leap seconds listed");
+  }
 
   const constants = [...xml.matchAll(/<constituent\b([^>]*)\/>/g)].map(([, tag]) => {
     const published = attribute(tag!, "name") ?? "";
-    const [amplitude, phase, speed] = ["amplitude", "phaseangle", "speed"].map((name) =>
-      Number(attribute(tag!, name) ?? NaN),
-    ) as [number, number, number];
+    // An attribute left empty would read as zero.
+    const [amplitude, phase, speed] = ["amplitude", "phaseangle", "speed"].map((name) => {
+      const text = attribute(tag!, name);
+      return text && /^-?\d+(\.\d+)?$/.test(text) ? Number(text) : NaN;
+    }) as [number, number, number];
     if (![amplitude, phase, speed].every(Number.isFinite) || amplitude < 0)
       throw fail(`hold a value that isn't a number for ${published}`);
     const entry = catalog[NAMES[published] ?? published];
@@ -126,6 +152,9 @@ export function parseConstants(code: string, xml: string): PublishedConstants {
     };
   });
   if (!constants.length) throw fail("are empty");
+  // Every constituent the answer opens is one read above.
+  if ((xml.match(/<constituent\b/g) ?? []).length !== constants.length)
+    throw fail("hold a constituent that can't be read");
   if (new Set(constants.map((c) => c.name)).size !== constants.length)
     throw fail("name a constituent twice");
   return { period: { start, end }, latitude, constants };

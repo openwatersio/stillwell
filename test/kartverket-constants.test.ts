@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { parseConstants, ttMinusUtc } from "../src/sources/kartverket/constants.ts";
+import { readFileSync } from "node:fs";
+import { parseConstants, periodOf, ttMinusUtc } from "../src/sources/kartverket/constants.ts";
 
 const answer = (
   constituents: string,
@@ -65,6 +66,32 @@ describe("parseConstants", () => {
       '<constituent name="M2" amplitude="14.00" phaseangle="5.00" speed="28.98410422" doodson="BZZZZZZ"/>';
     const { constants } = parseConstants("SVG", answer(low));
     assert.ok(constants[0]!.phase > 335 && constants[0]!.phase < 336, `${constants[0]!.phase}`);
+  });
+
+  it("reads a recorded answer whole", () => {
+    const xml = readFileSync("src/sources/kartverket/kartverket-constituents-VIK.xml", "utf8");
+    const { period, constants } = parseConstants("VIK", xml);
+    assert.equal(constants.length, (xml.match(/<constituent\b/g) ?? []).length);
+    assert.equal(constants.length, 46);
+    assert.equal(new Date(period.end - 1).toISOString().slice(0, 13), "2020-12-31T22");
+    // Kartverket publishes no K1 for Viker.
+    assert.ok(!constants.some((c) => c.name === "K1"));
+    assert.ok(constants.some((c) => c.name === "P1"));
+  });
+
+  it("refuses a date that isn't one, an empty value and a constituent it can't read", () => {
+    const rolled = answer(M2).replace("2006-01-01T00:00:00", "2006-02-31T00:00:00");
+    assert.throws(() => parseConstants("SVG", rolled), /isn't a time/);
+    assert.throws(
+      () => periodOf("SVG", answer(M2).replace('+01:00" end', '+00:00" end')),
+      /isn't a time/,
+    );
+    assert.equal(periodOf("SVG", answer(M2, undefined, false)), null);
+    const empty = M2.replace('amplitude="14.00"', 'amplitude=""');
+    assert.throws(() => parseConstants("SVG", answer(empty)), /isn't a number/);
+    const open =
+      '<constituent name="S2" amplitude="5.00" phaseangle="5.00" speed="30.0"></constituent>';
+    assert.throws(() => parseConstants("SVG", answer(M2 + open)), /can't be read/);
   });
 
   it("refuses an answer it can't compare", () => {

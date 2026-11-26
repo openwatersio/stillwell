@@ -1,5 +1,6 @@
 {
   "engine": "@slackwater/engine@1.0.0-beta.14",
+  "inputs": "de8f57b1c974e510",
   "method": 1,
   "final_year": 2024,
   "filter": {
@@ -27,11 +28,18 @@
         "vector": 0.000816
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.987075,
         "rms": 0.053441,
         "kept": 68
       },
+      "robust": {
+        "outside": 5,
+        "vector": 0.000196
+      },
+      "vector": 0.00004,
       "probe": null,
       "rows": [
         {
@@ -1452,11 +1460,18 @@
       "tt_seconds": 67.18451,
       "sa_long": null,
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.995291,
         "rms": 0.034158,
         "kept": 72
       },
+      "robust": {
+        "outside": 3,
+        "vector": 0.000114
+      },
+      "vector": 0.00003,
       "probe": null,
       "rows": [
         {
@@ -2956,11 +2971,18 @@
         "vector": 0.00099
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.986168,
         "rms": 0.040466,
         "kept": 67
       },
+      "robust": {
+        "outside": 6,
+        "vector": 0.000184
+      },
+      "vector": 0.000042,
       "probe": null,
       "rows": [
         {
@@ -4360,11 +4382,18 @@
         "vector": 0.000169
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.992605,
         "rms": 0.056187,
         "kept": 72
       },
+      "robust": {
+        "outside": 5,
+        "vector": 0.000241
+      },
+      "vector": 0.000033,
       "probe": null,
       "rows": [
         {
@@ -5814,11 +5843,18 @@
         "vector": 0.000402
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.995894,
         "rms": 0.033671,
         "kept": 72
       },
+      "robust": {
+        "outside": 0,
+        "vector": 0.00012
+      },
+      "vector": 0.000038,
       "probe": null,
       "rows": [
         {
@@ -7343,11 +7379,18 @@
         "vector": 0.001033
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.994067,
         "rms": 0.044982,
         "kept": 68
       },
+      "robust": {
+        "outside": 9,
+        "vector": 0.000162
+      },
+      "vector": 0.000033,
       "probe": null,
       "rows": [
         {
@@ -8747,11 +8790,18 @@
         "vector": 0.000609
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.996602,
         "rms": 0.03835,
         "kept": 70
       },
+      "robust": {
+        "outside": 21,
+        "vector": 0.000306
+      },
+      "vector": 0.00025,
       "probe": [
         {
           "year": 2006,
@@ -10352,11 +10402,18 @@
         "vector": 0.001346
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.655406,
         "rms": 0.068213,
         "kept": 65
       },
+      "robust": {
+        "outside": 8,
+        "vector": 0.000414
+      },
+      "vector": 0.000034,
       "probe": null,
       "rows": [
         {
@@ -11581,11 +11638,18 @@
         "vector": 0.000948
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.996883,
         "rms": 0.03531,
         "kept": 69
       },
+      "robust": {
+        "outside": 3,
+        "vector": 0.000131
+      },
+      "vector": 0.000034,
       "probe": null,
       "rows": [
         {
@@ -13160,11 +13224,18 @@
         "vector": 0.000331
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.992525,
         "rms": 0.060691,
         "kept": 71
       },
+      "robust": {
+        "outside": 9,
+        "vector": 0.000249
+      },
+      "vector": 0.000036,
       "probe": null,
       "rows": [
         {
@@ -14664,11 +14735,18 @@
         "vector": 0.000967
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.99217,
         "rms": 0.045266,
         "kept": 68
       },
+      "robust": {
+        "outside": 5,
+        "vector": 0.000147
+      },
+      "vector": 0.000035,
       "probe": null,
       "rows": [
         {
@@ -16093,11 +16171,18 @@
         "vector": 0.001124
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.98901,
         "rms": 0.046037,
         "kept": 66
       },
+      "robust": {
+        "outside": 7,
+        "vector": 0.00018
+      },
+      "vector": 0.000044,
       "probe": null,
       "rows": [
         {
@@ -17512,19 +17597,24 @@
       },
       "hours": 89284,
       "filtered_hours": 89056,
-      "short_years": [
-        2010
-      ],
+      "short_years": [],
       "marked": false,
       "phase_seconds": 69.478262,
       "tt_seconds": 67.949774,
       "sa_long": null,
       "standard": {
+        "since": "2010-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.994156,
         "rms": 0.042236,
         "kept": 67
       },
+      "robust": {
+        "outside": 3,
+        "vector": 0.000171
+      },
+      "vector": 0.000035,
       "probe": null,
       "rows": [
         {
@@ -18949,11 +19039,18 @@
         "vector": 0.000431
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.99284,
         "rms": 0.063872,
         "kept": 71
       },
+      "robust": {
+        "outside": 7,
+        "vector": 0.000277
+      },
+      "vector": 0.000037,
       "probe": null,
       "rows": [
         {
@@ -20424,11 +20521,18 @@
       "tt_seconds": 67.18451,
       "sa_long": null,
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.99523,
         "rms": 0.024015,
         "kept": 72
       },
+      "robust": {
+        "outside": 3,
+        "vector": 0.000088
+      },
+      "vector": 0.000036,
       "probe": null,
       "rows": [
         {
@@ -21903,11 +22007,18 @@
         "vector": 0.001348
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.688071,
         "rms": 0.075706,
         "kept": 65
       },
+      "robust": {
+        "outside": 11,
+        "vector": 0.000497
+      },
+      "vector": 0.000045,
       "probe": null,
       "rows": [
         {
@@ -23130,11 +23241,18 @@
       "tt_seconds": 67.18451,
       "sa_long": null,
       "standard": {
+        "since": "2006-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.690103,
         "rms": 0.080191,
         "kept": 63
       },
+      "robust": {
+        "outside": 13,
+        "vector": 0.000578
+      },
+      "vector": 0.000194,
       "probe": null,
       "rows": [
         {
@@ -24309,11 +24427,18 @@
         "vector": 0.000605
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.993218,
         "rms": 0.04888,
         "kept": 69
       },
+      "robust": {
+        "outside": 4,
+        "vector": 0.000178
+      },
+      "vector": 0.000039,
       "probe": null,
       "rows": [
         {
@@ -25738,11 +25863,18 @@
         "vector": 0.000757
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.880103,
         "rms": 0.046805,
         "kept": 68
       },
+      "robust": {
+        "outside": 7,
+        "vector": 0.000199
+      },
+      "vector": 0.000031,
       "probe": null,
       "rows": [
         {
@@ -27067,11 +27199,18 @@
         "vector": 0.000678
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.996556,
         "rms": 0.036589,
         "kept": 71
       },
+      "robust": {
+        "outside": 2,
+        "vector": 0.000149
+      },
+      "vector": 0.000037,
       "probe": null,
       "rows": [
         {
@@ -28571,11 +28710,18 @@
         "vector": 0.00121
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.994861,
         "rms": 0.049598,
         "kept": 69
       },
+      "robust": {
+        "outside": 7,
+        "vector": 0.000241
+      },
+      "vector": 0.00004,
       "probe": null,
       "rows": [
         {
@@ -30025,11 +30171,18 @@
         "vector": 0.001398
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.61786,
         "rms": 0.058068,
         "kept": 65
       },
+      "robust": {
+        "outside": 8,
+        "vector": 0.000309
+      },
+      "vector": 0.000033,
       "probe": null,
       "rows": [
         {
@@ -31175,11 +31328,18 @@
       "tt_seconds": 67.18451,
       "sa_long": null,
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.997033,
         "rms": 0.041091,
         "kept": 72
       },
+      "robust": {
+        "outside": 3,
+        "vector": 0.000155
+      },
+      "vector": 0.000033,
       "probe": null,
       "rows": [
         {
@@ -32729,11 +32889,18 @@
         "vector": 0.001482
       },
       "standard": {
+        "since": "2005-01-01T00:00:00.000Z",
+        "until": "2024-01-01T00:00:00.000Z",
         "held_out": 2024,
         "variance": 0.659577,
         "rms": 0.069975,
         "kept": 64
       },
+      "robust": {
+        "outside": 11,
+        "vector": 0.000435
+      },
+      "vector": 0.000049,
       "probe": null,
       "rows": [
         {
