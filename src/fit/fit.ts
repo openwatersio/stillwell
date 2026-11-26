@@ -13,14 +13,7 @@ import {
   SEASONAL_SIGNIFICANCE,
   tooShort,
 } from "./window.ts";
-import {
-  harmonicSamples,
-  NODE_CORRECTIONS,
-  scoreHeldOut,
-  SEASONAL,
-  tidalResiduals,
-  yearlyScatter,
-} from "./scores.ts";
+import { NODE_CORRECTIONS, scoreHeldOut, tidalResiduals } from "./scores.ts";
 import {
   Busy,
   emptyInputs,
@@ -52,7 +45,6 @@ import {
  */
 
 const HOUR_MS = 3_600_000;
-const DAY_MS = 86_400_000;
 /** The longest window a fit takes: one nodal cycle. */
 export const MAX_FIT_YEARS = 19;
 export { FIT_OPTIONS, MIN_FIT_DAYS, NODE_CORRECTIONS, SEASONAL_SIGNIFICANCE };
