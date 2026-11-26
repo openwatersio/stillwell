@@ -135,7 +135,7 @@ export function wholeEndedYear(from: Date, to: Date, now: number): boolean {
  * Station IDs from a file, one per line, for `--first`: a plain list (blank
  * lines and `#` comments skipped), or a CSV with a header, whose
  * `originator_id`, `id` or `station` column is used, so
- * docs/ticon-inventory.csv works as it is. IDs may be bare (`07010000`) or
+ * the TICON inventory's CSV works as it is. IDs may be bare (`07010000`) or
  * carry their source (`usgs/07010000`); ones for another source are dropped.
  */
 export function parseStationList(text: string, sourceId: string, csv: boolean): string[] {

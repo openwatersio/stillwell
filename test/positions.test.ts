@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { correctPositions, POSITIONS } from "../src/positions.ts";
 import { sources } from "../src/sources/index.ts";
-import { km } from "../src/ticon.ts";
+import { distanceKm as km } from "../src/stats.ts";
 
 /** Every station `POSITIONS` names for a source, at its served position. */
 const served = (source: string) =>

@@ -4,7 +4,7 @@ import { FILES } from "./store/files.ts";
 import { isMissing, readObservationFile, readRows, writeTable } from "./store/parquet.ts";
 import { linksPath, seriesPath } from "./store/paths.ts";
 import { readYears, usableHours } from "./store/years.ts";
-import { km } from "./ticon.ts";
+import { distanceKm as km } from "./stats.ts";
 
 /**
  * Offsets measured between linked series of one gauge from their levels, for pairs that share no reference datum to carry offsets through

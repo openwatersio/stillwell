@@ -1,9 +1,9 @@
 import { dropped, seriesOf, sound } from "../datums.ts";
 import { readMatches, sameByData, tooManyStopped, type DataMatch } from "../matches.ts";
 import { ID_KM } from "../same-as.ts";
+import { distanceKm as km } from "../stats.ts";
 import { exists, readRows } from "../store/parquet.ts";
 import { matchesPath, referencesPath, stationsPath } from "../store/paths.ts";
-import { km } from "../ticon.ts";
 import {
   ASSUMED,
   constantsDigest,

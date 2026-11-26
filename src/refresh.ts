@@ -44,13 +44,7 @@ import { linkGauges, type LinkReport } from "./same-as.ts";
 import { linkShifts, readLinks } from "./links.ts";
 import { readMatches } from "./matches.ts";
 import { JSON_FILES, dataPackage } from "./store/files.ts";
-import {
-  offsetRows,
-  ticonOriginators,
-  tideStations,
-  withDatums,
-  type DatumReport,
-} from "./datums.ts";
+import { offsetRows, tideStations, withDatums, type DatumReport } from "./datums.ts";
 import { isDropped } from "./sources/gesla/dropped.ts";
 import { backfillStatus } from "./backfilled.ts";
 import { usableShares, writeYears } from "./store/years.ts";
@@ -283,7 +277,6 @@ export async function publishStations(
   const { stations: linked, report: datums } = withDatums(
     gauges,
     await tideStations(),
-    await ticonOriginators(),
     linkShifts(await readLinks(store), gauges),
   );
   // A store's errata are its own sources' and those listing their copies; a restricted source's stay out of the public store, even where a public copy is listed.
@@ -421,7 +414,7 @@ async function linkedStations(
 export async function stationsToMeasure(store: string, all: Source[]): Promise<StoredStation[]> {
   const built = await linkedStations(store, all, []);
   if ("missing" in built) return [];
-  return withDatums(built.gauges, await tideStations(), await ticonOriginators()).stations;
+  return withDatums(built.gauges, await tideStations()).stations;
 }
 
 /**

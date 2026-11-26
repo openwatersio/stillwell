@@ -1,10 +1,8 @@
 import { urlSafe } from "./store/paths.ts";
-import { readFile } from "node:fs/promises";
-import { csvFields } from "./csv.ts";
 import { ID_KM } from "./same-as.ts";
 import { isDropped } from "./sources/gesla/dropped.ts";
 import type { Epoch, StoredStation } from "./schema.ts";
-import { km } from "./ticon.ts";
+import { distanceKm as km } from "./stats.ts";
 import { sources } from "./sources/index.ts";
 
 /**
@@ -79,13 +77,6 @@ export function seriesOf(record: { id: string; source: { id: string } }): string
   return source && `${source}/${urlSafe(record.source.id)}`;
 }
 
-/**
- * TICON contributors whose GESLA files are measured from a reference, so a
- * record's datums in its gauge zero apply to the series the TICON inventory
- * (`docs/ticon-inventory.csv`) names for it.
- */
-const TICON_ZEROS: Record<string, string> = { rws: "NAP", rws_hist: "NAP", smhi: "RH2000" };
-
 /** The datums slackwater-database gives a station, besides its chart datum. */
 const FROM_TIDE = ["MSL", "LAT"];
 
@@ -155,7 +146,6 @@ export interface DatumReport {
 export function withDatums(
   stations: StoredStation[],
   tide: TideStation[],
-  replaced: Map<string, string> = new Map(),
   shifts: Map<string, number> = new Map(),
 ): { stations: StoredStation[]; report: DatumReport } {
   const report: DatumReport = { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] };
@@ -163,7 +153,7 @@ export function withDatums(
   const records = new Map<string, { record: TideStation; zero: number | undefined }>();
   for (const t of tide) {
     if (dropped(t.id)) continue;
-    const [prefix, id] = [t.id.split("/")[0]!, t.id.slice(t.id.indexOf("/") + 1)];
+    const prefix = t.id.split("/")[0]!;
     const join = (station: StoredStation | undefined, zero: number | undefined) => {
       if (!station) return;
       const distance = km(station, { lat: t.latitude, lon: t.longitude });
@@ -195,17 +185,6 @@ export function withDatums(
     };
     const own = byId.get(seriesOf(t) ?? "");
     if (own) join(own, zeroOf(own, t));
-    const reference = prefix === "ticon" && TICON_ZEROS[id.slice(id.lastIndexOf("-") + 1)];
-    const originator = reference && byId.get(replaced.get(id) ?? "");
-    // Where the store has the record's GESLA file, its own note must name that zero: a few of RWS's are in MSL.
-    const gesla = byId.get(`gesla/${urlSafe(id)}`);
-    if (
-      reference &&
-      originator &&
-      t.datum_frame === "gauge" &&
-      (!gesla || offsetsOf(gesla)[reference] === 0)
-    )
-      join(originator, offsetsOf(originator)[reference]);
   }
   report.joined = records.size;
   const constituent = new Set(tide.filter((t) => t.datum_frame === "constituent").map((t) => t.id));
@@ -429,33 +408,6 @@ const compare = (a: number[], b: number[]) => a.map((x, i) => x - b[i]!).find((d
 export const dropped = (id: string | undefined) =>
   !!id?.startsWith("ticon/") && isDropped(id.slice(6));
 const round = (m: number) => Math.round(m * 1e4) / 1e4 + 0; // + 0 turns -0 into 0
-
-/**
- * The originator's series for each TICON record, from the TICON inventory's
- * `ticon_id` and `originator_id`, where the two are within `ID_KM`.
- */
-export function originators(csv: string): Map<string, string> {
-  const [header, ...lines] = csv.trim().split("\n");
-  const columns = csvFields(header!);
-  const [ticon, originator, distance] = ["ticon_id", "originator_id", "distance_km"].map((c) =>
-    columns.indexOf(c),
-  );
-  if ([ticon, originator, distance].includes(-1))
-    throw new Error("TICON inventory needs ticon_id, originator_id and distance_km columns");
-  const out = new Map<string, string>();
-  for (const line of lines) {
-    const f = csvFields(line);
-    if (f[originator!] && f[distance!] && Number(f[distance!]) <= ID_KM)
-      out.set(f[ticon!]!, f[originator!]!);
-  }
-  return out;
-}
-
-/** `originators` of the inventory in this repository. */
-export async function ticonOriginators(): Promise<Map<string, string>> {
-  const path = new URL("../docs/ticon-inventory.csv", import.meta.url);
-  return originators(await readFile(path, "utf8"));
-}
 
 /**
  * Rejections that leave a record's datums sound: another record of the same
