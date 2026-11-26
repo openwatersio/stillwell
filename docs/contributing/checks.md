@@ -6,7 +6,7 @@
 npm run ticon:inventory
 ```
 
-Reads a slackwater-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the store's station lists (`STILLWELL_STORE`, default the public bucket over HTTPS, so a local store needs every public source refreshed; restricted sources are left out), and writes the [TICON inventory](../ticon-inventory.md): the store series for each TICON record's originator, where there is one, for every record slackwater-database ships, and how far along each one is.
+Reads a slackwater-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the store's station lists (`STILLWELL_STORE`, default the public bucket over HTTPS, so a local store needs every public source refreshed; restricted sources are left out), and writes the TICON inventory to `reports/` (`STILLWELL_REPORTS`): the store series for each TICON record's originator, where there is one, for every record slackwater-database ships, and how far along each one is. The Site workflow writes it before each build, from slackwater-database at the version this repository installs, and the [inventory page](https://openwatersio.github.io/stillwell/reports/ticon-inventory/) shows it. Nothing in the store pipeline reads it.
 
 ## Clock check
 

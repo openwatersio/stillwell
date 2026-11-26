@@ -155,10 +155,8 @@ describe("ispra", () => {
 
   it("maps every GESLA ISPRA record to a gauge of the archive, or to none where it lists none", () => {
     const gauges = new Set(fixture("ispra-gauges.txt").trim().split("\n"));
-    const records = fixture("../../src/sources/gesla/coverage.csv")
-      .split("\n")
-      .map((row) => row.split(",")[0]!)
-      .filter((id) => id.endsWith("-ita-ispra"));
+    // GESLA 4.1's ISPRA records, as the gesla source lists them.
+    const records = fixture("ispra-gesla-records.txt").trim().split("\n");
     assert.equal(records.length, 39);
     const unlisted = records.filter((id) => {
       const mapped = ispra.idOfGeslaFile(id.slice("gesla/".length));

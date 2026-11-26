@@ -4,3 +4,4 @@ node_modules/
 !site/src/pages/data/
 .playwright-mcp
 .wrangler/
+/reports

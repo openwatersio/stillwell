@@ -28,10 +28,10 @@ Observed sea levels at French tide gauges, in metropolitan France and overseas, 
 The Monthly workflow refreshes REFMAR's list on the 2nd with every other source's. The first list has to be in the store before anything else runs: dispatch Monthly with `sources: refmar` once, or the poller, Compact daily and the refetch fail with no list. Then backfill through the Ingest workflow:
 
 ```bash
-node scripts/ingest.ts backfill refmar all 1821 2026 --skip-written --first docs/ticon-inventory.csv
+node scripts/ingest.ts backfill refmar all 1821 2026 --skip-written
 ```
 
-It starts at 1821, where TICON's Saint-Nazaire record does. A month before a gauge's first observation isn't asked for, so the early start costs nothing at gauges dated later. The record is about 75,000 station-months. Each month takes one request, or two from 2005 on where it isn't validated to its end, at most two a second, so the whole record is about 80,000 to 90,000 requests, 12 hours or more: three or four Ingest runs, each dispatched with `timeout` at 360 minutes and resuming where `--skip-written` finds the last one stopped. A year with no values writes no file, so each run asks again for the empty years between a gauge's starting year and its first values, and after an `OLD` gauge's last, a few thousand requests a run. `--first` puts the gauges TICON has a REFMAR record for first. The current year is fetched whole on every run, so it's backfilled on its own, `backfill refmar all 2026 2027`.
+It starts at 1821, where TICON's Saint-Nazaire record does. A month before a gauge's first observation isn't asked for, so the early start costs nothing at gauges dated later. The record is about 75,000 station-months. Each month takes one request, or two from 2005 on where it isn't validated to its end, at most two a second, so the whole record is about 80,000 to 90,000 requests, 12 hours or more: three or four Ingest runs, each dispatched with `timeout` at 360 minutes and resuming where `--skip-written` finds the last one stopped. A year with no values writes no file, so each run asks again for the empty years between a gauge's starting year and its first values, and after an `OLD` gauge's last, a few thousand requests a run. The current year is fetched whole on every run, so it's backfilled on its own, `backfill refmar all 2026 2027`.
 
 ### Scheduled runs
 

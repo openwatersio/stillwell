@@ -27,10 +27,10 @@ Hourly sea levels from tide gauges worldwide, read from the University of Hawaii
 
 ### Backfill
 
-The first list has to be in the store before anything else runs: dispatch Monthly with `sources: uhslc` once, or Compact daily and the refetch fail with no list, and `npm run ticon:inventory` can't read one. Backfill runs through the Ingest workflow, or locally against a local store:
+The first list has to be in the store before anything else runs: dispatch Monthly with `sources: uhslc` once, or Compact daily and the refetch fail with no list. Backfill runs through the Ingest workflow, or locally against a local store:
 
 ```bash
-node scripts/ingest.ts backfill uhslc all 1846 2026 --skip-written --first docs/ticon-inventory.csv
+node scripts/ingest.ts backfill uhslc all 1846 2026 --skip-written
 ```
 
 That's about 21,000 station-years, at least six hours at one request a second, so it takes two or more Ingest runs, each resuming where `--skip-written` finds the last one stopped. Years outside each station's record aren't asked for. It ends before the current year, which is fetched whole on every run and so is backfilled on its own, `backfill uhslc all 2026 2027`.

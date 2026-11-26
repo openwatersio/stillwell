@@ -27,7 +27,7 @@ Observed water levels from the permanent tide gauges of Kartverket, the Norwegia
 From nothing, dispatch Monthly with `sources: kartverket` first, since the poller and Compact daily fail for Kartverket until its list is in the store, and the backfill needs each station's `record_start` from it. Then, through the Ingest workflow:
 
 ```bash
-node scripts/ingest.ts backfill kartverket all 1986 2026 --skip-written --first docs/ticon-inventory.csv
+node scripts/ingest.ts backfill kartverket all 1986 2026 --skip-written
 node scripts/ingest.ts backfill kartverket all 2026 2027
 ```
 

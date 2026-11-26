@@ -1,7 +1,8 @@
 name: Site
 
 # Build the site in site/ and deploy it to GitHub Pages. The build runs the docs' result tables against the public
-# store and fails where a query breaks or a reference page's columns and the live files disagree. Pull requests that
+# store and fails where a query breaks or a reference page's columns and the live files disagree. Before it, the
+# report scripts write the TICON inventory and GESLA coverage, which the site's report pages show. Pull requests that
 # change the site only build it. Pushes to main deploy it, and so does a daily run, which picks up the store's own
 # changes. Monthly keeps the schedule enabled.
 on:
@@ -12,6 +13,9 @@ on:
       - ".github/workflows/site.yml"
       # Source pages render each adapter's README.
       - "src/sources/*/README.md"
+      - "scripts/ticon-inventory.ts"
+      - "scripts/gesla-coverage.ts"
+      - "src/ticon.ts"
   push:
     branches: [main]
     paths:
@@ -20,6 +24,9 @@ on:
       - ".github/workflows/site.yml"
       # Source pages render each adapter's README.
       - "src/sources/*/README.md"
+      - "scripts/ticon-inventory.ts"
+      - "scripts/gesla-coverage.ts"
+      - "src/ticon.ts"
   schedule:
     - cron: "0 7 * * *"
   workflow_dispatch:
@@ -37,7 +44,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: site
@@ -47,7 +54,9 @@ jobs:
         with:
           node-version-file: .mise.toml
           cache: npm
-          cache-dependency-path: site/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            site/package-lock.json
       - name: Check the lockfile regenerates from package.json
         run: |
           git ls-files --error-unmatch package-lock.json
@@ -56,6 +65,32 @@ jobs:
       - name: Check every package resolves from the npm registry
         run: npx -y lockfile-lint@5.1.0 --path package-lock.json --allowed-hosts npm --validate-https --validate-integrity --validate-package-names
       - run: npm ci
+      # The report pages read reports/, which the repository's scripts write from the store and from
+      # slackwater-database's TICON records at the version the repository installs. A report that fails, or a step it
+      # needs, fails the build and nothing deploys, so the deployed pages keep the last good reports. CI's reports job runs both scripts on
+      # every pull request, whichever files it touches.
+      - name: Install the repository's packages for the reports
+        working-directory: .
+        run: npm ci
+      - id: tide
+        working-directory: .
+        run: echo "version=$(node -p "require('./node_modules/@slackwater/database/package.json').version")" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        with:
+          repository: openwatersio/slackwater-database
+          ref: v${{ steps.tide.outputs.version }}
+          path: slackwater-database
+      # Each report has its own limit, so one that hangs fails the build before the job's limit.
+      - name: Write the TICON inventory
+        working-directory: .
+        timeout-minutes: 8
+        run: npm run ticon:inventory
+        env:
+          TIDE_DATABASE: slackwater-database
+      - name: Write the GESLA coverage
+        working-directory: .
+        timeout-minutes: 8
+        run: npm run gesla:coverage
       # The deployed site has no station pages. A pull request builds two small sources' pages, to render the
       # station page and bundle its chart: BSH's stations have predictions and no observations, and every Marine
       # Institute station has errata.

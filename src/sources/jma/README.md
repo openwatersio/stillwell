@@ -29,10 +29,10 @@ Hourly tide levels at the Japan Meteorological Agency's tide gauges, read from J
 
 ### Backfill
 
-Monthly refreshes JMA's list on the 2nd. A full backfill goes through the Ingest workflow, TICON's stations first. `all` takes active stations only, so the 20 closed ones are named in a second run:
+Monthly refreshes JMA's list on the 2nd. A full backfill goes through the Ingest workflow. `all` takes active stations only, so the 20 closed ones are named in a second run:
 
 ```bash
-node scripts/ingest.ts backfill jma all 1924 2026 --skip-written --first docs/ticon-inventory.csv
+node scripts/ingest.ts backfill jma all 1924 2026 --skip-written
 ```
 
 ```bash
