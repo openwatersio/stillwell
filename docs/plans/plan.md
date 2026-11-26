@@ -176,7 +176,7 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 
 Estimate: 14 days here, and 4 in slackwater-database.
 
-One pipeline fits every gauge that carries a tide, with a source's differences declared by its adapter. slackwater-database's [plan for constituents](https://github.com/openwatersio/slackwater-database/blob/main/docs/plans/stillwell-constituents.md) has the method and its references: the candidate list, the Rayleigh and SNR rules, Sa and Ssa, the held-out year and the calibration against agencies' own constants. Its `sources/stillwell` importer ([slackwater-database#450](https://github.com/openwatersio/slackwater-database/pull/450)) runs that method on SMHI and PEGELONLINE from outside the store. That importer, the verification report ([slackwater-database#425](https://github.com/openwatersio/slackwater-database/pull/425)) and the calibration ([slackwater-database#426](https://github.com/openwatersio/slackwater-database/pull/426)) are the code this phase starts from.
+One pipeline fits every gauge that carries a tide, with a source's differences declared by its adapter. [Harmonic fits](../fits.md) has the method and its references: what a fit reads, the window, the candidate list, the Rayleigh and SNR rules, Sa and Ssa, nodal corrections, and the scores on a held-out year. The scoring is ported from slackwater-database's verification code, and that repo's side of this phase, reading the fit files and deciding what ships, is in its [plan for constituents](https://github.com/openwatersio/slackwater-database/blob/main/docs/plans/stillwell-constituents.md).
 
 Definitions, before a fit is published:
 
