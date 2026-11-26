@@ -74,7 +74,7 @@ workers/live/          the poller's Worker, container and D1 database (phase 9)
 server/                the poller, its passes and its daily-file export (phase 9)
 src/fit/               which values a fit reads, the checks before it, the fit, its scores and the datums (phase 6)
 scripts/snapshot.ts    quarterly bulk snapshots (phase 12)
-.github/workflows/     the fits, as a job of Monthly (phase 6); snapshot-quarterly (phase 12)
+.github/workflows/     the fits, as a step of Monthly's list job (phase 6); snapshot-quarterly (phase 12)
 ```
 
 Adapters run in Node, in Actions and on the Stillwell server. Adapter code uses only `fetch` and plain TypeScript, with the store's pieces (DuckDB, the disk cache) kept in `src/store/` and `scripts/`.
@@ -208,7 +208,7 @@ The fit:
 
 What is published:
 
-- [ ] `fits/<source>.parquet` and `constituents/<source>.parquet`, defined in [`src/store/files.ts`](../../src/store/files.ts) with the other published files: the window, the year files and their versions, which values counted as final, the engine's version, each candidate's amplitude, phase, intervals, SNR and selection verdict, the definition each constituent was fitted under, the yearly scatter, the datums, and every held-out score. Each fit carries its station's license, commercial use and attribution.
+- [ ] `fits/<source>.parquet` and `constituents/<source>.parquet`, defined in [`src/store/files.ts`](../../src/store/files.ts) with the other published files: the window, the year files and their versions, which values counted as final, the engine's version, each candidate's amplitude, phase, intervals, SNR and selection verdict, the definition each constituent was fitted under, the yearly scatter, the datums, and every held-out score. A fit's terms are its station's, in `stations.parquet` by `id`: its license, commercial use and attribution.
 - [ ] A superseded fit stays readable by its version, as year files do, so a database release can name the fit it shipped.
 - [ ] A fit from a restricted series stays in the restricted store until its operator agrees to the constants being published (decision 8), as a field the source declares. slackwater-database reads only the public store.
 - [ ] A page in the site's docs on reading the fits, and what each column means.
@@ -219,7 +219,8 @@ What is published:
 
 Running:
 
-- [ ] A job in Monthly that fits a gauge again when a year file it read has a new version or its record has grown by a year, so constants follow the store instead of a TICON release.
+- [x] A step of Monthly's list job that fits the stations whose fit is due, when a year file it read has a new version, its record has grown by a year or anything else it depends on has changed, so constants follow the store instead of a TICON release. It works within a budget, the largest tides first, and only at a source with a station that has constants.
+- [ ] A first fit of each source from the Ingest workflow, once the calibration covers it. A source with more stations than a month's budget reaches takes several runs.
 - [ ] A monthly residual report: observed minus predicted at every station with constants, from a fit here or from slackwater-database through `tide_station`. Tidal-band energy in the residual means wrong constants; a step means a datum shift; a whole-hour phase lag means a clock error.
 
 In slackwater-database:

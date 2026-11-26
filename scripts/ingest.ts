@@ -17,7 +17,8 @@
  *   node scripts/ingest.ts delete-years <source> <station> <epoch> <year,...>
  *   node scripts/ingest.ts years <source> [--rebuild-years]
  *   node scripts/ingest.ts analyze <source> [--all] [--requalify [--budget 120]]
- *   node scripts/ingest.ts fit <source> [<station,...>] [--all] [--shard 1/4] [--concurrency 4]
+ *   node scripts/ingest.ts fit <source> [<station,...>] [--all] [--shard 1/4] [--concurrency 4] [--budget 120]
+ *       [--only-fitted]
  *
  * `stations` refreshes each source's list in the store, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
@@ -72,7 +73,8 @@
  * first verdict, over every year, starting stations for `--budget` minutes.
  * `fit` fits harmonic constants to the source's stations whose fit is due, from their
  * final values in the store, into fits/<source>.parquet and constituents/<source>.parquet
- * (src/fit/store.ts); `--all` fits every station again, and station IDs or `--shard` limit the run.
+ * (src/fit/store.ts); `--all` fits every station again, station IDs or `--shard` limit the run, and
+ * `--budget` starts stations only for that many minutes, the largest tides first, leaving the rest due.
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -143,7 +145,7 @@ import {
   type YearStats,
 } from "../src/store/parquet.ts";
 import { commitYears, markYears, readYears, reconcileYears } from "../src/store/years.ts";
-import { fitSource } from "../src/fit/store.ts";
+import { fitSource, readFits } from "../src/fit/store.ts";
 import { requalifyInWorker, WorkerDied } from "../src/store/requalify.ts";
 import {
   analyze,
@@ -1267,8 +1269,25 @@ async function requalifyStations(
 async function fitStations(sourceId: string, ids?: string): Promise<void> {
   const source = sourceOf(sourceId);
   const store = storeOfSource(source.metadata);
-  const list = await listOf(store, source);
   if (ids && values.shard) throw new Error("--shard splits every station, not named ones");
+  // A budget is minutes of a job's six hours, and 0 fits nothing and still says how many stations are due.
+  if (values.budget !== undefined && !/^\d{1,3}$/.test(values.budget))
+    throw new Error("--budget must be a whole number of minutes, from 0 to 999");
+  // A source the adapter reads no levels from, such as one of predictions only, has nothing to fit.
+  if (!source.observations && !source.metadata.hourly) {
+    console.log(`fit ${sourceId}: its adapter reads no levels`);
+    return;
+  }
+  // Monthly keeps up a source once any of its stations has constants, so fitting one by hand
+  // starts that. A file of stations without constants, or an empty one, starts nothing.
+  if (
+    values["only-fitted"] &&
+    ![...(await readFits(store, sourceId)).values()].some((f) => f.version !== null)
+  ) {
+    console.log(`fit ${sourceId}: no station has constants yet, and --only-fitted starts none`);
+    return;
+  }
+  const list = await listOf(store, source);
   const only = ids
     ? ids.split(",").map((id) => (id.startsWith(`${sourceId}/`) ? id : `${sourceId}/${id}`))
     : values.shard
@@ -1281,12 +1300,16 @@ async function fitStations(sourceId: string, ids?: string): Promise<void> {
     errata,
     all: values.all,
     ...(only ? { only } : {}),
+    // A millisecond short, so a budget of 0 is already past when the run looks.
+    ...(values.budget !== undefined
+      ? { until: Date.now() + Number(values.budget) * 60_000 - 1 }
+      : {}),
     // Each station on a thread of its own, as many at once as the machine has cores for.
     concurrency: positive("concurrency"),
     log: (line) => console.log(line),
   });
   const lines = [
-    `fit ${sourceId}: ${report.fitted.length} fitted, ${report.none.length} without constants, ${report.current} current, ${report.waiting.length} being written, ${report.failed.length} failed`,
+    `fit ${sourceId}: ${report.fitted.length} fitted, ${report.none.length} without constants, ${report.current} current, ${report.waiting.length} being written, ${report.left} left for the next run, ${report.failed.length} failed`,
     ...report.failed.map((f) => `  failed ${f}`),
   ];
   for (const line of lines) console.log(line);
@@ -1475,7 +1498,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] [--prune] | matches [--concurrency N] [--accept-matches] [--prune] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | delete-years <source> <station> <epoch> <year,...> | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]] | fit <source> [station,...] [--all] [--shard I/N] [--concurrency N]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] [--prune] | matches [--concurrency N] [--accept-matches] [--prune] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | delete-years <source> <station> <epoch> <year,...> | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]] | fit <source> [station,...] [--all] [--shard I/N] [--concurrency N] [--budget MINUTES] [--only-fitted]",
   );
   process.exit(1);
 }

@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { errataOf, utcDay, type Erratum } from "../errata.ts";
 import { Flag, type Epoch, type SourceMetadata, type StoredStation } from "../schema.ts";
-import { listFiles, readObservationsBetween } from "../store/parquet.ts";
+import { exists, listFiles, readObservationsBetween } from "../store/parquet.ts";
 import { seriesPath } from "../store/paths.ts";
 import type { YearRow } from "../store/years.ts";
 import type { Sample } from "../types.ts";
@@ -173,6 +173,16 @@ export function errataIn(
   );
 }
 
+/**
+ * Whether the store holds the file at `path`. A remote path with no wildcard is read, since a
+ * listing of one echoes it back whether or not it exists. A path with a glob character, as a
+ * station ID can have, is matched against a listing, which then lists for real, so another
+ * station's file doesn't count.
+ */
+export async function holds(path: string): Promise<boolean> {
+  return /[*?[]/.test(path) ? (await listFiles(path)).includes(path) : exists(path);
+}
+
 export interface ReadContext {
   store: string;
   metadata: SourceMetadata;
@@ -250,8 +260,7 @@ export async function readSeries(
       const path = seriesPath(store, "levels", station.source, station.source_id, year, epoch.id);
       const rows = await readObservationsBetween(path, start, end, true);
       // A missing file reads as no rows, as a year with none on the hour does.
-      // A listing globs, so a station ID with a glob character counts only its own file.
-      if (!rows.length && !(await listFiles(path)).includes(path))
+      if (!rows.length && !(await holds(path)))
         throw new Error(`${station.id}: ${path} is in the years file and missing from the store`);
       for (const o of rows) {
         if (!takes(o.flag, o.time) || !Number.isFinite(o.level)) continue;

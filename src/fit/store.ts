@@ -2,9 +2,9 @@ import type { Erratum } from "../errata.ts";
 import type { Source, StoredStation } from "../schema.ts";
 import { FILES } from "../store/files.ts";
 import { exists, readRows, writeTable } from "../store/parquet.ts";
-import { constituentsPath, fitsPath } from "../store/paths.ts";
-import { pool } from "../store/recent.ts";
-import { readYears } from "../store/years.ts";
+import { constituentsPath, fitsPath, seriesPath } from "../store/paths.ts";
+import { poolUntil } from "../store/recent.ts";
+import { readYears, type YearRow } from "../store/years.ts";
 import {
   engineVersion,
   fitStation,
@@ -12,7 +12,7 @@ import {
   type FitContext,
   type FittedCandidate,
 } from "./fit.ts";
-import { Busy, emptyInputs, finalYear, inputsDigest, Unfit, type Inputs } from "./series.ts";
+import { Busy, emptyInputs, finalYear, holds, inputsDigest, Unfit, type Inputs } from "./series.ts";
 import { fitInWorker, workerCount } from "./workers.ts";
 
 /**
@@ -167,6 +167,33 @@ export function due(
     : !rows.length || rows.some((r) => r.version !== previous.version);
 }
 
+/**
+ * The year files a station's last fit read that the years file has no row for though the store
+ * still holds them, by `<epoch> <year>`: what a years file built from a short listing leaves.
+ */
+async function missingFromYears(
+  store: string,
+  station: StoredStation,
+  previous: Fit | undefined,
+  years: ReadonlyMap<string, YearRow>,
+): Promise<string[]> {
+  if (!previous?.version) return [];
+  let read: string[];
+  try {
+    read = Object.keys((JSON.parse(previous.inputs) as Inputs).versions);
+  } catch {
+    return [];
+  }
+  const missing: string[] = [];
+  for (const key of read) {
+    if (years.has(`${station.id} ${key}`)) continue;
+    const [epoch, year] = key.split(" ").map(Number);
+    const path = seriesPath(store, "levels", station.source, station.source_id, year!, epoch);
+    if (await holds(path)) missing.push(key);
+  }
+  return missing;
+}
+
 export interface FitReport {
   /** Stations fitted in this run, with constants. */
   fitted: string[];
@@ -176,6 +203,8 @@ export interface FitReport {
   failed: string[];
   /** Stations whose year files are being written, left as they were for the next run. */
   waiting: string[];
+  /** Due stations the run's time ended before, which stay due. */
+  left: number;
   /** Stations whose stored fit is current. */
   current: number;
 }
@@ -189,7 +218,8 @@ const BATCH = 25;
  * A fit that throws keeps the station's stored rows and is reported, as does
  * a station whose year files are being written. While any station of a
  * source that finalizes is being written, its final year can't be told, and
- * the run stops before writing anything.
+ * the run waits, writing nothing. With `until`, it stops starting
+ * stations at that time and reports how many are left.
  */
 export async function fitSource(
   store: string,
@@ -203,6 +233,13 @@ export async function fitSource(
     only?: string[];
     /** How many stations are fitted at once, each on a thread of its own; one where not given. */
     concurrency?: number;
+    /**
+     * When to stop starting stations, in epoch milliseconds: the ones a run doesn't reach stay due
+     * for the next. Every run fits the stations with the largest measured tide first.
+     */
+    until?: number;
+    /** The clock `until` is read against. */
+    clock?: () => number;
     /** Fits one station: on a worker thread, unless a caller gives another way. */
     fit?: typeof fitStation;
     log?: (line: string) => void;
@@ -215,15 +252,18 @@ export async function fitSource(
   const engine = engineVersion();
   // A list that comes back empty would take every station's rows with it.
   if (!stations.length) throw new Error(`${metadata.id} lists no stations to fit`);
-  const report: FitReport = { fitted: [], none: [], failed: [], waiting: [], current: 0 };
+  const report: FitReport = { fitted: [], none: [], failed: [], waiting: [], left: 0, current: 0 };
   const listed = new Set(stations.map((s) => s.id));
-  const fits = new Map([...(await readFits(store, metadata.id))].filter(([id]) => listed.has(id)));
+  const before = await readFits(store, metadata.id);
+  const fits = new Map([...before].filter(([id]) => listed.has(id)));
   const constituents = new Map<string, FittedCandidate[]>();
-  for (const row of await readConstituents(store, metadata.id)) {
+  const candidates = await readConstituents(store, metadata.id);
+  for (const row of candidates) {
     if (!listed.has(row.id)) continue;
     if (!constituents.has(row.id)) constituents.set(row.id, []);
     constituents.get(row.id)!.push(row);
   }
+  const dropped = before.size !== fits.size || candidates.some((row) => !listed.has(row.id));
   const save = () =>
     writeFits(store, metadata.id, [...fits.values()], [...constituents.values()].flat());
   const chosen = stations.filter((s) => !options.only || options.only.includes(s.id));
@@ -237,11 +277,14 @@ export async function fitSource(
     ),
   );
   // Stations being written vote for no year, so the final year may be theirs to change, and a
-  // run on the wrong one would fit every station twice.
-  if (metadata.finalizes && writing.size)
-    throw new Error(
-      `${metadata.id}: ${writing.size} stations' year files are being written, so its final year can't be told; run again once they're done`,
+  // run on the wrong one would fit every station twice. The run waits, writing nothing.
+  if (metadata.finalizes && writing.size) {
+    options.log?.(
+      `  ${writing.size} stations' year files are being written, so ${metadata.id}'s final year can't be told`,
     );
+    report.waiting.push(...chosen.map((s) => s.id));
+    return report;
+  }
   let final: number | null;
   let unfit = "";
   try {
@@ -255,14 +298,32 @@ export async function fitSource(
   const base = { store, metadata, years, errata: options.errata, now: options.now, engine };
   const digestOf = (station: StoredStation) =>
     inputsDigest(station, { metadata, years, errata: options.errata, finalYear: final });
-  const todo = chosen.filter((s) => {
+  const until = options.until ?? Infinity;
+  const clock = options.clock ?? Date.now;
+  const todo: StoredStation[] = [];
+  for (const s of chosen) {
     if (writing.has(s.id)) {
       report.waiting.push(s.id);
-      return false;
+      continue;
     }
-    return options.all || due(fits.get(s.id), digestOf(s), engine, constituents.get(s.id));
-  });
-  report.current = chosen.length - todo.length - report.waiting.length;
+    if (!options.all && !due(fits.get(s.id), digestOf(s), engine, constituents.get(s.id))) continue;
+    // A years file built from a short listing lacks rows for files the store still holds, and a
+    // fit from it would replace constants with ones from less of the record. A file that is
+    // really gone, as after `delete-years` or a new epoch, is a change to fit again for.
+    const short = await missingFromYears(store, s, fits.get(s.id), years);
+    if (short.length) {
+      report.failed.push(
+        `${s.id}: the years file lacks ${short.length} year files its fit read and the store still holds, ${short[0]} among them; run \`ingest years ${metadata.id}\``,
+      );
+      continue;
+    }
+    todo.push(s);
+  }
+  report.current = chosen.length - todo.length - report.waiting.length - report.failed.length;
+  // Largest tide first, so a run that can't reach every station spends its time where a fit says
+  // most. A station analysis hasn't measured comes last, and none is ever left out for its size.
+  const tide = (s: StoredStation) => (Number.isFinite(s.tide_m) ? s.tide_m! : -1);
+  todo.sort((a, b) => tide(b) - tide(a));
 
   if (final === null) {
     // A source that finalizes and has constants has had a final year, so losing it is a fault in
@@ -272,6 +333,15 @@ export async function fitSource(
       throw new Error(
         `${metadata.id}: ${unfit}, though ${fitted.length} of its stations have constants; check its years file`,
       );
+  }
+  // A run whose time has passed fits nothing and says how many stations are due. It still takes
+  // out the rows of stations that left the list, which is no fit's work.
+  if (clock() > until) {
+    report.left = todo.length;
+    if (dropped) await save();
+    return report;
+  }
+  if (final === null) {
     // No station of the source can be fitted, and each one's row says why.
     for (const station of todo) {
       fits.set(station.id, {
@@ -287,30 +357,45 @@ export async function fitSource(
   const context: FitContext = { ...base, finalYear: final };
   const fit = options.fit ?? fitInWorker;
   const workers = workerCount(options.concurrency ?? 1);
+  let saved = false;
   for (let i = 0; i < todo.length; i += BATCH) {
-    await pool(todo.slice(i, i + BATCH), workers, async (station) => {
-      try {
-        const result = await fit(station, context);
-        fits.set(station.id, result.fit);
-        if (result.constituents.length) constituents.set(station.id, result.constituents);
-        else constituents.delete(station.id);
-        if (result.fit.reason === null) report.fitted.push(station.id);
-        else report.none.push({ id: station.id, reason: result.fit.reason });
-        options.log?.(
-          result.fit.reason === null
-            ? `  ${station.id}: fitted ${result.fit.since!.slice(0, 4)} to ${result.fit.held_out! - 1}, scored on ${result.fit.held_out}`
-            : `  ${station.id}: ${result.fit.reason}`,
-        );
-      } catch (error) {
-        if (error instanceof Busy) return void report.waiting.push(station.id);
-        report.failed.push(
-          `${station.id}: ${error instanceof Error ? error.message : String(error)}`,
-        );
-      }
-    });
+    if (clock() > until) {
+      report.left += todo.length - i;
+      break;
+    }
+    const batch = todo.slice(i, i + BATCH);
+    const late = await poolUntil(
+      batch,
+      workers,
+      until,
+      async (station) => {
+        try {
+          const result = await fit(station, context);
+          fits.set(station.id, result.fit);
+          if (result.constituents.length) constituents.set(station.id, result.constituents);
+          else constituents.delete(station.id);
+          if (result.fit.reason === null) report.fitted.push(station.id);
+          else report.none.push({ id: station.id, reason: result.fit.reason });
+          options.log?.(
+            result.fit.reason === null
+              ? `  ${station.id}: fitted ${result.fit.since!.slice(0, 4)} to ${result.fit.held_out! - 1}, scored on ${result.fit.held_out}`
+              : `  ${station.id}: ${result.fit.reason}`,
+          );
+        } catch (error) {
+          if (error instanceof Busy) return void report.waiting.push(station.id);
+          report.failed.push(
+            `${station.id}: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      },
+      options.clock,
+    );
+    report.left += late.length;
     await save();
+    saved = true;
   }
-  if (!todo.length) await save();
+  // With nothing fitted, the files change only by the rows of stations that left the list.
+  if (!saved && dropped) await save();
   return report;
 }
 
