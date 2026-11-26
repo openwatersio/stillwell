@@ -82,18 +82,17 @@ export interface ReferenceScore {
 
 /**
  * The nodal corrections each slackwater-database source's constants were
- * fitted under, by the prefix of its record IDs, where docs/fits.md records
- * what its publisher uses (Nodal corrections): the IHO's for TICON, and
- * Schureman's for NOAA. TICON-4's manual names none and refers for its
- * method to Piccioni et al. (2019), which does. slackwater-database's own
- * refits among its TICON records aren't told apart here. A record of any other
- * source is predicted under `ASSUMED`, and its row says so.
+ * fitted under, by the prefix of its record IDs, where they are known: NOAA's
+ * analyses use Schureman's (docs/fits.md, Nodal corrections). A record of any
+ * other source is predicted under `ASSUMED`, and its row says so. That
+ * includes TICON's: its constants come back under no one family (docs/fits.md,
+ * Reference scores; `scripts/ticon-corrections.ts`).
  */
-export const STATED: Record<string, NodeCorrections> = { ticon: "iho", noaa: "schureman" };
+export const STATED: Record<string, NodeCorrections> = { noaa: "schureman" };
 /**
- * For a source that doesn't say: the IHO's, which `@slackwater/engine`
- * defaults to, so the score is of the curve slackwater-database's own
- * predictions give.
+ * For a source whose corrections aren't known: the IHO's, which
+ * `@slackwater/engine` defaults to, so the score is of the curve
+ * slackwater-database's own predictions give.
  */
 export const ASSUMED: NodeCorrections = "iho";
 

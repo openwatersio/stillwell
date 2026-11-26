@@ -89,7 +89,7 @@ describe("the records scored for a station", () => {
           "levels",
           "gesla/kungsvik-2130-swe-smhi",
           "iho",
-          false,
+          true,
           RELEASE,
         ],
         [
@@ -97,7 +97,7 @@ describe("the records scored for a station", () => {
           "levels",
           "gesla/kungsvik-kun-swe-cmems",
           "iho",
-          false,
+          true,
           RELEASE,
         ],
       ],

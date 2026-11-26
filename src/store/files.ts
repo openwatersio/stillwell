@@ -978,7 +978,7 @@ export const FILES = {
         name: "node_corrections_assumed",
         type: "BOOLEAN",
         description:
-          "False where the source's documentation names the corrections it fits under, or refers to a paper that does: NOAA's names Schureman's, and TICON-4's manual names none and refers for its method to the paper on the first TICON, which names the IHO's. True where it doesn't, and the record is predicted under the IHO's, which slackwater-database's predictions use by default; constants fitted under another family then score worse than they would under their own.",
+          "False where the corrections the record's source fits under are known, as NOAA's are. True where they aren't, as for TICON's records, and the record is predicted under the IHO's, which slackwater-database's predictions use by default; constants fitted under other corrections then score worse than they would under their own.",
       },
       {
         name: "seen",
