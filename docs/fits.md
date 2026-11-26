@@ -8,7 +8,7 @@ A fit is a measurement. It is published whatever its size, with what a reader ne
 
 - **Final values.** A fit reads values the source won't revise again: verified values, and preliminary ones from before the station's `source_qc_start`, which the source will never check. A source that never marks values final declares how long after a year ends its values are read as final (`settles_after_months`), with its evidence in its README.
 - **Flags decide.** A fit reads what the store's flags allow. A value is `kept` under an erratum only where its own evidence supports keeping it, and a value no reader should use is `flagged`, which marks it suspect. The fit records every erratum touching the years it read.
-- **Values stamped on the hour, read as instantaneous.** Hourly sampling resolves every constituent below twelve cycles a day and keeps a 19-year fit to about 166,000 values. A fit can't tell an instant from a mean. Where a source's hourly values are means, its amplitudes come out low: a one-hour mean scales a constituent by sinc(f · 1 h), which is 0.989 for M2, 0.958 for M4 and 0.907 for M6. Such a series has an erratum or a note in its source's README, and its fit isn't corrected for it.
+- **Values stamped on the hour, read as instantaneous.** Hourly sampling resolves every constituent below twelve cycles a day and keeps a 19-year fit to about 166,000 values. A fit can't tell an instant from a mean. Where a source's hourly values are means, its amplitudes come out low: a one-hour mean scales a constituent by sinc(f · 1 h), which is 0.989 for M2, 0.958 for M4 and 0.907 for M6. Where a mean is stamped away from the middle of its interval, its phases shift too: a one-hour mean stamped at the start of its hour reads 30 minutes early, which is 14.5° of M2 and 7.5° of K1. Such a series has an erratum or a note in its source's README, and its fit isn't corrected for it.
 - **One datum.** Every datum epoch's levels are moved into the station's current datum by the epoch's `to_current`, and an epoch that can't be converted is left out.
 
 ## Window
@@ -142,7 +142,7 @@ The held-out year is scored the same way for any constants:
 - **Tidal-band RMS.** Observed minus predicted, hourly, after a Godin filter (running means of 24, 24 and 25 hours) removes everything slower than a day. The filter also removes the long-period constituents, so this score can't see them.
 - **Variance explained.** One minus the residual's variance over the observed levels', both after the same filter.
 - **Bands.** The residual's RMS in the diurnal, semidiurnal, quarter-diurnal and sixth-diurnal bands.
-- **High and low waters.** One picker finds the turns of the observed and the predicted hourly series, so both are picked the same way, and the time and height differences of matched turns are reported.
+- **High and low waters.** One picker finds the turns of the observed and the predicted hourly series, so both are picked the same way, as [Parker (2007)](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf) requires of such a comparison (§3.9.1, pp. 129–130), and the time and height differences of matched turns are reported.
 
 One year decides each score, so an unusual year can move it.
 
