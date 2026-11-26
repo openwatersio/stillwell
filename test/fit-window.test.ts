@@ -22,7 +22,7 @@ const station = {
   epochs: [{ id: 1, datum: "NAVD88", since: null, until: null, to_current: 0, state: "open" }],
 } as unknown as StoredStation;
 
-/** A year of hourly good values: four constituents, an annual cycle, an offset and fixed noise of at most 1 cm. */
+/** A year of hourly good values: four constituents, an annual cycle, a semiannual one that turns over each year, an offset and fixed noise of at most 1 cm. */
 function yearOfValues(year: number): Observation[] {
   const predictor = createTidePredictor(
     [
@@ -31,6 +31,8 @@ function yearOfValues(year: number): Observation[] {
       { name: "K1", amplitude: 0.2, phase: 120 },
       { name: "O1", amplitude: 0.15, phase: 200 },
       { name: "Sa", amplitude: 0.1, phase: 250 },
+      // Opposite in alternate years, so its mean over the years is small beside their spread.
+      { name: "Ssa", amplitude: 0.05, phase: year % 2 ? 40 : 220 },
     ],
     { offset: false, nodeCorrections: "schureman" },
   );
@@ -102,6 +104,12 @@ describe("fitSamples", () => {
         .map((r) => [r.name, r.amplitude_m, r.phase_deg, r.amplitude_ci_m, r.phase_ci_deg, r.snr]),
     );
     assert.ok(window.constituents.some((c) => c.name === "Sa"));
+    // The series puts candidates through every way of not being kept, so the two are compared on each.
+    for (const reason of ["snr", "rayleigh", "seasonal"])
+      assert.ok(
+        window.verdicts.some((v) => v.reason === reason),
+        `a candidate dropped for ${reason}`,
+      );
     assert.deepEqual(
       window.verdicts,
       rows.map((r) => ({ name: r.name, kept: r.kept, reason: r.reason, conflict: r.conflict })),

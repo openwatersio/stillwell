@@ -23,7 +23,7 @@ One least-squares fit over the whole window, with each constituent's nodal facto
 
 NOAA evaluates the factors once a year, at mid-year, for convenience ([Parker 2007](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf), p. 148). Measured on two gauges, that mode makes the 19-year fit about 12 seconds faster of 100 and moves most constants by under 0.3 mm, but lambda2 by 2.1 mm at Cuxhaven. The fits evaluate at every sample.
 
-**Robust weights.** The fit is iteratively reweighted with Cauchy weights, so surges and spikes that QC passes don't pull it, as UTide does by default, after Leffler and Jay (2009) ([Codiga 2011](https://www.po.gso.uri.edu/~codiga/utide/2011Codiga-UTide-Report.pdf), pp. 5 and 20). It costs about four times a plain fit. On the held-out year it lowers the tidal-band RMS by 0.2 mm at Kungsvik and 1.3 mm at Cuxhaven. The [calibration](results/fit-calibration.md#where-the-differences-come-from) measures what the weights do to each constant and to the held-out score at 20 CO-OPS gauges.
+**Robust weights.** The fit is iteratively reweighted with Cauchy weights, so surges and spikes that QC passes don't pull it, as UTide does by default, after Leffler and Jay (2009) ([Codiga 2011](https://www.po.gso.uri.edu/~codiga/utide/2011Codiga-UTide-Report.pdf), pp. 5 and 20). It costs about four times a plain fit. On the held-out year it lowers the tidal-band RMS by 0.2 mm at Kungsvik and 1.3 mm at Cuxhaven. The [calibration](results/fit-calibration.md#where-the-differences-come-from) measures what the weights do to each constant and to the held-out score at its CO-OPS gauges.
 
 **Confidence intervals** come from the residual spectrum around each constituent's frequency, so correlated noise doesn't shrink them ([Pawlowicz, Beardsley and Lentz 2002](<https://doi.org/10.1016/S0098-3004(02)00013-4>), §4.1). Those authors find the linearized intervals adequate for a signal-to-noise ratio above 10 and "probably not bad" down to 2 or 3.
 
@@ -148,7 +148,7 @@ One year decides each score, so an unusual year can move it.
 
 ## Calibration
 
-The [fit calibration](results/fit-calibration.md) fits 20 NOAA CO-OPS reference stations from the store and compares the constants with the ones NOAA publishes for the same gauges, which NOAA analyzed from the same observations under Schureman's corrections. It is the fits' independent reference, and it is run again whenever the method changes ([Checks](contributing/checks.md#fit-calibration)). It compares NOAA's own analysis years and the standard 19-year window, takes the method apart one step at a time between NOAA's and the store's, and scores every set of constants on the held-out year. Its summary says what agrees, which constituents differ and why, and what it found wrong.
+The [fit calibration](results/fit-calibration.md) fits NOAA CO-OPS reference stations from the store and compares the constants with the ones NOAA publishes for the same gauges, which NOAA analyzed from its own observations of them under Schureman's corrections. It is the fits' independent reference, and it is run again whenever the method changes ([Checks](contributing/checks.md#fit-calibration)). It compares NOAA's own analysis years and the standard 19-year window, takes the method apart one step at a time between NOAA's and the store's, and scores every set of constants on the held-out year. Its summary says what agrees, which constituents differ and why, and what it found wrong.
 
 ## What the IHO asks a publisher to state
 

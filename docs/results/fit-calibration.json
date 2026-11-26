@@ -1,5 +1,25 @@
 {
   "engine": "@slackwater/engine@1.0.0-beta.14",
+  "candidates": "f219fb23ae3a385a",
+  "leak": {
+    "K1": {
+      "S1": [
+        0.005732,
+        0.008285
+      ],
+      "P1": [
+        0.002956,
+        0.004234
+      ]
+    },
+    "K2": {
+      "R2": [
+        0.012749,
+        0.018898
+      ]
+    },
+    "exact": 0
+  },
   "method": 1,
   "node_corrections": "schureman",
   "final_year": 2025,
@@ -76,6 +96,33 @@
           "2018": 8760
         },
         "kept": 60
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1"
+        },
+        "score": {
+          "variance": 0.984748,
+          "rms": 0.023764,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.004833,
+            "phase": 214.192327,
+            "amplitude_ci": 0.000325,
+            "phase_ci": 3.912177,
+            "snr": 849.025264,
+            "d": {
+              "amplitude": -0.000167,
+              "relative": -0.033474,
+              "phase": -18.307673,
+              "vector": 0.001573,
+              "ratio": 4.679282
+            }
+          }
+        }
       },
       "yearly": [
         2014,
@@ -2369,6 +2416,49 @@
         },
         "kept": 61
       },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.995637,
+          "rms": 0.025886,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.004415,
+            "phase": 63.190901,
+            "amplitude_ci": 0.000318,
+            "phase_ci": 4.10819,
+            "snr": 742.177151,
+            "d": {
+              "amplitude": 0.000415,
+              "relative": 0.103637,
+              "phase": -21.009099,
+              "vector": 0.001587,
+              "ratio": 5.113576
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.000439,
+            "phase": 2.122518,
+            "amplitude_ci": 0.000281,
+            "phase_ci": 36.709878,
+            "snr": 9.358144,
+            "d": {
+              "amplitude": -0.000561,
+              "relative": -0.560875,
+              "phase": -7.277482,
+              "vector": 0.000567,
+              "ratio": 0.977605
+            }
+          }
+        }
+      },
       "yearly": [
         2014,
         2015,
@@ -4625,6 +4715,33 @@
         },
         "kept": 54
       },
+      "renamed": {
+        "held": {
+          "M1": "NO1"
+        },
+        "score": {
+          "variance": 0.995911,
+          "rms": 0.017654,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.001546,
+            "phase": 67.740821,
+            "amplitude_ci": 0.000338,
+            "phase_ci": 12.52893,
+            "snr": 80.110245,
+            "d": {
+              "amplitude": 0.000546,
+              "relative": 0.545581,
+              "phase": -29.159179,
+              "vector": 0.00083,
+              "ratio": 2.327329
+            }
+          }
+        }
+      },
       "yearly": [
         2016,
         2017,
@@ -6820,6 +6937,49 @@
           "2019": 8731
         },
         "kept": 63
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.99812,
+          "rms": 0.082581,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.005826,
+            "phase": 192.669327,
+            "amplitude_ci": 0.001369,
+            "phase_ci": 13.503948,
+            "snr": 69.526848,
+            "d": {
+              "amplitude": 0.000826,
+              "relative": 0.165115,
+              "phase": -20.230673,
+              "vector": 0.002068,
+              "ratio": 1.49812
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.005167,
+            "phase": 324.106179,
+            "amplitude_ci": 0.000446,
+            "phase_ci": 4.94859,
+            "snr": 515.765466,
+            "d": {
+              "amplitude": 0.000167,
+              "relative": 0.033368,
+              "phase": -2.993821,
+              "vector": 0.000314,
+              "ratio": 0.604954
+            }
+          }
+        }
       },
       "yearly": [
         2015,
@@ -9113,6 +9273,49 @@
         },
         "kept": 62
       },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.996214,
+          "rms": 0.060742,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.005197,
+            "phase": 188.457439,
+            "amplitude_ci": 0.001094,
+            "phase_ci": 12.083926,
+            "snr": 86.632274,
+            "d": {
+              "amplitude": 0.000197,
+              "relative": 0.039425,
+              "phase": -34.742561,
+              "vector": 0.00305,
+              "ratio": 2.875081
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.007182,
+            "phase": 202.063111,
+            "amplitude_ci": 0.000439,
+            "phase_ci": 3.504521,
+            "snr": 1026.929695,
+            "d": {
+              "amplitude": 0.000182,
+              "relative": 0.02599,
+              "phase": -2.636889,
+              "vector": 0.000374,
+              "ratio": 0.752348
+            }
+          }
+        }
+      },
       "yearly": [
         2015,
         2016,
@@ -11404,6 +11607,49 @@
           "2022": 8759
         },
         "kept": 65
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.978461,
+          "rms": 0.073263,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.003557,
+            "phase": 208.898922,
+            "amplitude_ci": 0.001006,
+            "phase_ci": 16.185714,
+            "snr": 48.034857,
+            "d": {
+              "amplitude": -0.000443,
+              "relative": -0.110725,
+              "phase": -38.501078,
+              "vector": 0.002526,
+              "ratio": 2.378696
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.006204,
+            "phase": 39.368971,
+            "amplitude_ci": 0.000797,
+            "phase_ci": 7.360388,
+            "snr": 232.937533,
+            "d": {
+              "amplitude": 0.000204,
+              "relative": 0.034028,
+              "phase": -5.331029,
+              "vector": 0.000603,
+              "ratio": 0.72427
+            }
+          }
+        }
       },
       "yearly": [
         2018,
@@ -13697,6 +13943,49 @@
         },
         "kept": 61
       },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.97268,
+          "rms": 0.105013,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.003208,
+            "phase": 291.026238,
+            "amplitude_ci": 0.001609,
+            "phase_ci": 28.47386,
+            "snr": 15.277245,
+            "d": {
+              "amplitude": 0.001208,
+              "relative": 0.603945,
+              "phase": -0.273762,
+              "vector": 0.001208,
+              "ratio": 0.717047
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.024198,
+            "phase": 292.549404,
+            "amplitude_ci": 0.001063,
+            "phase_ci": 2.518173,
+            "snr": 1991.141164,
+            "d": {
+              "amplitude": 0.000198,
+              "relative": 0.008255,
+              "phase": -2.250596,
+              "vector": 0.000967,
+              "ratio": 0.893566
+            }
+          }
+        }
+      },
       "yearly": [
         2016,
         2017,
@@ -15940,6 +16229,49 @@
           "2021": 8758
         },
         "kept": 57
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.716792,
+          "rms": 0.077823,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.003276,
+            "phase": 44.248447,
+            "amplitude_ci": 0.001271,
+            "phase_ci": 22.20117,
+            "snr": 25.502886,
+            "d": {
+              "amplitude": 0.000276,
+              "relative": 0.091996,
+              "phase": -23.451553,
+              "vector": 0.001304,
+              "ratio": 1.056318
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.004527,
+            "phase": 161.399484,
+            "amplitude_ci": 0.00034,
+            "phase_ci": 4.299948,
+            "snr": 682.050708,
+            "d": {
+              "amplitude": 0.000527,
+              "relative": 0.131743,
+              "phase": 1.299484,
+              "vector": 0.000536,
+              "ratio": 0.871741
+            }
+          }
+        }
       },
       "yearly": [
         2017,
@@ -18208,6 +18540,49 @@
           "2019": 8760
         },
         "kept": 63
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.970599,
+          "rms": 0.044932,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.002278,
+            "phase": 230.761324,
+            "amplitude_ci": 0.000922,
+            "phase_ci": 23.15743,
+            "snr": 23.451988,
+            "d": {
+              "amplitude": -0.000722,
+              "relative": -0.240688,
+              "phase": -12.538676,
+              "vector": 0.000921,
+              "ratio": 0.688463
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.004137,
+            "phase": 103.014416,
+            "amplitude_ci": 0.000407,
+            "phase_ci": 5.639938,
+            "snr": 396.400668,
+            "d": {
+              "amplitude": 0.000137,
+              "relative": 0.034246,
+              "phase": 0.914416,
+              "vector": 0.000152,
+              "ratio": 0.212422
+            }
+          }
+        }
       },
       "yearly": [
         2015,
@@ -20489,6 +20864,49 @@
         },
         "kept": 66
       },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.989711,
+          "rms": 0.05689,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.005258,
+            "phase": 196.698819,
+            "amplitude_ci": 0.000869,
+            "phase_ci": 9.448103,
+            "snr": 140.657244,
+            "d": {
+              "amplitude": 0.000258,
+              "relative": 0.051524,
+              "phase": -22.401181,
+              "vector": 0.002008,
+              "ratio": 2.370938
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.011132,
+            "phase": 26.76795,
+            "amplitude_ci": 0.000719,
+            "phase_ci": 3.701212,
+            "snr": 921.560886,
+            "d": {
+              "amplitude": 0.000132,
+              "relative": 0.011981,
+              "phase": -1.53205,
+              "vector": 0.000324,
+              "ratio": 0.413894
+            }
+          }
+        }
+      },
       "yearly": [
         2017,
         2018,
@@ -22756,6 +23174,49 @@
           "2022": 8760
         },
         "kept": 67
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.986056,
+          "rms": 0.020065,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.004297,
+            "phase": 353.914271,
+            "amplitude_ci": 0.000358,
+            "phase_ci": 4.769196,
+            "snr": 553.084604,
+            "d": {
+              "amplitude": 0.000297,
+              "relative": 0.074173,
+              "phase": -17.685729,
+              "vector": 0.001309,
+              "ratio": 3.708121
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.002662,
+            "phase": 119.80062,
+            "amplitude_ci": 0.000186,
+            "phase_ci": 4.000504,
+            "snr": 787.983667,
+            "d": {
+              "amplitude": 0.000662,
+              "relative": 0.331092,
+              "phase": 1.00062,
+              "vector": 0.000663,
+              "ratio": 1.241361
+            }
+          }
+        }
       },
       "yearly": [
         2018,
@@ -25061,6 +25522,49 @@
         },
         "kept": 61
       },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.957371,
+          "rms": 0.030332,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.006104,
+            "phase": 67.537046,
+            "amplitude_ci": 0.000597,
+            "phase_ci": 5.604927,
+            "snr": 401.007705,
+            "d": {
+              "amplitude": 0.001104,
+              "relative": 0.220719,
+              "phase": -28.862954,
+              "vector": 0.002966,
+              "ratio": 5.149363
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.001793,
+            "phase": 172.929708,
+            "amplitude_ci": 0.000159,
+            "phase_ci": 5.083241,
+            "snr": 488.0949,
+            "d": {
+              "amplitude": -0.000207,
+              "relative": -0.103666,
+              "phase": 1.229708,
+              "vector": 0.000211,
+              "ratio": 0.395156
+            }
+          }
+        }
+      },
       "yearly": [
         2018,
         2019,
@@ -27329,6 +27833,49 @@
         },
         "kept": 61
       },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.96341,
+          "rms": 0.0281,
+          "seen": true
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.004923,
+            "phase": 40.984938,
+            "amplitude_ci": 0.000413,
+            "phase_ci": 4.813643,
+            "snr": 544.482194,
+            "d": {
+              "amplitude": -0.000077,
+              "relative": -0.015453,
+              "phase": -19.115062,
+              "vector": 0.001649,
+              "ratio": 3.970804
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.002009,
+            "phase": 197.752002,
+            "amplitude_ci": 0.000204,
+            "phase_ci": 5.823553,
+            "snr": 371.786391,
+            "d": {
+              "amplitude": 0.000009,
+              "relative": 0.004385,
+              "phase": -4.447998,
+              "vector": 0.000156,
+              "ratio": 0.763766
+            }
+          }
+        }
+      },
       "yearly": [
         2021,
         2022,
@@ -29560,6 +30107,49 @@
           "2025": 8736
         },
         "kept": 59
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.915016,
+          "rms": 0.04988,
+          "seen": true
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.004703,
+            "phase": 51.812563,
+            "amplitude_ci": 0.000647,
+            "phase_ci": 7.893871,
+            "snr": 203.000093,
+            "d": {
+              "amplitude": 0.000703,
+              "relative": 0.175852,
+              "phase": -20.087437,
+              "vector": 0.001668,
+              "ratio": 2.544637
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.00044,
+            "phase": 215.639896,
+            "amplitude_ci": 0.000418,
+            "phase_ci": 54.299618,
+            "snr": 4.27456,
+            "d": {
+              "amplitude": -0.00056,
+              "relative": -0.559522,
+              "phase": -2.560104,
+              "vector": 0.00056,
+              "ratio": 0.858905
+            }
+          }
+        }
       },
       "yearly": [
         2021,
@@ -31828,6 +32418,49 @@
           "2021": 8758
         },
         "kept": 69
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.998722,
+          "rms": 0.019001,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.01211,
+            "phase": 204.546955,
+            "amplitude_ci": 0.000233,
+            "phase_ci": 1.10482,
+            "snr": 10343.662897,
+            "d": {
+              "amplitude": -0.00089,
+              "relative": -0.068491,
+              "phase": -20.553045,
+              "vector": 0.004564,
+              "ratio": 18.58405
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.002916,
+            "phase": 193.987822,
+            "amplitude_ci": 0.000214,
+            "phase_ci": 4.205852,
+            "snr": 712.983199,
+            "d": {
+              "amplitude": -0.000084,
+              "relative": -0.028143,
+              "phase": 1.187822,
+              "vector": 0.000104,
+              "ratio": 0.282401
+            }
+          }
+        }
       },
       "yearly": [
         2017,
@@ -34110,6 +34743,49 @@
           "2012": 8782
         },
         "kept": 70
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.998286,
+          "rms": 0.031486,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.015453,
+            "phase": 235.484706,
+            "amplitude_ci": 0.000379,
+            "phase_ci": 1.402663,
+            "snr": 6388.317126,
+            "d": {
+              "amplitude": 0.000453,
+              "relative": 0.030207,
+              "phase": -22.415294,
+              "vector": 0.005936,
+              "ratio": 15.970381
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.001932,
+            "phase": 355.936213,
+            "amplitude_ci": 0.000205,
+            "phase_ci": 6.067842,
+            "snr": 342.383746,
+            "d": {
+              "amplitude": -0.000068,
+              "relative": -0.034072,
+              "phase": 6.936213,
+              "vector": 0.000247,
+              "ratio": 1.143072
+            }
+          }
+        }
       },
       "yearly": [
         2007,
@@ -36417,6 +37093,49 @@
           "2016": 8783
         },
         "kept": 69
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.997118,
+          "rms": 0.044626,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.025449,
+            "phase": 275.677036,
+            "amplitude_ci": 0.000896,
+            "phase_ci": 2.019974,
+            "snr": 3096.290681,
+            "d": {
+              "amplitude": 0.000449,
+              "relative": 0.01797,
+              "phase": -22.322964,
+              "vector": 0.009776,
+              "ratio": 11.047731
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.008617,
+            "phase": 18.41603,
+            "amplitude_ci": 0.000348,
+            "phase_ci": 2.312863,
+            "snr": 2356.916188,
+            "d": {
+              "amplitude": -0.000383,
+              "relative": -0.04258,
+              "phase": -1.08397,
+              "vector": 0.000418,
+              "ratio": 0.629145
+            }
+          }
+        }
       },
       "yearly": [
         2011,
@@ -38779,6 +39498,49 @@
           "2016": 8779
         },
         "kept": 71
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.993933,
+          "rms": 0.207883,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.032032,
+            "phase": 14.699452,
+            "amplitude_ci": 0.001668,
+            "phase_ci": 3.002453,
+            "snr": 1417.355422,
+            "d": {
+              "amplitude": 0.002032,
+              "relative": 0.067733,
+              "phase": -25.500548,
+              "vector": 0.013833,
+              "ratio": 8.49206
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.098218,
+            "phase": 23.017571,
+            "amplitude_ci": 0.004031,
+            "phase_ci": 2.359607,
+            "snr": 2280.327355,
+            "d": {
+              "amplitude": -0.000782,
+              "relative": -0.007896,
+              "phase": 1.817571,
+              "vector": 0.003224,
+              "ratio": 0.770113
+            }
+          }
+        }
       },
       "yearly": [
         2012,
@@ -41999,6 +42761,49 @@
         },
         "kept": 69
       },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.991153,
+          "rms": 0.036712,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.013179,
+            "phase": 309.798142,
+            "amplitude_ci": 0.000448,
+            "phase_ci": 1.945462,
+            "snr": 3328.029092,
+            "d": {
+              "amplitude": 0.000179,
+              "relative": 0.013749,
+              "phase": -21.501858,
+              "vector": 0.004887,
+              "ratio": 11.048668
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.002391,
+            "phase": 217.454441,
+            "amplitude_ci": 0.000242,
+            "phase_ci": 5.788168,
+            "snr": 376.507233,
+            "d": {
+              "amplitude": 0.000391,
+              "relative": 0.195664,
+              "phase": -1.045559,
+              "vector": 0.000393,
+              "ratio": 0.704728
+            }
+          }
+        }
+      },
       "yearly": [
         2020,
         2021,
@@ -44316,6 +45121,49 @@
           "2012": 8778
         },
         "kept": 66
+      },
+      "renamed": {
+        "held": {
+          "M1": "NO1",
+          "2MK3": "MO3"
+        },
+        "score": {
+          "variance": 0.96555,
+          "rms": 0.016811,
+          "seen": false
+        },
+        "rows": {
+          "M1": {
+            "as": null,
+            "amplitude": 0.00361,
+            "phase": 224.55021,
+            "amplitude_ci": 0.000251,
+            "phase_ci": 3.993367,
+            "snr": 792.121881,
+            "d": {
+              "amplitude": -0.00039,
+              "relative": -0.097514,
+              "phase": -16.24979,
+              "vector": 0.001143,
+              "ratio": 4.068876
+            }
+          },
+          "2MK3": {
+            "as": null,
+            "amplitude": 0.000333,
+            "phase": 169.721583,
+            "amplitude_ci": 0.000142,
+            "phase_ci": 24.413255,
+            "snr": 21.173294,
+            "d": {
+              "amplitude": 0.000333,
+              "relative": null,
+              "phase": null,
+              "vector": 0.000333,
+              "ratio": 0.640614
+            }
+          }
+        }
       },
       "yearly": [
         2007,

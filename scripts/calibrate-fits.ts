@@ -2,7 +2,7 @@
  * How closely do the store's harmonic fits reproduce NOAA's constants?
  *
  * NOAA CO-OPS publishes harmonic constants for its own gauges, analyzed from
- * the observations the store holds as `coops`, under Schureman's nodal
+ * its own observations of them, which the store holds as `coops`, under Schureman's nodal
  * corrections, which the fits use too. For each reference station below this
  * fits the store's series three ways and compares each with NOAA's constants,
  * name for name:
@@ -19,14 +19,14 @@
  * from the CO-OPS metadata API, and writes docs/results/fit-calibration.json
  * and docs/results/fit-calibration.md. It never writes to the store.
  *
- * Usage: node scripts/calibrate-fits.ts [--concurrency n] [--report] [station...]
+ * Usage: node scripts/calibrate-fits.ts [--concurrency n] [--report]
  *
- * `--report` rewrites the Markdown from the JSON without fitting. Stations
- * named by their CO-OPS ID are fitted again and the rest kept from the JSON.
+ * `--report` rewrites the Markdown from the JSON without fitting.
  */
 import "./threadpool.ts";
 import { existsSync, statSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { isMainThread, parentPort, Worker } from "node:worker_threads";
 import {
@@ -41,18 +41,29 @@ import {
   difference,
   fittedFor,
   median,
+  analysisYears,
+  candidatesDigest,
+  checkCopy,
+  noaaConstants,
   phaseDifference,
   vectorAverage,
   type Difference,
 } from "../src/fit/calibration.ts";
-import { engineVersion, fitStation, varianceExplained } from "../src/fit/fit.ts";
-import { harmonicSamples, NODE_CORRECTIONS, rmsOf, tidalResiduals } from "../src/fit/scores.ts";
+import { engineVersion, FIT_OPTIONS, fitStation, varianceExplained } from "../src/fit/fit.ts";
+import { workerCount } from "../src/fit/workers.ts";
+import {
+  harmonicSamples,
+  NODE_CORRECTIONS,
+  rmsOf,
+  SEASONAL,
+  tidalResiduals,
+} from "../src/fit/scores.ts";
 import { emptyInputs, finalYear, METHOD, readSeries } from "../src/fit/series.ts";
 import { fitSamples, type Verdict } from "../src/fit/window.ts";
-import { fetchText } from "../src/http.ts";
 import { listOf } from "../src/refresh.ts";
 import type { StoredStation } from "../src/schema.ts";
 import { errata, sourceOf } from "../src/sources/index.ts";
+import { harmonicConstants } from "../src/sources/coops/index.ts";
 import { connected, limitDuckDb, settled } from "../src/store/parquet.ts";
 import { pool } from "../src/store/recent.ts";
 import { STORE } from "../src/store/stores.ts";
@@ -62,8 +73,6 @@ import type { Sample } from "../src/types.ts";
 const SOURCE = "coops";
 const JSON_PATH = "docs/results/fit-calibration.json";
 const REPORT_PATH = "docs/results/fit-calibration.md";
-const HARCON = (id: string) =>
-  `https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/${id}/harcon.json?units=metric`;
 
 /** NOAA publishes amplitudes to the millimeter and phases to a tenth of a degree. */
 const ROUNDING = { amplitude: 0.0005, phase: 0.05 };
@@ -184,13 +193,30 @@ interface Result {
   scores: { standard: Score; window: Score; noaa: Score; steps: Record<Step, Score> };
   standard: { since: string; until: string; hours: number; kept: number };
   window: { hours: number; by_year: Record<string, number>; kept: number };
+  /**
+   * The store's fit of NOAA's years again with one change: each line it holds under an earlier
+   * candidate's name is fitted under NOAA's. `held` gives the store's name for each of NOAA's, and
+   * `rows` those constituents against NOAA's. Null where the fit holds every line under NOAA's name.
+   */
+  renamed: { held: Record<string, string>; score: Score; rows: Record<string, Side> } | null;
   /** The years of NOAA's fitted by themselves. */
   yearly: number[];
   rows: Row[];
 }
 
+/** What `leak` measured when the fits ran, in meters for a tide of 1 m. */
+interface Leak {
+  K1: Record<string, [number, number]>;
+  K2: Record<string, [number, number]>;
+  /** The most any of them holds with node factors at each sample. */
+  exact: number;
+}
+
 interface Report {
   engine: string;
+  /** `candidatesDigest` when the fits ran: the candidate list isn't counted in `method`. */
+  candidates: string;
+  leak: Leak;
   method: number;
   node_corrections: string;
   final_year: number;
@@ -212,6 +238,7 @@ interface Task {
 
 type Reply = { result: Result } | { error: string };
 
+const isSeasonal = (name: string) => (SEASONAL as readonly string[]).includes(name);
 const yearSpan = (y: number) => ({ start: Date.UTC(y, 0, 1), end: Date.UTC(y + 1, 0, 1) });
 
 /** A worker fits one station at a time, as `src/fit/worker.ts` does. */
@@ -271,6 +298,11 @@ async function calibrate(task: Task): Promise<Result> {
 
   const byYear = new Map<number, Sample[]>();
   for (const y of pinned.years) byYear.set(y, await read(yearSpan(y)));
+  const none = [...byYear].filter(([, rows]) => !rows.length).map(([y]) => y);
+  if (none.length)
+    throw new Error(
+      `${station.id}: the store has no final values on the hour in ${none.join(", ")}`,
+    );
   const samples = [...byYear.values()].flat();
   const window = fitSamples(samples);
 
@@ -294,16 +326,26 @@ async function calibrate(task: Task): Promise<Result> {
     const span = yearSpan(y);
     return rows.length >= (YEAR_SHARE * (span.end - span.start)) / 3_600_000;
   });
+  // NOAA's method averages a fit of every year it names, so a year too short to fit alone leaves
+  // nothing to call NOAA's method.
+  if (whole.length !== byYear.size)
+    throw new Error(
+      `${station.id}: the store holds under two thirds of the hours of ${[...byYear.keys()].filter((y) => !whole.some(([w]) => w === y)).join(", ")}`,
+    );
   const averaged = (nodal: "yearly" | "exact") => {
     const fits = whole.map(
       ([, rows]) => engineFit(harmonicSamples(rows), names, { ...plain, nodal }).constituents,
     );
+    // Only a constituent every year's fit holds: an average of fewer years isn't NOAA's.
     return names.flatMap((name) => {
-      const average = vectorAverage(fits.flatMap((f) => f.filter((c) => c.name === name)));
+      const found = fits.flatMap((f) => f.filter((c) => c.name === name));
+      const average = found.length === fits.length ? vectorAverage(found) : null;
       return average ? [{ name, ...average }] : [];
     });
   };
-  const together = harmonicSamples(whole.flatMap(([, rows]) => rows));
+  // The fits of all years together read what the store's fit of NOAA's years reads, so the step
+  // from them to it changes the constituents and nothing else.
+  const together = harmonicSamples(samples);
   const steps: Record<Step, Constant[]> = {
     yearly: averaged("yearly"),
     exact: averaged("exact"),
@@ -347,13 +389,59 @@ async function calibrate(task: Task): Promise<Result> {
     };
   });
 
-  const held = await read(yearSpan(fit.held_out));
+  const heldOut = await read(yearSpan(fit.held_out));
   const score = (constants: Constant[], seen: boolean): Score => ({
-    variance: varianceExplained(constants, held),
-    rms: rmsOf(tidalResiduals(constants, held)).rms,
+    variance: varianceExplained(constants, heldOut),
+    rms: rmsOf(tidalResiduals(constants, heldOut)).rms,
     seen,
   });
   const seen = pinned.years.includes(fit.held_out);
+
+  const held = new Map(
+    rows.flatMap((row) => {
+      const s = fittedSide(row.window);
+      return s?.as ? [[s.as, row] as const] : [];
+    }),
+  );
+  let renamed: Result["renamed"] = null;
+  if (held.size) {
+    // What the store's fit fitted: the candidates selection kept, then Sa and Ssa, kept or not.
+    const fittedNames = [
+      ...window.verdicts.filter((v) => v.kept && !isSeasonal(v.name)),
+      ...window.verdicts.filter((v) => isSeasonal(v.name) && (v.kept || v.reason === "seasonal")),
+    ].map((v) => held.get(v.name)?.candidate ?? v.name);
+    const again = engineFit(together, fittedNames, {
+      ...FIT_OPTIONS,
+      confidence: true,
+      dropDependent: true,
+    }).constituents.filter(
+      (c) => !isSeasonal(c.name) || window.constituents.some((x) => x.name === c.name),
+    );
+    renamed = {
+      held: Object.fromEntries([...held].map(([as, row]) => [row.name, as])),
+      score: score(again, seen),
+      rows: Object.fromEntries(
+        [...held.values()].map((row) => {
+          const c = again.find((x) => x.name === row.candidate);
+          const theirs = { name: row.name, ...row.noaa };
+          return [
+            row.name,
+            c
+              ? {
+                  as: null,
+                  amplitude: c.amplitude,
+                  phase: c.phase,
+                  amplitude_ci: c.amplitudeInterval ?? null,
+                  phase_ci: c.phaseInterval ?? null,
+                  snr: c.snr ?? null,
+                  d: difference(c, theirs, ROUNDING),
+                }
+              : { reason: "not fitted" },
+          ];
+        }),
+      ),
+    };
+  }
   return {
     id: station.id,
     name: station.name,
@@ -389,38 +477,15 @@ async function calibrate(task: Task): Promise<Result> {
       by_year: Object.fromEntries([...byYear].map(([y, rows]) => [y, rows.length])),
       kept: window.constituents.length,
     },
+    renamed,
     yearly: whole.map(([y]) => y),
     rows,
   };
 }
 
-/** NOAA's constants for a station, in meters and Greenwich phase lags in UTC, with the comment on them. */
-async function harcon(id: string): Promise<{ comment: string; constants: Constant[] }> {
-  const body = JSON.parse(await fetchText(HARCON(id))) as {
-    units?: string;
-    HarmonicConstituents?: {
-      name: string;
-      amplitude: number;
-      phase_GMT: number;
-      comments?: string;
-    }[];
-  };
-  const list = body.HarmonicConstituents;
-  if (body.units !== "meters" || !list?.length)
-    throw new Error(`coops/${id}: NOAA's constants didn't come back in meters`);
-  const comments = new Set(list.map((c) => c.comments ?? ""));
-  if (comments.size !== 1)
-    throw new Error(`coops/${id}: NOAA's constants carry ${comments.size} different comments`);
-  const constants = list.map((c) => ({ name: c.name, amplitude: c.amplitude, phase: c.phase_GMT }));
-  if (constants.some((c) => !Number.isFinite(c.amplitude) || !Number.isFinite(c.phase)))
-    throw new Error(`coops/${id}: NOAA's constants hold a value that isn't a number`);
-  return { comment: [...comments][0]!, constants };
-}
-
 async function main(): Promise<void> {
-  const { values, positionals } = parseArgs({
+  const { values } = parseArgs({
     options: { concurrency: { type: "string", default: "4" }, report: { type: "boolean" } },
-    allowPositionals: true,
   });
   const previous: Report | null = existsSync(JSON_PATH)
     ? (JSON.parse(await readFile(JSON_PATH, "utf8")) as Report)
@@ -432,14 +497,24 @@ async function main(): Promise<void> {
   }
 
   // A station being written is refused by the reader, and its marker is dropped below, which is
-  // only sound on a copy nothing is writing to.
-  if (/^[a-z0-9]+:\/\//i.test(STORE) || !existsSync(STORE) || !statSync(STORE).isDirectory())
+  // sound only on a copy nothing is writing to, and so never on the default store of a checkout.
+  if (
+    !process.env.STILLWELL_STORE ||
+    /^[a-z0-9]+:\/\//i.test(STORE) ||
+    !existsSync(STORE) ||
+    !statSync(STORE).isDirectory() ||
+    resolve(STORE) === resolve("data")
+  )
     throw new Error(
-      `STILLWELL_STORE must be a local copy of the store, a directory; it is ${STORE}`,
+      `STILLWELL_STORE must name a local copy of the store, a directory other than the checkout's own \`data\`; it is ${process.env.STILLWELL_STORE ?? "not set"}`,
     );
-  const unknown = positionals.filter((id) => !STATIONS.some((s) => s.id === id));
-  if (unknown.length) throw new Error(`not a calibration station: ${unknown.join(", ")}`);
-  const pinned = STATIONS.filter((s) => !positionals.length || positionals.includes(s.id));
+  const concurrency = Number(values.concurrency);
+  if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > STATIONS.length)
+    throw new Error(`--concurrency is a whole number from 1 to ${STATIONS.length}`);
+  const pinned = STATIONS;
+  for (const pin of pinned)
+    if (analysisYears(pin.comment).join() !== pin.years.join())
+      throw new Error(`coops/${pin.id}: its years aren't the ones its comment names`);
 
   const source = sourceOf(SOURCE);
   const list = await listOf(STORE, source);
@@ -454,22 +529,29 @@ async function main(): Promise<void> {
       s.source_qc_start ? [[s.id, Date.parse(s.source_qc_start)] as const] : [],
     ),
   );
+  // A marked station votes for no year, and the store's own fits wait while any is marked. Here
+  // the year is taken only where it is the same whether the marked stations' rows vote or not.
   const final = finalYear(source.metadata, all, now, qcStarts);
+  const unmarked = new Map([...all].filter(([, r]) => r.epoch !== null && r.year !== null));
+  if (finalYear(source.metadata, unmarked, now, qcStarts) !== final)
+    throw new Error(
+      `${SOURCE}'s last year of final values depends on the stations the copy marks as being written; copy the years file again once they are done`,
+    );
   // The copy is fixed, so a marker on it says only that the store was being written when it was
-  // copied. Without the marker the station's rows are read as they were copied.
-  const years = [...all].filter(([, r]) => r.epoch !== null && r.year !== null);
+  // copied. `checkCopy` shows each station's rows describe the files copied, marked or not, and
+  // without the marker they are read as they are.
+  const years = [...unmarked];
   const engine = engineVersion();
-  if (previous && positionals.length && (previous.engine !== engine || previous.method !== METHOD))
-    throw new Error(`${JSON_PATH} is from another engine or method; fit every station again`);
 
   const tasks: Task[] = [];
   for (const pin of pinned) {
     const station = list.find((s) => s.id === `${SOURCE}/${pin.id}`);
     if (!station) throw new Error(`${STORE} lists no ${SOURCE}/${pin.id}`);
-    const { comment, constants } = await harcon(pin.id);
+    await checkCopy(STORE, station, all);
+    const { comment, constants } = noaaConstants(station.id, await harmonicConstants(pin.id));
     if (comment !== pin.comment)
       throw new Error(
-        `${station.id}: NOAA's comment on its constants now reads "${comment}"; set its years from that`,
+        `${station.id}: NOAA's comment on its constants read "${pin.comment}" and now reads "${comment}"; set its years from that`,
       );
     tasks.push({
       station,
@@ -487,27 +569,34 @@ async function main(): Promise<void> {
 
   const results = new Map<string, Result>();
   const failed: string[] = [];
-  const concurrency = Math.max(1, Math.floor(Number(values.concurrency)) || 1);
+  const lanes = workerCount(concurrency);
   await pool(
-    Array.from({ length: Math.min(concurrency, tasks.length) }, (_, i) => i),
-    concurrency,
+    Array.from({ length: lanes }, (_, i) => i),
+    lanes,
     async () => {
       const worker = new Worker(new URL(import.meta.url), {
         resourceLimits: { maxOldGenerationSizeMb: 2048 },
       });
       // One set of listeners for the worker's life: whichever station it is on gets the answer.
       let answer: (reply: Reply) => void = () => {};
+      let gone: string | undefined;
+      const end = (why: string) => {
+        gone = why;
+        answer({ error: why });
+      };
       worker
         .on("message", (reply: Reply) => answer(reply))
-        .on("error", (error) => answer({ error: String(error) }))
-        .on("exit", (code) => answer({ error: `the worker exited with ${code}` }));
+        .on("error", (error) => end(String(error)))
+        .on("exit", (code) => end(`the worker exited with ${code}`));
       for (let task = tasks.shift(); task; task = tasks.shift()) {
         const id = task.station.id;
         const started = Date.now();
         const sent = task;
-        const reply = await new Promise<Reply>((resolve) => {
-          answer = resolve;
-          worker.postMessage(sent);
+        // A worker that ended between stations would never answer the next one.
+        const reply = await new Promise<Reply>((answered) => {
+          answer = answered;
+          if (gone) answered({ error: gone });
+          else worker.postMessage(sent);
         });
         if ("error" in reply) {
           failed.push(`${id}: ${reply.error}`);
@@ -519,27 +608,39 @@ async function main(): Promise<void> {
       }
     },
   );
+  // A file rewritten while the fits ran would have been read against a row that no longer describes it.
+  for (const task of [...results.keys()]) {
+    const station = list.find((s) => s.id === task)!;
+    await checkCopy(STORE, station, all);
+  }
   // A report missing a station would read as a calibration of the rest.
-  if (failed.length) {
+  if (failed.length || results.size !== STATIONS.length) {
     console.error(`${failed.length} stations failed; nothing written`);
     process.exit(1);
   }
 
-  const kept = new Map((previous?.results ?? []).map((r) => [r.id, r]));
   const report: Report = {
     engine,
+    candidates: candidatesDigest(),
+    leak: {
+      K1: leak("K1", ["S1", "P1"]),
+      K2: leak("K2", ["R2"]),
+      exact: Math.max(
+        ...Object.values(leak("K1", ["S1", "P1"], "exact")).map((x) => x[1]),
+        ...Object.values(leak("K2", ["R2"], "exact")).map((x) => x[1]),
+      ),
+    },
     method: METHOD,
     node_corrections: NODE_CORRECTIONS,
     final_year: final,
-    results: STATIONS.flatMap((s) => {
-      const id = `${SOURCE}/${s.id}`;
-      const result = results.get(id) ?? kept.get(id);
-      return result ? [result] : [];
-    }),
+    results: STATIONS.map((s) => results.get(`${SOURCE}/${s.id}`)!),
   };
+  // Both files from the numbers as the JSON holds them, and neither written unless both can be.
+  const json = JSON.stringify(report, rounded, 2) + "\n";
+  const markdown = render(JSON.parse(json) as Report);
   await mkdir("docs/results", { recursive: true });
-  await writeFile(JSON_PATH, JSON.stringify(report, rounded, 2) + "\n");
-  await writeFile(REPORT_PATH, render(JSON.parse(JSON.stringify(report, rounded)) as Report));
+  await writeFile(JSON_PATH, json);
+  await writeFile(REPORT_PATH, markdown);
   console.error(`wrote ${JSON_PATH} and ${REPORT_PATH}`);
   // The workers wait for another station.
   process.exit(0);
@@ -605,6 +706,20 @@ function pairs(results: Result[], which: Which, long: boolean) {
 
 function render(report: Report): string {
   const { results } = report;
+  // The findings compare scores, so a report without one, or with no station to compare on, isn't written.
+  for (const r of results)
+    for (const score of [
+      r.scores.standard,
+      r.scores.window,
+      r.scores.noaa,
+      ...Object.values(r.scores.steps),
+    ])
+      if (score.rms === null || score.variance === null)
+        throw new Error(`${r.id} has a set of constants with no score on ${r.held_out}`);
+  if (!results.some((r) => !r.scores.window.seen))
+    throw new Error(
+      "every station's NOAA years include its held-out year, so no score is out of sample",
+    );
   const out: string[] = [];
   const p = (...lines: string[]) => out.push(...lines, "");
   const MAJOR = ["M2", "S2", "N2", "K2", "K1", "O1", "P1", "Q1"];
@@ -632,7 +747,7 @@ function render(report: Report): string {
 
   p("# Calibration of the harmonic fits against NOAA's constants");
   p(
-    `NOAA CO-OPS publishes harmonic constants for its own gauges, analyzed from the observations the store holds as \`coops\`, under Schureman's nodal corrections, which the [fits](../fits.md) use too. This report fits ${results.length} of those gauges from the store and compares the constants with NOAA's, constituent by constituent. It is written by [\`scripts/calibrate-fits.ts\`](../../scripts/calibrate-fits.ts) (\`npm run calibrate:fits\`), with every number in [fit-calibration.json](fit-calibration.json), and is run again whenever the method changes. [Checks](../contributing/checks.md#fit-calibration) says how to run it.`,
+    `NOAA CO-OPS publishes harmonic constants for its own gauges, analyzed from its own observations of them, which the store holds as \`coops\`, under Schureman's nodal corrections, which the [fits](../fits.md) use too. This report fits ${results.length} of those gauges from the store and compares the constants with NOAA's, constituent by constituent. It is written by [\`scripts/calibrate-fits.ts\`](../../scripts/calibrate-fits.ts) (\`npm run calibrate:fits\`), with every number in [fit-calibration.json](fit-calibration.json), and is run again whenever the method changes. [Checks](../contributing/checks.md#fit-calibration) says how to run it.`,
   );
   p(
     `These fits ran with ${report.engine}, method ${report.method} of [\`src/fit/\`](../../src/fit/), ${report.node_corrections === "schureman" ? "Schureman's" : report.node_corrections} nodal corrections, and ${report.final_year} as the source's last year of final values.`,
@@ -716,7 +831,7 @@ function render(report: Report): string {
   const marked = results.filter((r) => r.marked);
   if (marked.length)
     p(
-      `The copy of the store these fits read marked ${marked.map((r) => `\`${r.id}\``).join(", ")} as being written, which the fit's reader refuses. The script drops that marker, since nothing writes to a copy, and reads those stations' files as they were copied.`,
+      `The copy of the store these fits read marked ${marked.map((r) => `\`${r.id}\``).join(", ")} as being written, which the fit's reader refuses. The script checks for every station that each year file in the copy has a row in the copy's years file with that file's version, and stops where one doesn't. With that shown, it drops the marker and reads those stations as it reads the rest.`,
     );
 
   p("## Variance explained");
@@ -754,7 +869,7 @@ function render(report: Report): string {
     "For each of NOAA's constituents, over the stations where NOAA's amplitude is above zero and the fit kept the constituent: the median differences from NOAA's, without sign, and how many are outside the fit's interval. The last two columns are the standard fit against the store's own fit of NOAA's years, which is what the two periods differ by under one method, and NOAA's method on the store's values against NOAA's constants.",
   );
   const names = [...new Set(results.flatMap((r) => r.rows.map((x) => x.name)))];
-  const order = new Map(names.map((n) => [n, candidateOf(n)!.speed]));
+  const order = new Map(results.flatMap((r) => r.rows.map((x) => [x.name, x.speed] as const)));
   names.sort((a, b) => order.get(a)! - order.get(b)!);
   const line = (name: string): string[] | null => {
     const of = (which: Which) =>
@@ -924,16 +1039,13 @@ function render(report: Report): string {
   );
   for (const r of results) {
     p(`### ${r.name} (\`${r.id}\`)`);
-    const short = Object.entries(r.window.by_year).filter(
-      ([y, n]) => n < (YEAR_SHARE * (yearSpan(+y).end - yearSpan(+y).start)) / 3_600_000,
-    );
     p(
       [
         `NOAA: "${r.comment.replace(/\s+/g, " ").trim()}"`,
         `NOAA's years, ${spans(r.years)}: ${r.window.hours.toLocaleString("en-US")} hourly values, ${r.window.kept} constituents kept.`,
         `Standard, ${r.standard.since.slice(0, 4)} to ${+r.standard.until.slice(0, 4) - 1}: ${r.standard.hours.toLocaleString("en-US")} hourly values, ${r.standard.kept} kept.`,
-        short.length
-          ? `NOAA's method leaves out ${short.map(([y]) => y).join(", ")}, which the store holds under two thirds of.`
+        r.unknown.length
+          ? `The engine's catalog lacks ${r.unknown.join(", ")} of them, which no fit or prediction here holds.`
           : "",
         r.unlisted.length
           ? `NOAA also publishes ${r.unlisted.length} constituents the candidate list doesn't have, which aren't compared.`
@@ -1018,7 +1130,11 @@ function spans(years: number[]): string {
  * 2024. It is NOAA's method on a synthetic tide, so it says how much of a
  * difference from NOAA's S1, P1 and R2 that method accounts for.
  */
-function leak(from: string, into: string[]): Record<string, [number, number]> {
+function leak(
+  from: string,
+  into: string[],
+  nodal: "yearly" | "exact" = "yearly",
+): Record<string, [number, number]> {
   const predictor = createTidePredictor([{ name: from, amplitude: 1, phase: 0 }], {
     offset: false,
     nodeCorrections: NODE_CORRECTIONS,
@@ -1033,7 +1149,7 @@ function leak(from: string, into: string[]): Record<string, [number, number]> {
       });
     const fitted = engineFit(samples, [from, ...into], {
       nodeCorrections: NODE_CORRECTIONS,
-      nodal: "yearly",
+      nodal,
     }).constituents;
     for (const name of into) found[name]!.push(fitted.find((c) => c.name === name)!.amplitude);
   }
@@ -1087,7 +1203,7 @@ function findings(report: Report, w: Stats, s: Stats): string {
   const versus = (a: (r: Result) => Score, b: (r: Result) => Score) =>
     unseen.filter((r) => a(r).rms! < b(r).rms!).length;
   const reproduces = max(
-    unseen.map((r) => Math.abs(r.scores.steps.yearly.rms! - r.scores.noaa.rms!)),
+    results.map((r) => Math.abs(r.scores.steps.yearly.rms! - r.scores.noaa.rms!)),
   );
 
   // Robust weights.
@@ -1145,8 +1261,7 @@ function findings(report: Report, w: Stats, s: Stats): string {
       const [x, y] = [row && fittedSide(row.window), row && fittedSide(row.standard)];
       return x && y ? [apart(y, x)] : [];
     });
-  const k1 = leak("K1", ["S1", "P1"]);
-  const k2 = leak("K2", ["R2"]);
+  const { K1: k1, K2: k2, exact } = report.leak;
   const perMeter = ([low, high]: [number, number]) => `${mm(low, 1)} to ${mm(high, 1)} mm`;
 
   const better = versus(
@@ -1158,43 +1273,87 @@ function findings(report: Report, w: Stats, s: Stats): string {
   const lowest = results.reduce((a, b) =>
     a.scores.standard.variance! < b.scores.standard.variance! ? a : b,
   );
-  const anchorage = results.find((r) => r.unlisted.length > 0);
+
+  /** The names the fits of NOAA's years hold NOAA's `name` under, where they aren't NOAA's. */
+  const heldAs = (name: string) => [
+    ...new Set(
+      results.flatMap((r) => {
+        const side = fittedSide(r.rows.find((x) => x.name === name)?.window ?? { reason: "" });
+        return side?.as ? [side.as] : [];
+      }),
+    ),
+  ];
+  // Stations where the candidate list predicts worse than NOAA's own constituents under the same method.
+  const short37 = unseen.filter((r) => r.scores.window.rms! - r.scores.steps.robust.rms! >= 0.001);
+  const unexplained = worst.filter(([, c]) => c >= 5).map(([name]) => name);
+
+  const agrees = within(0.001) >= 0.95 * short.length;
+  const renames = [...new Map(results.flatMap((r) => Object.entries(r.renamed?.held ?? {})))];
+  const renamedChange = unseen.flatMap((r) =>
+    r.renamed ? [r.renamed.score.rms! - r.scores.window.rms!] : [],
+  );
+
+  const unexplainedYears = results
+    .filter((r) => unexplained.includes(r.name))
+    .map((r) => {
+      const [year, hours] = Object.entries(r.window.by_year).sort((a, b) => a[1] - b[1])[0]!;
+      const all = (yearSpan(+year).end - yearSpan(+year).start) / 3_600_000;
+      return `The least complete of ${r.name}'s years in the store is ${year}, with ${hours.toLocaleString("en-US")} of ${all.toLocaleString("en-US")} hours.`;
+    })
+    .join(" ");
 
   const lines: string[] = [];
-  const p = (...x: string[]) => lines.push(...x, "");
+  const p = (...x: string[]) => lines.push(...x.filter(Boolean), "");
   p("### What agrees");
   p(
-    `- **NOAA's method on the store's values gives NOAA's constants.** Fitted NOAA's way, ${within(0.0005)} of ${short.length} short-period constants are within 0.5 mm of NOAA's as vectors, which is half of NOAA's last digit, and ${within(0.001)} are within 1 mm. The major constituents of 1 cm or more differ by a median of ${percent(median(relative), 2)}% in amplitude and ${median(phase)!.toFixed(2)}° in phase, and at most by ${percent(max(relative), 2)}% and ${max(phase).toFixed(2)}°. Those constants predict the held-out year within ${mm(reproduces)} mm RMS of NOAA's own at every station. The store's hourly values, Schureman's corrections as the engine has them, and Greenwich phase lags in UTC are therefore the ones NOAA's constants were made with.`,
-    `- **The store's method over NOAA's years is close to NOAA on the major constituents.** Their amplitudes differ by a median of ${percent(median(pairsOf(results, "window", MAJOR).relative), 2)}% and their phases by ${median(pairsOf(results, "window", MAJOR).phase)!.toFixed(2)}°. ${w.majorOutside} of ${w.major} are outside the fit's interval, for the reasons below.`,
+    `- **NOAA's method on the store's values${agrees ? " gives NOAA's constants" : ""}.** Fitted NOAA's way, ${within(0.0005)} of ${short.length} short-period constants are within 0.5 mm of NOAA's as vectors, which is half of NOAA's last digit, and ${within(0.001)} are within 1 mm. The major constituents of 1 cm or more differ by a median of ${percent(median(relative), 2)}% in amplitude and ${median(phase)!.toFixed(2)}° in phase, and at most by ${percent(max(relative), 2)}% and ${max(phase).toFixed(2)}°. Those constants score within ${mm(reproduces)} mm RMS of NOAA's own on the held-out year at each of the ${results.length} stations. The comparison reads the store's hourly values with Schureman's corrections as the engine has them and Greenwich phase lags in UTC, so an error in any of the three would show here as a difference from NOAA.`,
+    `- **The store's method over NOAA's years is close to NOAA on the major constituents.** Their amplitudes differ by a median of ${percent(median(pairsOf(results, "window", MAJOR).relative), 2)}% and their phases by ${median(pairsOf(results, "window", MAJOR).phase)!.toFixed(2)}°. ${w.majorOutside} of ${w.major} are outside the fit's interval, and the next section says which steps of the method move them.`,
     `- **The standard fit predicts the held-out year better than NOAA's constants at ${better} of ${unseen.length} stations** whose NOAA analysis didn't read that year${behind.length ? `; the rest: ${behind.map((r) => r.name).join(", ")}` : ""}. It explains ${percent(Math.min(...variances), 1)}% to ${percent(max(variances), 1)}% of the tidal band's variance, the least at ${lowest.name}.`,
   );
   p("### What differs, and why");
   p(
-    `In the fit of NOAA's years, ${w.outside} of ${w.compared} short-period constants are outside the fit's interval. The constituents most often outside are ${often.map(([name, c]) => `${name} (${c})`).join(", ")}. [Where the differences come from](#where-the-differences-come-from) takes the method apart one step at a time, and these are what it shows:`,
+    `In the fit of NOAA's years, ${w.outside} of ${w.compared} short-period constants are outside the fit's interval. The constituents most often outside are ${often.map(([name, c]) => `${name} (${c})`).join(", ")}. [Where the differences come from](#where-the-differences-come-from) takes the method apart one step at a time, and the counts here are of the step that moves a constant furthest:`,
   );
   p(
-    `- **Robust weights move the largest constituents most.** They are the largest step for M2, and they raise amplitudes more often than they lower them: ${["M2", "S2", "O1", "M4"].map(raised).join(", ")}, against the same fit without them. M2 moves most at ${m2
+    `- **Robust weights.** They raise the amplitude of ${["M2", "S2", "O1", "M4"].map(raised).join(", ")}, against the same fit without them. M2 moves most at ${m2
       .slice(0, 3)
       .map((x) => `${x.r.name} (${mm(x.moved)} mm of ${mm(x.noaa.amplitude, 0)})`)
       .join(
         ", ",
-      )}. On the held-out year the step leaves the tidal-band RMS ${tally(change(3))}. It is the largest of the four steps for ${largest("M2", 2)} and ${largest("M4", 2)}. NOAA's analysis has no such weights.`,
-    `- **M1 is held as NO1.** The candidate list has the line under both names and Foreman's NO1 comes first, so every fit holds it as NO1, with the node factor the engine gives that name and not Schureman's for M1. ${count("M1")} of ${stations("M1")} are outside. NOAA's M1 also depends on its yearly evaluation: M1's node factor changes within a year, and evaluating it at each sample moves it more than any other of NOAA's 37 (the largest step for ${largest("M1", 0)}; taking the line as NO1 is the largest for the rest).`,
-    `- **S1, P1 and R2 in NOAA's constants hold part of K1 and K2.** K1's node factor changes within a year. Held at its mid-year value, as NOAA holds it, a K1 of 1 m alone leaves ${perMeter(k1.S1!)} in S1 and ${perMeter(k1.P1!)} in P1 in a one-year fit, over the years 2006 to 2024, and a K2 of 1 m leaves ${perMeter(k2.R2!)} in R2. With node factors at each sample those are zero. That step is the largest of the four for ${largest("S1", 0)} and ${largest("P1", 0)}.`,
-    `- **L2 depends on how the years are combined.** L2 shares its frequency with 2MN2, whose node factor differs, so where shallow water makes 2MN2 the tide doesn't follow L2's factor from year to year. One fit of all years then gives another constant than the average of yearly fits. Combining the years is the largest of the four steps for ${largest("L2", 1)}.`,
-    `- **2MK3 is held as MO3.** Both names are one line, and Foreman's MO3 comes first in the candidate list, with M2's and O1's node factors where NOAA's 2MK3 has M2's twice and K1's. ${count("2MK3")} of ${stations("2MK3")} are outside.`,
+      )}. They are the largest of the four steps for ${largest("M2", 2)} and ${largest("M4", 2)}. On the held-out year they leave the tidal-band RMS ${tally(change(3))}. NOAA's analysis has no such weights.`,
+    ...["M1", "2MK3"].map((name) => {
+      const as = heldAs(name);
+      if (!as.length) return "";
+      const again = results.flatMap((r) => {
+        const side = r.renamed?.rows[name];
+        return side && !("reason" in side) ? [side] : [];
+      });
+      const outsideAgain = again.filter((x) => (x.d.ratio ?? 0) > 1).length;
+      return `- **${name} is held as ${as.join(" or ")}.** The candidate list has the line under both names, and selection keeps the earlier one, with the node factor the engine gives that name and not NOAA's for ${name}. ${count(name)} of ${stations(name)} are outside, and the step to the candidate list is the largest for ${largest(name, 3)}. That step changes the rest of the list too, so the fit of NOAA's years was run again with only the name changed back: as ${name}, ${outsideAgain} of ${again.length} are outside. ${outsideAgain * 2 < count(name) ? "The name accounts for most of the difference." : `The name doesn't account for the difference: evaluating the node factor at each sample is the largest step for ${largest(name, 0)}, and NOAA's ${name} is from factors held at mid-year.`}`;
+    }),
+    `- **Node factors at each sample: S1, P1 and R2.** K1's node factor changes within a year. Held at its mid-year value, as NOAA holds it, a K1 of 1 m alone leaves ${perMeter(k1.S1!)} in S1 and ${perMeter(k1.P1!)} in P1 in a one-year fit, over the years 2006 to 2024, and a K2 of 1 m leaves ${perMeter(k2.R2!)} in R2. With node factors at each sample the same fits leave at most ${mm(exact, 2)} mm. A year fitted NOAA's way therefore puts that part of K1 and K2 into S1, P1 and R2. This step is the largest for ${largest("S1", 0)}, ${largest("P1", 0)} and ${largest("R2", 0)}.`,
+    `- **One fit of all years: L2.** Fitting the years together in place of averaging yearly fits is the largest step for ${largest("L2", 1)}. L2 shares its frequency with 2MN2, whose node factor differs ([M1 and L2](../fits.md#what-it-costs)), and a line that doesn't follow L2's factor from year to year would give this. The report doesn't measure 2MN2, so that cause isn't shown.`,
     `- **The standard fit reads other years.** ${s.outside} of ${s.compared} of its constants are outside the interval, which 19 years make narrow. [Constituents across stations](#constituents-across-stations) gives how far the standard fit is from the store's own fit of NOAA's years, which is what the two periods differ by under one method: M2 is a median ${mm(median(moved("M2")), 1)} mm from one period's fit to the other's and K1 ${mm(median(moved("K1")), 1)} mm.`,
-    "- **Long-period constituents aren't comparable.** NOAA takes Sa, Ssa, Mm, Msf and Mf from other spans than its analysis years, by other methods such as monthly means, or publishes zero where it found them unstable. They are in each station's table and in no count.",
-    worst.length
-      ? `- **${worst[0]![0]} isn't explained.** NOAA's method misses NOAA's constants by over 1 mm for ${n(over.length, "constant")}, ${worst.map(([name, c]) => `${c} at ${name}`).join(", ")}. At Boston no other set of five years near the ones NOAA names fits closer, tried outside this script, and what NOAA's analysis read there isn't known.`
+    "- **Long-period constituents.** NOAA takes Sa, Ssa, Mm, Msf and Mf from other spans than its analysis years, as each station's comment says, or publishes zero for them. They are in each station's table and in no count.",
+    over.length
+      ? `- **NOAA's method misses NOAA's constants by over 1 mm for ${n(over.length, "constant")}:** ${worst.map(([name, c]) => `${c} at ${name}`).join(", ")}.${unexplained.length ? ` At ${unexplained.join(" and ")}, where it is five or more, that points at the values or the years NOAA's analysis read, and this report doesn't find which. ${unexplainedYears}` : ""}`
       : "",
   );
   p("### Defects");
   p(
-    anchorage
-      ? `- **The candidate list is too short for ${anchorage.name}.** NOAA publishes ${anchorage.rows.length + anchorage.unlisted.length} constituents there, ${anchorage.unlisted.length} of them shallow-water compounds the candidate list doesn't have. Fitted by the store's method with NOAA's constituents, the same years predict the held-out year to ${mm(anchorage.scores.steps.robust.rms)} mm RMS; with the candidate list they give ${mm(anchorage.scores.window.rms)} mm, and the standard fit ${mm(anchorage.scores.standard.rms)} mm, against ${mm(anchorage.scores.noaa.rms)} mm for NOAA's constants. It is the only station where the store's constituents predict much worse than NOAA's.`
+    ...short37.map(
+      (r) =>
+        `- **The candidate list predicts worse than NOAA's constituents at ${r.name}.** NOAA publishes ${r.rows.length + r.unlisted.length} constituents there, ${r.unlisted.length} of which the candidate list doesn't have. Fitted by the store's method with NOAA's constituents, NOAA's years predict the held-out year to ${mm(r.scores.steps.robust.rms)} mm RMS. With the candidate list they give ${mm(r.scores.window.rms)} mm, and the standard fit ${mm(r.scores.standard.rms)} mm, against ${mm(r.scores.noaa.rms)} mm for NOAA's constants.`,
+    ),
+    renames.length
+      ? `- **Lines held under another name take that name's node factor.** ${renames.map(([name, as]) => `${name} is fitted as ${as}`).join(" and ")}, under Schureman's corrections as the engine gives them for those names. With NOAA's names in their place and nothing else changed, the fit of NOAA's years scores the held-out year ${tally(renamedChange)}.`
       : "",
-    "- **None found in the fitter, the nodal corrections or the phase convention.** Every difference above the rounding of NOAA's constants is traced to a step of the method or to the candidate list, except Boston's.",
+    short37.length
+      ? ""
+      : "- **The candidate list predicts no worse than NOAA's constituents at any station**, by 1 mm RMS or more on the held-out year.",
+    agrees
+      ? `- **None shown in the engine's solver, in Schureman's corrections for the names NOAA uses, or in the phase convention.** NOAA's method run through them gives NOAA's constants, as above${unexplained.length ? `, except at ${unexplained.join(" and ")}, which is open` : ""}. Each step from it to the store's method is a choice [Harmonic fits](../fits.md) makes, with its effect in the tables here.`
+      : "- **NOAA's method doesn't give NOAA's constants.** Under 95% of the constants fitted NOAA's way are within 1 mm of NOAA's, so the engine, the corrections, the phases or the store's values differ from NOAA's.",
   );
   return lines.join("\n").trimEnd();
 }

@@ -1,4 +1,11 @@
 import type { FittedConstituent, HarmonicConstituent } from "@slackwater/engine";
+import { createHash } from "node:crypto";
+import { existsSync } from "node:fs";
+import { readdir } from "node:fs/promises";
+import type { StoredStation } from "../schema.ts";
+import { EMPTY_YEAR, readYearStats } from "../store/parquet.ts";
+import { seriesDir } from "../store/paths.ts";
+import type { YearRow } from "../store/years.ts";
 import { CANDIDATES, type Candidate } from "./candidates.ts";
 import type { Verdict } from "./window.ts";
 
@@ -10,6 +17,18 @@ import type { Verdict } from "./window.ts";
  */
 
 const RAD = Math.PI / 180;
+
+/**
+ * A digest of the candidate list, its names and Doodson numbers in order, as
+ * `inputsDigest` takes them. The calibration report records it, since a
+ * change to the list moves fits without a new `METHOD`.
+ */
+export function candidatesDigest(): string {
+  return createHash("sha256")
+    .update(JSON.stringify(CANDIDATES.map((c) => [c.name, c.doodson])))
+    .digest("hex")
+    .slice(0, 16);
+}
 
 /** The candidate an agency's name means: its own name, or one of the spellings the candidate lists. */
 export function candidateOf(name: string): Candidate | undefined {
@@ -126,4 +145,96 @@ export function median(xs: readonly number[]): number | null {
   const sorted = [...xs].sort((a, b) => a - b);
   const mid = sorted.length >> 1;
   return sorted.length % 2 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2;
+}
+
+/** An agency's published constants for a gauge: amplitudes in meters and Greenwich phase lags in UTC, in degrees. */
+export interface Published {
+  /** The agency's note on the constants, which for NOAA names the years analyzed. */
+  comment: string;
+  constants: HarmonicConstituent[];
+}
+
+/**
+ * NOAA's constants from a CO-OPS metadata answer (`harcon.json?units=metric`).
+ * Throws on an answer that isn't a whole set: one in other units, with a
+ * value that isn't a number, with a name twice, without one of the
+ * candidates NOAA's standard 37 give, or whose constituents carry different
+ * comments, since the comment says which analysis the constants are from.
+ */
+export function noaaConstants(
+  id: string,
+  body: {
+    units?: string;
+    HarmonicConstituents?: {
+      name: string;
+      amplitude: number;
+      phase_GMT: number;
+      comments?: string;
+    }[];
+  },
+): Published {
+  const list = body.HarmonicConstituents;
+  if (body.units !== "meters" || !list?.length)
+    throw new Error(`${id}: NOAA's constants didn't come back in meters`);
+  const comments = new Set(list.map((c) => c.comments ?? ""));
+  if (comments.size !== 1)
+    throw new Error(`${id}: NOAA's constants carry ${comments.size} different comments`);
+  const constants = list.map((c) => ({ name: c.name, amplitude: c.amplitude, phase: c.phase_GMT }));
+  if (constants.some((c) => !Number.isFinite(c.amplitude) || !Number.isFinite(c.phase)))
+    throw new Error(`${id}: NOAA's constants hold a value that isn't a number`);
+  // Two spellings of one candidate would be compared with one fitted constant twice.
+  if (new Set(constants.map((c) => candidateOf(c.name)?.name ?? c.name)).size !== constants.length)
+    throw new Error(`${id}: NOAA's constants name a constituent twice`);
+  const found = new Set(constants.map((c) => candidateOf(c.name)?.name));
+  const missing = CANDIDATES.filter((c) => c.from.includes("noaa") && !found.has(c.name));
+  if (missing.length)
+    throw new Error(`${id}: NOAA's constants lack ${missing.map((c) => c.name).join(", ")}`);
+  return { comment: [...comments][0]!, constants };
+}
+
+/**
+ * The years the first sentence of NOAA's comment on a station's constants
+ * names, as `2014-2018` or `(2016-2019, 2022)`: the years of the harmonic
+ * analysis. The sentences after it are about the long-period constituents.
+ */
+export function analysisYears(comment: string): number[] {
+  const sentence = comment.split(/\.(?:\s|$)/)[0] ?? "";
+  const years = new Set<number>();
+  for (const [, from, to] of sentence.matchAll(/\b((?:19|20)\d{2})(?:\s*-\s*((?:19|20)\d{2}))?\b/g))
+    for (let y = Number(from); y <= Number(to ?? from); y++) years.add(y);
+  return [...years].sort((a, b) => a - b);
+}
+
+/**
+ * Checks that a local copy's years file agrees with its files for a station:
+ * every year file in the station's directories has a row in `years`, with the
+ * version the file's values give. Throws where one doesn't. A station the
+ * copy marks as being written can be read without its marker only once this
+ * passes, since its rows are then known to describe the files read. A row
+ * without a file is left to the reader, which refuses a year it is asked for
+ * and can't find.
+ */
+export async function checkCopy(
+  store: string,
+  station: StoredStation,
+  years: ReadonlyMap<string, YearRow>,
+): Promise<void> {
+  const files: { path: string; epoch: number; year: number }[] = [];
+  for (const epoch of station.epochs) {
+    const dir = seriesDir(store, "levels", station.source, station.source_id, epoch.id);
+    if (!existsSync(dir)) continue;
+    for (const name of await readdir(dir)) {
+      const year = /^(\d{4})\.parquet$/.exec(name)?.[1];
+      if (year) files.push({ path: `${dir}/${name}`, epoch: epoch.id, year: Number(year) });
+    }
+  }
+  const stats = await readYearStats(files.map((f) => f.path));
+  const wrong = files.filter((f) => {
+    const row = years.get(`${station.id} ${f.epoch} ${f.year}`);
+    return !row || row.version !== (stats.get(f.path) ?? EMPTY_YEAR).version;
+  });
+  if (wrong.length)
+    throw new Error(
+      `${station.id}: the copy's years file doesn't describe its files for ${wrong.map((f) => f.year).join(", ")}; copy the station's files and the years file again`,
+    );
 }
