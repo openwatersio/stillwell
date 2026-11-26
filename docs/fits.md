@@ -1,6 +1,6 @@
 # Harmonic fits
 
-How the store fits harmonic constants to a station's water levels, and why each choice was made. [Running ingest](contributing/ingest.md) covers the `fit` command, [`src/store/files.ts`](../src/store/files.ts) defines every column of the two files it writes, and the code is in [`src/fit/`](../src/fit/).
+How the store fits harmonic constants to a station's water levels, and why each choice was made. [Running ingest](contributing/ingest.md) covers the `fit` command, [`src/store/files.ts`](../src/store/files.ts) defines every column of the three files it writes, and the code is in [`src/fit/`](../src/fit/).
 
 A fit is a measurement. It is published whatever its size, with what a reader needs to judge it: the window, the files read, each constituent's confidence interval and signal-to-noise ratio, the scatter between years, and a score on a year the fit didn't read. Nothing here decides whether a gauge has enough tide to predict.
 
@@ -57,7 +57,7 @@ Three families are in use:
 | Family    | What it is                                                                                              | Used by                                          |
 | --------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
 | Schureman | Closed forms in the lunar orbit's inclination for every astronomical constituent                        | NOAA, the FES tide models, hatyan's default      |
-| IHO       | Series for eight constituents in Annex A of the IHO standard list, with rules for compounds             | TICON, which cites the IHO's 2006 factors        |
+| IHO       | Series for eight constituents in Annex A of the IHO standard list, with rules for compounds             | `@slackwater/engine`'s default                   |
 | Foreman   | Sums of each constituent's satellites, with third-degree ones scaled by latitude; none for long periods | t_tide, UTide, the Canadian Hydrographic Service |
 
 ### What was measured
@@ -121,7 +121,7 @@ Prediction skill doesn't settle the choice: each family is measurably best somew
 
 ### What it costs
 
-- **Comparison with TICON.** TICON's constants were fitted under IHO factors ([Piccioni et al. 2019](https://doi.org/10.1002/gdj3.72)), so a fit's O1 reads 0.8% above TICON's for the same tide, and its Mf 4% above. A comparison of constants across the two has to allow for the family.
+- **Comparison with TICON.** TICON's constants match no one family ([Reference scores](#reference-scores)): its O1, Q1 and Mf agree with a Schureman fit of the same levels, and its J1 reads 8% below one. Its M1 and OO1 agree with none. A comparison of constants across the two has to allow for that, constituent by constituent.
 - **Diurnal gauges.** At Honolulu and Pensacola, Foreman's corrections leave 0.2 to 0.3 mm less RMS in the held-out residual than Schureman's, about 1% of it.
 - **Use in t_tide or UTide.** Those predict under Foreman's set, and a Schureman fit used there differs by 3 to 8 mm RMS at these gauges. Direct reuse there would also need t_tide's own definitions of SA, S1 and M1, and only the constituents in its table. A user who needs exact agreement refits the series under Foreman's set, which the store's levels allow.
 - **A limit every family shares.** All three assume the nodal modulation the equilibrium tide has. Observed modulation departs from it in shallow water ([Amin 1985](https://doi.org/10.1111/j.1365-246X.1985.tb05138.x); [Feng, Tsimplis and Woodworth 2015](https://doi.org/10.1002/2014JC010312)). A 19-year window averages the modulation out of the fitted amplitude, but a prediction for one year carries the assumption.
@@ -145,6 +145,44 @@ The held-out year is scored the same way for any constants:
 - **High and low waters.** One picker finds the turns of the observed and the predicted hourly series, so both are picked the same way, as [Parker (2007)](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf) requires of such a comparison (§3.9.1, pp. 129–130), and the time and height differences of matched turns are reported.
 
 One year decides each score, so an unusual year can move it.
+
+### Reference scores
+
+The constants [slackwater-database](https://github.com/openwatersio/slackwater-database) holds for the same gauge are scored on the fit's held-out year by the same code, on the same hours, into `fits/references/<source>.parquet`: a row per fit and record. A reader comparing the two has the fit's score in `fits/<source>.parquet`, the record's here, and the standard error of the difference of their residual variances, taken from 30-day blocks as in [What was measured](#what-was-measured). No row says which is better.
+
+**Which records.** A record counts as the station's gauge on what the store records, never on position or name alone ([`src/fit/reference-links.ts`](../src/fit/reference-links.ts)):
+
+- `id`: the record carries the station's own ID in its source and is within 10 km of it, as a NOAA record does for a CO-OPS station, and a TICON record for the GESLA file it was analyzed from.
+- `levels`: the record carries the ID of another series of the gauge (`same_as`) whose hourly levels agree with the station's within 1 cm RMS with no lag in `stations/matches.parquet` ([Stations](stations.md#gauges-in-more-than-one-source)). That comparison covers the latest years both series hold, so it shows the two are one series now. It doesn't cover the years the record was analyzed over.
+
+A record reached only through a link nothing has compared isn't scored, since series linked along one estuary can be different gauges. That includes a station's `tide_station` where it was taken from such a link. A record linked either way is scored where the database accepts it or keeps it only as another's duplicate, and one it rejects for its constants, clock, datum or range isn't. A record of a GESLA file whose values are another gauge's has none, and neither does a record of a database source whose IDs name no series in the store (`seriesOf` in [`src/datums.ts`](../src/datums.ts)). A withheld series links nothing.
+
+**Under its own corrections.** Each record is predicted under the nodal corrections its constants were fitted with, where those are known: Schureman's for NOAA. The fit is predicted under its own. Where they aren't known, the record is predicted under the IHO's, which slackwater-database's predictions use by default, and the row says the corrections are assumed (`node_corrections_assumed`). The engine predicts under Schureman's and the IHO's corrections only, so a record fitted under Foreman's is scored under an assumption.
+
+**TICON's corrections are assumed.** TICON-4's manual names none and refers for its method to [Piccioni et al. (2019)](https://doi.org/10.1002/gdj3.72). Four TICON records, each refitted from its own GESLA file over the span the record gives with the record's constituents ([`scripts/ticon-corrections.ts`](../scripts/ticon-corrections.ts)), come back under no one family:
+
+| Gauge                                                    | Latitude | Span         |
+| -------------------------------------------------------- | -------- | ------------ |
+| Mornington Island (`mornington_island-h074011a-aus-bom`) | 16.7°S   | 2007 to 2016 |
+| Vung Tau (`vung_tau-383a-vnm-uhslc_rq`)                  | 10.3°N   | 1986 to 2002 |
+| Winchelsea Island (`winchelsea_is_bc-7935-can-meds`)     | 49.3°N   | 1967 to 1982 |
+| Sandy Cove (`sandy_cove_bc-7786-can-meds`)               | 49.3°N   | 2009 to 2025 |
+
+Refitted amplitude over TICON's, across the four:
+
+| Constituent | IHO            | Schureman      | Foreman        |
+| ----------- | -------------- | -------------- | -------------- |
+| O1          | 0.991 to 0.992 | 0.999 to 1.000 | 0.999 to 1.000 |
+| Q1          | 0.990 to 0.992 | 0.998 to 1.000 | 0.995 to 1.007 |
+| Mf          | 0.935 to 0.970 | 0.976 to 1.001 | 0.859 to 1.181 |
+| J1          | 0.999 to 1.001 | 1.085 to 1.092 | 1.054 to 1.105 |
+| M2          | 0.999          | 0.999 to 1.000 | 0.999 to 1.000 |
+
+O1, Q1 and Mf come back under Schureman's corrections and J1 under the IHO's. M1's phase is 65° to 95° from TICON's under every family, though TICON's manual gives M1 the Doodson number the engine's has, and OO1's is up to 24° off. So no family the engine predicts under reproduces a TICON record, and the M1 line costs one the most: over a year, the curve of TICON's diurnal and faster constants is 16 to 44 mm RMS from the curve of the same family's refit at these gauges, and 3.5 to 7.8 mm without M1 and OO1. The choice between the two families moves that by under 1 mm. These four gauges have a diurnal tide of 0.45 to 0.88 m in K1 and O1; where the diurnal tide is small, as at Kungsvik and Cuxhaven, M1 is too.
+
+**What a row carries.** The record's ID and source, the `@slackwater/database` release its constants were read from, a digest of those constants, how the record is linked, the corrections it was predicted under, and whether the span it says it was analyzed over includes the held-out year (`seen`), which then favors it over the fit. A score describes a record only while its constants have the row's digest. It holds none of the record's values, and is measured against them, so each row also carries the record's license, whether its terms allow commercial use, and its credit.
+
+**When they are taken again.** With the fit, whenever the station is fitted. Without fitting, when a release changes a linked record's constants, its terms or whether its analysis covers the held-out year, a record joins or leaves the gauge, or the link to one changes: the held-out year is read as the fit read it, and the scoring stops if the fit's own score no longer comes out as its row says. Each row carries its fit's `version` and `fitted`, a reader joins on both with `id`, and rows that don't match the fit's are taken again.
 
 ## What the IHO asks a publisher to state
 

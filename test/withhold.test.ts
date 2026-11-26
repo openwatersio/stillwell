@@ -648,9 +648,17 @@ describe("withhold", () => {
       assert.equal(existsSync(join(store, dir)), true, dir);
     // Nothing is left to delete the second time, but rows an earlier drop left are cleared.
     await writeJsonArray(backfilledPath(store, "test"), [ranges("test/d1"), ranges("test/k")]);
+    // As are a fit's rows, which a drop stopped after deleting the files left.
+    await writeFits(
+      store,
+      "test",
+      [fitted("test/d1"), fitted("test/k")],
+      [candidate("test/d1"), candidate("test/k")],
+    );
     const again = await dropFiles(store, "test", drop, { remove });
     assert.deepEqual(again.ids, []);
     assert.deepEqual(again.cleared, ["test/d1"]);
+    assert.deepEqual([...(await readFits(store, "test")).keys()], ["test/k"]);
     assert.deepEqual(await recorded(), ["test/k"]);
     await assert.rejects(
       dropFiles("https://stillwell.openwaters.io", "test", drop),
