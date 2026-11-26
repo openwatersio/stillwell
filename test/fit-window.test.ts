@@ -54,7 +54,7 @@ function yearOfValues(year: number): Observation[] {
 }
 
 describe("fitSamples", () => {
-  it("gives fitStation's constants and verdicts on fitStation's window", async () => {
+  it("gives the constants and verdicts fitStation publishes for the same window", async () => {
     const root = mkdtempSync(join(tmpdir(), "stillwell-fit-window-"));
     const years = new Map<string, YearRow>();
     for (const year of [2021, 2022, 2023, 2024]) {
@@ -111,7 +111,7 @@ describe("fitSamples", () => {
         `a candidate dropped for ${reason}`,
       );
     assert.deepEqual(
-      window.verdicts,
+      window.verdicts.map(({ name, kept, reason, conflict }) => ({ name, kept, reason, conflict })),
       rows.map((r) => ({ name: r.name, kept: r.kept, reason: r.reason, conflict: r.conflict })),
     );
   });

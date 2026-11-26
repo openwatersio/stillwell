@@ -45,7 +45,7 @@ export function candidateOf(name: string): Candidate | undefined {
 export function fittedFor(
   name: string,
   constituents: readonly FittedConstituent[],
-  verdicts: readonly Verdict[],
+  verdicts: readonly Pick<Verdict, "name" | "reason" | "conflict">[],
 ): { fitted: FittedConstituent; sameLine: string | null } | { reason: string } {
   const candidate = candidateOf(name);
   if (!candidate) return { reason: "not a candidate" };

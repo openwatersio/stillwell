@@ -293,6 +293,7 @@ async function calibrate(task: Task): Promise<Result> {
       kept: c.kept,
       reason: c.reason,
       conflict: c.conflict,
+      snr: c.snr,
     })),
   };
 
