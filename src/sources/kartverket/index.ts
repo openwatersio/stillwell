@@ -282,11 +282,12 @@ function parse(xml: string, sourceId: string, datum: string): Observation[] {
   const out: Observation[] = [];
   for (const w of elements(block[2]!, "waterlevel")) {
     const level = Number(w.value);
-    const time = Date.parse(w.time!);
-    if (w.value === undefined || !Number.isFinite(level) || Number.isNaN(time)) continue;
-    // An empty value isn't zero, and a day its month doesn't have isn't the day it rolls over to.
-    // The API isn't known to send either, so one fails the response and the station keeps its values.
-    if (!w.value.trim() || !isInstant(w.time!, time))
+    const time = Date.parse(w.time ?? "");
+    // A backfill replaces a month with what a response holds of it, so a reading skipped here would
+    // delete the stored one. Anything but a decimal number of centimeters at a UTC instant that exists
+    // fails the response, and the station keeps its values: an empty value isn't zero, and a day its
+    // month doesn't have isn't the day it rolls over to.
+    if (!/^-?\d+(\.\d+)?$/.test(w.value ?? "") || !isInstant(w.time ?? "", time))
       throw new Error(
         `Kartverket ${sourceId}: a reading of "${w.value}" at ${w.time} can't be read`,
       );
@@ -310,9 +311,13 @@ export function cacheable(text: string, end: number, now = Date.now()): boolean 
   return end <= now - CACHE_AFTER_MS && !!last && Date.parse(last) >= end - INTERVAL_MS;
 }
 
-/** Whether a UTC timestamp names the instant it parsed to: `2019-02-31T00:00` parses, as 3 March. */
+/**
+ * Whether `text` is a UTC timestamp to the second that names the instant it
+ * parsed to: `2019-02-31T00:00` parses, as 3 March. The adapter asks for UTC,
+ * so any other offset isn't an answer to its request.
+ */
 function isInstant(text: string, time: number): boolean {
-  if (!/(\+00:00|Z)$/.test(text)) return true;
+  if (!/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\+00:00|Z)$/.test(text) || Number.isNaN(time)) return false;
   return new Date(time).toISOString().slice(0, 19) === text.slice(0, 19);
 }
 

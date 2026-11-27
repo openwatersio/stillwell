@@ -349,6 +349,30 @@ describe("kartverket", () => {
     await assert.rejects(kartverket.levels("BGO", ...span), /at 1990-02-31T00:20/);
   });
 
+  it("refuses a response with any reading it can't read, where skipping it would delete the stored one", async () => {
+    const span = [new Date("1990-01-01T00:00Z"), new Date("1991-01-01T00:00Z")] as const;
+    const xml = fixture("kartverket-obs-1990.xml");
+    const time = 'time="1990-01-01T00:20:00+00:00"';
+    assert.ok(xml.includes('value="140.8"') && xml.includes(time));
+    for (const [from, to] of [
+      ['value="140.8"', 'value="abc"'],
+      ['value="140.8"', 'value="NaN"'],
+      ['value="140.8"', 'value="140,8"'],
+      ['value="140.8"', 'value="0x10"'],
+      ['value="140.8"', 'value="1e3"'],
+      ['value="140.8" ', ""],
+      [time, 'time="1990-01-32T00:20:00+00:00"'],
+      [time, 'time="1990-13-01T00:20:00+00:00"'],
+      [time, 'time="1990-01-01T00:20:00+01:00"'],
+      [time, 'time="1990-01-01T00:20:00"'],
+      [` ${time}`, ""],
+    ] as const) {
+      assert.ok(xml.includes(from), from);
+      serve([[/stationdata/, xml.replace(from, to)]]);
+      await assert.rejects(kartverket.levels("BGO", ...span), /can't be read/, to || from);
+    }
+  });
+
   it("starts the monthly read where the settling time puts it", () => {
     // Whatever the months, a year is in the two runs after it settles and in none after those.
     for (const months of [6, 12, 24])
@@ -360,6 +384,9 @@ describe("kartverket", () => {
         assert.equal(unsettledFrom(months, today), settled(ago(2)).getUTCFullYear());
         assert.ok(unsettledFrom(months, today) <= settled(today).getUTCFullYear());
       }
+    // A run dispatched on a day the month two back doesn't have looks back to that month's last day.
+    assert.equal(unsettledFrom(6, new Date("2027-08-31T00:00Z")), 2026);
+    assert.equal(unsettledFrom(6, new Date("2027-09-01T00:00Z")), 2027);
   });
 
   it("caches only responses a year past their range that run to its end", async () => {

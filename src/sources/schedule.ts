@@ -26,7 +26,13 @@ export function firstOfMonth(today: Date, months = 0): string {
  * src/fit/series.ts, which a test holds this to).
  */
 export function unsettledFrom(months: number, today: Date): number {
-  const then = Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 2, today.getUTCDate());
+  // The last day of that month where it has no such day, so 31 August looks back to 30 June.
+  const [y, m] = [today.getUTCFullYear(), today.getUTCMonth() - 2];
+  const then = Date.UTC(
+    y,
+    m,
+    Math.min(today.getUTCDate(), new Date(Date.UTC(y, m + 1, 0)).getUTCDate()),
+  );
   let year = new Date(then).getUTCFullYear();
   while (Date.UTC(year, months, 1) > then) year--;
   return year;
