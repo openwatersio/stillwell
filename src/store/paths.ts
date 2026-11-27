@@ -24,6 +24,7 @@ import type { Product } from "../schema.ts";
  *   fits/<source>.parquet                               each station's harmonic fit: its window, the files it read and its scores
  *   constituents/<source>.parquet                       each fit's candidate constituents, kept or not, with their constants
  *   fits/references/<source>.parquet                    slackwater-database's constants for each fitted gauge, scored on the fit's held-out year
+ *   fits/datums/<source>.parquet                        each fit's tidal datums: observed from its levels, and predicted from its constants
  *   recent/<source>/<YYYY-MM-DD>.parquet                one UTC day of every live station's values, for 30 days
  *   obs/<source>/<station>/<year>.parquet               observed levels
  *   extremes/<source>/<station>/<year>.parquet          the source's observed high and low waters
@@ -140,6 +141,10 @@ export function constituentsPath(root: string, source: string): string {
 
 export function referencesPath(root: string, source: string): string {
   return `${root}/fits/references/${source}.parquet`;
+}
+
+export function fitDatumsPath(root: string, source: string): string {
+  return `${root}/fits/datums/${source}.parquet`;
 }
 
 export function yearsPath(root: string, source: string): string {

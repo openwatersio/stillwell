@@ -35,6 +35,8 @@ import { writeYears } from "../src/store/years.ts";
 import type { Fit, FittedCandidate } from "../src/fit/fit.ts";
 import type { ReferenceScore } from "../src/fit/references.ts";
 import { readConstituents, readFits, readReferences, writeFits } from "../src/fit/store.ts";
+import type { FitDatums } from "../src/fit/datums.ts";
+import { readFitDatums, writeFitDatums } from "../src/fit/datums.ts";
 import { analysisPath } from "../src/store/paths.ts";
 
 // Every field set, so a field added to the type must be added here, where the test below checks that the definition has it.
@@ -180,6 +182,28 @@ const REFERENCE: ReferenceScore = {
   turn_height_rms_m: 0.05,
 };
 
+const DATUMS: FitDatums = {
+  id: "test/a",
+  version: "0123456789abcdef",
+  fitted: "2026-11-25T00:00:00.000Z",
+  reduced: "2026-11-25T01:00:00.000Z",
+  reason: null,
+  datum: "STND",
+  epoch: 1,
+  since: "2018-01-01T00:00:00.000Z",
+  until: "2026-01-01T00:00:00.000Z",
+  months: 96,
+  observed_hours: 70000,
+  inferred_hours: 128,
+  observed: { MHHW: 4.336, MHW: 4.193, MSL: 2.798, MLW: 1.336, MLLW: 1.224, MTL: 2.765 },
+  predicted_since: "2007-01-01T00:00:00.000Z",
+  predicted_until: "2026-01-01T00:00:00.000Z",
+  predicted: { HAT: 4.963, MSL: 2.762, LAT: 0.483 },
+  ignored: ["MA2"],
+  package: "@slackwater/datums@0.1.0-beta.0",
+  digest: "780821be9bbecc96",
+};
+
 describe("published file definitions", () => {
   let store: string;
   before(async () => {
@@ -249,6 +273,22 @@ describe("published file definitions", () => {
     fits: () => writeFits(store, "test", [FIT], [CANDIDATE]),
     constituents: () => writeFits(store, "test", [FIT], [CANDIDATE]),
     references: () => writeFits(store, "test", [FIT], [CANDIDATE], [REFERENCE]),
+    "fit-datums": () =>
+      writeFitDatums(store, "test", [
+        DATUMS,
+        {
+          ...DATUMS,
+          id: "test/b",
+          reason: "too short",
+          since: null,
+          until: null,
+          months: null,
+          observed_hours: null,
+          inferred_hours: null,
+          observed: null,
+          ignored: [],
+        },
+      ]),
     recent: (path) =>
       writeRecent(path, [
         [
@@ -379,6 +419,23 @@ describe("published file definitions", () => {
     assert.deepEqual([...(await readFits(store, "test")).values()], [FIT]);
     assert.deepEqual(await readConstituents(store, "test"), [CANDIDATE]);
     assert.deepEqual(await readReferences(store, "test"), [REFERENCE]);
+  });
+
+  it("reads a fit's datums back as written", async () => {
+    const none = {
+      ...DATUMS,
+      id: "test/b",
+      reason: "too short",
+      since: null,
+      until: null,
+      months: null,
+      observed_hours: null,
+      inferred_hours: null,
+      observed: null,
+      ignored: [],
+    };
+    await writeFitDatums(store, "test", [none, DATUMS]);
+    assert.deepEqual([...(await readFitDatums(store, "test")).values()], [DATUMS, none]);
   });
 
   it("lists every handling an erratum can have", () => {

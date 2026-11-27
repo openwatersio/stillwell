@@ -114,6 +114,7 @@ stations/analysis/<source>.parquet           what analyze measures from each sta
 fits/<source>.parquet                        each station's harmonic fit: its window, its scores and what it read
 constituents/<source>.parquet                each fit's candidate constituents, with their constants
 fits/references/<source>.parquet             slackwater-database's constants for each fitted gauge, scored on the fit's held-out year
+fits/datums/<source>.parquet                 each fit's tidal datums: observed from its levels, and predicted from its constants
 history/stations/<source>/<time>.parquet     the source's list as each refresh started, less withheld stations
 history/stations/<source>/<time>.json        what that refresh changed
 history/analysis/<source>/<time>.json        stations whose QC an analyze run changed, and how
