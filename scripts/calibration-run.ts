@@ -172,6 +172,8 @@ export async function inWorkers<T extends { station: StoredStation }, R>(
         if ("error" in reply) {
           failed.push(`${id}: ${reply.error}`);
           console.error(`${id}: ${reply.error}`);
+          // Nothing is written once a station fails, so the other lanes take no more.
+          queue.length = 0;
           break;
         }
         results.set(id, reply.result);
