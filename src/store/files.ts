@@ -718,7 +718,7 @@ export const FILES = {
         type: "VARCHAR",
         nullable: true,
         description:
-          "A digest of the fit's window and kept constants, which changes when either does; null without constants.",
+          "A digest of the fit's window, its kept constants and the order of its candidates, which changes when any of them does; null without constants.",
       },
       {
         name: "since",
@@ -1095,7 +1095,7 @@ export const FILES = {
     example: "constituents/smhi.parquet",
     title: "Harmonic constituents",
     description:
-      "One row per fitted station and candidate constituent, in the fit's priority order within a station: the constants of the candidates the fit kept, and why it left each of the others out. Each row gives its constituent's name and Doodson numbers, so the constants can be used with any prediction software that applies the nodal corrections `fits/<source>.parquet` names. The name is needed with the numbers: NO1 and M1, and MO3 and 2MK3, share numbers and differ in their nodal correction.",
+      "One row per fitted station and candidate constituent, in the fit's priority order within a station, which depends on the nodal corrections the fit used where two names share a line: the constants of the candidates the fit kept, and why it left each of the others out. Each row gives its constituent's name and Doodson numbers, so the constants can be used with any prediction software that applies the nodal corrections `fits/<source>.parquet` names. The name is needed with the numbers: NO1 and M1, and MO3 and 2MK3, share numbers and differ in their nodal correction. M1's numbers include the lunar perigee, which decides which of Schureman's corrections applies to it.",
     columns: [
       { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
       {

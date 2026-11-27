@@ -8,7 +8,7 @@ import {
 } from "@slackwater/engine";
 import type { StoredStation } from "../schema.ts";
 import type { Sample } from "../types.ts";
-import { CANDIDATES } from "./candidates.ts";
+import { candidatesFor } from "./candidates.ts";
 import {
   othersOf,
   packageVersion,
@@ -81,7 +81,7 @@ export interface Fit {
   fitted: string;
   /** Why the station has no constants; null where it has. */
   reason: string | null;
-  /** A digest of the fit's window and constants; null without constants. */
+  /** A digest of the fit's window, constants and candidate order; null without constants. */
   version: string | null;
   /** The fit's window, `since` to before `until`. */
   since: string | null;
@@ -295,7 +295,8 @@ export async function fitStation(
     // Sa and Ssa leave the selection and are judged by their yearly spread. Selection tests each
     // candidate in a plain fit; the robust weights enter with the fit of those it keeps.
     const seasonal: readonly string[] = SEASONAL;
-    const candidates = CANDIDATES.filter((c) => !seasonal.includes(c.name));
+    const list = candidatesFor(NODE_CORRECTIONS);
+    const candidates = list.filter((c) => !seasonal.includes(c.name));
     const engineSamples = harmonicSamples(samples);
     const { selection } = selectConstituents(engineSamples, {
       candidates: candidates.map(({ name }) => ({ name })),
@@ -329,12 +330,13 @@ export async function fitStation(
       throw new Error(`${station.id}: the fit gave a constant that isn't a number`);
 
     const version = createHash("sha256")
-      .update(JSON.stringify([start, end, NODE_CORRECTIONS, constants]))
+      // The candidates' order too: it sets each row's rank and which name a shared line is held under.
+      .update(JSON.stringify([start, end, NODE_CORRECTIONS, constants, list.map((c) => c.name)]))
       .digest("hex")
       .slice(0, 16);
     const verdicts = new Map(selection.map((s) => [s.name, s]));
     const byName = new Map(fitted.constituents.map((c) => [c.name, c]));
-    const rows: FittedCandidate[] = CANDIDATES.map((candidate, index) => {
+    const rows: FittedCandidate[] = list.map((candidate, index) => {
       const c = byName.get(candidate.name);
       const verdict = verdicts.get(candidate.name);
       const isSeasonal = seasonal.includes(candidate.name);

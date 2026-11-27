@@ -5,7 +5,8 @@ import { join } from "node:path";
 import { describe, it } from "node:test";
 import { constituents, createTidePredictor, type HarmonicConstituent } from "@slackwater/engine";
 import type { Erratum } from "../src/errata.ts";
-import { CANDIDATES } from "../src/fit/candidates.ts";
+import { CANDIDATES, candidatesFor, PREFERRED } from "../src/fit/candidates.ts";
+import { NODE_CORRECTIONS } from "../src/fit/scores.ts";
 import { engineVersion, fitStation, meanRange, varianceExplained } from "../src/fit/fit.ts";
 import type { FitContext } from "../src/fit/fit.ts";
 import { Flag, type Observation, type SourceMetadata, type StoredStation } from "../src/schema.ts";
@@ -20,6 +21,9 @@ const GENERATING: HarmonicConstituent[] = [
   { name: "S2", amplitude: 0.3, phase: 60 },
   { name: "K1", amplitude: 0.2, phase: 120 },
   { name: "O1", amplitude: 0.15, phase: 200 },
+  // The two lines that have another name in the list, NO1 and MO3.
+  { name: "M1", amplitude: 0.05, phase: 80 },
+  { name: "2MK3", amplitude: 0.05, phase: 300 },
 ];
 
 /** A fixed pseudo-random sequence in [-1, 1), so a run is the same every time. */
@@ -40,7 +44,7 @@ const tideAt = (times: number[], constants = GENERATING) => {
 };
 
 const generated = new Map<number, Observation[]>();
-/** A year of hourly good values: the four constituents, an offset and noise of at most 1 cm. */
+/** A year of hourly good values: the generating constituents, an offset and noise of at most 1 cm. */
 function yearOfValues(year: number, keep = Infinity): Observation[] {
   let rows = generated.get(year);
   if (!rows) {
@@ -102,6 +106,57 @@ async function store(spans: [year: number, keep?: number][]) {
   });
   return { years, context };
 }
+
+describe("candidatesFor", () => {
+  const names = (corrections: Parameters<typeof candidatesFor>[0]) =>
+    candidatesFor(corrections).map((c) => c.name);
+
+  it("puts the name Schureman's corrections are written for ahead of the one sharing its line", () => {
+    const schureman = names("schureman");
+    assert.ok(schureman.indexOf("M1") < schureman.indexOf("NO1"));
+    assert.ok(schureman.indexOf("2MK3") < schureman.indexOf("MO3"));
+    // Each takes the other's place, and nothing else moves.
+    const standard = CANDIDATES.map((c) => c.name);
+    assert.equal(schureman.indexOf("M1"), standard.indexOf("NO1"));
+    assert.equal(schureman.indexOf("NO1"), standard.indexOf("M1"));
+    const moved = new Set(["M1", "NO1", "2MK3", "MO3"]);
+    assert.deepEqual(
+      schureman.filter((n) => !moved.has(n)),
+      standard.filter((n) => !moved.has(n)),
+    );
+  });
+
+  it("keeps the list's own order for formulas with no preference", () => {
+    assert.deepEqual(
+      names("foreman"),
+      CANDIDATES.map((c) => c.name),
+    );
+  });
+
+  it("holds NO1's line as M1 under the IHO's formulas, which define M1, and MO3's as the list has it", () => {
+    const iho = names("iho");
+    assert.ok(iho.indexOf("M1") < iho.indexOf("NO1"));
+    assert.ok(iho.indexOf("MO3") < iho.indexOf("2MK3"));
+  });
+
+  it("gives the fits an order that differs from the list's, so stored fits come due with it", () => {
+    // The fits' digest and each fit's version hash this order; were they to hash the list's own,
+    // a change to PREFERRED would leave every stored fit current.
+    assert.notDeepEqual(
+      candidatesFor(NODE_CORRECTIONS).map((c) => c.name),
+      CANDIDATES.map((c) => c.name),
+    );
+  });
+
+  it("prefers only a name on the same line", () => {
+    for (const pairs of Object.values(PREFERRED))
+      for (const [name, preferred] of Object.entries(pairs)) {
+        const [a, b] = [name, preferred].map((n) => CANDIDATES.find((c) => c.name === n)!);
+        assert.deepEqual(a.doodson, b.doodson);
+        assert.equal(a.speed, b.speed);
+      }
+  });
+});
 
 describe("CANDIDATES", () => {
   it("names catalog constituents of the same speed and Doodson numbers", () => {
@@ -174,8 +229,22 @@ describe("fitStation", () => {
 
     assert.deepEqual(
       rows.map((r) => r.name),
-      CANDIDATES.map((c) => c.name),
+      candidatesFor("schureman").map((c) => c.name),
     );
+    // Each shared line is kept under the name Schureman's formulas hold it by, and the other
+    // name's row says which name took the line.
+    for (const [held, other] of [
+      ["M1", "NO1"],
+      ["2MK3", "MO3"],
+    ] as const) {
+      const row = (name: string) => rows.find((r) => r.name === name)!;
+      assert.equal(row(held).kept, true, held);
+      assert.deepEqual(
+        [row(other).kept, row(other).reason, row(other).conflict],
+        [false, "rayleigh", held],
+      );
+      assert.ok(row(held).rank < row(other).rank);
+    }
     for (const want of GENERATING) {
       const got = rows.find((r) => r.name === want.name)!;
       assert.equal(got.kept, true, `${want.name} is kept`);

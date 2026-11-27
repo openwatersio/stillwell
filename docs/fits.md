@@ -37,6 +37,17 @@ Every fit starts from the same candidates in the same priority order, defined in
 
 Starting from one list makes fits comparable between gauges, and including NOAA's and TICON's names lets a fit be compared with either name for name.
 
+**Names that share a line.** NO1 and M1 are one line, as are MO3 and 2MK3: the same Doodson numbers under two names, each with its own nodal correction. A line has one constant, so the two names can't both be kept, and the name decides the correction. The list keeps one order, and each set of nodal formulas names the lines it holds under the other name (`PREFERRED` in [`src/fit/candidates.ts`](../src/fit/candidates.ts)), which then takes the first name's place in the order:
+
+- **M1 for NO1, under Schureman's and the IHO's formulas.** Both define a correction for M1 and none for NO1, which they treat as a compound of N2 and O1. Foreman's define NO1's line and call it NO1.
+- **2MK3 for MO3, under Schureman's.** Neither name has a formula of its own there: each takes its correction from its members, M2 twice less K1, or M2 and O1. NOAA publishes the line as 2MK3.
+
+The [calibration against NOAA's constants](results/fit-calibration.md) measured the two together, on fits of the years NOAA analyzed: with NOAA's names and nothing else changed, the held-out year is predicted better at 9 and worse at none of the 18 stations whose NOAA analysis didn't read that year, counting a change of 0.1 mm or more, from −2.0 to +0.1 mm. The gain is in the prediction. M1's own constant is no closer to NOAA's under its name, since NOAA's comes from node factors held for a year at a time. The preference for M1 under the IHO's formulas follows from the formulas and hasn't been measured.
+
+The preferred name gets the first chance to be kept. Where it fails the signal-to-noise test, neither name is kept, and the other's row names it as the conflict.
+
+Holding the line as M1 has a cost for anyone predicting with other software. M1's Doodson numbers include the lunar perigee, p, and so does Schureman's correction for M1 as he writes it for the argument without p (his equation 202). The constants here are on the argument with p (equation 194), whose correction is u = −ν − Qa (equation 196). Applying equation 202's correction to these Doodson numbers counts p twice, and the phase drifts about 40° a year. 2MK3 isn't among the shallow-water lines t_tide and UTide define, while MO3 is, so those can't predict it. slackwater-database's stored constituent definitions can't carry M1's correction either ([slackwater-database#238](https://github.com/openwatersio/slackwater-database/issues/238)), so it predicts a fit that keeps M1 only with an engine that has it.
+
 A candidate is kept when it passes two tests:
 
 - **Rayleigh criterion.** The record separates it from every stronger candidate already kept by at least one cycle ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf), §2.1.2, p. 17). Where a record can't separate two candidates, the one earlier in the list stays.
@@ -72,17 +83,17 @@ Five gauges, each fitted on 19 years under each family and scored on a held-out 
 | Cuxhaven (`pegelonline/5990020`) | 53.9°N   | Semidiurnal, M2 1.38 m      |
 | Kungsvik (`smhi/2130`)           | 59.0°N   | Semidiurnal, M2 0.12 m      |
 
-Sa, Ssa and S1 were left out, since t_tide defines SA and S1 on lines that include the solar perigee.
+Sa, Ssa and S1 were left out, since t_tide defines SA and S1 on lines that include the solar perigee. Each family's fit chose from the candidates in its own order, so the two shared lines were held as M1 and 2MK3 under Schureman's corrections, M1 and MO3 under the IHO's, and NO1 and MO3 under Foreman's.
 
 **No family predicts best everywhere, and the differences are about 1% of the residual at most.** Tidal-band RMS of observed minus predicted levels on the held-out year, fitted and predicted under the same family:
 
 | Gauge     | Schureman | IHO       | Foreman   |
 | --------- | --------- | --------- | --------- |
-| Kwajalein | 24.66 mm  | 24.57 mm  | 24.57 mm  |
-| Honolulu  | 23.28 mm  | 23.18 mm  | 23.05 mm  |
-| Pensacola | 30.68 mm  | 30.65 mm  | 30.36 mm  |
-| Cuxhaven  | 180.73 mm | 180.64 mm | 181.23 mm |
-| Kungsvik  | 59.03 mm  | 59.03 mm  | 58.97 mm  |
+| Kwajalein | 24.57 mm  | 24.48 mm  | 24.57 mm  |
+| Honolulu  | 23.23 mm  | 23.13 mm  | 23.05 mm  |
+| Pensacola | 30.46 mm  | 30.43 mm  | 30.36 mm  |
+| Cuxhaven  | 180.72 mm | 180.64 mm | 181.29 mm |
+| Kungsvik  | 59.03 mm  | 59.03 mm  | 58.98 mm  |
 
 Whether a difference is more than one year's noise was tested by the difference of the two residual variances against twice its standard error, taken from 30-day blocks:
 
@@ -90,13 +101,13 @@ Whether a difference is more than one year's noise was tested by the difference 
 | --------- | --------------------- | ------------------------- |
 | Kwajalein | within noise          | within noise              |
 | Honolulu  | IHO better            | Foreman better            |
-| Pensacola | within noise          | Foreman better            |
+| Pensacola | within noise          | within noise              |
 | Cuxhaven  | IHO better            | Schureman better          |
 | Kungsvik  | within noise          | within noise              |
 
-Foreman's corrections fit the two gauges with a large diurnal tide measurably better than Schureman's, and Schureman's fit Cuxhaven measurably better than Foreman's. IHO's are measurably better than Schureman's at two gauges and never worse. The largest of these differences is 0.5 mm of RMS, at Cuxhaven, on a residual of 181 mm. What weather, seiches and river flow leave in the residual is a hundred times any difference between the families, or more.
+Foreman's corrections fit Honolulu measurably better than Schureman's, and Schureman's fit Cuxhaven measurably better than Foreman's. IHO's are measurably better than Schureman's at two gauges and never worse. The largest of these differences is 0.6 mm of RMS, at Cuxhaven, on a residual of 181 mm. What weather, seiches and river flow leave in the residual is a hundred times any difference between the families, or more. The name a shared line is held under matters as much as the family: with those lines as NO1 and MO3 under Schureman's corrections, its residual is 0.2 mm higher at Pensacola and 0.1 mm at Kwajalein, and Foreman's fit of Pensacola is then measurably better.
 
-**Using the constants under another family.** RMS difference between the curve predicted under the fit's family and the curve the same constants give under another, over the held-out year:
+**Using the constants under another family.** RMS difference between the curve predicted under the fit's family and the curve the same constants give under another, over the held-out year, from fits that held the shared lines as NO1 and MO3 under every family:
 
 | Fitted under | Predicted under | Kwajalein | Honolulu | Pensacola | Cuxhaven | Kungsvik |
 | ------------ | --------------- | --------- | -------- | --------- | -------- | -------- |
@@ -122,7 +133,7 @@ Prediction skill doesn't settle the choice: each family is measurably best somew
 ### What it costs
 
 - **Comparison with TICON.** TICON's constants match no one family ([Reference scores](#reference-scores)): its O1, Q1 and Mf agree with a Schureman fit of the same levels, and its J1 reads 8% below one. Its M1 and OO1 agree with none. A comparison of constants across the two has to allow for that, constituent by constituent.
-- **Diurnal gauges.** At Honolulu and Pensacola, Foreman's corrections leave 0.2 to 0.3 mm less RMS in the held-out residual than Schureman's, about 1% of it.
+- **Honolulu.** Foreman's corrections leave 0.2 mm less RMS in the held-out residual there than Schureman's, about 1% of it.
 - **Use in t_tide or UTide.** Those predict under Foreman's set, and a Schureman fit used there differs by 3 to 8 mm RMS at these gauges. Direct reuse there would also need t_tide's own definitions of SA, S1 and M1, and only the constituents in its table. A user who needs exact agreement refits the series under Foreman's set, which the store's levels allow.
 - **A limit every family shares.** All three assume the nodal modulation the equilibrium tide has. Observed modulation departs from it in shallow water ([Amin 1985](https://doi.org/10.1111/j.1365-246X.1985.tb05138.x); [Feng, Tsimplis and Woodworth 2015](https://doi.org/10.1002/2014JC010312)). A 19-year window averages the modulation out of the fitted amplitude, but a prediction for one year carries the assumption.
 - **M1 and L2.** M1 is several lines, defined and corrected differently in each family ([Woodworth 2019](https://os.copernicus.org/articles/15/431/2019/)), and L2 shares its frequency with 2MN2, whose node factor differs ([Parker 2007](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf), pp. 59–60). Their constants depend on the family more than any others.
