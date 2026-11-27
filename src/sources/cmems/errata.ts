@@ -109,6 +109,49 @@ export default {
       },
     },
     {
+      id: "cmems-list-2024-level",
+      stations: ["cmems/ListTG", "gesla/listtg-lis-deu-cmems"],
+      since: "2024-08-21",
+      handling: "flagged",
+      error:
+        "CMEMS's record of the WSV's List auf Sylt gauge has sat 6 to 25 cm lower against DMI's Havneby since 21 August 2024 than before, as PEGELONLINE's does (erratum `pegelonline-list-2024-level`).",
+      response:
+        "Values from 21 August 2024 on are flagged `suspect`, keeping the source flag as `source_flag`, as PEGELONLINE's are. GESLA's copy of the record is flagged over the same span.",
+      evidence:
+        "Found with erratum `pegelonline-list-2024-level`, November 2026. The record's monthly median against Havneby (`dmi/9006802`, 11 km) is −2.4 to 0.6 cm in every month from January 2023 to July 2024 and −24.4 to −8.4 cm in every month from September 2024 to November 2026. Its daily median goes from −1.4 cm on 20 August 2024 to −13.4 cm on the 21st and −24.4 cm on the 22nd, the days PEGELONLINE's record steps. The record isn't a copy of PEGELONLINE's values, which it differs from by up to tens of centimeters at single times, so it has an entry of its own. GESLA's copy, which ends on 31 May 2026, equals it at all 92,626 times they share from 21 August 2024, on 645 days.",
+      reported: null,
+      report: null,
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        // The span has no end, so days of its later years too, before the poller's last week.
+        for (const id of e.stations!)
+          for (const day of ["2025-06-15", "2026-05-15"]) {
+            const open = (await levels(store, id, day)).filter((o) => o.flag < Flag.suspect);
+            if (open.length)
+              throw new Error(`${open.length} ${id} values on ${day} aren't suspect`);
+          }
+        // The step itself: the record against Havneby, over the weeks before and after it.
+        const against = async (since: string, until: string) => {
+          const other = new Map(
+            (await store.levels("dmi/9006802", since, until)).map((o) => [o.time, o.level]),
+          );
+          const d = (await store.levels(e.stations![0]!, since, until))
+            .flatMap((o) => (other.has(o.time) ? [o.level - other.get(o.time)!] : []))
+            .sort((x, y) => x - y);
+          if (d.length < 500)
+            throw new Error(`ListTG and Havneby share ${d.length} times from ${since} to ${until}`);
+          return d[d.length >> 1]!;
+        };
+        const moved =
+          (await against(dayAfter(e.since!, 4), dayAfter(e.since!, 29))) -
+          (await against("2024-08-01", dayAfter(e.since!, -7)));
+        if (moved > -0.05)
+          throw new Error(
+            `ListTG moves ${(moved * 100).toFixed(1)} cm against Havneby, not down 5 cm`,
+          );
+      },
+    },
+    {
       id: "cmems-wangerooge-west-2026-dropout",
       stations: ["cmems/WangeroogeTG"],
       since: "2026-10-26",

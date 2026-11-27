@@ -10,7 +10,6 @@ import {
   offset,
   qcFlags,
   step,
-  unflagged,
 } from "./errata-checks.ts";
 
 export default {
@@ -294,26 +293,32 @@ export default {
     },
     {
       id: "pegelonline-list-2024-level",
-      stations: ["pegelonline/9570070"],
-      since: "2024-09-01",
-      handling: "kept",
+      stations: ["pegelonline/9570070", "gesla/listaufsylt-9570070-deu-wsv"],
+      since: "2024-08-21",
+      handling: "flagged",
       error:
-        "PEGELONLINE's List auf Sylt levels have sat 8 to 20 cm lower against Hörnum and Wittdün since September 2024 than before, with no change of gauge zero.",
+        "PEGELONLINE's List auf Sylt levels have sat lower against its neighbors since 21 August 2024 than before, by an amount that changes from month to month, 4 to 22 cm against Hörnum, with no change of gauge zero.",
       response:
-        "The store keeps the values as served: the offset wanders and continues, so its cause, and whether newer values are right, needs the WSV's answer.",
+        "Values from 21 August 2024 on are flagged `suspect`, keeping the source flag as `source_flag`: Hörnum, Wittdün and DMI's Højer each keep their level against DMI's Havneby through the step, so the change is List's, and an offset that wanders by more than 10 cm can't be taken off. GESLA's WSV record, which holds PEGELONLINE's values, is flagged over the same span, and CMEMS's record of the gauge under erratum `cmems-list-2024-level`.",
       evidence:
-        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: a step of −23 cm on 28 August 2024 against three of four neighboring gauges. Monthly median differences against Hörnum (`pegelonline/9570050`) are within ±1.3 cm from January to August 2024 and −7 to −22 cm in every month since; against Wittdün (`pegelonline/9570010`) within ±2.6 cm before and −7 to −20 cm in every month since except October 2024. The gauge zero's only date is 2019-11-01.",
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: a step of −23 cm on 28 August 2024 against three of four neighboring gauges. List's monthly median difference from Hörnum (`pegelonline/9570050`) is −5 to −1 cm in every month from January 2023 to July 2024 and −23 to −9 cm in every month from September 2024 to November 2026; from Wittdün (`pegelonline/9570010`) it is −3 to 5 cm before and −21 to −7 cm since, except −3 cm in October 2024. Against DMI's Havneby (`dmi/9006802`, 11 km), List's monthly median difference is 4.97 to 5.02 m in every month from January 2023 to August 2024 and 4.79 to 4.93 m in every month from September 2024 to November 2026; against DMI's Højer (`cmems/VidaaTG`, 15 km) it is 4.77 to 4.87 m before and 4.64 to 4.79 m since. Over the same 47 months the neighbors hold their level against Havneby: Hörnum 5.05 to 5.09 m, Wittdün 4.98 to 5.11 m before and 4.98 to 5.09 m since, Højer 0.14 to 0.20 m before and 0.13 to 0.20 m since. The daily median against Havneby is 4.99 to 5.03 m from 8 to 20 August 2024, 4.89 m on the 21st and 4.78 m on the 22nd, which dates the start a week before the cross-check's step. GESLA's WSV record holds hourly means of PEGELONLINE's values to 29 June 2026: `npm run errata:copies` matches 2,880 of its values on 120 days of the span at no offset, and its monthly median against Havneby goes from 4.99 m in August 2024 to 4.78 m in September. The gauge zero's only date is 2019-11-01.",
       check: async (store, e) => {
         const [station, since] = [e.stations![0]!, e.since!];
-        await unflagged(store, station, dayAfter(since, 14));
-        await step(
-          store,
-          station,
-          "9570050",
+        await flaggedSpan(store, e);
+        // The span has no end, so days of its later years too, before the poller's last week.
+        for (const id of e.stations!)
+          for (const day of ["2025-06-15", "2026-06-15"]) {
+            const open = (await levels(store, id, day)).filter((o) => o.flag < Flag.suspect);
+            if (open.length)
+              throw new Error(`${open.length} ${id} values on ${day} aren't suspect`);
+          }
+        const windows = [
           ["2024-08-01", dayAfter(since, -7)],
           [dayAfter(since, 4), dayAfter(since, 29)],
-          -0.05,
-        );
+        ] as const;
+        // Against a neighbor of the WSV's and one of DMI's.
+        for (const neighbor of ["9570050", "dmi/9006802"])
+          await step(store, station, neighbor, [...windows[0]], [...windows[1]], -0.05);
       },
     },
     {
