@@ -86,6 +86,7 @@ Adapters run in Node, in Actions and on the Stillwell server. Adapter code uses 
 ```
 fits/<source>.parquet                            a row per fit: its window, the year files read, its scores and datums (phase 6)
 constituents/<source>.parquet                    a row per fit and candidate constituent, kept or not, with why (phase 6)
+fits/references/<source>.parquet                 a row per fit and slackwater-database record of its gauge: the record's scores on the held-out year (phase 6)
 models/stofs2d/<cycle>.parquet                   station-point nowcast and forecast (phase 11)
 models/gtsm/<point>.parquet                      surge reanalysis at coastal points (phase 11)
 bulk/<snapshot>/<source>.parquet                 quarterly, Hive-partitioned by year (phase 12)
@@ -176,7 +177,7 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 
 Estimate: 14 days here, and 4 in slackwater-database.
 
-One pipeline fits every gauge that carries a tide, with a source's differences declared by its adapter. slackwater-database's [plan for constituents](https://github.com/openwatersio/slackwater-database/blob/main/docs/plans/stillwell-constituents.md) has the method and its references: the candidate list, the Rayleigh and SNR rules, Sa and Ssa, the held-out year and the calibration against agencies' own constants. Its `sources/stillwell` importer ([slackwater-database#450](https://github.com/openwatersio/slackwater-database/pull/450)) runs that method on SMHI and PEGELONLINE from outside the store. That importer, the verification report ([slackwater-database#425](https://github.com/openwatersio/slackwater-database/pull/425)) and the calibration ([slackwater-database#426](https://github.com/openwatersio/slackwater-database/pull/426)) are the code this phase starts from.
+One pipeline fits every gauge that carries a tide, with a source's differences declared by its adapter. [Harmonic fits](../fits.md) has the method and its references: what a fit reads, the window, the candidate list, the Rayleigh and SNR rules, Sa and Ssa, nodal corrections, and the scores on a held-out year. The scoring is ported from slackwater-database's verification code, and that repo's side of this phase, reading the fit files and deciding what ships, is in its [plan for constituents](https://github.com/openwatersio/slackwater-database/blob/main/docs/plans/stillwell-constituents.md).
 
 Definitions, before a fit is published:
 
@@ -189,6 +190,7 @@ What a fit reads:
 - [ ] A fit reads what the store's flags allow, and records every erratum touching the years it read. A value is `kept` only where its own evidence supports keeping it, and one no reader should use is `flagged`, so no consumer decides per erratum.
 - [ ] One reader for fits in `src/fit/`: every epoch in the current datum, final values for constants and every measured value for datums, hourly instantaneous samples, and the version of each year file read. It reads the restricted store too.
 - [ ] The filter behind any source's hourly values, and where each value is stamped in its interval, as source metadata, so a fit can correct amplitude and phase for it.
+- [ ] Years another series of the same gauge holds and the originator's lacks, such as GESLA's older years. The reason the originator lacks them is found first. Only years the originator can't supply are joined, at an offset measured where the two series overlap ([slackwater-database#400](https://github.com/openwatersio/slackwater-database/issues/400)), and the fit names both series.
 - [ ] A level comparison in `stations/matches.parquet` for every linked pair. A fit and a TICON record count as the same gauge only where their levels agree within 1 cm with no lag, and 142 linked pairs of PEGELONLINE and GESLA series, Brake's among them, have no comparison, so those fits can't be scored against or merged with TICON's records of the gauge.
 
 Checks before fitting, which stop a fit or cut its series:
@@ -199,10 +201,13 @@ Checks before fitting, which stop a fit or cut its series:
 The fit:
 
 - [ ] `src/fit/`: the whole window, up to 19 years before the held-out year, through the engine's `fit()` with robust weights, and the Rayleigh and SNR selection over the candidate list, which [`src/harmonic.ts`](../../src/harmonic.ts)'s `STANDARD` and `SHALLOW` lists give way to. QC, the tidal judgment and the cross-check then read a station's fit where it has one.
+- [ ] More shallow-water candidates where the tide needs them. NOAA fits more than 100 constituents at Anchorage, HATYAN's set has 94, and Foreman lists 77 optional shallow-water constituents. The calibration measures a longer list at every gauge against one added only where the residual has energy in the quarter-diurnal and higher bands, and what either does to the constants of gauges with little shallow-water tide.
+- [ ] Measure two rules the fits don't apply: keeping a constituent under the signal-to-noise limit where its amplitude and phase agree between the yearly fits ([Parker 2007](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf), pp. 165 and 308), and keeping M2, S2, K1 and O1 whatever their ratio.
+- [ ] Measure fits of records under 183 days with P1 and K2 inferred from a neighbor's ratios ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf)) against a longer record at the same gauges. Until then such a record gets a row with its reason and no constants.
 - [ ] Sa and Ssa from the whole window and from each year, kept only where the mean is at least twice its standard error, with the spread recorded either way.
 - [ ] Observed tidal datums from the same series, over the latest window each gauge has within the fit's window and the held-out year, which the fit records as its datum epoch. The store has no shared epoch for observed datums, since a gauge's latest years are the ones its current levels sit in and few gauges share any one span. They follow the rules in slackwater-database's [`docs/datums.md`](https://github.com/openwatersio/slackwater-database/blob/main/docs/datums.md), which move here with the code. The fit names the series and the gauge zero they were reduced in. HAT and LAT come from a synthesis of the fit's constants over 19 years, which anything holding the fit and its definitions can run. Another 19 years gives other extremes, so the synthesis here runs over the epoch slackwater-database pins (`DATUM_EPOCH`, 2007 through 2025), and the fit records it. Which datum is a station's chart datum, by country and by sea, stays in slackwater-database.
 - [ ] Scores on the held-out year: tidal-band RMS, the share of the tidal band's variance the fit explains, energy by band, and the time and height of high and low waters, with one extremum picker.
-- [ ] The same code scores the constants slackwater-database holds for the gauge on the same year, from a pinned `@slackwater/database` release named in the fit. Those are slackwater-database's TICON records, which include its own refits of mislabeled clocks, not TICON as published. Each score stores a digest of the constants it scored, and a new release that changes a linked record's digest scores it again.
+- [x] The same code scores the constants slackwater-database holds for the gauge on the same year, from the pinned `@slackwater/database` release each score names, into `fits/references/<source>.parquet` ([Reference scores](../fits.md#reference-scores)). Those are slackwater-database's records, which include its own refits of mislabeled clocks, not TICON as published. Each score stores a digest of the constants it scored, and a new release that changes a linked record's digest scores it again, without fitting.
 - [ ] Every series with enough final record is fitted, and its row carries what a consumer needs to set its own threshold: mean range, variance explained, each constituent's SNR and the yearly scatter. On one-off fits of 2021 to 2023 with a fixed set of 24 constituents, scored on 2024 as one minus the residual's variance over the observed levels', both after the Godin filter, the tide explains 92 to 95% of the tidal band's variance at NOAA's Gulf gauges, 31 to 38% in the Kattegat, 18% at Gedser, where DMI publishes tables, and 4 to 18% at German Baltic gauges, where BSH publishes none. A screen run here to save compute is named for its cost and never as a judgment that a gauge has no tide.
 - [ ] A record too short to fit, or one a check stopped, gets a row that says why, and no constants.
 
@@ -299,17 +304,49 @@ Estimate: 3 days.
 - [ ] Data README: schema, flags, datums, licenses per source, how to query with DuckDB, Polars and pandas.
 - [ ] Observed levels on the website's station pages, and `heightNow` in signalk-tides (in those repos).
 
-### HRoI and the BSH track
+### HRoI track
 
 In parallel with the phases above.
 
-The [evaluation](../hroi-evaluation.md) found HRoI times high and low waters better than a harmonic curve fit at BSH gauges and at most Dutch gauges, and gives one event per semidiurnal cycle, which is the event-selection problem slackwater-database hit with RWS.
+The harmonic representation of inequalities (HRoI; Horn 1960, [Boesch and Müller-Navarra 2019](https://doi.org/10.5194/os-15-1363-2019)) predicts high and low waters directly from lunar transits. The [evaluation](../hroi-evaluation.md) found it times high and low waters better than a harmonic curve fit at BSH gauges and at most Dutch gauges, and it gives one event per semidiurnal cycle, which is the event-selection problem slackwater-database hit with RWS. slackwater-database's validator against BSH's tables ([slackwater-database#391](https://github.com/openwatersio/slackwater-database/pull/391)) finds its German stations, all TICON fits, predicting early at every one of 96 matched gauges, by a median of 12 minutes and by up to 75 at low waters far up the rivers.
+
+An HRoI fit is a fit under decision 7: this repo fits it from the store's observations and publishes it with its scores, slackwater-database decides what ships, and the engine predicts from it.
+
+What BSH asked, in its emails of 2 and 3 November 2026 (recorded in slackwater-database#391's research notes):
+
+- Fits are trained on WSV's observed water levels, never on BSH's predictions.
+- Predictions from those fits are Open Waters' own, and nothing names BSH as their source. Docs and comments describe HRoI as a published method.
+- BSH doesn't release its HRoI constants. Its tables are a yardstick: reference data in `predictions/bsh/` and `predicted-extremes/bsh/` that fits are scored against.
+
+The track covers German and Dutch gauges on the North Sea and its tidal rivers (Brandon, 2026-11-26). The Dutch gauges are the about 180 where the store holds RWS's observed high and low waters; HRoI timed those better there than the harmonic fit and RWS's own astronomical tide, and one event per cycle would settle [slackwater-database#152](https://github.com/openwatersio/slackwater-database/issues/152). The four Baltic gauges in BSH's tables keep harmonic fits: their tide is too small and weather-driven for one high and one low water per half lunar day to mean much, and at Kiel-Holtenau slackwater-database's event count already differs from BSH's by 18.
+
+Reference data:
 
 - [ ] Wait for BSH's answer on the 1 August rule ([slackwater-database#335](https://github.com/openwatersio/slackwater-database/issues/335)) before publishing anything fitted to BSH predictions.
 - [x] Ingest BSH predictions into `predictions/bsh/` and `predicted-extremes/bsh/` as reference data: Monthly's BSH refresh fetches this year's, and from August next year's.
-- [ ] Test HRoI against observed German levels from PEGELONLINE's history in the store, which reaches 2000 at most gauges.
-- [ ] Learn BSH's per-gauge curve shapes instead of one mean curve (the Husum, Büsum and Papenburg gap).
-- [ ] Propose HRoI extremes to `@slackwater/engine` as an event method for stations with a long extremes record, in a separate issue there.
+- [ ] A reviewed crosswalk from BSH's places to PEGELONLINE's gauges. Each of BSH's `DE_<number>_tides.json` files names a `pegelonline_uuid`, which PEGELONLINE's station list resolves to a gauge number. Places without one, and pairs more than a few hundred meters apart, are checked by hand.
+
+Observed extremes:
+
+- [ ] Observed high and low waters for PEGELONLINE's tidal gauges in `extremes/pegelonline/`, taken from the stored levels by a documented rule (smoothing, then a turning-point search), since PEGELONLINE publishes none. Every turning point is kept, both highs or lows of a double among them ([slackwater-database#152](https://github.com/openwatersio/slackwater-database/issues/152) shows they are real).
+- [ ] RWS's observed extremes are used as RWS selects them. Where a tide has a double low water, as at about a third of tides at Hoek van Holland, the store keeps both lows, and the choice of training events takes the deeper.
+- [ ] Training events chosen in a separate documented step: one high and one low water per half lunar day, assigned to transits as [`src/hroi`](../../src/hroi) does. Each fit records, per year, the share of half days where the choice dropped a turning point. A gauge where that share passes a limit set before the evaluation gets no HRoI fit, because forcing its events would bias one.
+
+Evaluation, as a section of [hroi-evaluation.md](../hroi-evaluation.md), first at the 15 gauges it already covers and then at every gauge with enough record:
+
+- [ ] Fit to observed extremes over 19 years (2005 to 2023 where the record allows, 9 years where it is shorter), and score on the observed extremes of 2024 and 2025. German fits are also scored on BSH's tables for 2026 and 2027, and Dutch fits beside RWS's astronomical extremes for the same held-out years.
+- [ ] Four predictors on the same held-out events: HRoI on the moon's true transits, HRoI on a uniform grid of mean transits, the gauge's harmonic fit (phase 6) and its TICON constants. Mean transits would spare each engine a lunar ephemeris accurate to seconds, if the long-period terms absorb the difference.
+- [ ] The curve between extremes, on held-out 1-minute levels: the harmonic curve warped in time and height to pass through the HRoI extremes, mean curves by tidal range or by event index (as BSH appears to use, and the gap at Husum, Büsum and Papenburg), and the single mean curve the evaluation has.
+- [ ] The measures are written into the evaluation before any fit is scored: RMS of event time in minutes and of event height in centimeters, each beside the gauge's own spread between its 2024 and 2025 scores, so a difference between methods can be told from year-to-year noise.
+
+Publishing:
+
+- [ ] HRoI fits in the store beside `fits/` and `constituents/`, in a file defined with the first fit: the set of partial tides by name, the mean lunitidal intervals, the coefficients of interval and height for each of the four event series, the curve data the evaluation chooses, the window, and the scores. That is about 650 numbers a gauge.
+- [ ] Refit each year on the latest 19 years, as BSH does, because rivers change after dredging.
+- [ ] Mean high and low water, and their spring and neap values, reduced from the observed extremes over a stated 19-year window (phase 7), counting only years where at least 90% of half lunar days have a chosen high and low. The reduction is from observations, never from the fit.
+- [ ] Move the implementation in [`src/hroi`](../../src/hroi) to `@slackwater/engine`, fitting and prediction together, so the store's fits and every app's predictions share one implementation under the MIT license. This repo then imports it.
+
+slackwater-database's side, in that repo: an HRoI table on a station in the database format, a set of harmonic constants on every HRoI station so readers that predate the table and the TCD export still predict, the rank of a PEGELONLINE fit against TICON's record of the gauge, and a release order of engine, apps and then database.
 
 ## Out of scope
 
@@ -324,6 +361,7 @@ As the architecture estimates: about $7 a month in year one on R2 and Workers, p
 ## Open questions
 
 - BSH's answer on the 1 August rule.
+- Whether SHOM will license its predictions as reference data for scoring fits at French gauges, as BSH's and RWS's are used.
 - Which reference checks a gauge's clock where no other originator holds its record and no neighbor is close: an ocean tide model's constants at the gauge would share no gauge's clock, and the choice turns on which model's license allows it. EOT20 is the first to check; FES's and TPXO's terms are restrictive.
 - STOFS-2D station count and file sizes.
 - PSMSL's reply on commercial redistribution (request sent 2026-11-01).
