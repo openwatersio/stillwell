@@ -19,6 +19,19 @@ export function firstOfMonth(today: Date, months = 0): string {
     .slice(0, 10);
 }
 
+/**
+ * The first year a source that never finalizes reads again on `today`: the
+ * earliest year that hadn't been over for `months` months two months ago, so
+ * a year is read twice more after it settles (`settledBefore` in
+ * src/fit/series.ts, which a test holds this to).
+ */
+export function unsettledFrom(months: number, today: Date): number {
+  const then = Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 2, today.getUTCDate());
+  let year = new Date(then).getUTCFullYear();
+  while (Date.UTC(year, months, 1) > then) year--;
+  return year;
+}
+
 /** `today`'s UTC year. */
 export const yearOf = (today: Date) => today.getUTCFullYear();
 

@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
 import { DatumChanged } from "../src/epochs.ts";
+import { settledBefore } from "../src/fit/series.ts";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
+import { unsettledFrom } from "../src/sources/schedule.ts";
 
 const fixture = (name: string) =>
   readFileSync(new URL(`fixtures/${name}`, import.meta.url), "utf8");
@@ -243,12 +245,13 @@ describe("kartverket", () => {
     assert.deepEqual(values[0], {
       time: Date.parse("1990-01-01T00:00Z"),
       level: 1.393,
-      flag: Flag.good,
+      // Kartverket marks no value checked, whatever its age.
+      flag: Flag.preliminary,
     });
     assert.equal(values.at(-1)!.time, Date.parse("1990-01-01T02:50Z"));
   });
 
-  it("flags values from the last year preliminary", async () => {
+  it("flags recent values preliminary too", async () => {
     serve([[/stationdata/, fixture("kartverket-obs-recent.xml")]]);
     const values = await kartverket.levels(
       "BGO",
@@ -313,18 +316,68 @@ describe("kartverket", () => {
     );
   });
 
-  it("caches only final responses that run to the end of the range", async () => {
+  it("reads a year again each month until the fits take it as final", async () => {
+    const { metadata, schedule } = kartverket.source;
+    assert.equal(metadata.finalizes, false);
+    const plan = (day: string) => schedule!.lists!(new Date(day));
+    // Each run stops at the start of last month, short of the days compaction still folds.
+    assert.deepEqual(await plan("2026-12-02T00:00Z"), [["all", "2025", "2026-11-01", "--refetch"]]);
+    // 2025 settles on 1 January 2027; January's run reads it before its fits do, and February's again.
+    const settled = (day: string) => settledBefore(metadata, new Date(day))!.toISOString();
+    assert.equal(settled("2026-12-31T23:59Z"), "2025-01-01T00:00:00.000Z");
+    assert.equal(settled("2027-01-02T00:00Z"), "2026-01-01T00:00:00.000Z");
+    assert.deepEqual(await plan("2027-01-02T00:00Z"), [["all", "2025", "2026-12-01", "--refetch"]]);
+    assert.deepEqual(await plan("2027-02-02T00:00Z"), [["all", "2025", "2027-01-01", "--refetch"]]);
+    assert.deepEqual(await plan("2027-03-02T00:00Z"), [["all", "2026", "2027-02-01", "--refetch"]]);
+  });
+
+  it("refuses a response with an empty value or a day its month doesn't have", async () => {
+    const span = [new Date("1990-01-01T00:00Z"), new Date("1991-01-01T00:00Z")] as const;
+    serve([
+      [/stationdata/, fixture("kartverket-obs-1990.xml").replace('value="140.8"', 'value=""')],
+    ]);
+    await assert.rejects(kartverket.levels("BGO", ...span), /a reading of "" at 1990-01-01T00:10/);
+    serve([
+      [
+        /stationdata/,
+        fixture("kartverket-obs-1990.xml").replace(
+          'time="1990-01-01T00:20:00+00:00"',
+          'time="1990-02-31T00:20:00+00:00"',
+        ),
+      ],
+    ]);
+    await assert.rejects(kartverket.levels("BGO", ...span), /at 1990-02-31T00:20/);
+  });
+
+  it("starts the monthly read where the settling time puts it", () => {
+    // Whatever the months, a year is in the two runs after it settles and in none after those.
+    for (const months of [6, 12, 24])
+      for (let m = 0; m < 48; m++) {
+        const today = new Date(Date.UTC(2026, m, 2));
+        const ago = (n: number) => new Date(Date.UTC(2026, m - n, 2));
+        const settled = (day: Date) =>
+          settledBefore({ ...kartverket.source.metadata, settles_after_months: months }, day)!;
+        assert.equal(unsettledFrom(months, today), settled(ago(2)).getUTCFullYear());
+        assert.ok(unsettledFrom(months, today) <= settled(today).getUTCFullYear());
+      }
+  });
+
+  it("caches only responses a year past their range that run to its end", async () => {
     const requests = serve([[/stationdata/, fixture("kartverket-obs-1990.xml")]]);
     await kartverket.levels("BGO", new Date("1990-01-01T00:00Z"), new Date("1990-01-01T03:00Z"));
     await kartverket.levels("BGO", new Date("1990-01-01T00:00Z"), new Date("1990-01-01T04:00Z"));
     const keep = requests.map(([, options]) => options.keep!(fixture("kartverket-obs-1990.xml")));
     assert.deepEqual(keep, [true, false]);
     const recent = fixture("kartverket-obs-recent.xml");
-    assert.equal(kartverket.final(recent, Date.parse("2026-11-05T01:50Z")), false);
+    assert.equal(kartverket.cacheable(recent, Date.parse("2026-11-05T01:50Z")), false);
     assert.equal(
-      kartverket.final(recent, Date.parse("2026-11-05T01:50Z"), Date.parse("2028-01-01T00:00Z")),
+      kartverket.cacheable(
+        recent,
+        Date.parse("2026-11-05T01:50Z"),
+        Date.parse("2028-01-01T00:00Z"),
+      ),
       true,
     );
-    assert.equal(kartverket.final(fixture("kartverket-error.xml"), 0), false);
+    assert.equal(kartverket.cacheable(fixture("kartverket-error.xml"), 0), false);
   });
 });
