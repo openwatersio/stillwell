@@ -29,7 +29,11 @@ export function harmonicSamples(samples: readonly Sample[]): HarmonicSample[] {
  * docs/fits.md has the comparison with IHO's and Foreman's.
  */
 export const NODE_CORRECTIONS = "schureman";
-const PREDICT = { offset: false, nodeCorrections: NODE_CORRECTIONS } as const;
+
+/** The nodal corrections the engine predicts under. */
+export type NodeCorrections = "iho" | "schureman";
+const predictOptions = (nodeCorrections: NodeCorrections) =>
+  ({ offset: false, nodeCorrections }) as const;
 
 const HOUR_MS = 3_600_000;
 const DAY_MS = 86_400_000;
@@ -57,14 +61,17 @@ function runningMean(xs: number[], width: number, lead: number): number[] {
  * hour (ms / 3600000); an hour counts only when the 71 hours around it all
  * have data. The filter also takes out the long-period constituents, so the
  * score can't see them. Constituents the engine doesn't know predict nothing.
+ * Predicted under `nodeCorrections`: the fit's, unless the constants were
+ * fitted under another.
  */
 export function tidalResiduals(
   constituents: HarmonicConstituent[],
   samples: readonly Sample[],
+  nodeCorrections: NodeCorrections = NODE_CORRECTIONS,
 ): Map<number, number> {
   const out = new Map<number, number>();
   if (!samples.length) return out;
-  const predictor = createTidePredictor(constituents, PREDICT);
+  const predictor = createTidePredictor(constituents, predictOptions(nodeCorrections));
   const first = Math.floor(samples.reduce((m, s) => Math.min(m, s.time), Infinity) / HOUR_MS);
   const sums: number[] = [];
   const counts: number[] = [];
@@ -304,8 +311,9 @@ export function gaugeMinRange(observed: readonly Sample[]): number {
 export function predictAt(
   constituents: HarmonicConstituent[],
   samples: readonly Sample[],
+  nodeCorrections: NodeCorrections = NODE_CORRECTIONS,
 ): Sample[] {
-  const predictor = createTidePredictor(constituents, PREDICT);
+  const predictor = createTidePredictor(constituents, predictOptions(nodeCorrections));
   const predicted = samples.map(({ time }) => ({
     time,
     level: predictor.getWaterLevelAtTime({ time: new Date(time) }).level,
@@ -327,8 +335,16 @@ export interface HeldOutScore {
    *  variance minus this set's; null where the year is too short to measure
    *  it. Absent for the fit. */
   se?: number | null;
-  /** Whether this set's analysis covered the held-out year. */
-  seen?: boolean;
+  /** Whether this set's analysis covered the held-out year; null where its span isn't known. */
+  seen?: boolean | null;
+}
+
+/** Constants to score beside the fit's, predicted under the corrections they were fitted with. */
+export interface OtherConstants {
+  constituents: HarmonicConstituent[];
+  seen: boolean | null;
+  /** The fit's own where not given. */
+  nodeCorrections?: NodeCorrections;
 }
 
 /**
@@ -338,7 +354,7 @@ export interface HeldOutScore {
 export function scoreHeldOut(
   observed: readonly Sample[],
   fitted: HarmonicConstituent[],
-  others: Record<string, { constituents: HarmonicConstituent[]; seen: boolean }>,
+  others: Record<string, OtherConstants>,
 ): {
   minRange: number;
   fit: HeldOutScore;
@@ -346,14 +362,17 @@ export function scoreHeldOut(
 } {
   const minRange = gaugeMinRange(observed);
   const observedTurns = pickTurns(observed, minRange);
-  const score = (constituents: HarmonicConstituent[]) => {
-    const residuals = tidalResiduals(constituents, observed);
+  const score = (constituents: HarmonicConstituent[], nodeCorrections?: NodeCorrections) => {
+    const residuals = tidalResiduals(constituents, observed, nodeCorrections);
     return {
       residuals,
       score: {
         ...rmsOf(residuals),
         bands: bandRms(residuals),
-        turns: compareTurns(observedTurns, pickTurns(predictAt(constituents, observed), minRange)),
+        turns: compareTurns(
+          observedTurns,
+          pickTurns(predictAt(constituents, observed, nodeCorrections), minRange),
+        ),
       } satisfies HeldOutScore,
     };
   };
@@ -362,8 +381,8 @@ export function scoreHeldOut(
     minRange,
     fit: ours.score,
     others: Object.fromEntries(
-      Object.entries(others).map(([label, { constituents, seen }]) => {
-        const theirs = score(constituents);
+      Object.entries(others).map(([label, { constituents, seen, nodeCorrections }]) => {
+        const theirs = score(constituents, nodeCorrections);
         const se = varianceDifferenceSE(ours.residuals, theirs.residuals);
         return [
           label,

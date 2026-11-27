@@ -66,6 +66,17 @@ const JOINS: Record<string, string> = {
   jma: "jma",
 };
 
+/**
+ * The store series a slackwater-database record carries the ID of: the series
+ * its source's own station ID names, such as CO-OPS's for a NOAA record and
+ * the GESLA file's for a TICON record. Undefined for a source whose IDs name
+ * no series in the store.
+ */
+export function seriesOf(record: { id: string; source: { id: string } }): string | undefined {
+  const source = JOINS[record.id.split("/")[0]!];
+  return source && `${source}/${urlSafe(record.source.id)}`;
+}
+
 /** The datums slackwater-database gives a station, besides its chart datum. */
 const FROM_TIDE = ["MSL", "LAT"];
 
@@ -172,7 +183,7 @@ export function withDatums(
           records.set(station.id, joined);
       }
     };
-    const own = JOINS[prefix] && byId.get(`${JOINS[prefix]}/${urlSafe(t.source.id)}`);
+    const own = byId.get(seriesOf(t) ?? "");
     if (own) join(own, zeroOf(own, t));
   }
   report.joined = records.size;
@@ -394,7 +405,8 @@ const ALL_TIME: Period = { start: "0000-01-01", end: "9999-12-30" };
 const compare = (a: number[], b: number[]) => a.map((x, i) => x - b[i]!).find((d) => d !== 0) ?? 0;
 
 /** A TICON record of a GESLA file whose values are another gauge's. */
-const dropped = (id: string | undefined) => !!id?.startsWith("ticon/") && isDropped(id.slice(6));
+export const dropped = (id: string | undefined) =>
+  !!id?.startsWith("ticon/") && isDropped(id.slice(6));
 const round = (m: number) => Math.round(m * 1e4) / 1e4 + 0; // + 0 turns -0 into 0
 
 /**
@@ -403,6 +415,14 @@ const round = (m: number) => Math.round(m * 1e4) / 1e4 + 0; // + 0 turns -0 into
  * file's, so they serve that file's series.
  */
 const REDUNDANT = ["duplicate", "superseded"];
+
+/**
+ * Whether a record's quality evaluation leaves it sound: the database accepts
+ * it, or rejects it only because it kept another record of the same gauge.
+ * One rejected for its constants, clock, datum or range isn't.
+ */
+export const sound = (quality: { accepted: boolean; reason?: string } | undefined): boolean =>
+  !quality || quality.accepted || REDUNDANT.includes(quality.reason ?? "");
 
 /**
  * Reference stations in the installed `@slackwater/database` that it accepts,
@@ -424,7 +444,7 @@ export async function tideStations(): Promise<TideStation[]> {
     const q = db.qualityMap.get(s.id);
     if (s.type !== "reference" || dropped(s.id)) return [];
     if (!q || q.accepted) return [s as TideStation];
-    if (!REDUNDANT.includes(q.reason ?? "")) return [];
+    if (!sound(q)) return [];
     return [{ ...(s as TideStation), redundant: accepted(q.redundant) ?? null }];
   });
 }

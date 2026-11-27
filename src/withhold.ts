@@ -270,7 +270,8 @@ export async function removePrefixes(store: string, prefixes: string[]): Promise
  * `drop` names, such as GESLA's records that hold another gauge's values, and
  * their rows in the years file and the analysis, and the backfilled years of
  * every station `drop` names, files or not, so a run after an earlier one
- * clears what that left; `cleared` lists those, or with `dryRun` would. Deletes only the directories that have files, and with `dryRun`
+ * clears what that left; `cleared` lists those, or with `dryRun` would. The
+ * rows of every station `drop` names go from the fit files too, files or not. Deletes only the directories that have files, and with `dryRun`
  * deletes nothing, returning what it would delete. The bounds keep them until
  * `compact --rebuild-bounds`.
  */
@@ -303,11 +304,12 @@ export async function dropFiles(
       path,
       recorded.filter((r) => !dropped.has(r.id)),
     );
+  // Before the files and whether or not any are left, so a drop stopped after deleting them still takes these on its next run.
+  await dropFits(store, source, (id) => dropped.has(id));
   if (!ids.length) return { ids, prefixes, cleared };
   await remove(store, prefixes);
   const gone = new Set(ids);
   await dropAnalysis(store, source, (id) => gone.has(id));
-  await dropFits(store, source, (id) => gone.has(id));
   await dropYears(store, source, (id) => gone.has(id));
   return { ids, prefixes, cleared };
 }

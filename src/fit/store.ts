@@ -2,7 +2,7 @@ import type { Erratum } from "../errata.ts";
 import type { Source, StoredStation } from "../schema.ts";
 import { FILES } from "../store/files.ts";
 import { exists, readRows, writeTable } from "../store/parquet.ts";
-import { constituentsPath, fitsPath } from "../store/paths.ts";
+import { constituentsPath, fitsPath, referencesPath } from "../store/paths.ts";
 import { pool } from "../store/recent.ts";
 import { readYears } from "../store/years.ts";
 import {
@@ -12,13 +12,16 @@ import {
   type FitContext,
   type FittedCandidate,
 } from "./fit.ts";
+import { referencesDue, type Link, type Reference, type ReferenceScore } from "./references.ts";
 import { Busy, emptyInputs, finalYear, inputsDigest, Unfit, type Inputs } from "./series.ts";
-import { fitInWorker, workerCount } from "./workers.ts";
+import { fitInWorker, scoreInWorker, workerCount } from "./workers.ts";
 
 /**
  * A source's fits in the store: `fits/<source>.parquet`, a row per station,
- * and `constituents/<source>.parquet`, a row per fitted station and candidate.
- * `fitSource` fits the stations that are due and keeps the rest's rows.
+ * `constituents/<source>.parquet`, a row per fitted station and candidate, and
+ * `fits/references/<source>.parquet`, a row per fit and slackwater-database
+ * record of its gauge. `fitSource` fits the stations that are due, scores
+ * again the ones whose records changed, and keeps the rest's rows.
  */
 
 /** A TIMESTAMPTZ as DuckDB returns it, in ISO form; null stays null. */
@@ -102,25 +105,79 @@ export async function readConstituents(store: string, source: string): Promise<F
   }));
 }
 
+const REFERENCE_NUMBERS = [
+  "constituents",
+  "unpredicted",
+  "held_out",
+  "held_out_hours",
+  "held_out_rms_m",
+  "variance_difference_se_m2",
+  "d1_rms_m",
+  "d2_rms_m",
+  "d4_rms_m",
+  "d6_rms_m",
+  "turns",
+  "turns_missed",
+  "turn_time_mean_min",
+  "turn_time_rms_min",
+  "turn_height_mean_m",
+  "turn_height_rms_m",
+] as const;
+
+/** A source's reference scores, in the file's order; none before its first run. */
+export async function readReferences(store: string, source: string): Promise<ReferenceScore[]> {
+  const path = referencesPath(store, source);
+  if (!(await exists(path))) return [];
+  return (await readRows(path)).map(
+    (r) =>
+      ({
+        id: String(r.id),
+        version: String(r.version),
+        fitted: iso(r.fitted)!,
+        reference: String(r.reference),
+        reference_source: String(r.reference_source),
+        reference_license: String(r.reference_license),
+        reference_commercial_use: Boolean(r.reference_commercial_use),
+        reference_attribution: String(r.reference_attribution),
+        release: String(r.release),
+        digest: String(r.digest),
+        link: String(r.link) as Link,
+        linked: text(r.linked),
+        node_corrections: String(r.node_corrections),
+        node_corrections_assumed: Boolean(r.node_corrections_assumed),
+        seen: r.seen === null || r.seen === undefined ? null : Boolean(r.seen),
+        scored: iso(r.scored)!,
+        ...Object.fromEntries(REFERENCE_NUMBERS.map((name) => [name, number(r[name])])),
+      }) as ReferenceScore,
+  );
+}
+
 /**
- * Both files. One can be written and the other not, when a run stops between
- * them, so each candidate row carries its fit's `version`: a reader joins on
- * it, and `due` fits a station again when its rows and its fit disagree.
+ * All three files. A run can stop between them, so each candidate row and
+ * each reference row carries its fit's `version`: a reader joins on it, `due`
+ * fits a station again when its candidate rows and its fit disagree, and
+ * `referencesDue` scores it again when its reference rows do. The fits go
+ * last, so no fit row names rows that aren't written yet.
  */
 export async function writeFits(
   store: string,
   source: string,
   fits: Fit[],
   constituents: FittedCandidate[],
+  references: ReferenceScore[] = [],
 ): Promise<void> {
   await writeTable(constituentsPath(store, source), constituents, FILES.constituents);
+  // A source that has never had a scored record has no file.
+  if (references.length || (await exists(referencesPath(store, source))))
+    await writeTable(referencesPath(store, source), references, FILES.references);
   await writeTable(fitsPath(store, source), fits, FILES.fits);
 }
 
 /**
- * Take stations' rows out of both files, as `withhold` and `drop` do for a
- * station whose values leave the store, since its constants are made from
- * them. Rewrites only a file that holds one, and returns the stations found.
+ * Take stations' rows out of all three files, as `withhold` and `drop` do for
+ * a station whose values leave the store, since its constants and its
+ * records' scores are made from them. Rewrites only where a file holds one,
+ * and returns the stations found.
  */
 export async function dropFits(
   store: string,
@@ -129,14 +186,18 @@ export async function dropFits(
 ): Promise<string[]> {
   const fits = await readFits(store, source);
   const constituents = await readConstituents(store, source);
-  const found = new Set([...fits.keys(), ...constituents.map((c) => c.id)].filter(gone));
+  const references = await readReferences(store, source);
+  const found = new Set(
+    [...fits.keys(), ...constituents.map((c) => c.id), ...references.map((r) => r.id)].filter(gone),
+  );
   if (!found.size) return [];
-  // Candidates first, so no constants outlast the fit row that names them.
+  // Candidates and scores first, so neither outlasts the fit row that names them.
   await writeFits(
     store,
     source,
     [...fits.values()].filter((f) => !gone(f.id)),
     constituents.filter((c) => !gone(c.id)),
+    references.filter((r) => !gone(r.id)),
   );
   return [...found].sort();
 }
@@ -172,7 +233,9 @@ export interface FitReport {
   fitted: string[];
   /** Stations this run tried that have no constants, with why. */
   none: { id: string; reason: string }[];
-  /** Stations whose fit threw, with the error. */
+  /** Stations fitted before whose records were scored again in this run, without fitting. */
+  rescored: string[];
+  /** Stations whose fit or scoring threw, with the error. */
   failed: string[];
   /** Stations whose year files are being written, left as they were for the next run. */
   waiting: string[];
@@ -185,8 +248,10 @@ const BATCH = 25;
 
 /**
  * Fit `source`'s stations that are due, or every one with `all`, and write
- * both files after each batch. A station that leaves the list loses its rows.
- * A fit that throws keeps the station's stored rows and is reported, as does
+ * the files after each batch. A station whose fit is current and whose
+ * records' scores aren't (`referencesDue`) has only those taken again. A
+ * station that leaves the list loses its rows. A fit or a scoring that throws
+ * keeps the station's stored rows and is reported, as does
  * a station whose year files are being written. While any station of a
  * source that finalizes is being written, its final year can't be told, and
  * the run stops before writing anything.
@@ -205,6 +270,13 @@ export async function fitSource(
     concurrency?: number;
     /** Fits one station: on a worker thread, unless a caller gives another way. */
     fit?: typeof fitStation;
+    /** Scores a fitted station's records again: on a worker thread, unless a caller gives another way. */
+    score?: typeof scoreInWorker;
+    /**
+     * slackwater-database's records of a station's gauge (`referenceIndex`), or null where they
+     * can't be told, which leaves a current fit's scores as they are. Not told where not given.
+     */
+    references?: (station: StoredStation) => Reference[] | null;
     log?: (line: string) => void;
   },
 ): Promise<FitReport> {
@@ -215,7 +287,14 @@ export async function fitSource(
   const engine = engineVersion();
   // A list that comes back empty would take every station's rows with it.
   if (!stations.length) throw new Error(`${metadata.id} lists no stations to fit`);
-  const report: FitReport = { fitted: [], none: [], failed: [], waiting: [], current: 0 };
+  const report: FitReport = {
+    fitted: [],
+    none: [],
+    rescored: [],
+    failed: [],
+    waiting: [],
+    current: 0,
+  };
   const listed = new Set(stations.map((s) => s.id));
   const fits = new Map([...(await readFits(store, metadata.id))].filter(([id]) => listed.has(id)));
   const constituents = new Map<string, FittedCandidate[]>();
@@ -224,8 +303,22 @@ export async function fitSource(
     if (!constituents.has(row.id)) constituents.set(row.id, []);
     constituents.get(row.id)!.push(row);
   }
+  const scores = new Map<string, ReferenceScore[]>();
+  for (const row of await readReferences(store, metadata.id)) {
+    if (!listed.has(row.id)) continue;
+    if (!scores.has(row.id)) scores.set(row.id, []);
+    scores.get(row.id)!.push(row);
+  }
+  const referencesOf = options.references ?? (() => null);
   const save = () =>
-    writeFits(store, metadata.id, [...fits.values()], [...constituents.values()].flat());
+    writeFits(
+      store,
+      metadata.id,
+      [...fits.values()],
+      [...constituents.values()].flat(),
+      // Scores with no fit to join, as a build that doesn't keep this file leaves them, go.
+      [...scores].flatMap(([id, rows]) => (fits.get(id)?.version ? rows : [])),
+    );
   const chosen = stations.filter((s) => !options.only || options.only.includes(s.id));
 
   const writing = new Set(
@@ -262,7 +355,17 @@ export async function fitSource(
     }
     return options.all || due(fits.get(s.id), digestOf(s), engine, constituents.get(s.id));
   });
-  report.current = chosen.length - todo.length - report.waiting.length;
+  // A station whose fit stands and whose records don't: a release changed one's constants, or a link did.
+  const fitting = new Set(todo.map((s) => s.id));
+  // Not while the source has no final year: nothing can be read as the fits read it.
+  const rescore = chosen.filter((s) => {
+    if (final === null || fitting.has(s.id) || writing.has(s.id) || !fits.has(s.id)) return false;
+    const references = referencesOf(s);
+    return (
+      references !== null && referencesDue(fits.get(s.id)!, scores.get(s.id) ?? [], references)
+    );
+  });
+  report.current = chosen.length - todo.length - rescore.length - report.waiting.length;
 
   if (final === null) {
     // A source that finalizes and has constants has had a final year, so losing it is a fault in
@@ -279,6 +382,7 @@ export async function fitSource(
         reason: unfit,
       });
       constituents.delete(station.id);
+      scores.delete(station.id);
       report.none.push({ id: station.id, reason: unfit });
     }
     await save();
@@ -290,10 +394,13 @@ export async function fitSource(
   for (let i = 0; i < todo.length; i += BATCH) {
     await pool(todo.slice(i, i + BATCH), workers, async (station) => {
       try {
-        const result = await fit(station, context);
+        // A station whose links can't be told is fitted without scores, which the next run that can tell them takes.
+        const result = await fit(station, { ...context, references: referencesOf(station) ?? [] });
         fits.set(station.id, result.fit);
         if (result.constituents.length) constituents.set(station.id, result.constituents);
         else constituents.delete(station.id);
+        if (result.references.length) scores.set(station.id, result.references);
+        else scores.delete(station.id);
         if (result.fit.reason === null) report.fitted.push(station.id);
         else report.none.push({ id: station.id, reason: result.fit.reason });
         options.log?.(
@@ -310,9 +417,42 @@ export async function fitSource(
     });
     await save();
   }
-  if (!todo.length) await save();
+  const score = options.score ?? scoreInWorker;
+  for (let i = 0; i < rescore.length; i += BATCH) {
+    await pool(rescore.slice(i, i + BATCH), workers, async (station) => {
+      const stored = fits.get(station.id)!;
+      const references = referencesOf(station) ?? [];
+      try {
+        // A fit without constants, or a gauge no record is left for, has no rows to take.
+        const rows =
+          stored.version === null || !references.length
+            ? []
+            : await score(station, stored, constantsOf(constituents.get(station.id) ?? []), {
+                ...context,
+                references,
+              });
+        if (rows.length) scores.set(station.id, rows);
+        else scores.delete(station.id);
+        report.rescored.push(station.id);
+        options.log?.(`  ${station.id}: scored ${rows.length} records again`);
+      } catch (error) {
+        if (error instanceof Busy) return void report.waiting.push(station.id);
+        report.failed.push(
+          `${station.id}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    });
+    await save();
+  }
+  if (!todo.length && !rescore.length) await save();
   return report;
 }
+
+/** A fit's constants from its candidate rows, in their order. */
+const constantsOf = (rows: readonly FittedCandidate[]) =>
+  rows
+    .filter((r) => r.kept && r.amplitude_m !== null && r.phase_deg !== null)
+    .map((r) => ({ name: r.name, amplitude: r.amplitude_m!, phase: r.phase_deg! }));
 
 const blank = (id: string, now: Date, engine: string, digest: string): Fit => ({
   id,

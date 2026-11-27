@@ -1,11 +1,15 @@
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { createTidePredictor, type HarmonicConstituent } from "@slackwater/engine";
 import type { StoredStation } from "../schema.ts";
 import type { Sample } from "../types.ts";
 import { CANDIDATES } from "./candidates.ts";
+import {
+  othersOf,
+  packageVersion,
+  referenceRows,
+  type Reference,
+  type ReferenceScore,
+} from "./references.ts";
 import {
   FIT_OPTIONS,
   fitSamples,
@@ -50,23 +54,7 @@ export const MAX_FIT_YEARS = 19;
 export { FIT_OPTIONS, MIN_FIT_DAYS, NODE_CORRECTIONS, SEASONAL_SIGNIFICANCE };
 
 /** The package that fitted and its version, as the fit's provenance. */
-export function engineVersion(): string {
-  let dir = dirname(fileURLToPath(import.meta.resolve("@slackwater/engine")));
-  for (;;) {
-    try {
-      const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8")) as {
-        name?: string;
-        version?: string;
-      };
-      if (pkg.name === "@slackwater/engine") return `${pkg.name}@${pkg.version}`;
-    } catch {
-      // No package.json at this level.
-    }
-    const up = dirname(dir);
-    if (up === dir) throw new Error("can't find @slackwater/engine's package.json");
-    dir = up;
-  }
-}
+export const engineVersion = () => packageVersion("@slackwater/engine");
 
 /** A row of `fits/<source>.parquet`. */
 export interface Fit {
@@ -148,6 +136,8 @@ export interface FitContext extends Omit<ReadContext, "inputs"> {
   /** The source's last whole year of final values (`finalYear`). */
   finalYear: number;
   engine: string;
+  /** slackwater-database's records of the gauge, scored on the held-out year beside the fit; none where not given. */
+  references?: Reference[];
 }
 
 const year = (y: number) => ({ start: Date.UTC(y, 0, 1), end: Date.UTC(y + 1, 0, 1) });
@@ -237,20 +227,22 @@ export function varianceExplained(
  * last year of final values, in which half the station's hours can be scored:
  * an hour counts when the 71 hours around it all have values, as the Godin
  * filter needs. The window is the 19 years before it, or as many as the
- * station has. Returns the fit's row and a row for every candidate; a station
- * that can't be fitted gets a row that says why and no candidates. Throws
- * `Busy` while the station's year files are being written.
+ * station has. Returns the fit's row, a row for every candidate and a row for
+ * every record in the context's `references`; a station that can't be fitted
+ * gets a row that says why and neither. Throws `Busy` while the station's
+ * year files are being written.
  */
 export async function fitStation(
   station: StoredStation,
   context: FitContext,
-): Promise<{ fit: Fit; constituents: FittedCandidate[] }> {
+): Promise<{ fit: Fit; constituents: FittedCandidate[]; references: ReferenceScore[] }> {
   const inputs = { ...emptyInputs(), digest: inputsDigest(station, context) };
   const read = (period: { start: number; end: number }) =>
     readSeries(station, period, "final", { ...context, inputs });
   const none = (reason: string) => ({
     fit: noFit(station.id, context, inputs, reason),
     constituents: [],
+    references: [],
   });
   try {
     const listed = [...context.years.values()]
@@ -319,7 +311,12 @@ export async function fitStation(
     });
 
     const span = year(heldOut);
-    const score = scoreHeldOut(heldSamples, constants, {}).fit;
+    const references = context.references ?? [];
+    const { fit: score, others } = scoreHeldOut(
+      heldSamples,
+      constants,
+      othersOf(references, heldOut),
+    );
     return {
       fit: {
         id: station.id,
@@ -354,9 +351,61 @@ export async function fitStation(
         inputs: JSON.stringify(inputs),
       },
       constituents: rows,
+      references: referenceRows(
+        { id: station.id, version, fitted: context.now.toISOString(), held_out: heldOut },
+        references,
+        others,
+        context.now,
+      ),
     };
   } catch (error) {
     if (error instanceof Unfit && !(error instanceof Busy)) return none(error.message);
     throw error;
   }
+}
+
+/** How far a score taken again may be from the fit's stored one: rounding, in another order of the same sums. */
+const SAME_SCORE = 1e-9;
+
+/**
+ * Score a station's records against the fit it already has, without fitting
+ * again: the held-out year is read as the fit read it and the fit's constants
+ * are scored beside the records', as `fitStation` does. Throws where the
+ * year no longer scores the fit as its row says, since the scores would then
+ * be of other values than the fit's. Throws `Busy` while the station's year
+ * files are being written.
+ */
+export async function scoreReferences(
+  station: StoredStation,
+  fit: Fit,
+  constants: HarmonicConstituent[],
+  context: FitContext,
+): Promise<ReferenceScore[]> {
+  const references = context.references ?? [];
+  if (fit.version === null || fit.held_out === null || !references.length) return [];
+  const samples = await readSeries(station, year(fit.held_out), "final", {
+    ...context,
+    inputs: emptyInputs(),
+  });
+  const { fit: score, others } = scoreHeldOut(
+    samples,
+    constants,
+    othersOf(references, fit.held_out),
+  );
+  const stored = fit.held_out_rms_m;
+  // A score that couldn't be computed is null in the row, and can't be computed now either.
+  const same =
+    stored === null
+      ? !Number.isFinite(score.rms)
+      : Math.abs(score.rms - stored) <= SAME_SCORE * Math.max(stored, 1e-3);
+  if (score.hours !== fit.held_out_hours || !same)
+    throw new Error(
+      `${station.id}: ${fit.held_out} scores the fit ${score.rms} m over ${score.hours} hours, and its row says ${stored} m over ${fit.held_out_hours}`,
+    );
+  return referenceRows(
+    { id: station.id, version: fit.version, fitted: fit.fitted, held_out: fit.held_out },
+    references,
+    others,
+    context.now,
+  );
 }
