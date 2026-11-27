@@ -52,6 +52,8 @@ export interface DatumsReport {
   stale: string[];
   /** Stations whose stored datums are current. */
   current: number;
+  /** Stations due that a run with `until` didn't start, left due for the next run. */
+  left: number;
 }
 
 /** How many stations are reduced between writes, so a run that stops loses at most these. */
@@ -64,7 +66,8 @@ const BATCH = 25;
  * `version` or `fitted` leaves the file, so no row describes a fit that isn't
  * the station's. A reduction that throws leaves the station without a row and
  * is reported. A station whose year files are being written, or whose epochs
- * changed after its fit, keeps any row it has for that fit.
+ * changed after its fit, keeps any row it has for that fit. With `until`, it
+ * starts no batch after that time and reports how many stations are left.
  */
 export async function datumsSource(
   store: string,
@@ -77,6 +80,10 @@ export async function datumsSource(
     /** Only these stations, by `id`; none of them when empty. */
     only?: string[];
     concurrency?: number;
+    /** When to stop starting batches, in milliseconds since the epoch. */
+    until?: number;
+    /** The clock `until` is read against. */
+    clock?: () => number;
     /** Reduces one station: on a worker thread, unless a caller gives another way. */
     reduce?: typeof reduceDatums;
     log?: (line: string) => void;
@@ -96,6 +103,7 @@ export async function datumsSource(
     waiting: [],
     stale: [],
     current: 0,
+    left: 0,
   };
   const listed = new Set(stations.map((s) => s.id));
   const fits = await readFits(store, metadata.id);
@@ -149,7 +157,14 @@ export async function datumsSource(
   const reduce = options.reduce ?? datumsInWorker;
   const workers = workerCount(options.concurrency ?? 1);
   const context = { store, metadata, years, errata: options.errata, now: options.now };
+  const until = options.until ?? Infinity;
+  const clock = options.clock ?? Date.now;
+  let saved = false;
   for (let i = 0; i < todo.length; i += BATCH) {
+    if (clock() > until) {
+      report.left = todo.length - i;
+      break;
+    }
     await pool(todo.slice(i, i + BATCH), workers, async ({ station, fit }) => {
       const constants = constantsOf(candidates.get(station.id) ?? [], fit.version!);
       try {
@@ -171,6 +186,8 @@ export async function datumsSource(
       }
     });
     await save();
+    saved = true;
   }
+  if (!saved && changed) await save();
   return report;
 }

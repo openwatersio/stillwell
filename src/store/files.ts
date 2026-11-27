@@ -702,7 +702,7 @@ export const FILES = {
     example: "fits/smhi.parquet",
     title: "Harmonic fits",
     description:
-      "One row per station the store has tried to fit harmonic constants for: the window the fit read, how it scored on a year it didn't read, and what it read, or why the station has no constants. The constants are in `constituents/<source>.parquet`. A fit is a measurement, and no row says whether a gauge has enough tide to predict.",
+      "One row per station the store has tried to fit harmonic constants for: the window the fit read, how it scored on a year it didn't read, and what it read, or why the station has no constants. The constants are in `constituents/<source>.parquet`. A fit is a measurement, and no row says whether a gauge has enough tide to predict. A fit's terms are its station's: join `stations.parquet` on `id` for its license, commercial use and attribution.",
     columns: [
       { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
       { name: "fitted", type: "TIMESTAMPTZ", description: "When the fit ran." },

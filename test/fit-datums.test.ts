@@ -413,6 +413,46 @@ describe("datumsSource", () => {
     assert.deepEqual([...(await readFitDatums(store, "test")).keys()], ["test/a"]);
   });
 
+  it("starts nothing past its deadline, leaves the due stations, and still drops stale rows", async () => {
+    const other = mkdtempSync(join(tmpdir(), "stillwell-datums-until-"));
+    try {
+      await writeYears(other, "test", [
+        { id: "test/a", epoch: 1, year: 2024, hours: 1, flags: [1, 0, 0, 0, 0], version: "x" },
+      ]);
+      await writeFits(
+        other,
+        "test",
+        [fitOf("a"), fitOf("b"), fitOf("c")],
+        ["a", "b", "c"].map((id) => candidate(`test/${id}`, "v1", "M2")),
+      );
+      // a is current; b and c are due; e has left the list.
+      await writeFitDatums(other, "test", [stored("test/a"), stored("test/e")]);
+      let called = false;
+      const report = await datumsSource(
+        other,
+        source,
+        ["a", "b", "c"].map((id) => station(id)),
+        {
+          now: NOW,
+          errata: [],
+          until: 1000,
+          clock: () => 1001,
+          reduce: async () => {
+            called = true;
+            throw new Error("not called");
+          },
+        },
+      );
+      assert.equal(called, false);
+      assert.equal(report.left, 2);
+      assert.equal(report.current, 1);
+      assert.deepEqual(report.reduced, []);
+      assert.deepEqual([...(await readFitDatums(other, "test")).keys()], ["test/a"]);
+    } finally {
+      rmSync(other, { recursive: true, force: true });
+    }
+  });
+
   it("refuses an empty list, which would take every row", async () => {
     await assert.rejects(
       datumsSource(store, source, [], { now: NOW, errata: [] }),

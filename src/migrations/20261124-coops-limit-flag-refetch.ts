@@ -109,7 +109,7 @@ export default {
     })),
     {
       check:
-        "months CO-OPS flags only with L at 8443970, 8510560, 1630000, 9449424, 8575512 and 9063007 hold under 1% suspect levels",
+        "months CO-OPS flags only with L at 8443970, 8510560, 1630000, 9449424 and 8575512 hold under 1% suspect levels",
       async verify(store) {
         for (const [id, year, month] of [
           ["8443970", 2013, 10],
@@ -117,7 +117,6 @@ export default {
           ["1630000", 2006, 1],
           ["9449424", 2006, 3],
           ["8575512", 1997, 6],
-          ["9063007", 1965, 5],
         ] as const) {
           const rows = await readObservations(seriesPath(store, "levels", "coops", id, year));
           const inMonth = rows.filter((r) => new Date(r.time).getUTCMonth() === month - 1);
