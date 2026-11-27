@@ -10,7 +10,7 @@ Which tidal constituents a fit offers a station, and how it decides which to kee
 
 **Independent searches disagree on the compounds.** The Anchorage and Thames studies each chose 114 lines, and 74 are shared (Parker 2007, §4.1). At Philadelphia, six of the lines added for Anchorage failed a stability check until they were renamed from K2+N2 products to M2+L2 products 0.009°/h away (Zetler and Cummings 1967, pp. 110–112).
 
-**There is no "every constituent".** The tidal potential is finite only for a chosen cutoff: Doodson's 1921 development keeps 386 terms above a ten-thousandth of the largest, and the 1995 catalog of Hartmann and Wenzel has 12,935, most far below gauge noise. Shallow-water compounds are not in the potential. Every integer combination of parent frequencies is a candidate, and several combinations land on one frequency. Pugh puts practice at 60 to 100 constituents for a year of data and "more than 300" for 19 years ([Pugh 1987](https://nora.nerc.ac.uk/id/eprint/119157/), §4.2.5).
+**The set of possible constituents has no end.** The tidal potential is finite only for a chosen cutoff: Doodson's 1921 development keeps 386 terms above a ten-thousandth of the largest, and the 1995 catalog of Hartmann and Wenzel has 12,935, most far below gauge noise. Shallow-water compounds are not in the potential. Every integer combination of parent frequencies is a candidate, and several combinations land on one frequency. Pugh puts practice at 60 to 100 constituents for a year of data and "more than 300" for 19 years ([Pugh 1987](https://nora.nerc.ac.uk/id/eprint/119157/), §4.2.5).
 
 **What limits a long list is not the amount of data.**
 
