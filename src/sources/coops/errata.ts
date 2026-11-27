@@ -199,7 +199,7 @@ export default {
       error:
         "CO-OPS's verified 6-minute water levels and hourly heights carry the limit flag (L, an expected maximum or minimum height exceeded) on ordinary values at some stations, from an acquisition check against limits that are stale there. In March 2010 it is set on 4,142 of Annapolis's (8575512) 7,440 verified values and 2,210 of the Battery's (8518750), nearly all inside the month's own 1 to 99% range, and on none of Baltimore's (8574680), San Francisco's (9414290) or Key West's (8724580). On hourly heights it is set on every value at some stations, which left the store holding whole records as `suspect`: American Falls (9063010) 1960 to 1976, Black Rock Canal (9063017) 1970 to 1975, Barcelona (9063032) 1960 to 1969, Essexville (9075034) 1962 to 1969, Detour on Lake Huron (9075098) 1971 to 1976 and Bridgeport (8467150) in 1972.",
       response:
-        "On a verified 6-minute value or an hourly height L alone doesn't make it `suspect`; flat (F) and rate-of-change (R) still do, and L still does on preliminary values and on high and low waters. Years written before this rule keep these L values as `suspect` until a backfill with `--refetch` reads them again.",
+        "L doesn't make a verified 6-minute value or an hourly height `suspect`; it still does on preliminary values and on high and low waters. The year files written before the rule were read again with `--refetch`.",
       evidence:
         "Found November 2026 by crowd-depth's store reader, which saw Tolchester Beach (8573364) lose 212 days of 2012 to `suspect` at levels of −0.09 to +0.57 m MLLW, and confirmed by counting L in the verified values of March 2010, 2015 and 2020 at seven stations from CO-OPS's API with `datum=MLLW`: Tolchester Beach (8573364), Baltimore (8574680), Annapolis (8575512), Chesapeake Bay Bridge Tunnel (8638610), the Battery (8518750), San Francisco (9414290) and Key West (8724580). Where L is set, at Tolchester, Annapolis, the Battery and the Bridge Tunnel, nearly every flagged value sits inside the month's own 1 to 99% range, and the count changes from year to year (Annapolis 4,142 in March 2010, none in March 2020). The hourly heights were found the same month by the store's preferred-record check, which saw these records entirely `suspect`, and confirmed with one month a station from CO-OPS's API with `datum=STND`: at American Falls (June 1970), Black Rock Canal (June 1972), Barcelona (June 1965), Essexville (June 1965), Detour (June 1972) and Bridgeport (March 1972) L is set on every one of the 680 to 744 hourly values, and on none at Buffalo (9063020) or Harbor Beach (9075014) in the same months, or at the Battery, Annapolis, San Francisco or Key West in March 1982. The flagged values match unflagged ones: Detour's June 1972 median of 176.95 m against 176.93 m at Harbor Beach on the same lake, and Bridgeport's March 1972 range of 0.33 to 3.46 m (median 1.62 m) against −0.27 to 3.40 m (1.60 m) in March 1971 and 0.42 to 3.02 m (1.64 m) in March 1973, neither of which carries L. Where L marks only part of a month, it marks ordinary values too: at Bridgeport in 1978 it is set on 738 of March's 744 hourly values, which run from −0.19 to 3.18 m like April's unflagged −0.27 to 3.25 m, and on 114 of July's, with a median of 1.66 m against 1.72 m for the rest. None of the 478 high and low waters at the Battery, Annapolis, San Francisco and Key West in March 1982 carry L; CO-OPS publishes none for Bridgeport in 1972 to compare.",
       // L marks most of these months and is on no other flag, so only a few values stay suspect.
@@ -215,6 +215,29 @@ export default {
             throw new Error(
               `${suspect} of ${id}'s ${rows.length} levels from ${since} are suspect`,
             );
+        }
+      },
+    },
+    {
+      id: "coops-preliminary-offset-2002-2004",
+      stations: ["coops/9411406", "coops/9439201"],
+      since: "2002-03-26",
+      until: "2004-10-10",
+      handling: "kept",
+      error:
+        "CO-OPS's preliminary 6-minute water levels sit about 1.4 to 1.5 m from its verified hourly heights at the same times, in late March 2002 at 9439201 and from 10 September to 9 October 2004 at 9411406.",
+      response:
+        "The values are kept as CO-OPS serves them, flagged `preliminary` where CO-OPS flags nothing else; don't use them as water levels.",
+      evidence:
+        "Found November 2026 by pairing every stored preliminary 6-minute value on the hour with CO-OPS's hourly height at the same minute, from CO-OPS's API with `datum=STND`, in the 280 station-years from 1997 to 2020 that hold preliminary values and have hourly heights: 9411406 in 2004 differs by a median 1.51 m, every one of 478 pairs by over 10 cm, and 9439201 in 2002 by a median 1.36 m on all 15 pairs.",
+      check: async (store) => {
+        for (const [id, since, until] of [
+          ["coops/9439201", "2002-03-27", "2002-03-31"],
+          ["coops/9411406", "2004-09-12", "2004-09-20"],
+        ] as const) {
+          const rows = await store.levels(id, since, until);
+          if (!rows.some((o) => o.flag === Flag.preliminary))
+            throw new Error(`the store holds no preliminary ${id} levels from ${since}`);
         }
       },
     },

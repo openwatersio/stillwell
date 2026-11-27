@@ -1776,13 +1776,19 @@ describe("coops", () => {
     assert.equal(coops.periodOf(["error 01/01/1983 ... 12/31/2001"]), null);
   });
 
-  it("marks a value suspect for its limit flag only while it's preliminary or a high or low water", () => {
+  it("marks a value suspect for a CO-OPS check only while it's preliminary, or for L on a high or low water", () => {
     // Verified 6-minute values keep L from an acquisition check whose limits are stale (erratum `coops-stale-limit-flag`).
     assert.equal(coops.flagOf({ f: "0,0,0,1", q: "v" }), Flag.good);
     assert.equal(coops.flagOf({ f: "0,0,0,1", q: "p" }), Flag.suspect);
-    assert.equal(coops.flagOf({ f: "0,1,0,1", q: "v" }), Flag.suspect);
-    assert.equal(coops.flagOf({ f: "0,0,1,0", q: "v" }), Flag.suspect);
-    assert.equal(coops.flagOf({ f: "5,0,0,0", q: "v" }), Flag.good);
+    // CO-OPS's verification reviews F and R too.
+    assert.equal(coops.flagOf({ f: "0,1,0,1", q: "v" }), Flag.good);
+    assert.equal(coops.flagOf({ f: "0,0,1,0", q: "v" }), Flag.good);
+    assert.equal(coops.flagOf({ f: "0,1,0,0", q: "p" }), Flag.suspect);
+    assert.equal(coops.flagOf({ f: "0,0,1,0", q: "p" }), Flag.suspect);
+    // On a verified value the first flag is inferred; on a preliminary one it counts outliers.
+    assert.equal(coops.flagOf({ f: "1,0,0,0", q: "v" }), Flag.interpolated);
+    assert.equal(coops.flagOf({ f: "1,1,1,0", q: "v" }), Flag.interpolated);
+    assert.equal(coops.flagOf({ f: "5,0,0,0", q: "p" }), Flag.preliminary);
     // Only an explicit `v` counts as verified.
     assert.equal(coops.flagOf({ f: "0,0,0,1" }), Flag.suspect);
     // High and low waters keep L as suspect; I is interpolated.
