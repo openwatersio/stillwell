@@ -12,6 +12,7 @@ import {
   type FitContext,
   type FittedCandidate,
 } from "./fit.ts";
+import { readFitDatums, writeFitDatums } from "./datums.ts";
 import { referencesDue, type Link, type Reference, type ReferenceScore } from "./references.ts";
 import { Busy, emptyInputs, finalYear, holds, inputsDigest, Unfit, type Inputs } from "./series.ts";
 import { fitInWorker, scoreInWorker, workerCount } from "./workers.ts";
@@ -174,10 +175,10 @@ export async function writeFits(
 }
 
 /**
- * Take stations' rows out of all three files, as `withhold` and `drop` do for
- * a station whose values leave the store, since its constants and its
- * records' scores are made from them. Rewrites only where a file holds one,
- * and returns the stations found.
+ * Take stations' rows out of the fit files and the datums file, as `withhold`
+ * and `drop` do for a station whose values leave the store, since its
+ * constants, its records' scores and its datums are made from them. Rewrites
+ * only where a file holds one, and returns the stations found.
  */
 export async function dropFits(
   store: string,
@@ -187,10 +188,23 @@ export async function dropFits(
   const fits = await readFits(store, source);
   const constituents = await readConstituents(store, source);
   const references = await readReferences(store, source);
+  const datums = await readFitDatums(store, source);
   const found = new Set(
-    [...fits.keys(), ...constituents.map((c) => c.id), ...references.map((r) => r.id)].filter(gone),
+    [
+      ...fits.keys(),
+      ...constituents.map((c) => c.id),
+      ...references.map((r) => r.id),
+      ...datums.keys(),
+    ].filter(gone),
   );
   if (!found.size) return [];
+  // Datums first, so none outlasts the fit it was reduced from.
+  if ([...datums.keys()].some(gone))
+    await writeFitDatums(
+      store,
+      source,
+      [...datums.values()].filter((d) => !gone(d.id)),
+    );
   // Candidates and scores first, so neither outlasts the fit row that names them.
   await writeFits(
     store,

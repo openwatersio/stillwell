@@ -74,9 +74,11 @@
  * `fit` fits harmonic constants to the source's stations whose fit is due, from their
  * final values in the store, into fits/<source>.parquet and constituents/<source>.parquet
  * (src/fit/store.ts), and scores slackwater-database's constants for each gauge on the fit's
- * held-out year, into fits/references/<source>.parquet (src/fit/reference-links.ts); `--all` fits
- * every station again, station IDs or `--shard` limit the run, and `--budget` starts stations
- * only for that many minutes, the largest tides first, leaving the rest due.
+ * held-out year, into fits/references/<source>.parquet (src/fit/reference-links.ts), then reduces
+ * the tidal datums of each fit whose datums are due, into fits/datums/<source>.parquet
+ * (src/fit/datums.ts); `--all` fits every station again, station IDs or `--shard` limit the run,
+ * and `--budget` starts stations, and then datums, only for that many minutes, the largest tides
+ * first, leaving the rest due.
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -148,6 +150,7 @@ import {
 } from "../src/store/parquet.ts";
 import { commitYears, markYears, readYears, reconcileYears } from "../src/store/years.ts";
 import { loadReferences } from "../src/fit/reference-links.ts";
+import { datumsSource } from "../src/fit/datums-store.ts";
 import { fitSource, readFits } from "../src/fit/store.ts";
 import { requalifyInWorker, WorkerDied } from "../src/store/requalify.ts";
 import {
@@ -1298,16 +1301,17 @@ async function fitStations(sourceId: string, ids?: string): Promise<void> {
       : undefined;
   const unknown = (ids ? only! : []).filter((id) => !list.some((s) => s.id === id));
   if (unknown.length) throw new Error(`${sourceId} lists no ${unknown.join(", ")}`);
+  // A millisecond short, so a budget of 0 is already past when the run looks. The datums step
+  // shares it, so a budget bounds the whole run.
+  const until =
+    values.budget !== undefined ? { until: Date.now() + Number(values.budget) * 60_000 - 1 } : {};
   const report = await fitSource(store, source, list, {
     now: new Date(),
     errata,
     all: values.all,
     ...(only ? { only } : {}),
     references: await loadReferences(store, sourceId, shown, values["accept-matches"]),
-    // A millisecond short, so a budget of 0 is already past when the run looks.
-    ...(values.budget !== undefined
-      ? { until: Date.now() + Number(values.budget) * 60_000 - 1 }
-      : {}),
+    ...until,
     // Each station on a thread of its own, as many at once as the machine has cores for.
     concurrency: positive("concurrency"),
     log: (line) => console.log(line),
@@ -1316,10 +1320,29 @@ async function fitStations(sourceId: string, ids?: string): Promise<void> {
     `fit ${sourceId}: ${report.fitted.length} fitted, ${report.none.length} without constants, ${report.rescored.length} scored again, ${report.current} current, ${report.waiting.length} being written, ${report.left} left for the next run, ${report.failed.length} failed`,
     ...report.failed.map((f) => `  failed ${f}`),
   ];
-  for (const line of lines) console.log(line);
-  const file = process.env.GITHUB_STEP_SUMMARY;
-  if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
+  const summary = async (out: string[]) => {
+    for (const line of out) console.log(line);
+    const file = process.env.GITHUB_STEP_SUMMARY;
+    if (file) await appendFile(file, ["```", ...out, "```", ""].join("\n"));
+  };
+  // The fit's report first, so a datums step that throws doesn't hide it.
+  await summary(lines);
   if (report.failed.length) process.exitCode = 1;
+  // From the fits just written, so a station fitted in this run has its datums reduced in it too.
+  const datums = await datumsSource(store, source, list, {
+    now: new Date(),
+    errata,
+    all: values.all,
+    ...(only ? { only } : {}),
+    ...until,
+    concurrency: positive("concurrency"),
+    log: (line) => console.log(line),
+  });
+  await summary([
+    `datums ${sourceId}: ${datums.reduced.length} reduced, ${datums.none.length} of them without observed datums, ${datums.current} current, ${datums.waiting.length} being written, ${datums.stale.length} waiting for a fit, ${datums.left} left for the next run, ${datums.failed.length} failed`,
+    ...datums.failed.map((f) => `  failed ${f}`),
+  ]);
+  if (datums.failed.length) process.exitCode = 1;
 }
 
 async function analyzeSource(sourceId: string): Promise<void> {
