@@ -30,7 +30,7 @@ export const CLOCK = { speed: 10, amplitude: 0.005 };
 export const SA_YEARS = [1991, 2020] as const;
 /**
  * How the series is filtered in time: gaps of up to `gap_hours` are filled in
- * a straight line, a run of values shorter than `run_days` is left out, and
+ * a straight line, a run of values of `run_days` or under is left out, and
  * `trim_days` are dropped from each end of a run.
  */
 export const IN_TIME = { gap_hours: 1, run_days: 4, trim_days: 1 };
@@ -278,10 +278,10 @@ export function render(report: Report): string {
 
   p("## What is compared");
   p(
-    `Kartverket's constants are from its tide API's \`constituents\` request, which gives amplitudes in centimeters, to a hundredth, and phases to a hundredth of a degree against UTC+1, with the period of observations analyzed ([Kartverket](../../src/sources/kartverket/README.md)). The API doesn't describe the analysis. The fit compared here is the one that reproduces it from the store's values: one least-squares fit over Kartverket's period, without robust weights, of Kartverket's own constituents, with Foreman's nodal corrections at the gauge's latitude evaluated at each sample. It reads the store's final values on the hour, which for Kartverket are every value a year old or more, since Kartverket marks none as checked. With robust weights, as the store's own fits have, the same fit is a median ${mm(median(results.map((r) => r.robust.vector)), 3)} mm from Kartverket's constants over a gauge's short-period constituents, against ${mm(median(results.map((r) => r.vector)), 3)} mm without them.`,
+    `Kartverket's constants are from its tide API's \`constituents\` request, which gives amplitudes in centimeters, to a hundredth, and phases to a hundredth of a degree against UTC+1, with the period of observations analyzed ([Kartverket](../../src/sources/kartverket/README.md)). The API doesn't describe the analysis. The fit compared here is the one that reproduces it from the store's values: one least-squares fit over Kartverket's period, without robust weights, of Kartverket's own constituents, with Foreman's nodal corrections at the gauge's latitude evaluated at each sample. It reads the store's final values on the hour, which for Kartverket are every value a year old or more that isn't flagged suspect or bad, since Kartverket marks none as checked. With robust weights, as the store's own fits have, the same fit is a median ${mm(median(results.map((r) => r.robust.vector)), 3)} mm from Kartverket's constants over a gauge's short-period constituents, against ${mm(median(results.map((r) => r.vector)), 3)} mm without them.`,
   );
   p(
-    `Two corrections bring Kartverket's constants and the fit's to the same terms. Kartverket has answered on the clock, as far as it can see. The filter isn't documented and is taken from the comparison itself, so on it the comparison shows consistency and is no independent check; it is a question for Kartverket, not yet sent ([questions](../../src/sources/kartverket/errata.ts)):`,
+    `Two corrections bring Kartverket's constants and the fit's to the same terms. Kartverket has answered on the clock, as far as it can see. The filter isn't documented and is taken from the comparison itself, so on it the comparison shows consistency and is no independent check; it is a question for Kartverket ([questions](../../src/sources/kartverket/errata.ts)):`,
   );
   p(
     `- **The filter.** Kartverket's constants are smaller than the fit's above four cycles a day, as the gain of a low-pass filter would make them, which they would be if its analysis read a series filtered beyond the 10-minute values its API serves. The fit's amplitudes and their intervals are scaled by the gain of a zero-phase Butterworth filter of order ${report.filter.order} with a cutoff of ${report.filter.cutoff_hours} hours, which [The filter](#the-filter) estimates from the constants at ${FILTERED_FROM}° an hour and faster. Below that speed the gain is within ${percent(1 - zeroPhaseGain(FILTERED_FROM, report.filter.order, report.filter.cutoff_hours), 2)}% of one, and at four cycles a day it is within ${percent(1 - zeroPhaseGain(60, report.filter.order, report.filter.cutoff_hours), 2)}%, so the diurnal, semidiurnal and third-diurnal constants are compared very nearly as fitted.`,
@@ -530,7 +530,7 @@ export function render(report: Report): string {
       };
       const least = Math.min(...r.probe!.map((x) => x.vector));
       p(
-        `${r.name} has ${base} outside and a mean vector difference of ${mm(r.vector, 3)} mm, so it was fitted again with each year of the period left out in turn, and with each two years running. One year out leaves ${say(1)}; two leave ${say(2)}.${least < r.vector / 2 ? "" : " No year or pair of years accounts for the difference."} The largest of its constants outside is ${largest.row.name}, of ${mm(largest.row.kartverket.amplitude, 1)} mm, which the fit of ${r.name}'s own record is ${mm(largest.ours.d.vector, 2)} mm from. Kartverket's protocol says some constants come from a nearby station without saying which${r.id === "kartverket/HFT" ? ", and whether any of these do is a question for Kartverket, not yet sent ([questions](../../src/sources/kartverket/errata.ts))" : ""}. This report doesn't find why ${r.name}'s constants differ.`,
+        `${r.name} has ${base} outside and a mean vector difference of ${mm(r.vector, 3)} mm, so it was fitted again with each year of the period left out in turn, and with each two years running. One year out leaves ${say(1)}; two leave ${say(2)}.${least < r.vector / 2 ? "" : " No year or pair of years accounts for the difference."} The largest of its constants outside is ${largest.row.name}, of ${mm(largest.row.kartverket.amplitude, 1)} mm, which the fit of ${r.name}'s own record is ${mm(largest.ours.d.vector, 2)} mm from. Kartverket's protocol says some constants come from a nearby station without saying which${r.id === "kartverket/HFT" ? ", and whether any of these do is a question for Kartverket ([questions](../../src/sources/kartverket/errata.ts))" : ""}. This report doesn't find why ${r.name}'s constants differ.`,
       );
     }
   }

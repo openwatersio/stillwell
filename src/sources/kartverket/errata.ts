@@ -8,13 +8,24 @@ export default {
       id: "kartverket-constants-clock",
       stations: "every station",
       question:
-        "The tide API's `constituents` answer gives phases against UTC+1 (`utcoffset=\"+01:00\"`). Fitted from the API's own observations for the same period, the phases at 24 gauges ask for about 68 seconds more than one hour. Does the harmonic analysis take its astronomical arguments in UTC or in terrestrial time, and which program and version was it run with?",
-      why: "The store's comparison of its fits with the published constants moves each phase by one hour and by terrestrial time minus UTC, about 67 s. A stated convention makes that a known correction.",
+        "Does the tidal analysis behind the tide API's constants and predictions run in UTC or in terrestrial time, and where in its interval is a filtered 10-minute value stamped?",
+      why: "The tide API's `constituents` answer gives phases against UTC+1 (`utcoffset=\"+01:00\"`). The store's comparison of its fits with those constants moves each phase by one hour and by terrestrial time minus UTC, about 67 s. A stated convention makes that a known correction.",
       meanwhile:
         "Phases are moved by one hour and by terrestrial time minus UTC over the period, and the calibration reports the seconds each gauge's fitted phases ask for, with their intervals.",
       asked: "2026-11-15",
       answer:
-        "Asked with the question on its predictions' clock (https://github.com/openwatersio/slackwater-database/pull/417). Kartverket answered on 2026-11-27 that, as far as it can see, the times are moved from UTC to terrestrial time before the tidal analysis and aren't moved back before predictions are computed, so both are in terrestrial time. It also said the filtered 10-minute values are stamped at the middle of their interval. It didn't name the program or its version.",
+        "Sent for slackwater-database's comparison with Kartverket's predictions, which records the reply (https://github.com/openwatersio/slackwater-database/pull/417). Kartverket answered on 2026-11-27 that, as far as it can see, the times are moved from UTC to terrestrial time before the tidal analysis and aren't moved back before predictions are computed, so both are in terrestrial time, and that the filtered 10-minute values are stamped at the middle of their interval.",
+    },
+    {
+      id: "kartverket-constants-program",
+      stations: "every station",
+      question:
+        "Which program, and which version of it, computed the harmonic constants the tide API's `constituents` request gives?",
+      why: "Kartverket has said its analysis runs in terrestrial time as far as it can see. The program and its version would say which nodal corrections and which definition of each constituent the constants were fitted under, which the store's comparison takes to be Foreman's.",
+      meanwhile:
+        "The calibration fits under Foreman's corrections at each gauge's latitude and reports how closely that reproduces Kartverket's constants.",
+      asked: null,
+      answer: null,
     },
     {
       id: "kartverket-constants-filter",
