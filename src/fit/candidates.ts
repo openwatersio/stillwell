@@ -124,8 +124,8 @@ export const CANDIDATES: Candidate[] = [
  *   listed (tau1, eps2, pi1, psi1, phi1 and eta2) and aren't listed again.
  *   RP1 and KJ2 are half a cycle from psi1 and eta2 in phase.
  * - NOAA's SIGMA1 is compared with `sigma1`, though fitted NOAA's way sigma1
- *   is 7.8 mm from NOAA's 47 mm constant there: NOAA's constants predict
- *   better with it read as sigma1 than without it.
+ *   is 7.8 mm from NOAA's 47 mm constant there, which the calibration
+ *   reports as open.
  * - NOAA's 4MSL12 has the speed of `6MSN12` and is half a cycle from it, with
  *   other node factors. The line is here as 6MSN12, which is what the
  *   engine's catalog defines, and not as a spelling of NOAA's name.

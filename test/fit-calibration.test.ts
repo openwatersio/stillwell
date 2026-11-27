@@ -59,6 +59,8 @@ describe("candidateOf", () => {
       const entry = constituents[c.name];
       assert.equal(entry?.name, c.name);
       assert.ok(Math.abs(entry!.speed - c.speed) < 1e-6, c.name);
+      // Speed alone doesn't tell two lines half a cycle apart, as 4MSL12 and 6MSN12 are.
+      if (entry!.coefficients) assert.deepEqual(c.doodson, entry!.coefficients, c.name);
     }
     assert.equal(new Set(SHALLOW.map(line)).size, SHALLOW.length);
   });

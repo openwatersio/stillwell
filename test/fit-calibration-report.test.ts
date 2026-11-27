@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { calibrationDigest } from "../src/fit/calibration.ts";
-import { render, type Report } from "../src/fit/calibration-report.ts";
+import { LARGE_MISS, render, type Report } from "../src/fit/calibration-report.ts";
 import { NODE_CORRECTIONS } from "../src/fit/scores.ts";
 import { METHOD } from "../src/fit/series.ts";
 
@@ -83,6 +83,45 @@ describe("render", () => {
     const report = read();
     report.results[0]!.scores.noaa.rms = null;
     assert.throws(() => render(report), /no score/);
+    // A refit under NOAA's names with no score would otherwise count as an improvement.
+    const renamed = read();
+    renamed.results.find((r) => r.renamed)!.renamed!.score.rms = null;
+    assert.throws(() => render(renamed), /no score/);
+  });
+
+  it("names a constant NOAA's method misses by more than LARGE_MISS as open", () => {
+    const report = read();
+    const defects = () => section(render(report), "### Defects");
+    for (const result of report.results)
+      for (const row of result.rows)
+        if (row.steps.yearly) row.steps.yearly.vector = Math.min(row.steps.yearly.vector, 0.0001);
+    assert.match(defects(), /gives NOAA's constants, as above\. Each step/);
+    const row = report.results[0]!.rows.find((x) => x.name === "M2")!;
+    row.steps.yearly!.vector = LARGE_MISS + 0.001;
+    assert.match(
+      defects(),
+      new RegExp(`as above, except for M2 at ${report.results[0]!.name}, which is open`),
+    );
+  });
+
+  it("gives the largest difference in held-out RMS as a bound", () => {
+    const report = read();
+    for (const result of report.results) result.scores.steps.yearly.rms = result.scores.noaa.rms;
+    report.results[0]!.scores.steps.yearly.rms = report.results[0]!.scores.noaa.rms! + 0.000143;
+    assert.match(render(report), /score within 0\.2 mm RMS of NOAA's own/);
+  });
+
+  it("says a step accounts for a constituent's differences only where it is the largest for most", () => {
+    const report = read();
+    assert.match(render(report), /is the largest step for \d+ of L2's \d+ outside\. L2 shares/);
+    // The step to one fit of all years moves no L2.
+    for (const result of report.results)
+      for (const row of result.rows)
+        if (row.name === "L2" && row.steps.joint && row.steps.exact)
+          row.steps.joint = { ...row.steps.exact };
+    const markdown = render(report);
+    assert.match(markdown, /half or fewer, so it doesn't account for L2's/);
+    assert.doesNotMatch(markdown, /L2 shares its frequency/);
   });
 
   it("refuses a report in which every station's NOAA years include the held-out year", () => {

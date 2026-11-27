@@ -17,6 +17,10 @@ export const ROUNDING = { amplitude: 0.0005, phase: 0.05 };
 export const LONG_PERIOD = 2.5;
 /** A year of NOAA's is fitted by itself where it has this share of its hours, as the yearly scatter asks. */
 export const YEAR_SHARE = 2 / 3;
+/** The held-out year whose scores the shallow-water compounds were proposed on, so that year can't also test them. */
+export const PROPOSED_ON = 2025;
+/** A constant NOAA's method misses by more than this, in meters, is named as open by itself, however few its station has. */
+export const LARGE_MISS = 0.005;
 
 export interface Constant {
   name: string;
@@ -197,6 +201,7 @@ export function render(report: Report): string {
       r.scores.window,
       r.scores.noaa,
       ...Object.values(r.scores.steps),
+      ...(r.renamed ? [r.renamed.score] : []),
     ])
       if (score.rms === null || score.variance === null)
         throw new Error(`${r.id} has a set of constants with no score on ${r.held_out}`);
@@ -243,7 +248,7 @@ export function render(report: Report): string {
   );
   p("Three fits of the store's hourly final values are compared with them:");
   p(
-    "- **NOAA's years.** The store's method, [`fitSamples`](../../src/fit/window.ts), over the years NOAA analyzed. The data are the same, so the differences are the method's: one fit over all the years with node factors at each sample, robust weights, and a larger set of constituents.",
+    "- **NOAA's years.** The store's method, [`fitSamples`](../../src/fit/window.ts), over the years NOAA analyzed. The years are the same, so the differences are the method's: one fit over all the years with node factors at each sample, robust weights, and the candidate list in place of NOAA's constituents.",
     "- **Standard.** The fit the store publishes, `fitStation`: the 19 years before the held-out year. Its differences also hold whatever the tide has changed by between the two periods.",
     "- **NOAA's method.** Each of NOAA's years fitted by itself, without robust weights, with NOAA's constituents and the node factors at mid-year, and the years vector averaged. It is a diagnostic: where it agrees with NOAA and the store's method doesn't, the method is the cause and not the data.",
   );
@@ -519,7 +524,7 @@ export function render(report: Report): string {
 
   p("## The shallow-water compounds");
   p(
-    "No fit starts from the shallow-water compounds NOAA publishes for Anchorage beyond its 37 ([`SHALLOW`](../../src/fit/candidates.ts)). Here each gauge is fitted again with them after the candidate list, over the standard window and over NOAA's years, so the report shows what they would change. The held-out year is the evidence they were proposed on, so it can't also test them. The year before the window was read by neither fit and has judged no choice of candidates. A figure in brackets is from constants fitted from years that include the held-out one.",
+    `No fit starts from the shallow-water compounds NOAA publishes for Anchorage beyond its 37 ([\`SHALLOW\`](../../src/fit/candidates.ts)). Here each gauge is fitted again with them after the candidate list, over the standard window and over NOAA's years, so the report shows what they would change. ${results.every((r) => r.held_out === PROPOSED_ON) ? "The held-out year is the evidence they were proposed on, so it can't also test them." : `They were proposed on what ${PROPOSED_ON} showed.`} The year before the window was read by neither fit and has judged no choice of candidates. A figure in brackets is from constants fitted from years that include the held-out one.`,
   );
   const side = (x: Score | null) => (x ? mm(x.rms) : "");
   p(
@@ -669,7 +674,7 @@ function tierFinding(results: Result[]): string {
     const most = [...changes].sort((a, b) => a.change - b.change)[0]!;
     return `the RMS is lower at ${lower.length} and higher at ${higher.length} of ${changes.length} stations${higher.length ? ` (${higher.map((x) => `${x.r.name} ${signed(x.change * 1000)} mm`).join(", ")})` : ""}${lower.length ? `, and falls most at ${most.r.name}, by ${mm(-most.change)} mm` : ""}`;
   };
-  return `With the compounds, over the standard window and on the held-out year, ${say("held")}. On the year before the window ${say("before")}. Over NOAA's years, which are five or six, on the held-out year ${say("window")}. A change under 0.1 mm counts as neither.`;
+  return `With the compounds, over the standard window and on the held-out year, ${say("held")}. On the year before the window ${say("before")}. Over NOAA's years, ${[...new Set(results.map((r) => r.years.length))].sort((a, b) => a - b).join(" or ")} at a station, on the held-out year ${say("window")}. A change under 0.1 mm counts as neither.`;
 }
 
 type Stats = { compared: number; outside: number; major: number; majorOutside: number };
@@ -716,9 +721,12 @@ function findings(report: Report, w: Stats, s: Stats): string {
   };
   const versus = (a: (r: Result) => Score, b: (r: Result) => Score) =>
     unseen.filter((r) => a(r).rms! < b(r).rms!).length;
-  const reproduces = max(
-    results.map((r) => Math.abs(r.scores.steps.yearly.rms! - r.scores.noaa.rms!)),
-  );
+  // A bound, so it is rounded up.
+  const reproduces =
+    Math.ceil(
+      max(results.map((r) => Math.abs(r.scores.steps.yearly.rms! - r.scores.noaa.rms!))) * 10_000 -
+        1e-6,
+    ) / 10;
 
   // Robust weights.
   const raised = (name: string) => {
@@ -743,17 +751,22 @@ function findings(report: Report, w: Stats, s: Stats): string {
 
   // Constituents most often outside in the fit of NOAA's years.
   const outside = new Map<string, number>();
-  for (const x of pairs(results, "window", false))
+  const published = pairs(results, "window", false).filter((x) => x.row.noaa.amplitude > 0);
+  const zeros = pairs(results, "window", false).length - published.length;
+  for (const x of published)
     if ((x.s.d.ratio ?? 0) > 1) outside.set(x.row.name, (outside.get(x.row.name) ?? 0) + 1);
   const often = [...outside].sort((a, b) => b[1] - a[1]).slice(0, 7);
   const count = (name: string) => outside.get(name) ?? 0;
   const stations = (name: string) =>
-    results.filter((r) => r.rows.some((x) => x.name === name && fittedSide(x.window))).length;
+    results.filter((r) =>
+      r.rows.some((x) => x.name === name && x.noaa.amplitude > 0 && fittedSide(x.window)),
+    ).length;
 
+  const { K1: k1, K2: k2, exact } = report.leak;
   /** Of the constants of `name` outside the interval, how many have step `i` as the largest of the four. */
-  const largest = (name: string, i: number) => {
+  const largestOf = (name: string, i: number) => {
     const sizes = results.flatMap((r) => {
-      const row = r.rows.find((x) => x.name === name);
+      const row = r.rows.find((x) => x.name === name && x.noaa.amplitude > 0);
       const side = row && fittedSide(row.window);
       const t = row?.steps;
       return side && (side.d.ratio ?? 0) > 1 && t?.yearly && t.exact && t.joint && t.robust
@@ -767,15 +780,35 @@ function findings(report: Report, w: Stats, s: Stats): string {
           ]
         : [];
     });
-    return `${sizes.filter((x) => x[i] === Math.max(...x)).length} of ${name}'s ${sizes.length} outside`;
+    const count = sizes.filter((x) => x[i] === Math.max(...x)).length;
+    return {
+      name,
+      most: count * 2 > sizes.length,
+      text: `${count} of ${name}'s ${sizes.length} outside`,
+    };
   };
+  const largest = (name: string, i: number) => largestOf(name, i).text;
+  const list = (xs: string[]) =>
+    xs.length > 1 ? `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}` : (xs[0] ?? "");
+  /** Whether step `i` is the largest for most of each name's constants outside, as a sentence. */
+  const accounts = (names: string[], i: number) => {
+    const all = names.map((name) => largestOf(name, i));
+    const [most, rest] = [all.filter((x) => x.most), all.filter((x) => !x.most)];
+    const of = (xs: typeof all) => list(xs.map((x) => `${x.name}'s`));
+    return `It is the largest step for ${list(all.map((x) => x.text))}${
+      most.length
+        ? `: most of ${of(most)}${rest.length ? `, and half or fewer of ${of(rest)}, which it doesn't account for` : ""}`
+        : ", half or fewer of each, so it doesn't account for them"
+    }.`;
+  };
+  const leaks = Math.min(k1.S1![0], k1.P1![0], k2.R2![0]) > exact;
+  const l2 = largestOf("L2", 1);
   const moved = (name: string) =>
     results.flatMap((r) => {
       const row = r.rows.find((x) => x.name === name);
       const [x, y] = [row && fittedSide(row.window), row && fittedSide(row.standard)];
       return x && y ? [apart(y, x)] : [];
     });
-  const { K1: k1, K2: k2, exact } = report.leak;
   const perMeter = ([low, high]: [number, number]) => `${mm(low, 1)} to ${mm(high, 1)} mm`;
 
   const better = versus(
@@ -800,6 +833,12 @@ function findings(report: Report, w: Stats, s: Stats): string {
   // Stations where the candidate list predicts worse than NOAA's own constituents under the same method.
   const short37 = unseen.filter((r) => r.scores.window.rms! - r.scores.steps.robust.rms! >= 0.001);
   const unexplained = worst.filter(([, c]) => c >= 5).map(([name]) => name);
+  // A large miss is open wherever it is, so a station with few of them doesn't pass as explained.
+  const large = over.filter((x) => x.step.vector > LARGE_MISS && !unexplained.includes(x.r.name));
+  const open = [
+    ...unexplained.map((name) => `at ${name}`),
+    ...large.map((x) => `for ${x.row.name} at ${x.r.name}`),
+  ];
 
   const agrees = within(0.001) >= 0.95 * short.length;
   const renames = [...new Map(results.flatMap((r) => Object.entries(r.renamed?.held ?? {})))];
@@ -820,7 +859,7 @@ function findings(report: Report, w: Stats, s: Stats): string {
   const p = (...x: string[]) => lines.push(...x.filter(Boolean), "");
   p("### What agrees");
   p(
-    `- **NOAA's method on the store's values${agrees ? " gives NOAA's constants" : ""}.** Fitted NOAA's way, ${within(0.0005)} of ${short.length} short-period constants are within 0.5 mm of NOAA's as vectors, which is half of NOAA's last digit, and ${within(0.001)} are within 1 mm. The major constituents of 1 cm or more differ by a median of ${percent(median(relative), 2)}% in amplitude and ${median(phase)!.toFixed(2)}° in phase, and at most by ${percent(max(relative), 2)}% and ${max(phase).toFixed(2)}°. Those constants score within ${mm(reproduces)} mm RMS of NOAA's own on the held-out year at each of the ${results.length} stations. The comparison reads the store's hourly values with Schureman's corrections as the engine has them and Greenwich phase lags in UTC, so an error in any of the three would show here as a difference from NOAA.`,
+    `- **NOAA's method on the store's values${agrees ? " gives NOAA's constants" : ""}.** Fitted NOAA's way, ${within(0.0005)} of ${short.length} short-period constants are within 0.5 mm of NOAA's as vectors, which is half of NOAA's last digit, and ${within(0.001)} are within 1 mm. The major constituents of 1 cm or more differ by a median of ${percent(median(relative), 2)}% in amplitude and ${median(phase)!.toFixed(2)}° in phase, and at most by ${percent(max(relative), 2)}% and ${max(phase).toFixed(2)}°. Those constants score within ${reproduces.toFixed(1)} mm RMS of NOAA's own on the held-out year at each of the ${results.length} stations. The comparison reads the store's hourly values with Schureman's corrections as the engine has them and Greenwich phase lags in UTC, so an error in any of the three would show here as a difference from NOAA.`,
     `- **The store's method over NOAA's years, on the major constituents.** Their amplitudes differ by a median of ${percent(median(pairsOf(results, "window", MAJOR).relative), 2)}% and their phases by ${median(pairsOf(results, "window", MAJOR).phase)!.toFixed(2)}°. ${w.majorOutside} of ${w.major} are outside the fit's interval, and the next section says which steps of the method move them.`,
     `- **The standard fit predicts the held-out year better than NOAA's constants at ${better} of ${unseen.length} stations** whose NOAA analysis didn't read that year${behind.length ? `; the rest: ${behind.map((r) => r.name).join(", ")}` : ""}. It explains ${percent(Math.min(...variances), 1)}% to ${percent(max(variances), 1)}% of the tidal band's variance, the least at ${lowest.name}.`,
   );
@@ -829,10 +868,10 @@ function findings(report: Report, w: Stats, s: Stats): string {
   );
   p("### What differs, and why");
   p(
-    `In the fit of NOAA's years, ${w.outside} of ${w.compared} short-period constants are outside the fit's interval. The constituents most often outside are ${often.map(([name, c]) => `${name} (${c})`).join(", ")}. [Where the differences come from](#where-the-differences-come-from) takes the method apart one step at a time, and the counts here are of the step that moves a constant furthest:`,
+    `In the fit of NOAA's years, ${w.outside} of ${w.compared} short-period constants are outside the fit's interval${zeros ? `, counting the ${zeros} NOAA publishes as zero, which the counts by constituent here leave out` : ""}. The constituents most often outside are ${often.map(([name, c]) => `${name} (${c})`).join(", ")}. [Where the differences come from](#where-the-differences-come-from) takes the method apart one step at a time, and the counts here are of the step that moves a constant furthest:`,
   );
   p(
-    `- **Robust weights.** They raise the amplitude of ${["M2", "S2", "O1", "M4"].map(raised).join(", ")}, against the same fit without them. M2 moves most at ${m2
+    `- **Robust weights.** With them the amplitude is higher than in the same fit without them for ${["M2", "S2", "O1", "M4"].map(raised).join(", ")}. M2 moves most at ${m2
       .slice(0, 3)
       .map((x) => `${x.r.name} (${mm(x.moved)} mm of ${mm(x.noaa.amplitude, 0)})`)
       .join(
@@ -843,17 +882,18 @@ function findings(report: Report, w: Stats, s: Stats): string {
       if (!as.length) return "";
       const again = results.flatMap((r) => {
         const side = r.renamed?.rows[name];
-        return side && !("reason" in side) ? [side] : [];
+        const published = r.rows.some((x) => x.name === name && x.noaa.amplitude > 0);
+        return side && published && !("reason" in side) ? [side] : [];
       });
       const outsideAgain = again.filter((x) => (x.d.ratio ?? 0) > 1).length;
       return `- **${name} is held as ${as.join(" or ")}.** The candidate list has the line under both names, and selection keeps the earlier one, with the node factor the engine gives that name and not NOAA's for ${name}. ${count(name)} of ${stations(name)} are outside, and the step to the candidate list is the largest for ${largest(name, 3)}. That step changes the rest of the list too, so the fit of NOAA's years was run again with only the name changed back: as ${name}, ${outsideAgain} of ${again.length} are outside. ${outsideAgain * 2 < count(name) ? "The name accounts for most of the difference." : "The name alone doesn't account for the difference."}`;
     }),
-    `- **Node factors at each sample: S1, P1 and R2.** K1's node factor changes within a year. Held at its mid-year value, as NOAA holds it, a K1 of 1 m alone leaves ${perMeter(k1.S1!)} in S1 and ${perMeter(k1.P1!)} in P1 in a one-year fit, over the years 2006 to 2024, and a K2 of 1 m leaves ${perMeter(k2.R2!)} in R2. With node factors at each sample the same fits leave at most ${mm(exact, 2)} mm. A year fitted NOAA's way therefore puts that part of K1 and K2 into S1, P1 and R2. This step is the largest for ${largest("S1", 0)}, ${largest("P1", 0)} and ${largest("R2", 0)}.`,
-    `- **One fit of all years: L2.** Fitting the years together in place of averaging yearly fits is the largest step for ${largest("L2", 1)}. L2 shares its frequency with 2MN2, whose node factor differs ([M1 and L2](../fits.md#what-it-costs)), and a line that doesn't follow L2's factor from year to year would give this. The report doesn't measure 2MN2, so that cause isn't shown.`,
+    `- **Node factors at each sample.** K1's node factor changes within a year. Held at its mid-year value, as NOAA holds it, a K1 of 1 m alone leaves ${perMeter(k1.S1!)} in S1 and ${perMeter(k1.P1!)} in P1 in a one-year fit, depending on the year, and a K2 of 1 m leaves ${perMeter(k2.R2!)} in R2. With node factors at each sample the same fits leave at most ${mm(exact, 2)} mm.${leaks ? " A year fitted NOAA's way therefore puts that part of K1 and K2 into S1, P1 and R2." : ""} ${accounts(["S1", "P1", "R2"], 0)}`,
+    `- **One fit of all years.** Fitting the years together in place of averaging yearly fits is the largest step for ${l2.text}${l2.most ? ". L2 shares its frequency with 2MN2, whose node factor differs ([M1 and L2](../fits.md#what-it-costs)), and a line that doesn't follow L2's factor from year to year would give this. The report doesn't measure 2MN2, so that cause isn't shown." : ", half or fewer, so it doesn't account for L2's."}`,
     `- **The standard fit reads other years.** ${s.outside} of ${s.compared} of its constants are outside the interval, which 19 years make narrow. [Constituents across stations](#constituents-across-stations) gives how far the standard fit is from the store's own fit of NOAA's years, which is what the two periods differ by under one method: M2 is a median ${mm(median(moved("M2")), 1)} mm from one period's fit to the other's and K1 ${mm(median(moved("K1")), 1)} mm.`,
     "- **Long-period constituents.** NOAA takes Sa, Ssa, Mm, Msf and Mf from other spans than its analysis years, as each station's comment says, or publishes zero for them. They are in each station's table and in no count.",
     over.length
-      ? `- **NOAA's method misses NOAA's constants by over 1 mm for ${n(over.length, "constant")}:** ${worst.map(([name, c]) => `${c} at ${name}`).join(", ")}.${unexplained.length ? ` At ${unexplained.join(" and ")} it is five or more, and this report doesn't find why. ${unexplainedYears}` : ""}`
+      ? `- **NOAA's method misses NOAA's constants by over 1 mm for ${n(over.length, "constant")}:** ${worst.map(([name, c]) => `${c} at ${name}`).join(", ")}.${unexplained.length ? ` At ${unexplained.join(" and ")} it is five or more, and this report doesn't find why. ${unexplainedYears}` : ""}${large.length ? ` It misses ${list(large.map((x) => `${x.row.name} at ${x.r.name} by ${mm(x.step.vector)} mm of ${mm(x.row.noaa.amplitude, 0)}`))}, over ${mm(LARGE_MISS, 0)} mm, and this report doesn't find why either.` : ""}`
       : "",
   );
   p("### Defects");
@@ -869,7 +909,7 @@ function findings(report: Report, w: Stats, s: Stats): string {
       ? ""
       : "- **Over NOAA's years the candidate list and its selection predict no worse than NOAA's constituents at any station**, by 1 mm RMS or more on the held-out year.",
     agrees
-      ? `- **None shown in the engine's solver, in Schureman's corrections for the names NOAA uses, or in the phase convention.** NOAA's method run through them gives NOAA's constants, as above${unexplained.length ? `, except at ${unexplained.join(" and ")}, which is open` : ""}. Each step from it to the store's method is a choice [Harmonic fits](../fits.md) makes, with its effect in the tables here.`
+      ? `- **None shown in the engine's solver, in Schureman's corrections for the names NOAA uses, or in the phase convention.** NOAA's method run through them gives NOAA's constants, as above${open.length ? `, except ${list(open)}, which ${open.length > 1 ? "are" : "is"} open` : ""}. Each step from it to the store's method is a choice [Harmonic fits](../fits.md) makes, with its effect in the tables here.`
       : "- **NOAA's method doesn't give NOAA's constants.** Under 95% of the constants fitted NOAA's way are within 1 mm of NOAA's, so the engine, the corrections, the phases or the store's values differ from NOAA's.",
   );
   return lines.join("\n").trimEnd();
