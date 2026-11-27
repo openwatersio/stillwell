@@ -106,6 +106,19 @@ describe("scripts/monthly.sh", () => {
     assert.match(run("list-backfills", "bsh").stdout, /^ingest backfill bsh all \d{4} \d{4}\n$/);
   });
 
+  it("fits for at most two hours, and for none once the job has run five and a half", () => {
+    const budget = (started: number) =>
+      spawnSync("bash", ["scripts/monthly.sh", "fit", "smhi"], {
+        encoding: "utf8",
+        env: { ...process.env, PATH: `${shim}:${process.env.PATH}`, STARTED: String(started) },
+      }).stdout.trim();
+    const now = Math.floor(Date.now() / 1000);
+    assert.equal(budget(now), "ingest fit smhi --budget 120 --only-fitted");
+    // Four and a half hours in, an hour is left before none may start.
+    assert.match(budget(now - 270 * 60), /^ingest fit smhi --budget (59|60) --only-fitted$/);
+    assert.equal(budget(now - 340 * 60), "ingest fit smhi --budget 0 --only-fitted");
+  });
+
   it("fails for a source it doesn't know", () => {
     assert.notEqual(run("refetch", "nope").status, 0);
   });

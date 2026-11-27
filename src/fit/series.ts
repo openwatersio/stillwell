@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { errataOf, utcDay, type Erratum } from "../errata.ts";
 import { Flag, type Epoch, type SourceMetadata, type StoredStation } from "../schema.ts";
-import { listFiles, readObservationsBetween } from "../store/parquet.ts";
+import { exists, listFiles, readObservationsBetween } from "../store/parquet.ts";
 import { seriesPath } from "../store/paths.ts";
 import type { YearRow } from "../store/years.ts";
 import type { Sample } from "../types.ts";
@@ -173,6 +173,16 @@ export function errataIn(
   );
 }
 
+/**
+ * Whether the store holds the file at `path`. A remote path with no wildcard is read, since a
+ * listing of one echoes it back whether or not it exists. A path with a glob character, as a
+ * station ID can have, is matched against a listing, which then lists for real, so another
+ * station's file doesn't count.
+ */
+export async function holds(path: string): Promise<boolean> {
+  return /[*?[]/.test(path) ? (await listFiles(path)).includes(path) : exists(path);
+}
+
 export interface ReadContext {
   store: string;
   metadata: SourceMetadata;
@@ -186,7 +196,10 @@ export interface ReadContext {
 
 /**
  * A station's levels on the hour from `start` to before `end` (epoch ms), in
- * meters in its current datum, sorted by time. Each epoch's levels are read
+ * meters in its current datum, sorted by time. With `spacing`, in ms, every
+ * value instead: a year file's values are read in time order, and each one
+ * kept is at least `spacing` after the one kept before it, which thins a
+ * finer series and leaves a coarser one whole. Each epoch's levels are read
  * inside its span and moved by its `to_current`; an epoch that can't be
  * converted is left out, and where a rejected epoch and another share a time
  * the other wins. Throws `Unfit` where the station's year files are being
@@ -199,6 +212,7 @@ export async function readSeries(
   period: { start: number; end: number },
   values: Values,
   context: ReadContext,
+  spacing?: number,
 ): Promise<Sample[]> {
   const { store, metadata, years, inputs } = context;
   const settled = values === "final" ? settledBefore(metadata, context.now) : null;
@@ -248,13 +262,17 @@ export async function readSeries(
       if (version === undefined) continue;
       inputs.versions[`${epoch.id} ${year}`] = version;
       const path = seriesPath(store, "levels", station.source, station.source_id, year, epoch.id);
-      const rows = await readObservationsBetween(path, start, end, true);
+      const rows = await readObservationsBetween(path, start, end, spacing === undefined);
       // A missing file reads as no rows, as a year with none on the hour does.
-      // A listing globs, so a station ID with a glob character counts only its own file.
-      if (!rows.length && !(await listFiles(path)).includes(path))
+      if (!rows.length && !(await holds(path)))
         throw new Error(`${station.id}: ${path} is in the years file and missing from the store`);
+      let last = -Infinity;
       for (const o of rows) {
         if (!takes(o.flag, o.time) || !Number.isFinite(o.level)) continue;
+        if (spacing !== undefined) {
+          if (o.time - last < spacing) continue;
+          last = o.time;
+        }
         if (rejected && byTime.has(o.time)) continue;
         // Levels are stored as 32-bit floats; round off the widening noise below 0.1 mm.
         const level = Math.round((o.level + epoch.to_current) * 1e4) / 1e4;
