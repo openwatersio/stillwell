@@ -349,6 +349,15 @@ describe("kartverket", () => {
     await assert.rejects(kartverket.levels("BGO", ...span), /at 1990-02-31T00:20/);
   });
 
+  it("reads a level below chart datum", async () => {
+    const span = [new Date("1990-01-01T00:00Z"), new Date("1991-01-01T00:00Z")] as const;
+    const xml = fixture("kartverket-obs-1990.xml");
+    assert.ok(xml.includes('value="140.8"'));
+    serve([[/stationdata/, xml.replace('value="140.8"', 'value="-3.2"')]]);
+    const rows = await kartverket.levels("BGO", ...span);
+    assert.ok(rows.some((r) => r.level === -0.032));
+  });
+
   it("refuses a response with any reading it can't read, where skipping it would delete the stored one", async () => {
     const span = [new Date("1990-01-01T00:00Z"), new Date("1991-01-01T00:00Z")] as const;
     const xml = fixture("kartverket-obs-1990.xml");

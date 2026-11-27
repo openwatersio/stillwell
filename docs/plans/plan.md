@@ -186,7 +186,7 @@ Definitions, before a fit is published:
 
 What a fit reads:
 
-- [ ] Each source that never finalizes its values declares its revision window, measured or stated by the source ([#526](https://github.com/openwatersio/stillwell/issues/526)), so "values the source won't revise again" has one definition, in the adapter. Until #526 gives PEGELONLINE a measured or stated window, its adapter declares a year settled once it ended 12 months before the run, on the evidence of erratum `pegelonline-cuxhaven-2025-revised`. Kartverket's adapter declares the same 12 months, a decision with no revision record behind it.
+- [ ] Each source that never finalizes its values declares its revision window, measured or stated by the source ([#526](https://github.com/openwatersio/stillwell/issues/526)), so "values the source won't revise again" has one definition, in the adapter. Until #526 gives PEGELONLINE a measured or stated window, its adapter declares a year settled once it ended 12 months before the run, on the evidence of erratum `pegelonline-cuxhaven-2025-revised`.
 - [ ] A fit reads what the store's flags allow, and records every erratum touching the years it read. A value is `kept` only where its own evidence supports keeping it, and one no reader should use is `flagged`, so no consumer decides per erratum.
 - [ ] One reader for fits in `src/fit/`: every epoch in the current datum, final values for constants and every measured value for datums, hourly instantaneous samples, and the version of each year file read. It reads the restricted store too.
 - [ ] The filter behind any source's hourly values, and where each value is stamped in its interval, as source metadata, so a fit can correct amplitude and phase for it.
