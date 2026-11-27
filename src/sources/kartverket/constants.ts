@@ -75,19 +75,6 @@ export interface PublishedConstants {
 }
 
 /**
- * Kartverket's constants from a `constituents` answer. Amplitudes come in
- * centimeters. Phases come against UTC+1, and a phase is moved by the
- * constituent's speed over one hour and over the mean of terrestrial time
- * minus UTC in the period. Kartverket's answer states the hour, and its
- * reply to question `kartverket-constants-clock` says the analysis runs in
- * terrestrial time; the README's Constants entry has the measurement.
- *
- * Throws on an answer in another unit or offset, without a period, with a
- * date that isn't one, a constituent it can't read whole, a name twice, or a
- * constituent the catalog doesn't have at that speed, so nothing is compared
- * under a wrong name and no part of an answer is taken for the whole.
- */
-/**
  * The period of observations an answer names, from `start` to before `end`
  * (epoch ms), or null where it names none, as a gauge without an analysis of
  * its own does. The end names the period's last hour. Throws on a date that
@@ -118,6 +105,20 @@ export function periodOf(code: string, xml: string): { start: number; end: numbe
   return { start, end };
 }
 
+/**
+ * Kartverket's constants from a `constituents` answer. Amplitudes come in
+ * centimeters. Phases come against UTC+1, and a phase is moved by the
+ * constituent's speed over one hour and over the mean of terrestrial time
+ * minus UTC in the period. Kartverket's answer states the hour, and its
+ * reply to question `kartverket-constants-clock` says the analysis runs in
+ * terrestrial time, as far as it can see; the README's Constants entry has
+ * the measurement.
+ *
+ * Throws on an answer in another unit or offset, without a period, with a
+ * date that isn't one, a constituent it can't read whole, a name twice, or a
+ * constituent the catalog doesn't have at that speed, so nothing is compared
+ * under a wrong name and no part of an answer is taken for the whole.
+ */
 export function parseConstants(code: string, xml: string): PublishedConstants {
   const fail = (why: string) => new Error(`kartverket/${code}: its constants ${why}`);
   const head = /<constituents\b([^>]*)>/.exec(xml)?.[1];

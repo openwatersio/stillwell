@@ -64,7 +64,7 @@ import {
 } from "../src/fit/kartverket-report.ts";
 import { harmonicSamples, rmsOf, tidalResiduals } from "../src/fit/scores.ts";
 import { emptyInputs, METHOD, readSeries } from "../src/fit/series.ts";
-import { Flag, type StoredStation } from "../src/schema.ts";
+import type { StoredStation } from "../src/schema.ts";
 import { sourceOf } from "../src/sources/index.ts";
 import {
   parseConstants,
@@ -74,12 +74,12 @@ import {
   type PublishedConstants,
 } from "../src/sources/kartverket/constants.ts";
 import { harmonicConstants } from "../src/sources/kartverket/index.ts";
-import { readObservationsBetween } from "../src/store/parquet.ts";
-import { seriesPath } from "../src/store/paths.ts";
 import type { YearRow } from "../src/store/years.ts";
 import type { Sample } from "../src/types.ts";
 
 const SOURCE = "kartverket";
+/** The deed of the license the adapter's metadata names by ID, CC-BY-4.0, which asks for its URI with the data. */
+const LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/";
 const JSON_PATH = "docs/results/kartverket-calibration.json";
 const REPORT_PATH = "docs/results/kartverket-calibration.md";
 const HOUR_MS = 3_600_000;
@@ -157,19 +157,14 @@ async function calibrate(task: Task): Promise<Result> {
   // line, each run through the filter, a day dropped at its ends, and read on the hour.
   let viaFilter: FittedConstituent[] | null = null;
   let filteredHours: number | null = null;
-  if (station.epochs.length === 1) {
-    const tenMinute: Sample[] = [];
-    for (
-      let y = new Date(period.start).getUTCFullYear();
-      y <= new Date(period.end - 1).getUTCFullYear();
-      y++
-    ) {
-      const path = seriesPath(task.store, "levels", station.source, station.source_id, y);
-      if (!base.years.has(`${station.id} 1 ${y}`)) continue;
-      for (const o of await readObservationsBetween(path, period.start, period.end, false))
-        if (o.flag === Flag.good && Number.isFinite(o.level) && o.time % STEP_MS === 0)
-          tenMinute.push({ time: o.time, level: Math.round(o.level * 1e4) / 1e4 });
-    }
+  {
+    // The 10-minute values through the reader the hourly fit has, so both take the same flags,
+    // errata, epochs and years.
+    // Every value, a spacing of 1 ms thinning none, and of those the ones on the 10-minute grid,
+    // which the filter's even spacing needs.
+    const tenMinute = (
+      await readSeries(station, period, "final", { ...base, inputs: emptyInputs() }, 1)
+    ).filter((s) => s.time % STEP_MS === 0);
     const out: Sample[] = [];
     let run: Sample[] = [];
     const flush = () => {
@@ -306,6 +301,11 @@ async function calibrate(task: Task): Promise<Result> {
   });
   if (fit.reason !== null || fit.held_out === null)
     throw new Error(`${station.id} has no fit: ${fit.reason}`);
+  // A held-out year inside Kartverket's period would score its constants on values they were fitted to.
+  if (yearSpan(fit.held_out).start < period.end)
+    throw new Error(
+      `${station.id}: its held-out year, ${fit.held_out}, is inside Kartverket's period`,
+    );
 
   // Kartverket's constants, and this fit's, predicted under Foreman's corrections over the store's
   // held-out year, and scored as the store's own fit is: what the Godin filter leaves of observed
@@ -426,6 +426,14 @@ async function main(): Promise<void> {
     method: METHOD,
     final_year: copy.final,
     filter: FILTER,
+    source: {
+      attribution: sourceOf(SOURCE).metadata.attribution,
+      license: sourceOf(SOURCE).metadata.license.name,
+      license_url: LICENSE_URL,
+      url: sourceOf(SOURCE).metadata.license.url,
+      changes:
+        "Amplitudes are in meters where Kartverket gives centimeters, and phases are moved to UTC as the report says.",
+    },
     results: GAUGES.map((code) => results.get(`${SOURCE}/${code}`)!),
   };
   const json = JSON.stringify(report, rounded, 2) + "\n";

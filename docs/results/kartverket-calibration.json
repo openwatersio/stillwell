@@ -1,11 +1,18 @@
 {
   "engine": "@slackwater/engine@1.0.0-beta.15",
-  "inputs": "df96644589faea9d",
+  "inputs": "067a81d637016f80",
   "method": 1,
   "final_year": 2024,
   "filter": {
     "order": 4,
     "cutoff_hours": 2.98
+  },
+  "source": {
+    "attribution": "Norwegian Mapping Authority, Hydrographic Service",
+    "license": "Creative Commons Attribution 4.0 International",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "url": "https://kartverket.no/en/api-and-data/tides-and-water-level-data",
+    "changes": "Amplitudes are in meters where Kartverket gives centimeters, and phases are moved to UTC as the report says."
   },
   "results": [
     {

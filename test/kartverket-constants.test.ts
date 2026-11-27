@@ -69,7 +69,7 @@ describe("parseConstants", () => {
   });
 
   it("reads a recorded answer whole", () => {
-    const xml = readFileSync("src/sources/kartverket/kartverket-constituents-VIK.xml", "utf8");
+    const xml = readFileSync("test/fixtures/kartverket-constituents-VIK.xml", "utf8");
     const { period, constants } = parseConstants("VIK", xml);
     assert.equal(constants.length, (xml.match(/<constituent\b/g) ?? []).length);
     assert.equal(constants.length, 46);
