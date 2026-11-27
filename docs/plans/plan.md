@@ -183,7 +183,7 @@ One pipeline fits every gauge that carries a tide, with a source's differences d
 Definitions, before a fit is published:
 
 - [ ] A definition format that names the nodal correction each constituent was fitted under, so a reader with another engine knows what it has ([slackwater-database#238](https://github.com/openwatersio/slackwater-database/issues/238)). slackwater-database's stored definitions can't carry M1's correction, so data fitted with it needs a pinned engine there. A fit's definitions are the contract only once that gap is closed.
-- [ ] The candidate list as data in `src/fit/`, in priority order and by Doodson number: Foreman's, then the constituents NOAA's 37 and TICON's 50 add, with IHO's names and the spellings other tools use. A candidate the fitting engine can't fit, as `@slackwater/engine` can't Foreman's H1 and H2, is reported as left out.
+- [ ] The candidate list as data in `src/fit/`, by Doodson number and with each candidate's Rayleigh comparison: Foreman's, then the constituents NOAA's 37 and TICON's 50 add, with IHO's names and the spellings other tools use. A candidate the fitting engine can't fit, as `@slackwater/engine` can't Foreman's H1 and H2, is reported as left out.
 
 What a fit reads:
 

@@ -77,7 +77,8 @@ backfills() {
 # files a backfill or compaction would rewrite. A fit is a minute or more of computation a station, so it starts
 # stations for at most 2 hours, and none once the job has run 5 and a half, the largest tides first. The rest
 # stay due for the next run: in most months only stations whose levels changed are due, and when a source's
-# final year moves on, all of them are, and a large source takes several runs to catch up. Only a source
+# final year moves on or the candidate list changes, all of them are, and a large source takes several runs
+# to catch up. Only a source
 # with a station that has constants is fitted (`--only-fitted`), so a source's first fit is a run by hand from
 # the Ingest workflow, which a maintainer makes once the source's fits can be trusted. Only a full refresh runs it.
 fit() {

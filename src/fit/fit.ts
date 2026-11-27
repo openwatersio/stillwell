@@ -8,7 +8,7 @@ import {
 } from "@slackwater/engine";
 import type { StoredStation } from "../schema.ts";
 import type { Sample } from "../types.ts";
-import { CANDIDATES } from "./candidates.ts";
+import { CANDIDATES, type Candidate } from "./candidates.ts";
 import {
   othersOf,
   packageVersion,
@@ -127,7 +127,7 @@ export interface FittedCandidate {
   /** The `version` of the fit the row belongs to. */
   version: string;
   name: string;
-  /** Place in the candidates' priority order, from 1. */
+  /** Place in the list of candidates, from 1. */
   rank: number;
   doodson: number[];
   speed: number;
@@ -241,6 +241,35 @@ export function varianceExplained(
 }
 
 /**
+ * The candidates as the engine's selection takes them: each name with its
+ * Rayleigh comparison. A comparison the sampling can't resolve is never in
+ * the fit, and the engine would test against it all the same, so a candidate
+ * whose comparison is at or above the Nyquist frequency of the median step
+ * between `times` goes without one, and is tested against every candidate
+ * kept before it.
+ */
+export function comparable(
+  candidates: readonly Candidate[],
+  times: readonly number[],
+): { name: string; comparison?: string }[] {
+  const steps = times
+    .slice(1)
+    .map((time, i) => time - times[i]!)
+    .filter((step) => step > 0)
+    .sort((a, b) => a - b);
+  const middle = steps.length >> 1;
+  const median =
+    steps.length % 2 ? steps[middle]! : (steps[middle - 1]! + steps[middle]!) / 2 || Infinity;
+  // Degrees an hour: half a cycle a step.
+  const nyquist = (180 * 3_600_000) / median;
+  const speed = new Map(CANDIDATES.map((c) => [c.name, c.speed]));
+  return candidates.map(({ name, comparison }) => ({
+    name,
+    comparison: comparison && speed.get(comparison)! < nyquist ? comparison : undefined,
+  }));
+}
+
+/**
  * Fit one station. The held-out year is the latest, at or before the source's
  * last year of final values, in which half the station's hours can be scored:
  * an hour counts when the 71 hours around it all have values, as the Godin
@@ -298,7 +327,10 @@ export async function fitStation(
     const candidates = CANDIDATES.filter((c) => !seasonal.includes(c.name));
     const engineSamples = harmonicSamples(samples);
     const { selection } = selectConstituents(engineSamples, {
-      candidates: candidates.map(({ name }) => ({ name })),
+      candidates: comparable(
+        candidates,
+        samples.map((s) => s.time),
+      ),
       nodeCorrections: NODE_CORRECTIONS,
     });
     const chosen = selection.filter((s) => s.kept).map((s) => s.name);

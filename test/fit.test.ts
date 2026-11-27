@@ -3,10 +3,21 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { constituents, createTidePredictor, type HarmonicConstituent } from "@slackwater/engine";
+import {
+  constituents,
+  createTidePredictor,
+  foremanCandidates,
+  type HarmonicConstituent,
+} from "@slackwater/engine";
 import type { Erratum } from "../src/errata.ts";
 import { CANDIDATES } from "../src/fit/candidates.ts";
-import { engineVersion, fitStation, meanRange, varianceExplained } from "../src/fit/fit.ts";
+import {
+  comparable,
+  engineVersion,
+  fitStation,
+  meanRange,
+  varianceExplained,
+} from "../src/fit/fit.ts";
 import type { FitContext } from "../src/fit/fit.ts";
 import { Flag, type Observation, type SourceMetadata, type StoredStation } from "../src/schema.ts";
 import { readYearStats, writeObservations } from "../src/store/parquet.ts";
@@ -120,6 +131,45 @@ describe("CANDIDATES", () => {
     assert.ok(names.includes("Sa") && names.includes("Ssa"));
     assert.ok(!names.includes("H1") && !names.includes("H2"));
   });
+
+  it("gives Foreman's candidates the comparison his table gives them", () => {
+    // H1 and H2 are the lines MA2 and MB2 name here. Z0, the mean, stands for no test.
+    const here = (name: string | undefined) =>
+      name === "Z0" ? undefined : ({ H1: "MA2", H2: "MB2" }[name ?? ""] ?? name);
+    const names = new Set(CANDIDATES.map((c) => c.name));
+    const seasonal = ["Sa", "Ssa"];
+    for (const { name, comparison } of foremanCandidates) {
+      const candidate = CANDIDATES.find((c) => c.name === here(name));
+      assert.ok(candidate, `${name} is a candidate`);
+      if (!seasonal.includes(name)) assert.equal(candidate.comparison, here(comparison), name);
+    }
+    const foreman = new Set(foremanCandidates.map((c) => here(c.name)));
+    for (const c of CANDIDATES) {
+      if (c.comparison) assert.ok(names.has(c.comparison), `${c.name}: ${c.comparison}`);
+      if (!foreman.has(c.name)) assert.equal(c.comparison, undefined, c.name);
+    }
+  });
+});
+
+describe("comparable", () => {
+  const start = Date.UTC(2023, 0, 1);
+  const comparisonOf = (step: number, name: string) =>
+    comparable(
+      CANDIDATES,
+      Array.from({ length: 100 }, (_, i) => start + i * step),
+    ).find((c) => c.name === name)!.comparison;
+
+  it("gives each candidate its comparison on hourly values", () => {
+    assert.equal(comparisonOf(HOUR, "T2"), "S2");
+    assert.equal(comparisonOf(HOUR, "S1"), "K1");
+    assert.equal(comparisonOf(HOUR, "K1"), undefined);
+  });
+
+  it("drops a comparison the sampling can't resolve", () => {
+    // Six hours between values put the Nyquist frequency at 30 degrees an hour, S2's speed.
+    assert.equal(comparisonOf(6 * HOUR, "T2"), undefined);
+    assert.equal(comparisonOf(6 * HOUR, "S1"), "K1");
+  });
 });
 
 describe("engineVersion", () => {
@@ -190,6 +240,46 @@ describe("fitStation", () => {
       Object.keys(versions).sort(),
       [...years.values()].map((r) => `${r.epoch} ${r.year}`).sort(),
     );
+  });
+
+  it("tests S1, pi1, psi1, T2 and R2 against their comparisons over a common year", async () => {
+    const { context } = await store([[2023], [2024]]);
+    const { fit, constituents: rows } = await fitStation(station, context());
+    assert.equal(fit.reason, null);
+    assert.equal(fit.since, "2023-01-01T00:00:00.000Z");
+    const row = (name: string) => rows.find((r) => r.name === name)!;
+    for (const want of GENERATING) {
+      const got = row(want.name);
+      assert.equal(got.kept, true, `${want.name} is kept`);
+      assert.ok(Math.abs(got.amplitude_m! - want.amplitude) < 0.01, `${want.name} amplitude`);
+    }
+    for (const [name, conflict] of [
+      ["S1", "K1"],
+      ["pi1", "P1"],
+      ["psi1", "K1"],
+      ["T2", "S2"],
+      ["R2", "S2"],
+    ] as const) {
+      assert.equal(row(name).kept, false, `${name} is left out`);
+      assert.equal(row(name).reason, "rayleigh", name);
+      assert.equal(row(name).conflict, conflict, name);
+    }
+    // A cycle a year apart from K1 and S2, and two from P1 and K2, which a year separates.
+    for (const name of ["P1", "K2"]) assert.notEqual(row(name).reason, "rayleigh", name);
+  });
+
+  it("lets a leap year, which separates them, test those candidates on their size", async () => {
+    const { context } = await store([[2024], [2025]]);
+    const { fit, constituents: rows } = await fitStation(station, context({ finalYear: 2025 }));
+    assert.equal(fit.since, "2024-01-01T00:00:00.000Z");
+    for (const name of ["S1", "pi1", "T2", "R2", "K1", "S2"])
+      assert.notEqual(rows.find((r) => r.name === name)!.reason, "rayleigh", name);
+    // The pairs are barely a cycle apart, and the constants still come out.
+    for (const want of GENERATING) {
+      const got = rows.find((r) => r.name === want.name)!;
+      assert.equal(got.kept, true, `${want.name} is kept`);
+      assert.ok(Math.abs(got.amplitude_m! - want.amplitude) < 0.01, `${want.name} amplitude`);
+    }
   });
 
   it("gives a row with a reason and no candidates where the station has no year files", async () => {

@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { after, describe, it } from "node:test";
 import { createTidePredictor } from "@slackwater/engine";
 import type { Erratum } from "../src/errata.ts";
+import { CANDIDATES } from "../src/fit/candidates.ts";
 import type { Fit, FittedCandidate } from "../src/fit/fit.ts";
 import { engineVersion, fitStation } from "../src/fit/fit.ts";
 import { emptyInputs, finalYear, inputsDigest, readSeries } from "../src/fit/series.ts";
@@ -130,6 +131,18 @@ describe("inputsDigest", () => {
       digest,
     );
     assert.notEqual(inputsDigest(a, { ...base, finalYear: 2025 }), digest);
+  });
+
+  it("changes with a candidate's Rayleigh comparison", () => {
+    const s1 = CANDIDATES.find((c) => c.name === "S1")!;
+    const comparison = s1.comparison;
+    try {
+      s1.comparison = undefined;
+      assert.notEqual(inputsDigest(a, base), digest);
+    } finally {
+      s1.comparison = comparison;
+    }
+    assert.equal(inputsDigest(a, base), digest);
   });
 
   it("covers a gauge's files however long ago it closed", () => {

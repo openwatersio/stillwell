@@ -1095,7 +1095,7 @@ export const FILES = {
     example: "constituents/smhi.parquet",
     title: "Harmonic constituents",
     description:
-      "One row per fitted station and candidate constituent, in the fit's priority order within a station: the constants of the candidates the fit kept, and why it left each of the others out. Each row gives its constituent's name and Doodson numbers, so the constants can be used with any prediction software that applies the nodal corrections `fits/<source>.parquet` names. The name is needed with the numbers: NO1 and M1, and MO3 and 2MK3, share numbers and differ in their nodal correction.",
+      "One row per fitted station and candidate constituent, in the order of the fit's list of candidates within a station: the constants of the candidates the fit kept, and why it left each of the others out. Each row gives its constituent's name and Doodson numbers, so the constants can be used with any prediction software that applies the nodal corrections `fits/<source>.parquet` names. The name is needed with the numbers: NO1 and M1, and MO3 and 2MK3, share numbers and differ in their nodal correction.",
     columns: [
       { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
       {
@@ -1113,7 +1113,7 @@ export const FILES = {
         name: "rank",
         type: "INTEGER",
         description:
-          "The candidate's place in the fit's priority order, from 1: where the record can't separate two candidates, the one with the lower rank is kept.",
+          "The candidate's place in the list of candidates its fit started from, from 1. [Harmonic fits](https://github.com/openwatersio/stillwell/blob/main/docs/fits.md#constituents) gives the rule for which constituent a candidate is tested against.",
       },
       {
         name: "doodson",
@@ -1137,13 +1137,13 @@ export const FILES = {
         type: "VARCHAR",
         nullable: true,
         description:
-          "Why a candidate isn't kept: `rayleigh`, the record can't separate it from `conflict`; `snr`, its signal-to-noise ratio is under 2 in a fit without robust weights, which is how candidates are tested; `nyquist`, the sampling can't resolve it; `rankDeficient`, the fit can't tell it from stronger candidates; `seasonal`, Sa or Ssa whose amplitude is under twice the standard error of its mean over the yearly fits; `unknown`, the fitting engine doesn't define it. Null for a kept one.",
+          "Why a candidate isn't kept: `rayleigh`, the record can't separate it from `conflict`; `snr`, its signal-to-noise ratio is under 2 in a fit without robust weights, which is how candidates are tested; `nyquist`, the sampling can't resolve it; `rankDeficient`, the fit can't tell it from the other candidates it holds; `seasonal`, Sa or Ssa whose amplitude is under twice the standard error of its mean over the yearly fits; `unknown`, the fitting engine doesn't define it. Null for a kept one.",
       },
       {
         name: "conflict",
         type: "VARCHAR",
         nullable: true,
-        description: "The stronger constituent a `rayleigh` candidate couldn't be separated from.",
+        description: "The constituent a `rayleigh` candidate couldn't be separated from.",
       },
       {
         name: "amplitude_m",
