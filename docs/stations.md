@@ -113,6 +113,7 @@ stations/requalify/<source>.json             stations a requalify --budget run d
 stations/analysis/<source>.parquet           what analyze measures from each station's levels, such as whether they carry a tide
 fits/<source>.parquet                        each station's harmonic fit: its window, its scores and what it read
 constituents/<source>.parquet                each fit's candidate constituents, with their constants
+fits/references/<source>.parquet             slackwater-database's constants for each fitted gauge, scored on the fit's held-out year
 history/stations/<source>/<time>.parquet     the source's list as each refresh started, less withheld stations
 history/stations/<source>/<time>.json        what that refresh changed
 history/analysis/<source>/<time>.json        stations whose QC an analyze run changed, and how

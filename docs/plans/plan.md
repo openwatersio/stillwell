@@ -86,6 +86,7 @@ Adapters run in Node, in Actions and on the Stillwell server. Adapter code uses 
 ```
 fits/<source>.parquet                            a row per fit: its window, the year files read, its scores and datums (phase 6)
 constituents/<source>.parquet                    a row per fit and candidate constituent, kept or not, with why (phase 6)
+fits/references/<source>.parquet                 a row per fit and slackwater-database record of its gauge: the record's scores on the held-out year (phase 6)
 models/stofs2d/<cycle>.parquet                   station-point nowcast and forecast (phase 11)
 models/gtsm/<point>.parquet                      surge reanalysis at coastal points (phase 11)
 bulk/<snapshot>/<source>.parquet                 quarterly, Hive-partitioned by year (phase 12)
@@ -176,7 +177,7 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 
 Estimate: 14 days here, and 4 in slackwater-database.
 
-One pipeline fits every gauge that carries a tide, with a source's differences declared by its adapter. slackwater-database's [plan for constituents](https://github.com/openwatersio/slackwater-database/blob/main/docs/plans/stillwell-constituents.md) has the method and its references: the candidate list, the Rayleigh and SNR rules, Sa and Ssa, the held-out year and the calibration against agencies' own constants. Its `sources/stillwell` importer ([slackwater-database#450](https://github.com/openwatersio/slackwater-database/pull/450)) runs that method on SMHI and PEGELONLINE from outside the store. That importer, the verification report ([slackwater-database#425](https://github.com/openwatersio/slackwater-database/pull/425)) and the calibration ([slackwater-database#426](https://github.com/openwatersio/slackwater-database/pull/426)) are the code this phase starts from.
+One pipeline fits every gauge that carries a tide, with a source's differences declared by its adapter. [Harmonic fits](../fits.md) has the method and its references: what a fit reads, the window, the candidate list, the Rayleigh and SNR rules, Sa and Ssa, nodal corrections, and the scores on a held-out year. The scoring is ported from slackwater-database's verification code, and that repo's side of this phase, reading the fit files and deciding what ships, is in its [plan for constituents](https://github.com/openwatersio/slackwater-database/blob/main/docs/plans/stillwell-constituents.md).
 
 Definitions, before a fit is published:
 
@@ -189,6 +190,7 @@ What a fit reads:
 - [ ] A fit reads what the store's flags allow, and records every erratum touching the years it read. A value is `kept` only where its own evidence supports keeping it, and one no reader should use is `flagged`, so no consumer decides per erratum.
 - [ ] One reader for fits in `src/fit/`: every epoch in the current datum, final values for constants and every measured value for datums, hourly instantaneous samples, and the version of each year file read. It reads the restricted store too.
 - [ ] The filter behind any source's hourly values, and where each value is stamped in its interval, as source metadata, so a fit can correct amplitude and phase for it.
+- [ ] Years another series of the same gauge holds and the originator's lacks, such as GESLA's older years. The reason the originator lacks them is found first. Only years the originator can't supply are joined, at an offset measured where the two series overlap ([slackwater-database#400](https://github.com/openwatersio/slackwater-database/issues/400)), and the fit names both series.
 - [ ] A level comparison in `stations/matches.parquet` for every linked pair. A fit and a TICON record count as the same gauge only where their levels agree within 1 cm with no lag, and 142 linked pairs of PEGELONLINE and GESLA series, Brake's among them, have no comparison, so those fits can't be scored against or merged with TICON's records of the gauge.
 
 Checks before fitting, which stop a fit or cut its series:
@@ -199,10 +201,13 @@ Checks before fitting, which stop a fit or cut its series:
 The fit:
 
 - [ ] `src/fit/`: the whole window, up to 19 years before the held-out year, through the engine's `fit()` with robust weights, and the Rayleigh and SNR selection over the candidate list, which [`src/harmonic.ts`](../../src/harmonic.ts)'s `STANDARD` and `SHALLOW` lists give way to. QC, the tidal judgment and the cross-check then read a station's fit where it has one.
+- [ ] More shallow-water candidates where the tide needs them. NOAA fits more than 100 constituents at Anchorage, HATYAN's set has 94, and Foreman lists 77 optional shallow-water constituents. The calibration measures a longer list at every gauge against one added only where the residual has energy in the quarter-diurnal and higher bands, and what either does to the constants of gauges with little shallow-water tide.
+- [ ] Measure two rules the fits don't apply: keeping a constituent under the signal-to-noise limit where its amplitude and phase agree between the yearly fits ([Parker 2007](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf), pp. 165 and 308), and keeping M2, S2, K1 and O1 whatever their ratio.
+- [ ] Measure fits of records under 183 days with P1 and K2 inferred from a neighbor's ratios ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf)) against a longer record at the same gauges. Until then such a record gets a row with its reason and no constants.
 - [ ] Sa and Ssa from the whole window and from each year, kept only where the mean is at least twice its standard error, with the spread recorded either way.
 - [ ] Observed tidal datums from the same series, over the latest window each gauge has within the fit's window and the held-out year, which the fit records as its datum epoch. The store has no shared epoch for observed datums, since a gauge's latest years are the ones its current levels sit in and few gauges share any one span. They follow the rules in slackwater-database's [`docs/datums.md`](https://github.com/openwatersio/slackwater-database/blob/main/docs/datums.md), which move here with the code. The fit names the series and the gauge zero they were reduced in. HAT and LAT come from a synthesis of the fit's constants over 19 years, which anything holding the fit and its definitions can run. Another 19 years gives other extremes, so the synthesis here runs over the epoch slackwater-database pins (`DATUM_EPOCH`, 2007 through 2025), and the fit records it. Which datum is a station's chart datum, by country and by sea, stays in slackwater-database.
 - [ ] Scores on the held-out year: tidal-band RMS, the share of the tidal band's variance the fit explains, energy by band, and the time and height of high and low waters, with one extremum picker.
-- [ ] The same code scores the constants slackwater-database holds for the gauge on the same year, from a pinned `@slackwater/database` release named in the fit. Those are slackwater-database's TICON records, which include its own refits of mislabeled clocks, not TICON as published. Each score stores a digest of the constants it scored, and a new release that changes a linked record's digest scores it again.
+- [x] The same code scores the constants slackwater-database holds for the gauge on the same year, from the pinned `@slackwater/database` release each score names, into `fits/references/<source>.parquet` ([Reference scores](../fits.md#reference-scores)). Those are slackwater-database's records, which include its own refits of mislabeled clocks, not TICON as published. Each score stores a digest of the constants it scored, and a new release that changes a linked record's digest scores it again, without fitting.
 - [ ] Every series with enough final record is fitted, and its row carries what a consumer needs to set its own threshold: mean range, variance explained, each constituent's SNR and the yearly scatter. On one-off fits of 2021 to 2023 with a fixed set of 24 constituents, scored on 2024 as one minus the residual's variance over the observed levels', both after the Godin filter, the tide explains 92 to 95% of the tidal band's variance at NOAA's Gulf gauges, 31 to 38% in the Kattegat, 18% at Gedser, where DMI publishes tables, and 4 to 18% at German Baltic gauges, where BSH publishes none. A screen run here to save compute is named for its cost and never as a judgment that a gauge has no tide.
 - [ ] A record too short to fit, or one a check stopped, gets a row that says why, and no constants.
 
@@ -358,6 +363,7 @@ As the architecture estimates: about $7 a month in year one on R2 and Workers, p
 ## Open questions
 
 - BSH's answer on the 1 August rule.
+- Whether SHOM will license its predictions as reference data for scoring fits at French gauges, as BSH's and RWS's are used.
 - Which reference checks a gauge's clock where no other originator holds its record and no neighbor is close: an ocean tide model's constants at the gauge would share no gauge's clock, and the choice turns on which model's license allows it. EOT20 is the first to check; FES's and TPXO's terms are restrictive.
 - STOFS-2D station count and file sizes.
 - PSMSL's reply on commercial redistribution (request sent 2026-11-01).

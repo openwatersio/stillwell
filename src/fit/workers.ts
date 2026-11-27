@@ -2,7 +2,8 @@ import { availableParallelism, totalmem } from "node:os";
 import { Worker } from "node:worker_threads";
 import type { StoredStation } from "../schema.ts";
 import type { YearRow } from "../store/years.ts";
-import type { fitStation, FitContext } from "./fit.ts";
+import type { Fit, fitStation, FitContext } from "./fit.ts";
+import type { ReferenceScore } from "./references.ts";
 import { Busy } from "./series.ts";
 
 /**
@@ -12,13 +13,19 @@ import { Busy } from "./series.ts";
  * keeps the files.
  */
 
-type Result = Awaited<ReturnType<typeof fitStation>>;
+type Fitted = Awaited<ReturnType<typeof fitStation>>;
+type Result = Fitted | ReferenceScore[];
 
-/** What a worker is sent: a station and its context as plain data, the years file as its entries. */
+/**
+ * What a worker is sent: a station and its context as plain data, the years
+ * file as its entries. With `score`, the station's fit and its constants, to
+ * score its records against without fitting again (`scoreReferences`).
+ */
 export interface Task {
   id: number;
   station: StoredStation;
   context: Omit<FitContext, "years"> & { years: [string, YearRow][] };
+  score?: { fit: Fit; constants: { name: string; amplitude: number; phase: number }[] };
 }
 
 /** What a worker sends back: the station's rows, that its year files are being written, or an error. */
@@ -85,20 +92,29 @@ export function workerCount(concurrency: number): number {
 }
 
 /**
- * `fitStation` on a worker thread that isn't fitting, starting one where none
- * is free. The caller runs no more of these at once than `workerCount` allows.
- * Rejects with `Busy` as `fitStation` throws it, and with `WorkerDied` where
- * the worker ended before answering.
+ * A task on a worker thread that isn't working, starting one where none is
+ * free. The caller runs no more of these at once than `workerCount` allows.
+ * Rejects with `Busy` as the task throws it, and with `WorkerDied` where the
+ * worker ended before answering.
  */
-export function fitInWorker(station: StoredStation, context: FitContext): Promise<Result> {
+function run<T extends Result>(
+  station: StoredStation,
+  context: FitContext,
+  score?: Task["score"],
+): Promise<T> {
   const pooled = pool.find((p) => !p.task) ?? spawn();
   const id = tasks++;
   return new Promise((resolve, reject) => {
-    pooled.task = { resolve, reject };
+    pooled.task = { resolve: resolve as (result: Result) => void, reject };
     pooled.worker.ref();
     // An erratum's check is a function, which a message can't carry and a fit doesn't use.
     const errata = context.errata.map(({ check: _, ...erratum }) => erratum);
-    const task: Task = { id, station, context: { ...context, errata, years: [...context.years] } };
+    const task: Task = {
+      id,
+      station,
+      context: { ...context, errata, years: [...context.years] },
+      ...(score ? { score } : {}),
+    };
     try {
       pooled.worker.postMessage(task);
     } catch (error) {
@@ -108,4 +124,19 @@ export function fitInWorker(station: StoredStation, context: FitContext): Promis
       reject(error instanceof Error ? error : new Error(String(error)));
     }
   });
+}
+
+/** `fitStation` on a worker thread. */
+export function fitInWorker(station: StoredStation, context: FitContext): Promise<Fitted> {
+  return run<Fitted>(station, context);
+}
+
+/** `scoreReferences` on a worker thread. */
+export function scoreInWorker(
+  station: StoredStation,
+  fit: Fit,
+  constants: { name: string; amplitude: number; phase: number }[],
+  context: FitContext,
+): Promise<ReferenceScore[]> {
+  return run<ReferenceScore[]>(station, context, { fit, constants });
 }
