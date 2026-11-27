@@ -78,10 +78,9 @@ export interface PublishedConstants {
  * Kartverket's constants from a `constituents` answer. Amplitudes come in
  * centimeters. Phases come against UTC+1, and a phase is moved by the
  * constituent's speed over one hour and over the mean of terrestrial time
- * minus UTC in the period. Kartverket states the hour. The rest is taken
- * from the comparison of its constants with fits of its observations, and is
- * asked of it (question `kartverket-constants-clock`); the README's Constants
- * entry has the measurement.
+ * minus UTC in the period. Kartverket's answer states the hour, and its
+ * reply to question `kartverket-constants-clock` says the analysis runs in
+ * terrestrial time; the README's Constants entry has the measurement.
  *
  * Throws on an answer in another unit or offset, without a period, with a
  * date that isn't one, a constituent it can't read whole, a name twice, or a
