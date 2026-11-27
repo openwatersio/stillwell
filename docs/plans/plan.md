@@ -74,7 +74,7 @@ workers/live/          the poller's Worker, container and D1 database (phase 9)
 server/                the poller, its passes and its daily-file export (phase 9)
 src/fit/               which values a fit reads, the checks before it, the fit, its scores and the datums (phase 6)
 scripts/snapshot.ts    quarterly bulk snapshots (phase 12)
-.github/workflows/     the fits, as a job of Monthly (phase 6); snapshot-quarterly (phase 12)
+.github/workflows/     the fits, as a step of Monthly's list job (phase 6); snapshot-quarterly (phase 12)
 ```
 
 Adapters run in Node, in Actions and on the Stillwell server. Adapter code uses only `fetch` and plain TypeScript, with the store's pieces (DuckDB, the disk cache) kept in `src/store/` and `scripts/`.
@@ -84,9 +84,10 @@ Adapters run in Node, in Actions and on the Stillwell server. Adapter code uses 
 [Files reference](https://openwatersio.github.io/stillwell/docs/reference/files/) has the store's layout and columns. The plan adds:
 
 ```
-fits/<source>.parquet                            a row per fit: its window, the year files read, its scores and datums (phase 6)
+fits/<source>.parquet                            a row per fit: its window, the year files read and its scores (phase 6)
 constituents/<source>.parquet                    a row per fit and candidate constituent, kept or not, with why (phase 6)
 fits/references/<source>.parquet                 a row per fit and slackwater-database record of its gauge: the record's scores on the held-out year (phase 6)
+fits/datums/<source>.parquet                     a row per fit with constants: its observed tidal datums and those of a prediction from its constants (phase 6)
 models/stofs2d/<cycle>.parquet                   station-point nowcast and forecast (phase 11)
 models/gtsm/<point>.parquet                      surge reanalysis at coastal points (phase 11)
 bulk/<snapshot>/<source>.parquet                 quarterly, Hive-partitioned by year (phase 12)
@@ -205,7 +206,7 @@ The fit:
 - [ ] Measure two rules the fits don't apply: keeping a constituent under the signal-to-noise limit where its amplitude and phase agree between the yearly fits ([Parker 2007](https://tidesandcurrents.noaa.gov/publications/Tidal_Analysis_and_Predictions.pdf), pp. 165 and 308), and keeping M2, S2, K1 and O1 whatever their ratio.
 - [ ] Measure fits of records under 183 days with P1 and K2 inferred from a neighbor's ratios ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf)) against a longer record at the same gauges. Until then such a record gets a row with its reason and no constants.
 - [ ] Sa and Ssa from the whole window and from each year, kept only where the mean is at least twice its standard error, with the spread recorded either way.
-- [ ] Observed tidal datums from the same series, over the latest window each gauge has within the fit's window and the held-out year, which the fit records as its datum epoch. The store has no shared epoch for observed datums, since a gauge's latest years are the ones its current levels sit in and few gauges share any one span. They follow the rules in slackwater-database's [`docs/datums.md`](https://github.com/openwatersio/slackwater-database/blob/main/docs/datums.md), which move here with the code. The fit names the series and the gauge zero they were reduced in. HAT and LAT come from a synthesis of the fit's constants over 19 years, which anything holding the fit and its definitions can run. Another 19 years gives other extremes, so the synthesis here runs over the epoch slackwater-database pins (`DATUM_EPOCH`, 2007 through 2025), and the fit records it. Which datum is a station's chart datum, by country and by sea, stays in slackwater-database.
+- [x] Observed tidal datums from the same series, into `fits/datums/<source>.parquet` ([Tidal datums](../fits.md#tidal-datums)), reduced by [`@slackwater/datums`](https://www.npmjs.com/package/@slackwater/datums) over the longest run of whole years of complete months each gauge has within the fit's window and the held-out year, the latest on a tie, which the row records. The store has no shared epoch for observed datums, since a gauge's latest years are the ones its current levels sit in and few gauges share any one span. The row names the series, the gauge zero and the epoch they were reduced in. HAT, LAT and the package's other datums of a prediction come from a synthesis of the fit's constants over 19 years, which anything holding the fit and its definitions can run. Another 19 years gives other extremes, so the synthesis runs over the epoch the package pins (`DATUM_EPOCH`, 2007 through 2025), and the row records it. Which datum is a station's chart datum, by country and by sea, stays in slackwater-database.
 - [ ] Scores on the held-out year: tidal-band RMS, the share of the tidal band's variance the fit explains, energy by band, and the time and height of high and low waters, with one extremum picker.
 - [x] The same code scores the constants slackwater-database holds for the gauge on the same year, from the pinned `@slackwater/database` release each score names, into `fits/references/<source>.parquet` ([Reference scores](../fits.md#reference-scores)). Those are slackwater-database's records, which include its own refits of mislabeled clocks, not TICON as published. Each score stores a digest of the constants it scored, and a new release that changes a linked record's digest scores it again, without fitting.
 - [ ] Every series with enough final record is fitted, and its row carries what a consumer needs to set its own threshold: mean range, variance explained, each constituent's SNR and the yearly scatter. On one-off fits of 2021 to 2023 with a fixed set of 24 constituents, scored on 2024 as one minus the residual's variance over the observed levels', both after the Godin filter, the tide explains 92 to 95% of the tidal band's variance at NOAA's Gulf gauges, 31 to 38% in the Kattegat, 18% at Gedser, where DMI publishes tables, and 4 to 18% at German Baltic gauges, where BSH publishes none. A screen run here to save compute is named for its cost and never as a judgment that a gauge has no tide.
@@ -213,7 +214,7 @@ The fit:
 
 What is published:
 
-- [ ] `fits/<source>.parquet` and `constituents/<source>.parquet`, defined in [`src/store/files.ts`](../../src/store/files.ts) with the other published files: the window, the year files and their versions, which values counted as final, the engine's version, each candidate's amplitude, phase, intervals, SNR and selection verdict, the definition each constituent was fitted under, the yearly scatter, the datums, and every held-out score. Each fit carries its station's license, commercial use and attribution.
+- [ ] `fits/<source>.parquet` and `constituents/<source>.parquet`, defined in [`src/store/files.ts`](../../src/store/files.ts) with the other published files: the window, the year files and their versions, which values counted as final, the engine's version, each candidate's amplitude, phase, intervals, SNR and selection verdict, the definition each constituent was fitted under, the yearly scatter and every held-out score, with the datums in a file of their own. A fit's terms are its station's, in `stations.parquet` by `id`: its license, commercial use and attribution.
 - [ ] A superseded fit stays readable by its version, as year files do, so a database release can name the fit it shipped.
 - [ ] A fit from a restricted series stays in the restricted store until its operator agrees to the constants being published (decision 8), as a field the source declares. slackwater-database reads only the public store.
 - [ ] A page in the site's docs on reading the fits, and what each column means.
@@ -226,7 +227,8 @@ What is published:
 
 Running:
 
-- [ ] A job in Monthly that fits a gauge again when a year file it read has a new version or its record has grown by a year, so constants follow the store instead of a TICON release.
+- [x] A step of Monthly's list job that fits the stations whose fit is due, when a year file it read has a new version, its record has grown by a year or anything else it depends on has changed, so constants follow the store instead of a TICON release. It works within a budget, the largest tides first, and only at a source with a station that has constants.
+- [ ] A first fit of each source from the Ingest workflow, once the calibration covers it. A source with more stations than a month's budget reaches takes several runs.
 - [ ] A monthly residual report: observed minus predicted at every station with constants, from a fit here or from slackwater-database through `tide_station`. Tidal-band energy in the residual means wrong constants; a step means a datum shift; a whole-hour phase lag means a clock error.
 
 In slackwater-database:
@@ -248,7 +250,7 @@ Estimate: 3 days.
 - [x] Per source: CO-OPS datums API; RWS NAP and MSL; BSH and PEGELONLINE PNP, NHN and SKN; USGS gage datum to NAVD88; USACE series datums.
 - [x] Tests that convert a known level at a few stations to each datum and compare with the operator's published value.
 - [x] Offsets measured between linked series from their overlapping levels, in their own monthly job, so a series that shares a gauge's zero with a slackwater-database record, such as PEGELONLINE with WSV's GESLA files, gets its MSL and LAT. PEGELONLINE publishes only mean high and low tide for its tidal gauges, not a mean water level.
-- [ ] MSL, LAT and the other tidal datums from the station's own fit (phase 6) where it has one, as `datums_source: computed`, ahead of slackwater-database's, which then come only from records the store didn't fit.
+- [ ] MSL, LAT and the other tidal datums from the station's own fit (`fits/datums/<source>.parquet`) where it has one, ahead of slackwater-database's, which then come only from records the store didn't fit. `computed` already names offsets carried from another series of the gauge, which [`src/links.ts`](../../src/links.ts) tells from a station's own, so these need a `datums_source` of their own. Where a source publishes datums for an official epoch, as NOAA does for 1983 through 2001, a station's own reduction over its latest years differs by the change in sea level between the two, and crowd-depth reduces soundings to the MLLW in `datums`, so whether the fit's datums replace the source's there is a decision to make first, with the differences measured at every station they would change.
 
 ### Phase 8: Remaining real-time feeds
 

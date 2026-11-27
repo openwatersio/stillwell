@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -388,6 +389,58 @@ describe("fitSource", () => {
     await assert.rejects(fitSource(store, source, [station("a")], options), /no years file/);
   });
 
+  it("starts no station after its time, the largest tides first, and says how many it left", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "stillwell-fit-budget-"));
+    await writeYears(dir, "test", [row(2024, "b")]);
+    const finalizes = { metadata: FINALIZES } as unknown as Source;
+    const stations = [
+      station("small", { tide_m: 0.01 }),
+      station("unmeasured"),
+      station("large", { tide_m: 1.5 }),
+      station("middle", { tide_m: 0.4 }),
+    ];
+    const started: string[] = [];
+    let now = 0;
+    const report = await fitSource(dir, finalizes, stations, {
+      ...options,
+      until: 1,
+      clock: () => now,
+      concurrency: 1,
+      // Each fit takes one tick, so the time runs out after the second starts.
+      fit: async (s) => {
+        started.push(s.id);
+        now += 1;
+        return {
+          fit: { ...fit({ id: s.id, reason: "x", version: null }) } as Fit,
+          constituents: [],
+          references: [],
+        };
+      },
+    });
+    assert.deepEqual(started, ["test/large", "test/middle"]);
+    assert.equal(report.left, 2);
+    assert.deepEqual([...(await readFits(dir, "test")).keys()], ["test/large", "test/middle"]);
+    // A run whose time has passed starts none and writes nothing: the two it left and the two the
+    // stand-in gave no real digest are all still due.
+    const none = await fitSource(dir, finalizes, stations, {
+      ...options,
+      until: -1,
+      clock: () => 0,
+      fit: async () => assert.fail("no station starts after the time"),
+    });
+    assert.equal(none.left, 4);
+    assert.deepEqual([...(await readFits(dir, "test")).keys()], ["test/large", "test/middle"]);
+    // It still takes out the rows of a station that left the list.
+    await fitSource(
+      dir,
+      finalizes,
+      stations.filter((s) => s.id !== "test/large"),
+      { ...options, until: -1, clock: () => 0 },
+    );
+    assert.deepEqual([...(await readFits(dir, "test")).keys()], ["test/middle"]);
+    rmSync(dir, { recursive: true, force: true });
+  });
+
   it("refuses an empty list, which would take every station's rows with it", async () => {
     await writeYears(store, "test", [row(2024, "b")]);
     await assert.rejects(fitSource(store, source, [], options), /lists no stations/);
@@ -488,10 +541,17 @@ describe("fitSource", () => {
       { id: "test/a", epoch: null, year: null },
       row(2024, "b", "test/b"),
     ]);
-    await assert.rejects(
-      fitSource(store, finalizing, [station("a"), station("b")], { ...options, all: true }),
-      /year files are being written/,
-    );
+    const lines: string[] = [];
+    const report = await fitSource(store, finalizing, [station("a"), station("b")], {
+      ...options,
+      all: true,
+      log: (line) => lines.push(line),
+      fit: async () => assert.fail("no station is fitted while the final year can't be told"),
+    });
+    // The run waits and doesn't fail, so a write in progress doesn't fail the job that follows it.
+    assert.deepEqual(report.waiting, ["test/a", "test/b"]);
+    assert.deepEqual(report.failed, []);
+    assert.match(lines[0]!, /1 stations' year files are being written/);
     assert.equal((await readFits(store, "test")).get("test/a")!.version, "v");
     assert.equal((await readConstituents(store, "test")).length, 1);
   });
@@ -509,6 +569,47 @@ describe("fitSource", () => {
     assert.equal((await readConstituents(store, "test")).length, 1);
   });
 
+  it("keeps a station's constants where the years file lacks a file its fit read and the store holds", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "stillwell-fit-short-"));
+    // The fit read 2023 and 2024, and the store still holds both files.
+    for (const year of [2023, 2024])
+      await writeObservations(
+        seriesPath(dir, "levels", "test", "a", year),
+        [{ time: Date.UTC(year, 0, 1), level: 1, flag: Flag.good }],
+        "NAVD88",
+      );
+    const [fa, ca] = constants("test/a");
+    const read = {
+      ...fa,
+      inputs: JSON.stringify({
+        ...emptyInputs(),
+        digest: "d",
+        versions: { "1 2023": "a", "1 2024": "b" },
+      }),
+    };
+    const stub = async (s: StoredStation) => ({
+      fit: { ...fit({ id: s.id, reason: "x", version: null }) } as Fit,
+      constituents: [],
+      references: [],
+    });
+    // A years file from a short listing: 2024's row is gone, with the file still there.
+    await writeFits(dir, "test", [read], [ca]);
+    await writeYears(dir, "test", [row(2023, "a")]);
+    const short = await fitSource(dir, finalizing, [station("a")], { ...options, fit: stub });
+    assert.match(
+      short.failed[0]!,
+      /test\/a: the years file lacks 1 year files .* 1 2024 among them; run `ingest years test`/,
+    );
+    assert.equal((await readFits(dir, "test")).get("test/a")!.version, "v");
+    assert.equal((await readConstituents(dir, "test")).length, 1);
+    // The file really gone, as after delete-years: the station is fitted again.
+    rmSync(seriesPath(dir, "levels", "test", "a", 2024));
+    const gone = await fitSource(dir, finalizing, [station("a")], { ...options, fit: stub });
+    assert.deepEqual(gone.failed, []);
+    assert.equal((await readFits(dir, "test")).get("test/a")!.reason, "x");
+    rmSync(dir, { recursive: true, force: true });
+  });
+
   it("takes stations' rows out of both files", async () => {
     const [fa, ca] = constants("test/a");
     const [fb, cb] = constants("test/b");
@@ -520,5 +621,54 @@ describe("fitSource", () => {
       ["test/b"],
     );
     assert.deepEqual(await dropFits(store, "test", (id) => id === "test/a"), []);
+  });
+});
+
+describe("ingest fit", () => {
+  const store = mkdtempSync(join(tmpdir(), "stillwell-fit-cli-"));
+  after(() => rmSync(store, { recursive: true, force: true }));
+  const run = (...args: string[]) =>
+    spawnSync(process.execPath, ["scripts/ingest.ts", "fit", ...args], {
+      encoding: "utf8",
+      env: { ...process.env, STILLWELL_STORE: store },
+    });
+
+  it("fits nothing at a source whose adapter reads no levels", () => {
+    const bsh = run("bsh");
+    assert.equal(bsh.status, 0);
+    assert.match(bsh.stdout, /fit bsh: its adapter reads no levels/);
+  });
+
+  it("starts no fits with --only-fitted where the source's file holds no constants", async () => {
+    // Rows that say why each station has none, as a source with no revision window gets.
+    await writeFits(
+      store,
+      "smhi",
+      [{ ...fit({ id: "smhi/1", reason: "x", version: null }) } as Fit],
+      [],
+    );
+    const smhi = run("smhi", "--only-fitted", "--budget", "0");
+    assert.equal(smhi.status, 0);
+    assert.match(smhi.stdout, /no station has constants yet, and --only-fitted starts none/);
+    rmSync(join(store, "fits"), { recursive: true, force: true });
+    rmSync(join(store, "constituents"), { recursive: true, force: true });
+  });
+
+  it("starts no fits with --only-fitted at a source that has none", () => {
+    const smhi = run("smhi", "--only-fitted", "--budget", "0");
+    assert.equal(smhi.status, 0);
+    assert.match(
+      smhi.stdout,
+      /fit smhi: no station has constants yet, and --only-fitted starts none/,
+    );
+  });
+
+  it("refuses a budget that isn't minutes", () => {
+    // By its own message: an empty store would refuse the run for want of a station list anyway.
+    for (const budget of ["1.5", "9".repeat(309), "soon", "1e3"])
+      assert.match(
+        run("smhi", "--budget", budget).stderr,
+        /--budget must be a whole number of minutes/,
+      );
   });
 });

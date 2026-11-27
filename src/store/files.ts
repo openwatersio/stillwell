@@ -702,7 +702,7 @@ export const FILES = {
     example: "fits/smhi.parquet",
     title: "Harmonic fits",
     description:
-      "One row per station the store has tried to fit harmonic constants for: the window the fit read, how it scored on a year it didn't read, and what it read, or why the station has no constants. The constants are in `constituents/<source>.parquet`. A fit is a measurement, and no row says whether a gauge has enough tide to predict.",
+      "One row per station the store has tried to fit harmonic constants for: the window the fit read, how it scored on a year it didn't read, and what it read, or why the station has no constants. The constants are in `constituents/<source>.parquet`. A fit is a measurement, and no row says whether a gauge has enough tide to predict. A fit's terms are its station's: join `stations.parquet` on `id` for its license, commercial use and attribution.",
     columns: [
       { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
       { name: "fitted", type: "TIMESTAMPTZ", description: "When the fit ran." },
@@ -1201,6 +1201,126 @@ export const FILES = {
       },
     ],
     sort: ["id", "rank"],
+  },
+  "fit-datums": {
+    path: "fits/datums/<source>.parquet",
+    example: "fits/datums/smhi.parquet",
+    title: "Tidal datums",
+    description:
+      "One row per station with constants in `fits/<source>.parquet`: tidal datums reduced from the station's own measured levels, and the datums of a 19-year prediction from its constants, each as heights above the station's zero, by `@slackwater/datums`. The observed datums cover the latest whole years of complete months the station has from the start of the fit's window to the end of its held-out year, and `reason` says why a station has none. Which of them is a station's chart datum is slackwater-database's choice, and `stations.parquet` doesn't read this file.",
+    columns: [
+      { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
+      {
+        name: "version",
+        type: "VARCHAR",
+        description:
+          "The `version` of the fit whose constants filled gaps and made the prediction, in `fits/<source>.parquet`. The files are written one after another, so join them on `id`, `version` and `fitted`.",
+      },
+      {
+        name: "fitted",
+        type: "TIMESTAMPTZ",
+        description:
+          "The `fitted` of that fit. A row whose `version` or `fitted` isn't its fit's is from an earlier fit.",
+      },
+      { name: "reduced", type: "TIMESTAMPTZ", description: "When the datums were reduced." },
+      {
+        name: "reason",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "Why the station has no observed datums, such as no whole year of complete months; null where it has them. The predicted datums don't depend on it.",
+      },
+      {
+        name: "datum",
+        type: "VARCHAR",
+        description:
+          "The zero every height in the row is above: the station's `datum` in its current epoch, which the fit moved every epoch's levels into.",
+      },
+      {
+        name: "epoch",
+        type: "INTEGER",
+        description: "The station's current datum epoch, whose `datum` that is.",
+      },
+      {
+        name: "since",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description:
+          "The start of the observed reduction's window: the longest run of complete UTC calendar months that is a whole number of years, the latest on a tie, within the 19 years up to the last complete month read. Null without observed datums.",
+      },
+      {
+        name: "until",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description: "The end of that window, exclusive.",
+      },
+      {
+        name: "months",
+        type: "INTEGER",
+        nullable: true,
+        description: "How many months the window holds, a multiple of 12.",
+      },
+      {
+        name: "observed_hours",
+        type: "INTEGER",
+        nullable: true,
+        description:
+          "Hours of the window with a measured value: one flagged good or preliminary. A value a source marks both provisional and estimated is stored as preliminary, so it counts here.",
+      },
+      {
+        name: "inferred_hours",
+        type: "INTEGER",
+        nullable: true,
+        description:
+          "Hours of the window filled from the fit's prediction plus the residual interpolated across a gap of up to 23 hours.",
+      },
+      {
+        name: "observed",
+        type: "MAP(VARCHAR, DOUBLE)",
+        nullable: true,
+        description:
+          "The observed datums, NOAA's first reduction over the window: `MHHW`, `MHW`, `MSL`, `MTL`, `MLW` and `MLLW`, in meters above `datum`. Null without them.",
+      },
+      {
+        name: "predicted_since",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description:
+          "The start of the 19 years the fit's constants are predicted over: the epoch `@slackwater/datums` pins, the same for every station.",
+      },
+      {
+        name: "predicted_until",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description: "The end of those 19 years, exclusive.",
+      },
+      {
+        name: "predicted",
+        type: "MAP(VARCHAR, DOUBLE)",
+        nullable: true,
+        description:
+          "The datums of that prediction, in meters above `datum`, on top of the fit's `z0_m`, the mean level over its window: `HAT` and `LAT`, the highest and lowest predicted tide, the Large Tide levels `HHWLT` and `LLWLT`, `MHHW`, `MHW`, `MSL`, `MTL`, `MLW` and `MLLW` of the predicted turns, `MHWS` and `MLWS` from the M2 and S2 amplitudes, `NLLW` and `ALLW` (Indian Spring Low Water) and `TLT` (China's Theoretical Lowest Tide), each where the package can compute it. Null, with `predicted_since` and `predicted_until`, where the fit kept no daily or faster constituent.",
+      },
+      {
+        name: "ignored",
+        type: "VARCHAR[]",
+        description:
+          "Constituents the fit kept that the package's prediction engine doesn't define, which neither filled gaps nor entered the prediction; empty where none.",
+      },
+      {
+        name: "package",
+        type: "VARCHAR",
+        description:
+          "The package that reduced the datums and its version, such as `@slackwater/datums@0.1.0-beta.0`.",
+      },
+      {
+        name: "digest",
+        type: "VARCHAR",
+        description:
+          "A digest of what the datums depend on besides their fit: the package's version and the method's. The row is reduced again when it changes.",
+      },
+    ],
+    sort: ["id"],
   },
   recent: {
     path: "recent/<source>/<YYYY-MM-DD>.parquet",

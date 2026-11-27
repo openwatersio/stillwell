@@ -2,6 +2,7 @@ import { availableParallelism, totalmem } from "node:os";
 import { Worker } from "node:worker_threads";
 import type { StoredStation } from "../schema.ts";
 import type { YearRow } from "../store/years.ts";
+import type { FitDatums } from "./datums.ts";
 import type { Fit, fitStation, FitContext } from "./fit.ts";
 import type { ReferenceScore } from "./references.ts";
 import { Busy } from "./series.ts";
@@ -14,18 +15,20 @@ import { Busy } from "./series.ts";
  */
 
 type Fitted = Awaited<ReturnType<typeof fitStation>>;
-type Result = Fitted | ReferenceScore[];
+type Result = Fitted | ReferenceScore[] | FitDatums;
 
 /**
  * What a worker is sent: a station and its context as plain data, the years
  * file as its entries. With `score`, the station's fit and its constants, to
- * score its records against without fitting again (`scoreReferences`).
+ * score its records against without fitting again (`scoreReferences`). With
+ * `datums`, the same, to reduce its datums from (`reduceDatums`).
  */
 export interface Task {
   id: number;
   station: StoredStation;
   context: Omit<FitContext, "years"> & { years: [string, YearRow][] };
   score?: { fit: Fit; constants: { name: string; amplitude: number; phase: number }[] };
+  datums?: { fit: Fit; constants: { name: string; amplitude: number; phase: number }[] };
 }
 
 /** What a worker sends back: the station's rows, that its year files are being written, or an error. */
@@ -101,6 +104,7 @@ function run<T extends Result>(
   station: StoredStation,
   context: FitContext,
   score?: Task["score"],
+  datums?: Task["datums"],
 ): Promise<T> {
   const pooled = pool.find((p) => !p.task) ?? spawn();
   const id = tasks++;
@@ -114,6 +118,7 @@ function run<T extends Result>(
       station,
       context: { ...context, errata, years: [...context.years] },
       ...(score ? { score } : {}),
+      ...(datums ? { datums } : {}),
     };
     try {
       pooled.worker.postMessage(task);
@@ -139,4 +144,18 @@ export function scoreInWorker(
   context: FitContext,
 ): Promise<ReferenceScore[]> {
   return run<ReferenceScore[]>(station, context, { fit, constants });
+}
+
+/** `reduceDatums` on a worker thread. */
+export function datumsInWorker(
+  station: StoredStation,
+  fit: Fit,
+  constants: { name: string; amplitude: number; phase: number }[],
+  context: Omit<FitContext, "finalYear" | "engine">,
+): Promise<FitDatums> {
+  // A reduction reads no final year or engine, which a task's context carries for fits.
+  return run<FitDatums>(station, { ...context, finalYear: 0, engine: "" }, undefined, {
+    fit,
+    constants,
+  });
 }

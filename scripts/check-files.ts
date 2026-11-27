@@ -55,6 +55,7 @@ for (const source of sources) {
   await check(`fits/${source}.parquet`, FILES.fits, true);
   await check(`constituents/${source}.parquet`, FILES.constituents, true);
   await check(`fits/references/${source}.parquet`, FILES.references, true);
+  await check(`fits/datums/${source}.parquet`, FILES["fit-datums"], true);
   // Yesterday's, which the poller has written whole.
   await check(
     recentDayPath("", source, recentDays(Date.now(), 2)[0]!).slice(1),
