@@ -48,16 +48,22 @@ An experiment on 56 gauges offered NOAA's 59 Anchorage compounds after the 79. O
 
 **D. A regularized fit.** Every candidate is fitted with a penalty or a prior scaled to its expected size, which handles near-collinear lines smoothly. Shrinkage biases amplitudes low, which is Parker's lost-energy concern.
 
-**E. Another method where the residual is not stationary.** For the Elbe, Weser and river gauges, lines added to a stationary model cannot follow a tide that river flow modulates. The roadmap's HRoI track is this for German and Dutch gauges. It complements any of A to D.
+**E. A progressive fit from the residual.** Fit a core set, take the spectrum of what is left, add the candidates that match peaks standing above the continuum, refit the whole set, and repeat until none passes. Zetler and Cummings reached Anchorage's 114 this way from a 37-constituent fit of 192 days (1967, pp. 104–105), Rossiter and Lennon named 54 lines in the Thames from residual periodograms ([1968](https://doi.org/10.1111/j.1365-246X.1968.tb00223.x), p. 284), and SHOM adds any line left in the residual. An open-coast gauge stays on a short list and an estuary gets what it needs, at a cost paid only where it buys something. Four cautions come with it. The test has to read the tidal bands, since weather dominates the whole residual. The largest of several hundred spectral bins always looks significant, so the bar must allow for how many were examined. A constituent that reduces variance is not thereby real: Parker prefers consistent phase from year to year as the acceptance test (2007, §4.4, p. 165). And energy lying between the line groups is interaction with weather, which Zetler and Cummings left alone (p. 105). A short record cannot resolve the spectrum, so this design needs a fixed tier under some record length. NOAA's advice runs the other way, "start with the largest number of constituents and reduce the number if the results are unstable" ([Zervas 1999](https://repository.library.noaa.gov/view/noaa/50573), §2.1, p. 14), which is design B.
+
+**F. Another method where the residual is not stationary.** For the Elbe, Weser and river gauges, lines added to a stationary model cannot follow a tide that river flow modulates. The roadmap's HRoI track is this for German and Dutch gauges. It complements any of A to E.
 
 Two questions cut across the designs: how a shared-frequency line gets its name, and whether a 19-year fit should resolve nodal satellites directly where the formulas are known to be wrong.
 
 ## Experiment
 
+A first measurement decides whether design E has a trigger at all. Fit each gauge of the compound experiment with the 79 over 19 years, and take the spectrum of the held-out residual. If energy above the continuum in the third-diurnal and higher bands separates the 18 gauges that gained 1 mm or more from the 59 compounds from the 37 that did not, the residual says where to add. If it does not, a progressive fit needs another trigger. The same spectra, taken after the 59 are fitted, show whether lines remain at the gauges that gained, or only a broad rise around each main line that no further constituent would take up.
+
+The full comparison follows from that:
+
 - **Gauges.** Several hundred, stratified by class: open coast, shelf, estuary, river.
 - **Record lengths.** 0.5, 1, 2, 4, 10 and 19 years, made by truncating long records, so each rule is scored where it is weakest.
 - **Scoring.** Fit on years before a cutoff and score each of several later years, at gaps of one to five years. Report paired differences per gauge, the residual within each tidal species, the times and heights of high and low water, and the spread of each constant across disjoint windows.
-- **Arms.** The 79; the 79 with NOAA's 59; every separable catalog line under thresholds of 2, 4 and 6, with and without a stability filter; stepwise selection; a regularized fit; lists tiered by record length. The robust weights are a factor in each arm, since they change the variance every threshold rests on.
+- **Arms.** The 79; the 79 with NOAA's 59; every separable catalog line under thresholds of 2, 4 and 6, with and without a stability filter; a progressive fit from the residual, under two or three stopping rules; a regularized fit; lists tiered by record length. The robust weights are a factor in each arm, since they change the variance every threshold rests on.
 - **Synthetic check.** Inject known lines into real residuals to measure each rule's false-positive and false-negative rates.
 - **Prerequisites in the fit.** A condition-number diagnostic and a stepwise cut, each of which stands on its own.
 
