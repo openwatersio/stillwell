@@ -34,6 +34,7 @@ Every file is under `https://stillwell.openwaters.io/`, readable over HTTPS with
 
 - [`fits/<source>.parquet`](#harmonic-fits): each station's harmonic fit, with its window, its scores on a year it didn't read, and what it read.
 - [`constituents/<source>.parquet`](#harmonic-fits): the constants of each fit, a row per candidate constituent.
+- [`fits/references/<source>.parquet`](#reference-scores): the scores, on a fit's held-out year, of the constants `@slackwater/database` holds for the same gauge.
 - [`fits/datums/<source>.parquet`](#tidal-datums): the tidal datums of each fit, observed from the station's levels and predicted from its constants.
 
 ## Reading one station
@@ -80,6 +81,26 @@ LIMIT 10`}
 To predict from a fit, sum its kept constituents and add the fit's `z0_m`, the window's mean level in the station's datum. Phases are Greenwich lags with time in UTC. The amplitudes and phases were fitted under the nodal corrections the fit's `node_corrections` names, Schureman's (1958), and a prediction has to apply the same ones: constants fitted under one family of corrections predict slightly differently under another. The constituent's name is needed with its Doodson numbers, since NO1 and M1, and MO3 and 2MK3, share numbers and differ in their correction.
 
 <Schema resource="constituents" />
+
+## Reference scores
+
+`fits/references/<source>.parquet` has a row for each fit and each record of constants that [`@slackwater/database`](https://www.npmjs.com/package/@slackwater/database) holds for the same gauge. The record's constants are scored on the fit's held-out year, over the same hours and with the same code as the fit, so `held_out_rms_m` here compares with `held_out_rms_m` in `fits/<source>.parquet`. No row says which constants are better. `variance_difference_se_m2` is the standard error of the fit's residual variance minus the record's.
+
+A record counts as the station's gauge in one of two ways, given in `link`. With `id`, the record carries the station's own ID in its source and lies within 10 km. With `levels`, it carries the ID of a linked series, named in `linked`, whose hourly levels agree with the station's within 1 cm RMS with no lag. A record reached only through a link whose levels haven't been compared has no row.
+
+Each record is predicted under the nodal corrections in `node_corrections`. Where `node_corrections_assumed` is true, the record's source doesn't state which corrections it fitted under, and the score is under the IHO's. `seen` says whether the span the record was analyzed over includes the held-out year, and is null where the record gives no span. `reference_license` and `reference_commercial_use` give the record's terms.
+
+Join on `id`, `version` and `fitted`: a fit's `version` covers its window and constants and not the held-out year's values, and the two files are written one after the other. Kungsvik's fit and the records scored against it:
+
+<QueryResult
+  sql={`SELECT r.reference, r.held_out, round(f.held_out_rms_m * 1000, 2) AS fit_rms_mm, round(r.held_out_rms_m * 1000, 2) AS reference_rms_mm, r.seen, r.reference_license
+FROM 'https://stillwell.openwaters.io/fits/references/smhi.parquet' r
+JOIN 'https://stillwell.openwaters.io/fits/smhi.parquet' f USING (id, version, fitted)
+WHERE r.id = 'smhi/2130'
+ORDER BY r.reference`}
+/>
+
+<Schema resource="references" />
 
 ## Tidal datums
 
