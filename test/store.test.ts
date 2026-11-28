@@ -10,6 +10,8 @@ import {
   readDatums,
   readExtremes,
   readObservations,
+  readObservationsBetween,
+  scanObservationsBetween,
   foldObservationFile,
   readObservationFile,
   readRecent,
@@ -882,5 +884,67 @@ describe("foldObservationFile", () => {
     const { stats } = await foldObservationFile(path, T, "NAP", null, async () => null);
     assert.equal(stats, null);
     assert.deepEqual(await readYearStats([path]), was);
+  });
+});
+
+describe("scanObservationsBetween", () => {
+  const dir = join(root, "scan");
+  const at = (from: number, to: number, path: string) => {
+    const seen: [number, number, Flag][] = [];
+    const count = scanObservationsBetween(path, from, to, (...row) => seen.push(row));
+    return count.then((n) => ({ n, seen }));
+  };
+  // Every minute for more than two of DuckDB's 2048-row chunks, with every flag and a NaN level.
+  const write = async (path: string, level: number) => {
+    mkdirSync(dirname(path), { recursive: true });
+    const db = await (await DuckDBInstance.create(":memory:")).connect();
+    await db.run(
+      `COPY (SELECT make_timestamptz(${T * 1000}::BIGINT + i * 60000000::BIGINT) AS time, CASE WHEN i = 8 THEN 'nan'::FLOAT ELSE (${level} + i / 1000)::FLOAT END AS level_m, (i % 5)::UTINYINT AS flag, NULL::UTINYINT AS source_flag, NULL::TIMESTAMPTZ AS received, 'NAP' AS datum FROM range(5000) t(i) ORDER BY random()) TO '${path}' (FORMAT parquet)`,
+    );
+  };
+
+  it("visits, in time order, the values readObservationsBetween returns", async () => {
+    const path = join(dir, "own", "2026.parquet");
+    await write(path, 1);
+    for (const [from, to] of [
+      [T, T + 5000 * 60_000],
+      [T + 30 * 60_000, T + 4321 * 60_000],
+    ] as const) {
+      const rows = await readObservationsBetween(path, from, to);
+      const { n, seen } = await at(from, to, path);
+      assert.equal(n, rows.length);
+      assert.deepEqual(
+        seen,
+        rows.map((r) => [r.time, r.level, r.flag]),
+      );
+    }
+  });
+
+  it("leaves its connection usable when the visitor throws", async () => {
+    const path = join(dir, "own", "2026.parquet");
+    await write(path, 1);
+    const fail = () => {
+      throw new Error("visitor");
+    };
+    await assert.rejects(scanObservationsBetween(path, T, T + 5000 * 60_000, fail), /visitor/);
+    assert.equal((await readObservationsBetween(path, T, T + 5000 * 60_000)).length, 5000);
+    assert.equal((await at(T, T + 5000 * 60_000, path)).n, 5000);
+  });
+
+  it("visits nothing from a file that doesn't exist", async () => {
+    assert.deepEqual(await at(T, T + 3_600_000, join(dir, "none", "2026.parquet")), {
+      n: 0,
+      seen: [],
+    });
+  });
+
+  it("reads only its own file when its path has a glob character", async () => {
+    const own = join(dir, "g*", "2026.parquet");
+    await write(join(dir, "gh", "2026.parquet"), 9);
+    assert.deepEqual(await at(T, T + 5000 * 60_000, own), { n: 0, seen: [] });
+    await write(own, 1);
+    const { n, seen } = await at(T, T + 5000 * 60_000, own);
+    assert.equal(n, 5000);
+    assert.ok(seen.every(([, level]) => !(level >= 9)));
   });
 });

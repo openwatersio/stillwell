@@ -1509,7 +1509,7 @@ export const SOURCES_SCHEMA: JsonSchema = {
       settles_after_months: {
         type: nullable("integer"),
         description:
-          "For a source that never finalizes: how many months after a calendar year ends its values are read as final: the source's own figure where it states one, otherwise one decided from its record of revisions, with the evidence in the source's README. Null for a source that finalizes, and where none is known.",
+          "For a source that never finalizes: how many months after a calendar year ends its values are read as final: the source's own figure where it states one, otherwise one decided for it, from its record of revisions where the store has one. The source's README says which and what it rests on. Null for a source that finalizes, and where none is set.",
       },
       stations: { type: "integer", description: "How many active stations the source has." },
       backfill: {

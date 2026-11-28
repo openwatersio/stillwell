@@ -51,7 +51,6 @@ describe("sourcesFor", () => {
       "crms",
       "dwr",
       "jma",
-      "kartverket",
       "linz",
       "marine-institute",
       "refmar",

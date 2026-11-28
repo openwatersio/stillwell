@@ -1,5 +1,5 @@
 import { constituents as catalog } from "@slackwater/engine";
-import { CANDIDATES } from "./candidates.ts";
+import { CANDIDATES, SHALLOW } from "./candidates.ts";
 
 /**
  * What the spectrum of a fit's held-out residual holds, species by species:
@@ -48,18 +48,10 @@ export const FIGURES: Record<string, string> = {
 
 /**
  * The 59 shallow-water compounds NOAA publishes for Anchorage beyond the
- * candidates, by the engine's names, in the order NOAA lists them. NOAA's
- * 4MSL12 is the engine's 6MSN12.
+ * candidates, by the engine's names: the fit's `SHALLOW` list, where the
+ * names that differ from NOAA's are explained.
  */
-// prettier-ignore
-export const COMPOUNDS: string[] = [
-  "3MS8", "NO3", "MLN2S2", "3MS4", "4MS10", "MSL6", "3MN8", "2MLNS6", "MSKO7", "3MLS6", "MSK5", "2MLS4",
-  "ML4", "2MP5", "MSN6", "2ML2S2", "2ML6", "2MSO7", "OQ2", "SKM2", "2NMLS6", "2MSN8", "2(MS)8", "3MP5",
-  "SL4", "MNK5", "2NM6", "2MSL8", "3MSN10", "MNO5", "3M2S10", "2PO1", "5MS12", "M10", "4MN10", "2MNO7",
-  "4MLS8", "3MK8", "2MSK8", "3MSK9", "4MSN12", "4M2S12", "3MSL10", "2(MN)8", "3KM5", "2NS2", "4MK9",
-  "4MSK11", "3ML8", "6MSN12", "OP2", "M2(KS)2", "3MNK9", "2MS2K2", "2NMK7", "MKL2S2", "2M2NK9",
-  "2KM(SN)2", "2SN(MK)2",
-];
+export const COMPOUNDS: string[] = SHALLOW.map((c) => c.name);
 
 export interface Constant {
   name: string;
