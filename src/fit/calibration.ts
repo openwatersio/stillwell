@@ -22,14 +22,14 @@ const RAD = Math.PI / 180;
 /**
  * A digest of what the calibration's comparison rests on besides the fit's
  * `METHOD`: the candidate list and the shallow-water compounds, each with its
- * Doodson numbers, spellings and lists, in order, the names not read through
+ * Doodson numbers, spellings, lists and Rayleigh comparison, in order, the names not read through
  * the catalog, and the reference stations as pinned. The report records it, and is of other inputs when it
  * changes. It is wider than what `inputsDigest` takes of the candidates, so a
  * new spelling makes the report due without making any stored fit due.
  */
 export function calibrationDigest(): string {
   const list = (candidates: readonly Candidate[]) =>
-    candidates.map((c) => [c.name, c.doodson, c.spellings ?? [], c.from]);
+    candidates.map((c) => [c.name, c.doodson, c.spellings ?? [], c.from, c.comparison ?? null]);
   return createHash("sha256")
     .update(JSON.stringify([list(CANDIDATES), list(SHALLOW), MISNAMED, STATIONS]))
     .digest("hex")

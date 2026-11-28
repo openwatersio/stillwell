@@ -2,7 +2,7 @@
 
 Kartverket, the Norwegian Mapping Authority's Hydrographic Service, publishes harmonic constants for its gauges, analyzed from its own observations of them, which the store holds as `kartverket`. This report fits 24 of those gauges, every one in the store's list whose constants are from a period that ends with 2020 and starts before 2011, from the store the way that reproduces Kartverket's analysis, and compares the constants with Kartverket's, constituent by constituent. It is written by [`scripts/calibrate-kartverket.ts`](../../scripts/calibrate-kartverket.ts) (`npm run calibrate:kartverket`), with every number in [kartverket-calibration.json](kartverket-calibration.json), and is run again whenever the method changes. [Checks](../contributing/checks.md#kartverket) says how to run it, and the [calibration against NOAA](fit-calibration.md) is its companion. Kartverket's constants, which each gauge's table and the JSON carry, are © Norwegian Mapping Authority, Hydrographic Service, under [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/), from [its tide and water-level data](https://kartverket.no/en/api-and-data/tides-and-water-level-data). Amplitudes are in meters where Kartverket gives centimeters, and phases are moved to UTC as the report says.
 
-These fits ran with @slackwater/engine@1.0.0-beta.15, method 1 of [`src/fit/`](../../src/fit/), and 2024 as the source's last year of final values.
+These fits ran with @slackwater/engine@1.0.0-beta.16, method 1 of [`src/fit/`](../../src/fit/), and 2024 as the source's last year of final values.
 
 ## What is compared
 

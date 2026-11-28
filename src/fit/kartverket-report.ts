@@ -159,7 +159,7 @@ export function kartverketDigest(): string {
         // A function has no JSON of its own.
         [chosen.toString(), isOutside.toString()],
         // The store's own fit starts from these. `METHOD`, which the report records, covers the rest of the fit.
-        CANDIDATES.map((c) => [c.name, c.doodson]),
+        CANDIDATES.map((c) => [c.name, c.doodson, c.comparison ?? null]),
         code,
       ]),
     )
