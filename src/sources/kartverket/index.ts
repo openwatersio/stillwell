@@ -367,6 +367,15 @@ async function pace(): Promise<void> {
 }
 
 /**
+ * Kartverket's published harmonic constants for a gauge, as the API's XML,
+ * asked for afresh so a calibration compares with what Kartverket publishes
+ * now. `parseConstants` (constants.ts) reads it.
+ */
+export function harmonicConstants(code: string): Promise<string> {
+  return request({ tide_request: "constituents", stationcode: code }, true);
+}
+
+/**
  * The API answers a bad request with 200 and an `<error>` element, and an
  * outage of its backend with 200 and a bare message such as
  * `Connection refused (111)<br />`; both fail, so a station keeps its values.

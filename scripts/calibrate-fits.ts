@@ -24,11 +24,19 @@
  * `--report` rewrites the Markdown from the JSON without fitting.
  */
 import "./threadpool.ts";
-import { existsSync, realpathSync, statSync } from "node:fs";
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import {
+  concurrencyOf,
+  inWorkers,
+  openCopy,
+  rounded,
+  stationOf,
+  work,
+  writePair,
+} from "./calibration-run.ts";
+import { existsSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
-import { isMainThread, parentPort, Worker } from "node:worker_threads";
+import { isMainThread } from "node:worker_threads";
 import {
   constituents as catalog,
   createTidePredictor,
@@ -43,7 +51,6 @@ import {
   fittedFor,
   analysisYears,
   calibrationDigest,
-  checkCopy,
   MISNAMED,
   noaaConstants,
   vectorAverage,
@@ -63,9 +70,8 @@ import {
   type Side,
   type Step,
 } from "../src/fit/calibration-report.ts";
-import { engineVersion, FIT_OPTIONS, fitStation, varianceExplained } from "../src/fit/fit.ts";
+import { FIT_OPTIONS, fitStation, varianceExplained } from "../src/fit/fit.ts";
 import { STATIONS } from "../src/fit/calibration-stations.ts";
-import { DUCKDB_MB, HEAP_MB, workerCount } from "../src/fit/workers.ts";
 import {
   harmonicSamples,
   NODE_CORRECTIONS,
@@ -75,14 +81,10 @@ import {
 } from "../src/fit/scores.ts";
 import { emptyInputs, finalYear, METHOD, readSeries } from "../src/fit/series.ts";
 import { fitSamples, type Verdict } from "../src/fit/window.ts";
-import { listOf } from "../src/refresh.ts";
 import type { StoredStation } from "../src/schema.ts";
 import { errata, sourceOf } from "../src/sources/index.ts";
 import { harmonicConstants } from "../src/sources/coops/index.ts";
-import { connected, limitDuckDb, settled } from "../src/store/parquet.ts";
-import { pool } from "../src/store/recent.ts";
-import { STORE } from "../src/store/stores.ts";
-import { readYears, type YearRow } from "../src/store/years.ts";
+import type { YearRow } from "../src/store/years.ts";
 import type { Sample } from "../src/types.ts";
 
 const SOURCE = "coops";
@@ -102,25 +104,7 @@ interface Task {
   engine: string;
 }
 
-type Reply = { result: Result } | { error: string };
-
 const isSeasonal = (name: string) => (SEASONAL as readonly string[]).includes(name);
-
-/** A worker fits one station at a time, as `src/fit/worker.ts` does. */
-function work(): void {
-  limitDuckDb({ threads: "1", memory_limit: `${DUCKDB_MB}MB` });
-  parentPort!.on("message", async (task: Task) => {
-    let reply: Reply;
-    try {
-      reply = { result: await calibrate(task) };
-      await connected();
-    } catch (error) {
-      await settled();
-      reply = { error: error instanceof Error ? (error.stack ?? error.message) : String(error) };
-    }
-    parentPort!.postMessage(reply);
-  });
-}
 
 async function calibrate(task: Task): Promise<Result> {
   const { station, pinned, noaa } = task;
@@ -404,59 +388,15 @@ async function main(): Promise<void> {
     return;
   }
 
-  // A station being written is refused by the reader, and its marker is dropped below, which is
-  // sound only on a copy nothing is writing to, and so never on the default store of a checkout.
-  if (
-    !process.env.STILLWELL_STORE ||
-    /^[a-z0-9]+:\/\//i.test(STORE) ||
-    !existsSync(STORE) ||
-    !statSync(STORE).isDirectory() ||
-    (existsSync("data") && realpathSync(STORE) === realpathSync("data")) ||
-    resolve(STORE) === resolve("data")
-  )
-    throw new Error(
-      `STILLWELL_STORE must name a local copy of the store, a directory other than the checkout's own \`data\`; it is ${process.env.STILLWELL_STORE ?? "not set"}`,
-    );
-  const concurrency = Number(values.concurrency);
-  if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > STATIONS.length)
-    throw new Error(`--concurrency is a whole number from 1 to ${STATIONS.length}`);
-  const pinned = STATIONS;
-  for (const pin of pinned)
+  const concurrency = concurrencyOf(values.concurrency, STATIONS.length);
+  for (const pin of STATIONS)
     if (analysisYears(pin.comment).join() !== pin.years.join())
       throw new Error(`coops/${pin.id}: its years aren't the ones its comment names`);
 
-  const source = sourceOf(SOURCE);
-  const list = await listOf(STORE, source);
-  const all = await readYears(STORE, SOURCE);
-  if (!all) throw new Error(`${STORE} has no years file for ${SOURCE}`);
-  const marked = new Set(
-    [...all.values()].filter((r) => r.epoch === null || r.year === null).map((r) => r.id),
-  );
-  const now = new Date();
-  const qcStarts = new Map(
-    list.flatMap((s) =>
-      s.source_qc_start ? [[s.id, Date.parse(s.source_qc_start)] as const] : [],
-    ),
-  );
-  // A marked station votes for no year, and the store's own fits wait while any is marked. Here
-  // the year is taken only where it is the same whether the marked stations' rows vote or not.
-  const final = finalYear(source.metadata, all, now, qcStarts);
-  const unmarked = new Map([...all].filter(([, r]) => r.epoch !== null && r.year !== null));
-  if (finalYear(source.metadata, unmarked, now, qcStarts) !== final)
-    throw new Error(
-      `${SOURCE}'s last year of final values depends on the stations the copy marks as being written; copy the years file again once they are done`,
-    );
-  // The copy is fixed, so a marker on it says only that the store was being written when it was
-  // copied. `checkCopy` shows each station's rows describe the files copied, marked or not, and
-  // without the marker they are read as they are.
-  const years = [...unmarked];
-  const engine = engineVersion();
-
+  const copy = await openCopy(SOURCE);
   const tasks: Task[] = [];
-  for (const pin of pinned) {
-    const station = list.find((s) => s.id === `${SOURCE}/${pin.id}`);
-    if (!station) throw new Error(`${STORE} lists no ${SOURCE}/${pin.id}`);
-    await checkCopy(STORE, station, all);
+  for (const pin of STATIONS) {
+    const station = await stationOf(copy, `${SOURCE}/${pin.id}`);
     const { comment, constants } = noaaConstants(station.id, await harmonicConstants(pin.id));
     if (constants.length !== (pin.constituents ?? 37))
       throw new Error(
@@ -470,67 +410,17 @@ async function main(): Promise<void> {
       station,
       pinned: pin,
       noaa: constants,
-      marked: marked.has(station.id),
-      store: STORE,
-      years,
-      errata: errata.map(({ check: _, ...erratum }) => erratum),
-      now: now.toISOString(),
-      finalYear: final,
-      engine,
+      marked: copy.marked.has(station.id),
+      store: copy.store,
+      years: copy.years,
+      errata: copy.errata,
+      now: copy.now.toISOString(),
+      finalYear: copy.final,
+      engine: copy.engine,
     });
   }
-
-  const results = new Map<string, Result>();
-  const failed: string[] = [];
-  const lanes = workerCount(concurrency);
-  await pool(
-    Array.from({ length: lanes }, (_, i) => i),
-    lanes,
-    async () => {
-      const worker = new Worker(new URL(import.meta.url), {
-        resourceLimits: { maxOldGenerationSizeMb: HEAP_MB },
-      });
-      // One set of listeners for the worker's life: whichever station it is on gets the answer.
-      let answer: (reply: Reply) => void = () => {};
-      let gone: string | undefined;
-      const end = (why: string) => {
-        gone = why;
-        answer({ error: why });
-      };
-      worker
-        .on("message", (reply: Reply) => answer(reply))
-        .on("error", (error) => end(String(error)))
-        .on("exit", (code) => end(`the worker exited with ${code}`));
-      for (let task = tasks.shift(); task; task = tasks.shift()) {
-        const id = task.station.id;
-        const started = Date.now();
-        const sent = task;
-        // A worker that ended between stations would never answer the next one.
-        const reply = await new Promise<Reply>((answered) => {
-          answer = answered;
-          if (gone) answered({ error: gone });
-          else worker.postMessage(sent);
-        });
-        if ("error" in reply) {
-          failed.push(`${id}: ${reply.error}`);
-          console.error(`${id}: ${reply.error}`);
-          break;
-        }
-        results.set(id, reply.result);
-        console.error(`${id}: fitted in ${Math.round((Date.now() - started) / 1000)} s`);
-      }
-    },
-  );
-  // A file rewritten while the fits ran would have been read against a row that no longer describes it.
-  for (const task of [...results.keys()]) {
-    const station = list.find((s) => s.id === task)!;
-    await checkCopy(STORE, station, all);
-  }
-  // A report missing a station would read as a calibration of the rest.
-  if (failed.length || results.size !== STATIONS.length) {
-    console.error(`${failed.length} stations failed; nothing written`);
-    process.exit(1);
-  }
+  const results = await inWorkers<Task, Result>(new URL(import.meta.url), copy, tasks, concurrency);
+  const { engine, final } = copy;
 
   const report: Report = {
     engine,
@@ -552,22 +442,10 @@ async function main(): Promise<void> {
   const json = JSON.stringify(report, rounded, 2) + "\n";
   const markdown = render(JSON.parse(json) as Report);
   complete(report);
-  // Both written beside their places first, so a write that fails leaves the pair as it was.
-  await mkdir("docs/results", { recursive: true });
-  await writeFile(`${JSON_PATH}.tmp`, json);
-  await writeFile(`${REPORT_PATH}.tmp`, markdown);
-  await rename(`${JSON_PATH}.tmp`, JSON_PATH);
-  await rename(`${REPORT_PATH}.tmp`, REPORT_PATH);
+  await writePair(JSON_PATH, json, REPORT_PATH, markdown);
   console.error(`wrote ${JSON_PATH} and ${REPORT_PATH}`);
   // The workers wait for another station.
   process.exit(0);
-}
-
-/** Numbers to a micrometer or a millionth of a degree, so the file doesn't carry the noise below them. */
-function rounded(_: string, value: unknown): unknown {
-  return typeof value === "number" && !Number.isInteger(value)
-    ? Math.round(value * 1e6) / 1e6
-    : value;
 }
 
 /**
@@ -607,4 +485,4 @@ function leak(
 }
 
 if (isMainThread) await main();
-else work();
+else work(calibrate);

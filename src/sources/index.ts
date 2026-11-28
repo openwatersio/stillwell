@@ -42,6 +42,7 @@ import geslaErrata from "./gesla/errata.ts";
 import ispraErrata from "./ispra/errata.ts";
 import jmaErrata from "./jma/errata.ts";
 import jodcErrata from "./jodc/errata.ts";
+import kartverketErrata from "./kartverket/errata.ts";
 import linzErrata from "./linz/errata.ts";
 import marineInstituteErrata from "./marine-institute/errata.ts";
 import pegelonlineErrata from "./pegelonline/errata.ts";
@@ -103,6 +104,7 @@ export const errataFiles: Record<string, ErrataFile> = {
   ispra: ispraErrata,
   jma: jmaErrata,
   jodc: jodcErrata,
+  kartverket: kartverketErrata,
   linz: linzErrata,
   "marine-institute": marineInstituteErrata,
   pegelonline: pegelonlineErrata,

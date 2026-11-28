@@ -141,17 +141,17 @@ export interface Report {
 
 export const yearSpan = (y: number) => ({ start: Date.UTC(y, 0, 1), end: Date.UTC(y + 1, 0, 1) });
 
-const mm = (m: number | null | undefined, digits = 1) =>
+export const mm = (m: number | null | undefined, digits = 1) =>
   m === null || m === undefined ? "" : (m * 1000).toFixed(digits);
-const signed = (x: number | null | undefined, digits = 1) =>
+export const signed = (x: number | null | undefined, digits = 1) =>
   x === null || x === undefined
     ? ""
     : `${x > 0 ? "+" : x < 0 ? "−" : ""}${Math.abs(x).toFixed(digits)}`;
-const percent = (x: number | null | undefined, digits = 1) =>
+export const percent = (x: number | null | undefined, digits = 1) =>
   x === null || x === undefined ? "" : (x * 100).toFixed(digits);
-const ratio = (x: number | null) =>
+export const ratio = (x: number | null) =>
   x === null ? "" : x > 1 ? `**${x.toFixed(1)}**` : x.toFixed(1);
-const table = (head: string[], rows: string[][], left = 1) =>
+export const table = (head: string[], rows: string[][], left = 1) =>
   [
     `| ${head.join(" | ")} |`,
     `| ${head.map((_, i) => (i < left ? "---" : "---:")).join(" | ")} |`,
@@ -159,8 +159,10 @@ const table = (head: string[], rows: string[][], left = 1) =>
   ].join("\n");
 
 /** How far apart two constants are as vectors, in meters. */
-const apart = (a: { amplitude: number; phase: number }, b: { amplitude: number; phase: number }) =>
-  difference({ name: "", ...a }, { name: "", ...b }, ROUNDING).vector;
+export const apart = (
+  a: { amplitude: number; phase: number },
+  b: { amplitude: number; phase: number },
+) => difference({ name: "", ...a }, { name: "", ...b }, ROUNDING).vector;
 export const fittedSide = (s: Side) => ("reason" in s ? null : s);
 const isLong = (r: Row) => r.speed < LONG_PERIOD;
 /** The form number, (K1 + O1) / (M2 + S2), from NOAA's constants, and the name of the tide it gives. */
