@@ -61,7 +61,8 @@ export const emptyInputs = (): Inputs => ({
 /**
  * The fit's method, counted up whenever a change to `src/fit/` could change a
  * fit's constants or scores, so every stored fit comes due under the new one.
- * The candidate list is in the digest itself, and needs no count.
+ * The candidate list, with each candidate's Rayleigh comparison, is in the
+ * digest itself, and needs no count.
  */
 export const METHOD = 1;
 
@@ -69,8 +70,8 @@ export const METHOD = 1;
  * A digest of everything a station's fit depends on: its
  * year files up to the source's final year, with their versions, its epochs
  * and their conversions, where its source's checks start, every erratum that
- * names it with its handling, the source's rule for final values, and
- * the method's version.
+ * names it with its handling, the source's rule for final values, the
+ * candidates with their Rayleigh comparisons, and the method's version.
  * A fit records it, and is due again when it changes.
  */
 export function inputsDigest(
@@ -99,7 +100,7 @@ export function inputsDigest(
         finalizes: metadata.finalizes,
         settles_after_months: metadata.settles_after_months ?? null,
         method: METHOD,
-        candidates: CANDIDATES.map((c) => [c.name, c.doodson]),
+        candidates: CANDIDATES.map((c) => [c.name, c.doodson, c.comparison ?? null]),
       }),
     )
     .digest("hex")

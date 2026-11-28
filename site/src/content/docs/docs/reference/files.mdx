@@ -64,7 +64,7 @@ A fit is a measurement, published whatever its size. No row says whether a gauge
 
 <Schema resource="fits" />
 
-`constituents/<source>.parquet` has a row for each candidate constituent of each station with constants, in the fit's priority order. The rows with `kept` true are the fit's constants. The others say why they were left out. The two files are written one after the other, so join them on `id` and `version`, as the query below does: a station's candidate rows can be a fit ahead of its row in the other file for as long as one run takes to write both.
+`constituents/<source>.parquet` has a row for each candidate constituent of each station with constants, in the order of the fit's list of candidates. The rows with `kept` true are the fit's constants. The others say why they were left out. The two files are written one after the other, so join them on `id` and `version`, as the query below does: a station's candidate rows can be a fit ahead of its row in the other file for as long as one run takes to write both.
 
 Kungsvik's ten largest constants:
 

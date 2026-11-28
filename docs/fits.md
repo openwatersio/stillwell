@@ -29,9 +29,9 @@ NOAA evaluates the factors once a year, at mid-year, for convenience ([Parker 20
 
 ## Constituents
 
-Every fit starts from the same candidates in the same priority order, defined in [`src/fit/candidates.ts`](../src/fit/candidates.ts) by their Doodson numbers:
+Every fit starts from the same candidates, defined in [`src/fit/candidates.ts`](../src/fit/candidates.ts) by their Doodson numbers:
 
-1. Foreman's standard set of 45 astronomical and 24 shallow-water constituents, in his order of selection, which follows decreasing amplitude in the tidal potential ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf), p. 16 and pp. 18–19). Of the 69, the mean (Z0) is fitted as `z0_m`, H1 and H2 enter under the IHO names of the same lines, MA2 and MB2, and OQ2 is left out, which leaves 65 under his names.
+1. Foreman's standard set of 45 astronomical and 24 shallow-water constituents, each with the comparison constituent his table gives it ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf), p. 16 and pp. 18–19). Of the 69, the mean (Z0) is fitted as `z0_m`, H1 and H2 enter under the IHO names of the same lines, MA2 and MB2, and OQ2 is left out, which leaves 65 under his names.
 2. The constituents NOAA's standard 37 add.
 3. The constituents TICON-4's 50 add ([TICON-4 manual](https://doi.org/10.17882/109129)).
 
@@ -39,7 +39,7 @@ Starting from one list makes fits comparable between gauges, and including NOAA'
 
 A candidate is kept when it passes two tests:
 
-- **Rayleigh criterion.** The record separates it from every stronger candidate already kept by at least one cycle ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf), §2.1.2, p. 17). Where a record can't separate two candidates, the one earlier in the list stays.
+- **Rayleigh criterion.** The record separates it from its comparison constituent by at least one cycle ([Foreman 1977](https://waves-vagues.dfo-mpo.gc.ca/Library/54866.pdf), §2.1.2, p. 17). [`src/fit/candidates.ts`](../src/fit/candidates.ts) gives each candidate's comparison. S1, psi1, pi1, T2 and R2 sit one cycle a year from K1, P1 and S2 and are tested against them, and MA2 and MB2 against M2, as Foreman's H1 and H2 are. Hourly values of a common year span 8,759 hours, which is under the 8,766 to 8,767 those pairs need, so such a record leaves those seven out and keeps K1, P1, S2 and K2. A leap year's 8,783 hours separate them. gamma2 is compared with MA2, the line of Foreman's H1, and needs 472 days. Three kinds of candidate have no comparison and are tested against every candidate kept before them in the list: K1, M2 and MSf, which Foreman compares with the mean; the candidates NOAA's and TICON's lists add, except MA2 and MB2; and any candidate whose comparison the record's sampling can't resolve. Sa and Ssa are outside this test and are judged as described below.
 - **Signal to noise.** In a fit without robust weights, its amplitude squared is at least twice its variance, UTide's default for including a constituent ([Codiga 2011](https://www.po.gso.uri.edu/~codiga/utide/2011Codiga-UTide-Report.pdf), pp. 35–36 and 40).
 
 The kept candidates are then fitted together with robust weights, and their published signal-to-noise ratio is from that fit. Every candidate has a row in `constituents/<source>.parquet`, kept or not, with the reason and, for a Rayleigh rejection, the constituent it conflicts with. A reader who wants a stricter or looser set has what is needed to choose one.

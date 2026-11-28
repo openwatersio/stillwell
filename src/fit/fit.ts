@@ -11,6 +11,7 @@ import {
   type ReferenceScore,
 } from "./references.ts";
 import {
+  comparable,
   FIT_OPTIONS,
   fitSamples,
   MIN_FIT_DAYS,
@@ -51,7 +52,7 @@ import {
 const HOUR_MS = 3_600_000;
 /** The longest window a fit takes: one nodal cycle. */
 export const MAX_FIT_YEARS = 19;
-export { FIT_OPTIONS, MIN_FIT_DAYS, NODE_CORRECTIONS, SEASONAL_SIGNIFICANCE };
+export { comparable, FIT_OPTIONS, MIN_FIT_DAYS, NODE_CORRECTIONS, SEASONAL_SIGNIFICANCE };
 
 /** The package that fitted and its version, as the fit's provenance. */
 export const engineVersion = () => packageVersion("@slackwater/engine");
@@ -109,7 +110,7 @@ export interface FittedCandidate {
   /** The `version` of the fit the row belongs to. */
   version: string;
   name: string;
-  /** Place in the candidates' priority order, from 1. */
+  /** Place in the list of candidates, from 1. */
   rank: number;
   doodson: number[];
   speed: number;

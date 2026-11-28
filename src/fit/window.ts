@@ -62,14 +62,45 @@ export function tooShort(samples: readonly Sample[]): boolean {
 }
 
 /**
+ * The candidates as the engine's selection takes them: each name with its
+ * Rayleigh comparison. A comparison the sampling can't resolve is never in
+ * the fit, and the engine would test against it all the same, so a candidate
+ * whose comparison is at or above the Nyquist frequency of the median step
+ * between `times` goes without one, and is tested against every candidate
+ * kept before it.
+ */
+export function comparable(
+  candidates: readonly Candidate[],
+  times: readonly number[],
+): { name: string; comparison?: string }[] {
+  const steps = times
+    .slice(1)
+    .map((time, i) => time - times[i]!)
+    .filter((step) => step > 0)
+    .sort((a, b) => a - b);
+  const middle = steps.length >> 1;
+  const median =
+    steps.length % 2 ? steps[middle]! : (steps[middle - 1]! + steps[middle]!) / 2 || Infinity;
+  // Degrees an hour: half a cycle a step.
+  const nyquist = (180 * 3_600_000) / median;
+  const speed = new Map(CANDIDATES.map((c) => [c.name, c.speed]));
+  return candidates.map(({ name, comparison }) => ({
+    name,
+    comparison: comparison && speed.get(comparison)! < nyquist ? comparison : undefined,
+  }));
+}
+
+/**
  * Fit `samples`, a station's levels on the hour sorted by time: the
  * candidates, the Rayleigh and SNR selection in a plain fit, robust weights
  * for the constituents kept, and Sa and Ssa judged by their yearly spread.
  * It is the fit `fitStation` makes of the 19 years before its held-out year,
  * and fits whatever window a caller read, such as the years an agency
  * analyzed, so the two are one method. The samples needn't be contiguous.
- * `list` is the candidates to start from, in priority order, where they
- * aren't the whole list; the verdicts are in its order.
+ * `list` is the candidates to start from, in order, where they aren't the
+ * whole list: each is tested against its comparison, and one without a
+ * comparison against every candidate kept before it. The verdicts are in its
+ * order.
  * Throws `Unfit` for a record too short to fit.
  */
 export function fitSamples(
@@ -84,7 +115,10 @@ export function fitSamples(
   const candidates = list.filter((c) => !seasonal.includes(c.name));
   const engineSamples = harmonicSamples(samples);
   const { selection } = selectConstituents(engineSamples, {
-    candidates: candidates.map(({ name }) => ({ name })),
+    candidates: comparable(
+      candidates,
+      samples.map((s) => s.time),
+    ),
     nodeCorrections: NODE_CORRECTIONS,
   });
   const chosen = selection.filter((s) => s.kept).map((s) => s.name);
