@@ -37,19 +37,36 @@ export default {
           const mean = rows.reduce((a, b) => a + b.level, 0) / rows.length;
           return Math.sqrt(rows.reduce((a, b) => a + (b.level - mean) ** 2, 0) / rows.length);
         };
+        const hourly = (rows: { time: number; level: number }[]) => {
+          const hours = new Map<number, number[]>();
+          for (const o of rows) {
+            const h = Math.floor(o.time / 3_600_000);
+            hours.set(h, [...(hours.get(h) ?? []), o.level]);
+          }
+          return [...hours].map(
+            ([h, v]) => [h, v.reduce((a, b) => a + b, 0) / v.length] as [number, number],
+          );
+        };
         for (const [since, until] of RELEASED) {
           const control = await reader.levels("rws/ijmuiden.buitenhaven", since, until);
           for (const station of STATIONS) {
             const rows = await reader.levels(station, since, until);
             const where = `${station} from ${since} to ${until}`;
             if (rows.length < 300 || control.length < 300)
-              throw new Error(`too few levels to judge ${where}: ${rows.length}`);
+              throw new Error(
+                `too few levels to judge ${where}: ${rows.length}, with ${control.length} at IJmuiden`,
+              );
             const suspect = rows.filter((o) => o.flag >= Flag.suspect).length;
             if (suspect > rows.length / 5)
               throw new Error(`${suspect} of ${rows.length} levels of ${where} are suspect`);
             const ratio = spread(rows) / spread(control);
             if (!(ratio > 0.75 && ratio < 1.3))
               throw new Error(`${where} spreads ${ratio.toFixed(2)} times as far as IJmuiden`);
+            const at = new Map(hourly(control));
+            const gaps = hourly(rows).flatMap(([h, v]) => (at.has(h) ? [v - at.get(h)!] : []));
+            const offset = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+            if (!(Math.abs(offset) < 0.08))
+              throw new Error(`${where} sits ${offset.toFixed(2)} m from IJmuiden`);
             const zeros = new Map<number, number>();
             for (const o of rows)
               if (o.level === 0) {
