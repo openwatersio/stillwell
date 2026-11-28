@@ -1,3 +1,4 @@
+import { firstOfMonth, unsettledFrom } from "../schedule.ts";
 import { DatumChanged } from "../../epochs.ts";
 import { getText } from "../../http.ts";
 import {
@@ -40,8 +41,13 @@ export const metadata: SourceMetadata = {
   chart_datum: "CD",
   // Values arrive 10 to 20 minutes after they're measured.
   hourly: true,
-  // Values count as final once they're a year old, so the refetch reads them again until then.
-  finalizes: true,
+  // The API marks no value checked, so none becomes final.
+  finalizes: false,
+  // Kartverket states no revision window and the store has no record of its revisions, so this
+  // one is decided here, not measured or stated: a year counts once it ended 12 months ago. The
+  // monthly run reads a year again until then (`schedule`). A later revision can still reach a
+  // year a fit has read (#526).
+  settles_after_months: 12,
 };
 
 /** The datum Kartverket's gauges are read against; the only one every station has. */
@@ -52,11 +58,8 @@ const OTHER_DATUMS: Record<string, string> = { MSL: "MSL", NN2000: "NN2000" };
 const MINUTE_MS = 60_000;
 const INTERVAL_MS = 10 * MINUTE_MS;
 const DAY_MS = 86_400_000;
-/**
- * The API carries no quality flag and states no revision window, so the store
- * treats values this old as final.
- */
-const FINAL_MS = 365 * DAY_MS;
+/** A response is cached once its range ended this long ago. The workflows keep no cache. */
+const CACHE_AFTER_MS = 365 * DAY_MS;
 
 /** A Kartverket station as listed, with its first observation the API has, which a backfill keeps to. */
 export type KartverketStation = ListedStation & { record_start: string | null };
@@ -258,7 +261,7 @@ export async function levels(
         totime: minute(b),
       },
       false,
-      (text) => final(text, b),
+      (text) => cacheable(text, b),
     );
     for (const value of parse(xml, sourceId, datum))
       if (value.time >= a && value.time < b) out.push(value);
@@ -276,30 +279,46 @@ function parse(xml: string, sourceId: string, datum: string): Observation[] {
   if (head.reflevelcode !== datum)
     throw new Error(`Kartverket ${sourceId} is measured from ${head.reflevelcode}, not ${datum}`);
   if (head.unit !== "cm") throw new Error(`Kartverket ${sourceId} sent levels in ${head.unit}`);
-  const cutoff = Date.now() - FINAL_MS;
   const out: Observation[] = [];
   for (const w of elements(block[2]!, "waterlevel")) {
     const level = Number(w.value);
-    const time = Date.parse(w.time!);
-    if (w.value === undefined || !Number.isFinite(level) || Number.isNaN(time)) continue;
+    const time = Date.parse(w.time ?? "");
+    // A backfill replaces a month with what a response holds of it, so a reading skipped here would
+    // delete the stored one. Anything but a decimal number of centimeters at a UTC instant that exists
+    // fails the response, and the station keeps its values: an empty value isn't zero, and a day its
+    // month doesn't have isn't the day it rolls over to.
+    if (!/^-?\d+(\.\d+)?$/.test(w.value ?? "") || !isInstant(w.time ?? "", time))
+      throw new Error(
+        `Kartverket ${sourceId}: a reading of "${w.value}" at ${w.time} can't be read`,
+      );
     out.push({
       time,
       // Centimeters to a tenth, as whole millimeters in meters.
       level: Math.round(level * 10) / 1000,
-      // `obs` is the only flag the API documents for observations.
-      flag: w.flag !== "obs" ? Flag.suspect : time < cutoff ? Flag.good : Flag.preliminary,
+      // `obs` is the only flag the API documents for observations, and says nothing of a check.
+      flag: w.flag !== "obs" ? Flag.suspect : Flag.preliminary,
     });
   }
   return out;
 }
 
 /**
- * Whether a response for a range ending at `end` can be cached: every value in
- * it is final and it runs to the range's end.
+ * Whether a response for a range ending at `end` can be cached: the range
+ * ended a year ago and the response runs to its end.
  */
-export function final(text: string, end: number, now = Date.now()): boolean {
+export function cacheable(text: string, end: number, now = Date.now()): boolean {
   const last = elements(text, "waterlevel").at(-1)?.time;
-  return end <= now - FINAL_MS && !!last && Date.parse(last) >= end - INTERVAL_MS;
+  return end <= now - CACHE_AFTER_MS && !!last && Date.parse(last) >= end - INTERVAL_MS;
+}
+
+/**
+ * Whether `text` is a UTC timestamp to the second that names the instant it
+ * parsed to: `2019-02-31T00:00` parses, as 3 March. The adapter asks for UTC,
+ * so any other offset isn't an answer to its request.
+ */
+function isInstant(text: string, time: number): boolean {
+  if (!/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\+00:00|Z)$/.test(text) || Number.isNaN(time)) return false;
+  return new Date(time).toISOString().slice(0, 19) === text.slice(0, 19);
 }
 
 /** [from, to) split at UTC calendar years. */
@@ -382,6 +401,23 @@ export function seriesChanged(committed: Station, listed: ListedStation): string
 
 export const source: Source = {
   metadata,
+  // Kartverket marks no value checked and may revise one, so each list refresh reads again, for
+  // every listed gauge, the years that haven't settled (`settles_after_months`), and a year for
+  // two months after it settles, the first time before the fits that first read it. A fit made
+  // on a read that failed is made again if the second read changes the year's file; where both
+  // fail, the year waits for a backfill by hand. A backfill replaces whole months, and
+  // compaction still folds the poller's copy of last month's final days, which would replace a
+  // revision, so the run stops at the start of last month.
+  schedule: {
+    lists: (today) => [
+      [
+        "all",
+        `${unsettledFrom(metadata.settles_after_months!, today)}`,
+        firstOfMonth(today, -1),
+        "--refetch",
+      ],
+    ],
+  },
   stations,
   seriesChanged,
   observations: (s, start, end) =>

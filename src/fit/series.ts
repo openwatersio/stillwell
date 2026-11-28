@@ -1,7 +1,12 @@
 import { createHash } from "node:crypto";
 import { errataOf, utcDay, type Erratum } from "../errata.ts";
 import { Flag, type Epoch, type SourceMetadata, type StoredStation } from "../schema.ts";
-import { exists, listFiles, readObservationsBetween } from "../store/parquet.ts";
+import {
+  exists,
+  listFiles,
+  readObservationsBetween,
+  scanObservationsBetween,
+} from "../store/parquet.ts";
 import { seriesPath } from "../store/paths.ts";
 import type { YearRow } from "../store/years.ts";
 import type { Sample } from "../types.ts";
@@ -249,7 +254,7 @@ export async function readSeries(
 
   // In id order, so a rejected epoch yields to the one before it.
   const epochs = [...station.epochs].sort((a, b) => a.id - b.id);
-  const byTime = new Map<number, { level: number; rejected: boolean }>();
+  const byTime = new Map<number, number>();
   for (const epoch of epochs) {
     if (epoch.to_current === null) continue;
     const start = Math.max(period.start, epoch.since ? Date.parse(epoch.since) : -Infinity);
@@ -263,22 +268,27 @@ export async function readSeries(
       if (version === undefined) continue;
       inputs.versions[`${epoch.id} ${year}`] = version;
       const path = seriesPath(store, "levels", station.source, station.source_id, year, epoch.id);
-      const rows = await readObservationsBetween(path, start, end, spacing === undefined);
-      // A missing file reads as no rows, as a year with none on the hour does.
-      if (!rows.length && !(await holds(path)))
-        throw new Error(`${station.id}: ${path} is in the years file and missing from the store`);
       let last = -Infinity;
-      for (const o of rows) {
-        if (!takes(o.flag, o.time) || !Number.isFinite(o.level)) continue;
+      const visit = (time: number, level: number, flag: Flag) => {
+        if (!takes(flag, time) || !Number.isFinite(level)) return;
         if (spacing !== undefined) {
-          if (o.time - last < spacing) continue;
-          last = o.time;
+          if (time - last < spacing) return;
+          last = time;
         }
-        if (rejected && byTime.has(o.time)) continue;
+        if (rejected && byTime.has(time)) return;
         // Levels are stored as 32-bit floats; round off the widening noise below 0.1 mm.
-        const level = Math.round((o.level + epoch.to_current) * 1e4) / 1e4;
-        byTime.set(o.time, { level, rejected });
-      }
+        byTime.set(time, Math.round((level + epoch.to_current!) * 1e4) / 1e4);
+      };
+      // A spaced read visits the file's values without making rows of them, since it keeps a fraction of a finer series.
+      let count: number;
+      if (spacing === undefined) {
+        const rows = await readObservationsBetween(path, start, end, true);
+        for (const o of rows) visit(o.time, o.level, o.flag);
+        count = rows.length;
+      } else count = await scanObservationsBetween(path, start, end, visit);
+      // A missing file reads as no rows, as a year with none on the hour does.
+      if (!count && !(await holds(path)))
+        throw new Error(`${station.id}: ${path} is in the years file and missing from the store`);
     }
   }
 
@@ -294,5 +304,7 @@ export async function readSeries(
   if (settled) inputs.settled_before = settled.toISOString();
   for (const { id, handling, since, until } of touching)
     inputs.errata[id] = { handling, since, until };
-  return [...byTime].map(([time, { level }]) => ({ time, level })).sort((a, b) => a.time - b.time);
+  const samples: Sample[] = [];
+  for (const [time, level] of byTime) samples.push({ time, level });
+  return samples.sort((a, b) => a.time - b.time);
 }

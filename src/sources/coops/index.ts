@@ -790,6 +790,27 @@ function metadataOf<T>(path: string, fresh = false): Promise<T> {
   return paced(() => getJson<T>(`${MDAPI}/${path}`, { fresh }));
 }
 
+/** A station's harmonic constants as the metadata API gives them, in meters. */
+export interface HarmonicConstants {
+  units?: string;
+  HarmonicConstituents?: {
+    name: string;
+    amplitude: number;
+    /** Greenwich phase lag in UTC, in degrees. */
+    phase_GMT: number;
+    /** How NOAA made the constants, the years analyzed among it. */
+    comments?: string;
+  }[];
+}
+
+/**
+ * NOAA's published harmonic constants for a station, asked for afresh in the
+ * metadata queue, so a calibration compares with what NOAA publishes now.
+ */
+export function harmonicConstants(id: string): Promise<HarmonicConstants> {
+  return metadataOf<HarmonicConstants>(`stations/${id}/harcon.json?units=metric`, true);
+}
+
 /** Runs a metadata-side request in the queue, a second after the last, waiting out a 403. */
 function paced<T>(request: () => Promise<T>): Promise<T> {
   const next = metadataQueue.then(async () => {

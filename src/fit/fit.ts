@@ -1,14 +1,8 @@
 import { createHash } from "node:crypto";
-import {
-  createTidePredictor,
-  fit as engineFit,
-  selectConstituents,
-  type FitOptions,
-  type HarmonicConstituent,
-} from "@slackwater/engine";
+import { createTidePredictor, type HarmonicConstituent } from "@slackwater/engine";
 import type { StoredStation } from "../schema.ts";
 import type { Sample } from "../types.ts";
-import { CANDIDATES, type Candidate } from "./candidates.ts";
+import { CANDIDATES } from "./candidates.ts";
 import {
   othersOf,
   packageVersion,
@@ -17,13 +11,14 @@ import {
   type ReferenceScore,
 } from "./references.ts";
 import {
-  harmonicSamples,
-  NODE_CORRECTIONS,
-  scoreHeldOut,
-  SEASONAL,
-  tidalResiduals,
-  yearlyScatter,
-} from "./scores.ts";
+  comparable,
+  FIT_OPTIONS,
+  fitSamples,
+  MIN_FIT_DAYS,
+  SEASONAL_SIGNIFICANCE,
+  tooShort,
+} from "./window.ts";
+import { NODE_CORRECTIONS, scoreHeldOut, tidalResiduals } from "./scores.ts";
 import {
   Busy,
   emptyInputs,
@@ -55,21 +50,9 @@ import {
  */
 
 const HOUR_MS = 3_600_000;
-const DAY_MS = 86_400_000;
 /** The longest window a fit takes: one nodal cycle. */
 export const MAX_FIT_YEARS = 19;
-/** The shortest: under half a year the record can't separate P1 from K1 or K2 from S2. */
-export const MIN_FIT_DAYS = 183;
-/**
- * How many standard errors of the yearly mean Sa's or Ssa's amplitude must
- * reach to be kept. Weather, steric change and river flow set their size, not
- * the record's resolution, so the test is whether the mean over the years is
- * significant (Parker 2007, §3.7.2), near the 95% level as SNR ≥ 2 is.
- */
-export const SEASONAL_SIGNIFICANCE = 2;
-export { NODE_CORRECTIONS };
-
-const FIT_OPTIONS: FitOptions = { robust: true, nodeCorrections: NODE_CORRECTIONS };
+export { comparable, FIT_OPTIONS, MIN_FIT_DAYS, NODE_CORRECTIONS, SEASONAL_SIGNIFICANCE };
 
 /** The package that fitted and its version, as the fit's provenance. */
 export const engineVersion = () => packageVersion("@slackwater/engine");
@@ -241,35 +224,6 @@ export function varianceExplained(
 }
 
 /**
- * The candidates as the engine's selection takes them: each name with its
- * Rayleigh comparison. A comparison the sampling can't resolve is never in
- * the fit, and the engine would test against it all the same, so a candidate
- * whose comparison is at or above the Nyquist frequency of the median step
- * between `times` goes without one, and is tested against every candidate
- * kept before it.
- */
-export function comparable(
-  candidates: readonly Candidate[],
-  times: readonly number[],
-): { name: string; comparison?: string }[] {
-  const steps = times
-    .slice(1)
-    .map((time, i) => time - times[i]!)
-    .filter((step) => step > 0)
-    .sort((a, b) => a - b);
-  const middle = steps.length >> 1;
-  const median =
-    steps.length % 2 ? steps[middle]! : (steps[middle - 1]! + steps[middle]!) / 2 || Infinity;
-  // Degrees an hour: half a cycle a step.
-  const nyquist = (180 * 3_600_000) / median;
-  const speed = new Map(CANDIDATES.map((c) => [c.name, c.speed]));
-  return candidates.map(({ name, comparison }) => ({
-    name,
-    comparison: comparison && speed.get(comparison)! < nyquist ? comparison : undefined,
-  }));
-}
-
-/**
  * Fit one station. The held-out year is the latest, at or before the source's
  * last year of final values, in which half the station's hours can be scored:
  * an hour counts when the 71 hours around it all have values, as the Godin
@@ -316,61 +270,25 @@ export async function fitStation(
     const start = Math.max(year(first).start, year(heldOut - MAX_FIT_YEARS).start);
     const end = year(heldOut).start;
     const samples = await read({ start, end });
-    const days = samples.length ? (samples.at(-1)!.time - samples[0]!.time) / DAY_MS : 0;
-    // The span and the count both, so a few values far apart aren't a record.
-    if (days < MIN_FIT_DAYS || samples.length < (MIN_FIT_DAYS * 24) / 2)
+    if (tooShort(samples))
       return none(`under ${MIN_FIT_DAYS} days of final values before ${heldOut}`);
 
-    // Sa and Ssa leave the selection and are judged by their yearly spread. Selection tests each
-    // candidate in a plain fit; the robust weights enter with the fit of those it keeps.
-    const seasonal: readonly string[] = SEASONAL;
-    const candidates = CANDIDATES.filter((c) => !seasonal.includes(c.name));
-    const engineSamples = harmonicSamples(samples);
-    const { selection } = selectConstituents(engineSamples, {
-      candidates: comparable(
-        candidates,
-        samples.map((s) => s.time),
-      ),
-      nodeCorrections: NODE_CORRECTIONS,
-    });
-    const chosen = selection.filter((s) => s.kept).map((s) => s.name);
-    const fitted = engineFit(engineSamples, [...chosen, ...SEASONAL], {
-      ...FIT_OPTIONS,
-      confidence: true,
-      dropDependent: true,
-    });
-    // Largest first, so a pair a year can't separate keeps its larger member.
-    const yearly = yearlyScatter(
-      samples,
-      [...fitted.constituents]
-        .filter((c) => !seasonal.includes(c.name))
-        .sort((a, b) => b.amplitude - a.amplitude)
-        .map((c) => c.name),
-      { ...FIT_OPTIONS, seasonal: true },
-    );
-    const seasonalKept = (name: string, amplitude: number) => {
-      const spread = yearly.seasonal?.[name];
-      return !!spread && amplitude >= SEASONAL_SIGNIFICANCE * spread.se;
-    };
-    const kept = fitted.constituents.filter(
-      (c) => !seasonal.includes(c.name) || seasonalKept(c.name, c.amplitude),
-    );
-    const constants = kept.map(({ name, amplitude, phase }) => ({ name, amplitude, phase }));
-    // Constants that aren't numbers predict nothing, and would read as missing in the file.
-    if (constants.some((c) => !Number.isFinite(c.amplitude) || !Number.isFinite(c.phase)))
-      throw new Error(`${station.id}: the fit gave a constant that isn't a number`);
+    const fitted = fitSamples(samples);
+    const { yearly } = fitted;
+    const constants = fitted.constituents.map(({ name, amplitude, phase }) => ({
+      name,
+      amplitude,
+      phase,
+    }));
 
     const version = createHash("sha256")
       .update(JSON.stringify([start, end, NODE_CORRECTIONS, constants]))
       .digest("hex")
       .slice(0, 16);
-    const verdicts = new Map(selection.map((s) => [s.name, s]));
-    const byName = new Map(fitted.constituents.map((c) => [c.name, c]));
+    const byName = new Map(fitted.fitted.map((c) => [c.name, c]));
     const rows: FittedCandidate[] = CANDIDATES.map((candidate, index) => {
       const c = byName.get(candidate.name);
-      const verdict = verdicts.get(candidate.name);
-      const isSeasonal = seasonal.includes(candidate.name);
-      const isKept = !!c && kept.includes(c);
+      const verdict = fitted.verdicts[index]!;
       const scatter = yearly.constituents[candidate.name];
       return {
         id: station.id,
@@ -379,20 +297,14 @@ export async function fitStation(
         rank: index + 1,
         doodson: candidate.doodson,
         speed: candidate.speed,
-        kept: isKept,
-        reason: isKept
-          ? null
-          : isSeasonal
-            ? c
-              ? "seasonal"
-              : "rankDeficient"
-            : (verdict?.reason ?? "rankDeficient"),
-        conflict: verdict?.conflict ?? null,
+        kept: verdict.kept,
+        reason: verdict.reason,
+        conflict: verdict.conflict,
         amplitude_m: finite(c?.amplitude ?? null),
         phase_deg: finite(c?.phase ?? null),
         amplitude_ci_m: finite(c?.amplitudeInterval ?? null),
         phase_ci_deg: finite(c?.phaseInterval ?? null),
-        snr: finite(c?.snr ?? verdict?.snr ?? null),
+        snr: finite(c?.snr ?? verdict.snr),
         yearly_amplitude_sd_m: finite(scatter?.amplitude ?? null),
         yearly_phase_sd_deg: finite(scatter?.phase ?? null),
         yearly_se_m: finite(yearly.seasonal?.[candidate.name]?.se ?? null),
@@ -415,7 +327,7 @@ export async function fitStation(
         since: iso(start),
         until: iso(end),
         hours: samples.length,
-        z0_m: finite(fitted.offset),
+        z0_m: finite(fitted.z0),
         rms_m: finite(fitted.rms),
         years: yearly.years,
         node_corrections: NODE_CORRECTIONS,
