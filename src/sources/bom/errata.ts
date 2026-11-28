@@ -6,7 +6,7 @@ import {
   type StoreReader,
 } from "../../errata.ts";
 import { Flag } from "../../schema.ts";
-import { distanceKm } from "../../stats.ts";
+import { distanceKm, median } from "../../stats.ts";
 
 /** Throws unless every level the store holds for `station` on the 15th of each month of the `years` years from `year` is suspect or worse. A month with no values that day is skipped, and reading fewer than 5 of every 6 months fails. */
 async function everyMonthSuspect(store: StoreReader, station: string, year: number, years: number) {
@@ -96,7 +96,7 @@ export default {
       response:
         "2005 to 2008 is flagged `suspect`. The values stay in the store as BOM's files hold them. UHSLC's series (`uhslc/005`) covers the same years.",
       evidence:
-        "November 2026. Month by month from 2005 to 2026, BOM's Majuro (`bom/005`) equals UHSLC's (`uhslc/005`) to 1 mm in every month from January 2009, and differs by more than 0.01 m on average in all 48 months of 2005 to 2008 (0.44 m in January 2005, 0.17 to 0.45 m from September to December 2008); of the 29 gauges BOM shares with UHSLC, no other differs by 0.11 m or more in any month. BOM's 1996 file for Majuro, the only other year before 2009, agrees with UHSLC's within 0.03 m at all 8,784 hours. Stony Point and Lorne have no UHSLC series, so they were compared with GESLA's records of BOM's gauges instead: Lorne's equals BOM's file in all 180 months, and Stony Point's is 0.090 m above it in every month of 2005 to 2014 and equal to it in 1996 and 2020 to 2023, which no entry covers. GESLA's record of BOM's Majuro (`gesla/majuro-67680-mhl-bom`) equals UHSLC's to 1 mm at every hour of 2005 and 2008 (8,732 and 8,784 hours) and, in 2006 and 2007, at all but 28 and 53 hours, whose largest difference from UHSLC's is 0.13 m; those hours equal BOM's file at none, so the record doesn't carry BOM's values and isn't listed. Per-year fits of M2, S2, N2, K2, K1, O1, P1 and Q1 gave BOM's 2005, 2006, 2007 and 2008 files residuals of 0.147, 0.141, 0.151 and 0.128 m and UHSLC's 0.053, 0.076, 0.070 and 0.061 m. BOM's 2006 file has all 8,760 hours.",
+        "November 2026. Month by month from 2005 to 2026, BOM's Majuro (`bom/005`) equals UHSLC's (`uhslc/005`) to 1 mm in every month from January 2009, and differs by more than 0.01 m on average in all 48 months of 2005 to 2008 (0.44 m in January 2005, 0.17 to 0.45 m from September to December 2008); of the 29 gauges BOM shares with UHSLC, no other differs by 0.11 m or more in any month. BOM's 1996 file for Majuro, the only other year before 2009, agrees with UHSLC's within 0.03 m at all 8,784 hours. Stony Point and Lorne have no UHSLC series, so they were compared with GESLA's records of BOM's gauges instead: Lorne's equals BOM's file in all 180 months, and Stony Point's differs only in 2005 to 2014 (erratum `bom-stony-point-2005-2014-zero`). GESLA's record of BOM's Majuro (`gesla/majuro-67680-mhl-bom`) equals UHSLC's to 1 mm at every hour of 2005 and 2008 (8,732 and 8,784 hours) and, in 2006 and 2007, at all but 28 and 53 hours, whose largest difference from UHSLC's is 0.13 m; those hours equal BOM's file at none, so the record doesn't carry BOM's values and isn't listed. Per-year fits of M2, S2, N2, K2, K1, O1, P1 and Q1 gave BOM's 2005, 2006, 2007 and 2008 files residuals of 0.147, 0.141, 0.151 and 0.128 m and UHSLC's 0.053, 0.076, 0.070 and 0.061 m. BOM's 2006 file has all 8,760 hours.",
       reported: null,
       report: null,
       check: async (store, e) => {
@@ -121,7 +121,7 @@ export default {
       response:
         "Both series are kept as served and this entry flags neither. A reader of either copy reads levels that differ from the other's by 0.01 to 0.06 m in daily medians across these two years, and by up to 0.24 m at single hours.",
       evidence:
-        "November 2026. Hourly values of `bom/170` and `uhslc/170` compared hour by hour for 2008 to 2011: equal to 0.1 mm in every month of 2008 and to 4 August 2009, then apart from the first hour of 5 August by the amounts above. The difference isn't a shift of the clock: from September to November 2009 the mean absolute difference is 0.049 m at a lag of 0 hours (correlation 0.99917) and 0.12 and 0.14 m at lags of -1 and 1 hour. GESLA's record of BOM's gauge (`gesla/christmas_island-46290-aus-bom`) equals BOM's file at every hour from 5 August to the end of 2009, its last year (3,487 hours), and is 0.049 m above UHSLC's on average. UHSLC's documentation file for the research-quality version (`rqds/indian/doc/qa170a.dmt`) lists data replaced on days 201, 213, 215 and 216 of 2009, the last run ending at 05:00 UTC on 4 August, and says the series from 2008 is assumed linked to the historic reference level. Cocos Island (`bom/171`, equal to UHSLC's to 1 mm in all 225 months), the only other gauge within 1,000 km, can't settle it: its monthly difference from Christmas Island moves by more than 0.1 m between years in the same month. Of the other 28 gauges BOM and UHSLC share, none has a month in which the two copies' mean difference is more than 0.01 m from the gauge's median, except Majuro in 2005 to 2008 (erratum `bom-majuro-2005-2008-values`) and single months at Suva, Honiara, Port Vila and Esperance; Stony Point and Lorne have no UHSLC series; GESLA's records of them equal BOM's files except Stony Point's 2005 to 2014, which they sit 0.090 m above. Which copy is right wasn't settled; question `bom-christmas-island-2009-reference` puts it to BOM.",
+        "November 2026. Hourly values of `bom/170` and `uhslc/170` compared hour by hour for 2008 to 2011: equal to 0.1 mm in every month of 2008 and to 4 August 2009, then apart from the first hour of 5 August by the amounts above. The difference isn't a shift of the clock: from September to November 2009 the mean absolute difference is 0.049 m at a lag of 0 hours (correlation 0.99917) and 0.12 and 0.14 m at lags of -1 and 1 hour. GESLA's record of BOM's gauge (`gesla/christmas_island-46290-aus-bom`) equals BOM's file at every hour from 5 August to the end of 2009, its last year (3,487 hours), and is 0.049 m above UHSLC's on average. UHSLC's documentation file for the research-quality version (`rqds/indian/doc/qa170a.dmt`) lists data replaced on days 201, 213, 215 and 216 of 2009, the last run ending at 05:00 UTC on 4 August, and says the series from 2008 is assumed linked to the historic reference level. Cocos Island (`bom/171`, equal to UHSLC's to 1 mm in all 225 months), the only other gauge within 1,000 km, can't settle it: its monthly difference from Christmas Island moves by more than 0.1 m between years in the same month. Of the other 28 gauges BOM and UHSLC share, none has a month in which the two copies' mean difference is more than 0.01 m from the gauge's median, except Majuro in 2005 to 2008 (erratum `bom-majuro-2005-2008-values`) and months at Suva and Honiara (errata `uhslc-suva-2023-august-offset`, `uhslc-honiara-2023-offsets` and `uhslc-honiara-2024-march`), Port Vila and Esperance (errata `bom-port-vila-2022-march` and `bom-esperance-1993-1996`); Stony Point and Lorne have no UHSLC series, and GESLA's records of them equal BOM's files except Stony Point's 2005 to 2014 (erratum `bom-stony-point-2005-2014-zero`). Which copy is right wasn't settled; question `bom-christmas-island-2009-reference` puts it to BOM.",
       reported: null,
       report: null,
       check: async (store, e) => {
@@ -160,6 +160,132 @@ export default {
       },
     },
     {
+      id: "bom-stony-point-2005-2014-zero",
+      stations: ["bom/993"],
+      since: "2005-01-01",
+      until: "2015-01-01",
+      handling: "corrected",
+      error:
+        "BOM's FTP files for Stony Point from 2005 to 2014 are 0.090 m below the gauge's zero in its files for 1996 and 2020 on (it has no values for 2019), and in GESLA's record of BOM's gauge.",
+      response:
+        "The adapter adds 0.090 m to Stony Point's levels of 2005 to 2014. It isn't a datum epoch: the zero is the gauge's own before and after, and an epoch can't go and return.",
+      evidence:
+        "November 2026. GESLA's record of BOM's gauge (`gesla/western_port_stony_point-60710-aus-bom`) is 0.090 m above BOM's file, to 2 mm, at all but 0 to 48 hours of each year from 2005 to 2014 apart from 28 October to 1 December 2007 (erratum `bom-stony-point-november-2007-timing`), and equals it in 1996 and 2020 to 2023. Annual mean of Stony Point minus Lorne (`bom/992`, equal to GESLA's record of it in all 180 months) is 0.259 m in 1996 and 0.258 to 0.260 m in 2020 to 2023, 0.159 to 0.170 m in 2005 to 2014 from BOM's file (2007 has too little of Lorne to compare) and 0.249 to 0.260 m from GESLA's record. Stony Point minus Portland and minus Burnie step by the same 0.09 m. The hours where they differ otherwise are 3 to 8 mm apart at the median, 38 of them in the ten years by more than 0.02 m and up to 0.23 m, on single days. BOM's monthly statistics of the gauge on the same FTP server (`ntc/IDO70000/IDO70000_60710_SLD.txt`) give means 0.0896 to 0.0907 m above the hourly file's in all 119 months of 2005 to 2014 with over 600 hours, and equal to it (median 0.0000 m) in 1996 and 2020 to 2023. No record from another agency covers the gauge, so every comparison is with BOM's own data. Against Lorne's BOM record, Stony Point's annual mean is 0.256, 0.250 and 0.239 m above it in 2024, 2025 and 2026 and its median hourly difference 0.22 to 0.23 m, as at the corrected 2012 level of 0.233 m, and its corrected 2005 mean sits 0.15 m above AHD. BOM's files for 2015 to 2018 hold no Stony Point; a value BOM publishes for them needs the same comparison.",
+      reported: null,
+      report: null,
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        const gesla = "gesla/western_port_stony_point-60710-aus-bom";
+        // Every year of the span, so a year the refetch skipped can't pass.
+        for (let year = 2005; year < 2015; year++) {
+          const [mine, theirs] = await Promise.all([
+            store.levels(id, `${year}-01-01`, `${year + 1}-01-01`),
+            store.levels(gesla, `${year}-01-01`, `${year + 1}-01-01`),
+          ]);
+          const other = new Map(theirs.map((o) => [o.time, o.level]));
+          // The days of erratum `bom-stony-point-november-2007-timing` differ for a reason of their own.
+          const shared = mine.filter(
+            (o) =>
+              other.has(o.time) &&
+              (o.time < Date.UTC(2007, 9, 28) || o.time >= Date.UTC(2007, 11, 2)),
+          );
+          const off = shared.filter((o) => Math.abs(other.get(o.time)! - o.level) > 0.002);
+          if (shared.length < 6500 || off.length > shared.length / 100)
+            throw new Error(
+              `${id} differs from GESLA's record at ${off.length} of ${shared.length} hours of ${year}`,
+            );
+        }
+        const after = await medianGap(store, id, gesla, "2020-03-01", "2020-04-01");
+        if (Math.abs(after) > 0.002)
+          throw new Error(`GESLA's record is ${after.toFixed(3)} m from ${id} in March 2020`);
+        const lorne = await medianGap(store, "bom/992", id, "2012-01-01", "2013-01-01");
+        if (lorne < 0.2 || lorne > 0.31)
+          throw new Error(
+            `Stony Point is ${lorne.toFixed(3)} m above Lorne in 2012, not 0.2 to 0.31 m`,
+          );
+      },
+    },
+    {
+      id: "bom-stony-point-november-2007-timing",
+      stations: ["bom/993", "gesla/western_port_stony_point-60710-aus-bom"],
+      since: "2007-10-28",
+      until: "2007-12-02",
+      handling: "flagged",
+      error:
+        "BOM's FTP file and GESLA's record of BOM's Stony Point gauge differ by up to 0.17 m at single hours from 28 October to 1 December 2007, beyond the 0.090 m of erratum `bom-stony-point-2005-2014-zero`: the difference rises and falls with the tide, as if one copy's clock were some minutes off the other's. The store can't tell which.",
+      response:
+        "28 October to 1 December 2007 is flagged `suspect` in both; the zero correction applies to BOM's values as it does elsewhere.",
+      evidence:
+        "November 2026. After raising BOM's values by 0.090 m, 589 of the 596 shared hours of November 2007 differ from GESLA's by more than 2 mm; the correlation from 5 to 30 November is 0.9953 at the same hour, 0.9258 an hour late and 0.8349 an hour early, which puts the shift near 12 minutes. A tidal fit to the rest of 2007 leaves November residuals of 0.163 m standard deviation for BOM's values and 0.162 m for GESLA's, too close to choose. Each copy's best lag against Portland and against Burnie was compared in September 2007, January 2007 and November: against Portland, BOM's November lag moves by 0.2 to 0.3 hours and GESLA's stays, and against Burnie both move by about 0.1 hours, so neither is shown right.",
+      reported: null,
+      report: null,
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        const [mine, theirs] = await Promise.all([
+          store.levels("bom/993", "2007-11-05", "2007-12-01"),
+          store.levels("gesla/western_port_stony_point-60710-aus-bom", "2007-11-05", "2007-12-01"),
+        ]);
+        const other = new Map(theirs.map((o) => [o.time, o.level]));
+        const gaps = mine.flatMap((o) => (other.has(o.time) ? [other.get(o.time)! - o.level] : []));
+        // Taken around their median, so the zero correction's presence doesn't count as a difference.
+        const middle = median(gaps);
+        const off = gaps.filter((g) => Math.abs(g - middle) > 0.02);
+        if (gaps.length < 500 || off.length < gaps.length / 4)
+          throw new Error(
+            `only ${off.length} of ${gaps.length} shared hours of November 2007 differ by over 0.02 m`,
+          );
+      },
+    },
+    {
+      id: "bom-port-vila-2022-march",
+      stations: ["bom/046"],
+      since: "2022-03-01",
+      until: "2022-04-01",
+      handling: "kept",
+      error:
+        "BOM's Port Vila values (046) in March 2022 are 0.015 m higher than UHSLC's (erratum `uhslc-port-vila-2022-march`). One of the two is off its zero, and the store can't tell which.",
+      response: "Both copies are kept as served and neither is flagged.",
+      evidence:
+        "November 2026, from the comparison in erratum `uhslc-port-vila-2022-march`. GESLA's record of BOM's gauge (`gesla/port_vila-57320-vut-bom`) equals UHSLC's in every month it shares from 1993 and holds no values for 2022.",
+      reported: null,
+      report: null,
+      check: async (store) => {
+        const gap = await medianGap(store, "uhslc/046", "bom/046", "2022-03-01", "2022-04-01");
+        if (gap < 0.011 || gap > 0.019)
+          throw new Error(
+            `BOM's Port Vila is ${gap.toFixed(3)} m from UHSLC's, not 0.011 to 0.019 m`,
+          );
+      },
+    },
+    {
+      id: "bom-esperance-1993-1996",
+      stations: ["bom/176", "gesla/esperance-62080-aus-bom"],
+      since: "1993-01-01",
+      until: "1997-01-01",
+      handling: "kept",
+      error:
+        "BOM's records of Esperance from 1993 to 1996 are 0.017 m lower than UHSLC's (erratum `uhslc-esperance-1993-1996`). One of the two is off its zero, and the store can't tell which. BOM's FTP files hold 1996 only; GESLA's record of BOM's gauge holds all four years.",
+      response: "Both copies are kept as served and neither is flagged.",
+      evidence: "November 2026, from the comparison in erratum `uhslc-esperance-1993-1996`.",
+      reported: null,
+      report: null,
+      check: async (store) => {
+        const gap = await medianGap(
+          store,
+          "uhslc/176",
+          "gesla/esperance-62080-aus-bom",
+          "1993-01-01",
+          "1997-01-01",
+        );
+        // BOM's own file too, which holds 1996 alone of these years.
+        const file = await medianGap(store, "uhslc/176", "bom/176", "1996-01-01", "1997-01-01");
+        if (file > -0.013 || file < -0.021)
+          throw new Error(`BOM's 1996 Esperance file is ${file.toFixed(3)} m from UHSLC's`);
+        if (gap > -0.014 || gap < -0.021)
+          throw new Error(`GESLA's record of BOM's Esperance is ${gap.toFixed(3)} m from UHSLC's`);
+      },
+    },
+    {
       id: "bom-gzip-named-z",
       stations: "every station",
       since: "1996-01-01",
@@ -180,6 +306,27 @@ export default {
     },
   ],
   questions: [
+    {
+      id: "bom-stony-point-november-2007",
+      stations: ["bom/993"],
+      question:
+        "Stony Point's hourly values in your FTP file differ from GESLA's record of your gauge from 28 October to 1 December 2007 as if one were about 12 minutes off the other. Which keeps UTC? The same two also differ by 0.090 m at nearly every hour of 2005 to 2014; is your file for those years on a different zero?",
+      why: "The answer says which copy of November 2007 to unflag, and confirms the 0.090 m correction the store applies to 2005 to 2014.",
+      meanwhile:
+        "The store adds 0.090 m to your 2005 to 2014 values and flags 28 October to 1 December 2007 `suspect`.",
+      asked: null,
+      answer: null,
+    },
+    {
+      id: "bom-archives-2015-2018",
+      stations: "every station",
+      question:
+        "Your FTP archives for 2015 to 2018 (`pacific/uhslc/2015.ar` to `2018.ar`, dated 13 November 2019) hold only Alofi's file. Can you publish the other gauges' hourly values for those four years?",
+      why: "The store would hold 2015 to 2018 at the other gauges from your files, instead of only from other agencies' copies.",
+      meanwhile: "BOM's series have no values for 2015 to 2018 except at Alofi.",
+      asked: null,
+      answer: null,
+    },
     {
       id: "bom-christmas-island-2009-reference",
       stations: ["bom/170"],
