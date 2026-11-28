@@ -75,9 +75,9 @@ jobs:
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
   # A migration that can't run, or a failure, stops every migration not yet done. Each run while stopped says why in
-  # its summary. One issue says so once 2 hours have passed since a failed step last failed, which leaves the merged
-  # change's own follow-up time to handle it, and at once for any other stop. An open one takes each new stop a run
-  # finds. It closes when a run finds nothing left to run, or when a step succeeds (`record`).
+  # its summary. One issue says so at the first run 2 hours or more after a failed step last failed, which leaves the
+  # merged change's own follow-up time to handle it, and at once for any other stop. An open one takes each new stop a
+  # run finds. It closes when a run finds nothing left to run, or when a step succeeds (`record`).
   stopped:
     needs: plan
     if: github.run_attempt == 1

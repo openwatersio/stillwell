@@ -281,19 +281,21 @@ describe("the record", () => {
 describe("the stopped job", () => {
   const script: string = parse(readFileSync(".github/workflows/migrations.yml", "utf8")).jobs
     .stopped.steps[0].run;
-  const ago = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString();
-  /** The `gh` calls the job's script makes with no issue open. */
+  const NOW = Date.parse("2026-11-28T12:00:00Z");
+  const ago = (seconds: number) => new Date(NOW - seconds * 1000).toISOString();
+  /** The `gh` calls the job's script makes at NOW with no issue open. */
   async function calls(env: { ID?: string; STOPPED?: string; SINCE?: string }): Promise<string> {
     const dir = await mkdtemp(join(tmpdir(), "migrations-stopped-"));
     try {
       const log = join(dir, "gh.log");
       await writeFile(log, "");
       await writeFile(join(dir, "gh"), '#!/bin/sh\necho "$1 $2" >> "$GH_LOG"\n');
-      // The runner's `date` is GNU's, which reads `-d`; not every `date` does.
+      // A fixed clock that reads `-d` as the runner's GNU `date` does, failing on a time it can't read.
       await writeFile(
         join(dir, "date"),
-        `#!${process.execPath}\nconst [flag, time] = process.argv.slice(2);\n` +
-          `console.log(Math.floor((flag === "-d" ? Date.parse(time) : Date.now()) / 1000));\n`,
+        `#!/usr/bin/env node\nconst [flag, time] = process.argv.slice(2);\n` +
+          `const ms = flag === "-d" ? Date.parse(time) : ${NOW};\n` +
+          `if (Number.isNaN(ms)) process.exit(1);\nconsole.log(Math.floor(ms / 1000));\n`,
       );
       await chmod(join(dir, "gh"), 0o755);
       await chmod(join(dir, "date"), 0o755);
@@ -318,12 +320,13 @@ describe("the stopped job", () => {
   const STOPPED = "20261101-a failed: exit 1";
 
   it("opens an issue once a failed step's stop is 2 hours old", async () => {
-    assert.doesNotMatch(await calls({ STOPPED, SINCE: ago(115) }), /issue create/);
-    assert.match(await calls({ STOPPED, SINCE: ago(125) }), /issue create/);
+    assert.doesNotMatch(await calls({ STOPPED, SINCE: ago(7199) }), /issue create/);
+    assert.match(await calls({ STOPPED, SINCE: ago(7200) }), /issue create/);
   });
 
-  it("opens one at once for a stop with no time", async () => {
+  it("opens one at once for a stop with no time, or one it can't read", async () => {
     assert.match(await calls({ STOPPED: "no record" }), /issue create/);
+    assert.match(await calls({ STOPPED, SINCE: "unknown" }), /issue create/);
   });
 
   it("leaves issues alone when the run takes a step", async () => {
