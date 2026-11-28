@@ -21,13 +21,6 @@ export async function levels(
   return rows;
 }
 
-/** Throws when every value of a day outside a span is flagged suspect or worse, as the span would leave it. */
-export async function unflagged(store: StoreReader, station: string, day: string) {
-  const rows = await levels(store, station, day);
-  if (rows.every((o) => o.flag >= Flag.suspect))
-    throw new Error(`every ${id(station)} value on ${day}, outside the span, is flagged suspect`);
-}
-
 /** `a` minus `b` at each time both hold. */
 export async function differences(
   store: StoreReader,
