@@ -248,7 +248,55 @@ Estimate: 3 days.
 - [x] Per source: CO-OPS datums API; RWS NAP and MSL; BSH and PEGELONLINE PNP, NHN and SKN; USGS gage datum to NAVD88; USACE series datums.
 - [x] Tests that convert a known level at a few stations to each datum and compare with the operator's published value.
 - [x] Offsets measured between linked series from their overlapping levels, in their own monthly job, so a series that shares a gauge's zero with a slackwater-database record, such as PEGELONLINE with WSV's GESLA files, gets its MSL and LAT. PEGELONLINE publishes only mean high and low tide for its tidal gauges, not a mean water level.
-- [ ] MSL, LAT and the other tidal datums from the station's own fit (`fits/datums/<source>.parquet`) where it has one, ahead of slackwater-database's, which then come only from records the store didn't fit. `computed` already names offsets carried from another series of the gauge, which [`src/links.ts`](../../src/links.ts) tells from a station's own, so these need a `datums_source` of their own. Where a source publishes datums for an official epoch, as NOAA does for 1983 through 2001, a station's own reduction over its latest years differs by the change in sea level between the two, and crowd-depth reduces soundings to the MLLW in `datums`, so whether the fit's datums replace the source's there is a decision to make first, with the differences measured at every station they would change.
+- [ ] Official harmonic constants, with the datums and epochs the agency publishes with them, imported beside the fits, CO-OPS first ([Datums go with their harmonics](#datums-go-with-their-harmonics)).
+- [ ] A station's `datums` from the set of constants it's published with, its fit first, and each agency's chart datum named with its epoch ([Datums go with their harmonics](#datums-go-with-their-harmonics)).
+
+#### Datums go with their harmonics
+
+A set of datums belongs to the constants it was reduced or predicted with, and the two are published together. The store's own fit and its datums (`fits/<source>.parquet`, `constituents/<source>.parquet`, `fits/datums/<source>.parquet`) are the primary set for every fitted station. An agency's harmonic constants, where it publishes any, are imported and listed beside the fit with the datums and epochs the agency publishes with them. No value crosses from one set to the other. Every set is in heights on the zero of the station's stored levels, so the difference between any two is a translation between them: our MLLW less NOAA's 1983–2001 MLLW, for instance.
+
+**Official constants.** `fits/official/<source>.parquet` holds one row per station an agency publishes constants for: the agency's analysis period, its datums as heights on the station's zero with each datum's epoch, when it was published, and the agency's terms. `constituents/official/<source>.parquet` holds the constants. Each source's adapter reads its agency's own publication, as it reads its levels. The agencies behind the store's sources that publish constants:
+
+- **CO-OPS**: harmonic constituents and datums for its harmonic stations, the datums on the 1983–2001 National Tidal Datum Epoch.
+- **Kartverket**: constituents analysed over 2006–2020 for its 33 public stations, and `stationlevels`, whose MSL is the 1996–2014 mean.
+- **LINZ**: one analysis per site, every year at major ports and every three years at the rest.
+- **JMA**: 60-constituent tables for 70 stations, reissued each year.
+- **The Japan Coast Guard (JHOD)**: 60-constituent tables for 20 of its gauges, which are `jodc` stations with `HD` codes.
+
+DMI publishes predictions, not constants, and slackwater-database's RWS and WSV records are its own fits. slackwater-database's importers for these agencies are the reference for each adapter's reader.
+
+**What `datums` holds.** A station's `datums` in `stations.parquet` holds one set of tidal datums, from the constants the station is published with, taken whole:
+
+1. its fit, where it has one with observed datums (`reason` null) on its current epoch (`datums_source: fit`);
+2. otherwise the agency's official set (`official`);
+3. otherwise its slackwater-database record's, which are reduced and predicted with that record's constants (`slackwater-database`);
+4. otherwise the datums the source gives without constants, as CO-OPS does for some water-level stations (`source`);
+5. otherwise the set of a linked series of the gauge, carried whole (`computed`), as [`src/links.ts`](../../src/links.ts) carries MSL and LAT today.
+
+Height systems, the names outside `TIDAL_DATUMS` in [`src/datums.ts`](../../src/datums.ts) such as NAVD88, NN2000, NHN and AHD, come from the source beside whichever set the station has. `datums_epoch` gives each value's years: a fit's observed window for its observed datums and the synthesis's years for HAT and LAT, an agency's epoch for its own. A station with no set has only its height systems, as today. `fits/official` lists the agency's set beside every station's, whichever set `datums` holds.
+
+**Chart datum.** Charts are drawn on the agency's chart datum as the agency fixed it, so `chart_datum` names that surface and `datums` carries it as a named reference, beside the set and not a member of it. Where the agency's chart datum shares its name with a datum in the set, its name carries the agency's epoch, as `NAVD88(...)` carries a realization: `MLLW(1983-2001)` at a CO-OPS gauge, beside the fit's `MLLW`, or the source's ID where the agency gives no epoch, as `LAT(marine-institute)`. Where the chart datum is a fixed surface with a name of its own, such as Kartverket's CD, which is also the zero of its levels, BSH's SKN or REFMAR's ZH, it keeps its name. So `datums[chart_datum] − datums.MLLW` at a fitted CO-OPS gauge is the translation from our MLLW to the chart's, and at an unfitted one it's zero. Where no agency fixes a chart datum's height, `chart_datum` names the datum slackwater-database's country policy picks, as today, and its value is the set's.
+
+**What each reader sees.**
+
+- **Levels API**: its default is `chart_datum`, through `stations/offsets.parquet`, so default levels stay on the surface charts use at every station that has one. `?datum=MLLW` at a fitted CO-OPS gauge gives levels above our MLLW, and `?datum=MLLW(1983-2001)` above NOAA's. Offsets rows for the named references come from `offsetRows` as every other name's do.
+- **crowd-depth**: in Stillwell mode it reads `datums[chart_datum]` and MHHW less MLLW for each CO-OPS gauge, and takes its residuals in MLLW, or MSL where there's none, taking a final month again whenever a station's datums change. `datums[chart_datum]` follows the rename on its own. Its residuals in `MLLW` would move to our MLLW as each gauge is fitted, and be taken again each time a refit moves the fit's window, so crowd-depth takes them in `chart_datum` instead, a change in crowd-depth.
+- **`src/links.ts`**: `own()` counts `fit` and `official` as the station's own. A station takes a linked series' set only where it has none, whole, with its chart datum reference.
+- **`frameOf`**: counts a chart datum whose value comes from the station's fit or official set as the gauge's frame, as it does one from slackwater-database.
+- **`src/store/analysis.ts` and pair-check**: read the source's list, where the named references never appear, so pair-check never takes `MLLW(1983-2001)` for a shared reference between two gauges.
+- **Site**: the station page's Datums table prints the set with its provider, and a second table lists the official set beside it with its epochs, with the translation between each pair of names. LevelChart lists the names in `datums` and needs nothing new.
+- **slackwater-database**: reads `fits`, `constituents` and `fits/datums` directly (decision 7), so the published `datums` changes nothing it reads. It can read `fits/official` for the agencies it imports itself today.
+
+**Upgrade.** `datums_source`, `datums_epoch` and `chart_datum` are derived when `publish` builds `stations.parquet` (`NOT_IN_LISTS` in [`src/store/files.ts`](../../src/store/files.ts)), so no list or migration changes. The first publish after this renames each CO-OPS gauge's chart datum to `MLLW(1983-2001)` and adds its offsets rows. Each station's set moves to its fit at the first publish after it's fitted. In the `stations.parquet` of 26 November, 3,758 GESLA stations and 1,237 CO-OPS stations take MSL or LAT from slackwater-database, and about 3,300 stations carry MSL, LAT or a chart datum from a linked series.
+
+**How close the fits are.** Measured in #667 on a local mirror, and on SMHI in the public store:
+
+- **CO-OPS**, 20 gauges: over the same months as NOAA's own tabulation, MSL within 1 mm, MHHW and MHW within an RMS of 4 mm, MLW and MLLW 9 mm, with Anchorage's MLLW 34 mm high and Galveston Pier 21's MLW 18 mm low unexplained. Against the 1983–2001 datums, MSL is 46 mm lower to 156 mm higher, the change in relative sea level since; the mean range is within 20 mm at 16 of the 20.
+- **Kartverket**, 24 gauges: MSL differs by an RMS of 18 mm at 23 of them. A regional rise of 3.75 mm a year, fitted to these gauges, less the land uplift Kartverket gives for each, times the years between the 1996–2014 window and the fit's, leaves an RMS of 5.5 mm and at most 13 mm. HAT and LAT differ by an RMS of 23 and 24 mm. Kartverket's MHW, MLW, MHWS, MLWS and MHWN are MSL plus or minus M2, or M2 and S2, to within 1 cm at all 33 of its stations, though its descriptions call MHW and MLW the means of all high and low waters. Ny-Ålesund is 59 to 85 mm below Kartverket on every datum, which would take about 12 mm a year of uplift to explain, and Kartverket gives no rate there.
+- **SMHI**, 61 gauges: SMHI publishes no tidal datums, but its mean water level in RH 2000 is a regression line over each gauge's record. The fits' MSL is 52 mm above it on average, 21 mm for windows centered 2000–2013 and 71 mm from 2020 on, since recent years sit above the line.
+- **Every other source with official constants or datums** (LINZ, JMA, JHOD, the Marine Institute, BSH, PEGELONLINE, BODC) needs its first full fit before it can be measured.
+
+The differences are the agencies' epochs, which the translation in `datums` and the official files carries.
 
 ### Phase 8: Remaining real-time feeds
 
