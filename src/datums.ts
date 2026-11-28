@@ -1,5 +1,5 @@
 import { urlSafe } from "./store/paths.ts";
-import { ID_KM } from "./same-as.ts";
+import { ID_KM, UNLINKS } from "./same-as.ts";
 import { isDropped } from "./sources/gesla/dropped.ts";
 import type { Epoch, StoredStation } from "./schema.ts";
 import { distanceKm as km } from "./stats.ts";
@@ -19,6 +19,8 @@ import { sources } from "./sources/index.ts";
  *   through a reference both give an offset to (`REFERENCES`), such as BSH's
  *   SKN to a PEGELONLINE gauge through NHN, or else through the offset
  *   measured between the two series' levels (`src/links.ts`).
+ *
+ * Prediction aliases cannot override explicit instrument separations; eligible peers can still supply a record.
  *
  * Offsets describe the current epoch, as `datums` always has; older epochs
  * reach them through `to_current` (`offsetRows`).
@@ -195,6 +197,22 @@ export function withDatums(
     const datums_source: Record<string, DatumSource> = Object.fromEntries(
       Object.keys(s.datums).map((k) => [k, "source"]),
     );
+    const candidate =
+      s.tide_station ?? (record?.redundant === undefined ? record?.id : record.redundant) ?? null;
+    const replacement = candidate;
+    const slash = replacement?.indexOf("/") ?? -1;
+    const source = slash > 0 && JOINS[replacement!.slice(0, slash)];
+    const replacedBy = source && `${source}/${urlSafe(replacement!.slice(slash + 1))}`;
+    // A duplicate in the prediction catalog cannot override a known instrument separation in the store.
+    const members = new Set([s.id, ...s.same_as]);
+    const replacementMembers = new Set(
+      replacedBy ? [replacedBy, ...(byId.get(replacedBy)?.same_as ?? [])] : [],
+    );
+    const distinct = UNLINKS.some(
+      ({ a, b }) =>
+        (members.has(a) && replacementMembers.has(b)) ||
+        (members.has(b) && replacementMembers.has(a)),
+    );
     const station: StoredStation = {
       ...s,
       datums: { ...s.datums },
@@ -205,8 +223,7 @@ export function withDatums(
           .filter((k) => TIDAL_DATUMS.includes(k) && periodOf(s))
           .map((k) => [k, periodOf(s)!]),
       ),
-      tide_station:
-        s.tide_station ?? (record?.redundant === undefined ? record?.id : record.redundant) ?? null,
+      tide_station: distinct ? null : candidate,
       datums_attribution: [],
       chart_datum: null,
       frame: "unknown",

@@ -5,6 +5,7 @@ import {
   type ErrataFile,
   type StoreReader,
 } from "../../errata.ts";
+import { compare } from "../gesla/check.ts";
 import { Flag } from "../../schema.ts";
 
 const iso = (time: number) => new Date(time).toISOString();
@@ -29,6 +30,43 @@ async function allSuspect(store: StoreReader, id: string, since: string, until: 
 
 export default {
   errata: [
+    ...[
+      { year: "2020", since: "2020-07-01", until: "2020-09-01", probe: "2020-08-05", lag: -60 },
+      { year: "2022", since: "2022-06-01", until: "2022-10-01", probe: "2022-08-20", lag: -20 },
+    ].map(({ year, since, until, probe, lag }) => ({
+      id: `cmems-coruna-clock-${year}`,
+      stations: ["cmems/Coruna2TG", "gesla/coruna2tg-cor-esp-cmems"],
+      since,
+      until,
+      handling: "flagged" as const,
+      error: `Coruna2TG and its GESLA copy have timing discrepancies against REDMAR's separate Coruña instrument during the ${year} episode.`,
+      response:
+        "Keep the conservative uncertainty window suspect without changing timestamps or native source flags. These are observation-based windows, not inferred exact correction epochs. The native UTC product is checked separately from IGN's own hourly files, whose clock has its own errata.",
+      evidence:
+        "Complete 2019–2024 controls against both REDMAR CorunaTG and UHSLC/830, and weekly REDMAR controls, are at https://github.com/openwatersio/stillwell/blob/main/docs/results/ign-coruna-identity-2026-11-22.md (copy-controls.json and copy-windows.json). The windows include adjacent weak-offset weeks and padding around the strong discrepancies. Most other well-paired months favor zero lag against REDMAR. UHSLC diverges after mid-2020, so it is not treated as sole ground truth. The GESLA copy has the same stored numeric series as CMEMS over 2019–2023. No correction is inferred.",
+      check: async (store: StoreReader, e: Parameters<typeof flaggedSpan>[1]) => {
+        await flaggedSpan(store, e);
+        const until = dayAfter(probe, 7);
+        const reference = await store.levels("cmems/CorunaTG", probe, until);
+        if (!reference.length) throw new Error("no independent REDMAR control");
+        for (const id of e.stations ?? []) {
+          const observed = await store.levels(id, probe, until);
+          const zero = compare(observed, reference, 0),
+            shifted = compare(observed, reference, lag * 60000);
+          if (zero.n < 72 || !Number.isFinite(zero.spread))
+            throw new Error(`${id} lacks a usable zero-lag control`);
+          if (
+            shifted.n < 72 ||
+            !Number.isFinite(shifted.spread) ||
+            shifted.spread >= zero.spread * 0.85
+          )
+            throw new Error(
+              `${id} no longer shows the recorded clock discrepancy; review the erratum`,
+            );
+        }
+      },
+    })),
+
     {
       id: "cmems-baltic-names",
       stations: [

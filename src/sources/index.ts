@@ -1,6 +1,6 @@
 import { readErrata, withErrata, type ErrataFile } from "../errata.ts";
 import type { Observation, Source } from "../schema.ts";
-import { Dropped, leaveOut, sweepDrops, tallying } from "../span.ts";
+import { Dropped, inSpan, sweepDrops, tallying } from "../span.ts";
 import { source as bodc } from "./bodc/index.ts";
 import { source as bom } from "./bom/index.ts";
 import { source as bsh } from "./bsh/index.ts";
@@ -13,6 +13,7 @@ import { source as dmi } from "./dmi/index.ts";
 import { source as dwr } from "./dwr/index.ts";
 import { source as ea } from "./ea/index.ts";
 import { source as gesla } from "./gesla/index.ts";
+import { source as ign } from "./ign/index.ts";
 import { source as ispra } from "./ispra/index.ts";
 import { source as jma } from "./jma/index.ts";
 import { source as jodc } from "./jodc/index.ts";
@@ -39,6 +40,7 @@ import dmiErrata from "./dmi/errata.ts";
 import dwrErrata from "./dwr/errata.ts";
 import eaErrata from "./ea/errata.ts";
 import geslaErrata from "./gesla/errata.ts";
+import ignErrata from "./ign/errata.ts";
 import ispraErrata from "./ispra/errata.ts";
 import jmaErrata from "./jma/errata.ts";
 import jodcErrata from "./jodc/errata.ts";
@@ -67,6 +69,7 @@ const adapters: Record<string, Source> = {
   dwr,
   ea,
   gesla,
+  ign,
   ispra,
   jma,
   jodc,
@@ -101,6 +104,7 @@ export const errataFiles: Record<string, ErrataFile> = {
   dwr: dwrErrata,
   ea: eaErrata,
   gesla: geslaErrata,
+  ign: ignErrata,
   ispra: ispraErrata,
   jma: jmaErrata,
   jodc: jodcErrata,
@@ -129,9 +133,11 @@ export const {
  * gauge reads one: it's a fill value or junk, missing rather than a bad value
  * (errata `usace-fill-values`, `cdec-fill-values`, `usgs-fill-values` and
  * `pegelonline-fill-values`, and GESLA's and CMEMS's, whose adapters drop them too).
+ * Transient withdrawals reach the merge without being treated as numerical levels.
  */
 export function withinSpan(source: Source): Source {
-  const keep = (rows: Observation[]) => leaveOut(rows);
+  const keep = (rows: Observation[]) =>
+    rows.filter((r) => r.withdrawn || inSpan(r.level, r.time, r.source_flag ?? r.flag));
   const { observations, recent } = source;
   return {
     ...source,

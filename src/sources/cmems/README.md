@@ -11,6 +11,8 @@ Sea levels at tide gauges that Copernicus Marine's In Situ Thematic Assembly Cen
 - **Freshness:** values arrive a day or two late, so no station is polled hourly. Monthly's refetch reads them, and replaces the latest dataset's values once the history copy has them.
 - **Independent checks:** the [pair check](../../../docs/contributing/checks.md#pair-check) on 72 pairs of a CMEMS record (66 stations) and another originator's record of the same gauge, from CCO, the EA, FMI, IEO, ISPRA, the Marine Institute, PEGELONLINE, SMHI, CO-OPS and the BfG, over the latest year both hold; 4 more pairs hold one record twice. The clocks agree in 71 of the 72. The one that doesn't, Ems Meetpaal against PEGELONLINE's Eemshaven, fits 10 minutes off at 4.4 cm RMS against 6.7 cm, which is the distance between two gauges: PEGELONLINE's own Eemshaven agrees at zero with RWS's harbor gauge. No pair shares a named datum, since each provider's zero is its own, so the datums are unchecked against another originator.
 
+Coruna2TG’s historical timing discrepancies and the identical GESLA copy are flagged by `cmems-coruna-clock-2020` and `cmems-coruna-clock-2022`; their independent controls and uncertainty-window limits are in [errata.ts](errata.ts). No inferred timestamp correction is applied.
+
 ## Known limits
 
 - **Kept values:** a refetch replaces only the times it fetches, since the latest dataset moves past a month long before the history copy reaches it. So a value the latest dataset had and the history copy drops stays as the latest dataset gave it, `preliminary`. Where a provider's history is coarser than its latest dataset, as at Alcudia, a month holds both, and the minutes the history lacks stay `preliminary`.

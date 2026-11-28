@@ -115,7 +115,7 @@ ORDER BY o.time LIMIT 5`}
 
 ## The tide record
 
-`tide_station` is the group's record in slackwater-database. It is the station's own record where it has one. Otherwise it is the accepted record that replaces a copy slackwater-database rejected as a duplicate, or the record linked to the group's preferred station or another of its `same_as`. It is null where there's none. Every station of Cuxhaven names the same record. Whether a station's levels share a zero with that record's predictions is its `frame`, described in [Datums](/docs/guides/datums/#chart-datum).
+`tide_station` is the group's record in slackwater-database. It is the station's own record where it has one. Otherwise it is the accepted record that replaces a copy slackwater-database rejected as a duplicate, or the record linked to the group's preferred station or another of its `same_as`. A candidate from an explicitly separated instrument group is refused even if the catalog calls it a duplicate; an eligible record from another group member can still supply the prediction. It is null when no eligible candidate remains. Every station of Cuxhaven names the same record. Whether a station's levels share a zero with that record's predictions is its `frame`, described in [Datums](/docs/guides/datums/#chart-datum).
 
 ## More examples
 

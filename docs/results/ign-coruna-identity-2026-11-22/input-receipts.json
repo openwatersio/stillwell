@@ -1,0 +1,133 @@
+[
+  {
+    "url": "https://stillwell.openwaters.io/stations.parquet",
+    "path": "stations.parquet",
+    "bytes": 2834285,
+    "sha256": "a0db060d31f9287760c186d0f9db068f66b1587919a04b09ba3b25e38026b0c0"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/matches.parquet",
+    "path": "stations/matches.parquet",
+    "bytes": 501535,
+    "sha256": "83e78e4c26df04d74124e9375e18229353c6b2e10aacb56708a9db4f77f2a3a6"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/links.parquet",
+    "path": "stations/links.parquet",
+    "bytes": 117635,
+    "sha256": "49eb5c57b7c1901b145aab1cd4a0fc25a7ee4af165bd50f584f50103d80e6a79"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/cmems.parquet",
+    "path": "stations/cmems.parquet",
+    "bytes": 51218,
+    "sha256": "632c176b2d6ebb8a35eb84ea9b7d231701ea4b59e4c64f55635bb4763be7db64"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/bounds/cmems.parquet",
+    "path": "stations/bounds/cmems.parquet",
+    "bytes": 13056,
+    "sha256": "1f5a04ea40940d44977a57b85090408cb3ba2065d8223e20953441dda13fbc2e"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/analysis/cmems.parquet",
+    "path": "stations/analysis/cmems.parquet",
+    "bytes": 15783,
+    "sha256": "1026aadb4ec07779645a721804a3d71dc3d9e15e4b95aa23a766aa861cf00fcc"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/years/cmems.parquet",
+    "path": "stations/years/cmems.parquet",
+    "bytes": 394006,
+    "sha256": "254491848436e5a49a410cd369695591b28e5b6b049aec52fbd01a031cf9a17b"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/gesla.parquet",
+    "path": "stations/gesla.parquet",
+    "bytes": 565195,
+    "sha256": "58b86cef8df804921e34363998a72a25fcc98e11763b7f32bf55358133a16f8c"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/bounds/gesla.parquet",
+    "path": "stations/bounds/gesla.parquet",
+    "bytes": 139567,
+    "sha256": "c2d56593471594b0cc13e8a15a93af6ddde02bf1d1c12b3aa3965f6dd2639ab6"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/analysis/gesla.parquet",
+    "path": "stations/analysis/gesla.parquet",
+    "bytes": 158616,
+    "sha256": "94e284671705bb39d3ba559f56ffb36b7af715efe2a29660286276ebce46ab5b"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/years/gesla.parquet",
+    "path": "stations/years/gesla.parquet",
+    "bytes": 2794624,
+    "sha256": "7f8f9fdb24cad96932635053664bf73357805d75e9cacc3ac7b7abb2cdb1bbf7"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/uhslc.parquet",
+    "path": "stations/uhslc.parquet",
+    "bytes": 43433,
+    "sha256": "6983f7ec6c9b96ca4370c4f967405bcbc0ab64dcf599fae18aed4759e3ecf8c0"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/bounds/uhslc.parquet",
+    "path": "stations/bounds/uhslc.parquet",
+    "bytes": 10828,
+    "sha256": "f9f2990700b8bd0cf8e4fe5e39736572c08d2edd303e4fc2ae398ce40aca2561"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/analysis/uhslc.parquet",
+    "path": "stations/analysis/uhslc.parquet",
+    "bytes": 11028,
+    "sha256": "7d69dfba27cbef38e48a6d7b838ee77649655187d17013e4a180340bd312d444"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/years/uhslc.parquet",
+    "path": "stations/years/uhslc.parquet",
+    "bytes": 465836,
+    "sha256": "02759230f1083bc7e4538de69fe55d4baf6b675456c9ea90e292f103481b72f6"
+  },
+  {
+    "kind": "local IGN validation store",
+    "path": "stations/ign.parquet",
+    "bytes": 6014,
+    "sha256": "7a8e0e08bf2cdeeaaf738608cb7f5ee4a7fbb923a969465dd99e33df54a68511"
+  },
+  {
+    "kind": "local IGN validation store",
+    "path": "stations/bounds/ign.parquet",
+    "bytes": 760,
+    "sha256": "bf31553a85fe3162fc798fb024972597211dce373e6225b6ec69ad83a74a16f2"
+  },
+  {
+    "kind": "local IGN validation store",
+    "path": "stations/years/ign.parquet",
+    "bytes": 2648,
+    "sha256": "2c74755829448eeb2d1f9c4e17a2524678bd7bfa91e67c1d6dcdfb800e8130c8"
+  },
+  {
+    "kind": "local copy requalification",
+    "path": "stations/years/cmems.parquet",
+    "bytes": 394009,
+    "sha256": "2d35b1751f0bd1284a3254b4855c2ca957e7594ffe0a952da6e1495369757a1b"
+  },
+  {
+    "kind": "local copy requalification",
+    "path": "stations/years/gesla.parquet",
+    "bytes": 2794630,
+    "sha256": "7da15ddfdc32202c5c252c47e9f335c5ba34fdb25db01f614bd1046291605b49"
+  },
+  {
+    "url": "https://uhslc.soest.hawaii.edu/rqds/atlantic/doc/qa830a.dmt",
+    "path": "qa830a.dmt",
+    "bytes": 10454,
+    "sha256": "b58dbbd4cb984d908d445072678cea5b1600d3dc29a8ab2c9fee8e3d0a46a545"
+  },
+  {
+    "path": "data/ticon/coruna-coru-esp-ieo.json",
+    "bytes": 5770,
+    "sha256": "40af5d6bdd7fb2c0ac5bad987129f847026f2658d9741a151789dcdf78524ed4"
+  }
+]

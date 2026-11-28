@@ -24,6 +24,8 @@ export const FLAG_NAMES = Object.keys(Flag) as (keyof typeof Flag)[];
  */
 export interface Observation extends Sample {
   flag: Flag;
+  /** Transient source invalidation: merge retains a prior level as bad, never this marker. */
+  withdrawn?: true;
   source_flag?: Flag;
   received?: number;
 }
@@ -352,6 +354,8 @@ export interface SourceMetadata {
  */
 export interface Source {
   metadata: SourceMetadata;
+  /** Credit for a published series, where the source requires its actual observation dates. */
+  attribution?(station: Station): string;
   /** Decisions made about the source's stations. */
   overrides?: Overrides;
   /** `previous` is the store's list, for a source that keeps choices it made before. */
@@ -359,7 +363,8 @@ export interface Source {
   /**
    * Why a station, by its `source_id`, is withheld from the store, or null.
    * Withheld means its owner refused republication, the station has a new
-   * ID, or its values aren't water levels: the adapter never lists
+   * ID, its values aren't water levels, or the evidence does not support
+   * publishing it: the adapter never lists
    * or fetches it, a refresh drops it from the store's list and the bounds and
    * recent window, publishing leaves it out, and `ingest withhold` deletes its
    * files (src/withhold.ts).
@@ -384,9 +389,9 @@ export interface Source {
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   /**
    * Whether backfill keeps every level the store holds, replacing only those
-   * at times it fetched, not each month it fetched: for a source that never
-   * withdraws a value, and whose archive can lack what the poller kept,
-   * such as a whole day or a late reading.
+   * at times it fetched, not each month it fetched: for an archive that can
+   * omit what the poller kept, such as a whole day or a late reading.
+   * Explicit withdrawals still invalidate a row.
    */
   keepsStored?: boolean;
   /**

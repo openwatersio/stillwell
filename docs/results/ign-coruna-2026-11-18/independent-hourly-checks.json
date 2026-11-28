@@ -1,0 +1,386 @@
+[
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2000_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8784,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2000-01-01T00:00:00.000Z",
+    "last": "2000-12-31T23:00:00.000Z",
+    "days": 366,
+    "r0": 0.9908004335465248,
+    "best": {
+      "lag": 0,
+      "r": 0.9908004335465248
+    },
+    "k1_minutes": -4.685356229578055
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2001_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8760,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2001-01-01T00:00:00.000Z",
+    "last": "2001-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9899263152836222,
+    "best": {
+      "lag": 0,
+      "r": 0.9899263152836222
+    },
+    "k1_minutes": 1.3568767722972372
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2002_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8714,
+    "dropped_ambiguous_or_missing_9999": 46,
+    "first": "2002-01-01T00:00:00.000Z",
+    "last": "2002-12-31T23:00:00.000Z",
+    "days": 364,
+    "r0": 0.991619162650012,
+    "best": {
+      "lag": 0,
+      "r": 0.991619162650012
+    },
+    "k1_minutes": 3.2225510750204074
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2003_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8760,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2003-01-01T00:00:00.000Z",
+    "last": "2003-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9926539260079855,
+    "best": {
+      "lag": 0,
+      "r": 0.9926539260079855
+    },
+    "k1_minutes": 2.585729275836259
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2004_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8784,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2004-01-01T00:00:00.000Z",
+    "last": "2004-12-31T23:00:00.000Z",
+    "days": 366,
+    "r0": 0.9905011222868315,
+    "best": {
+      "lag": -10,
+      "r": 0.9928647183324132
+    },
+    "k1_minutes": -4.872736399718973
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2005_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8733,
+    "dropped_ambiguous_or_missing_9999": 27,
+    "first": "2005-01-01T00:00:00.000Z",
+    "last": "2005-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9923976155098422,
+    "best": {
+      "lag": 0,
+      "r": 0.9923976155098422
+    },
+    "k1_minutes": 4.783338323277857
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2006_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8760,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2006-01-01T00:00:00.000Z",
+    "last": "2006-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9868614666569447,
+    "best": {
+      "lag": 10,
+      "r": 0.9914554883908564
+    },
+    "k1_minutes": 11.306266402505164
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2007_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8221,
+    "dropped_ambiguous_or_missing_9999": 539,
+    "first": "2007-01-01T00:00:00.000Z",
+    "last": "2007-12-31T23:00:00.000Z",
+    "days": 343,
+    "r0": 0.9899952466984193,
+    "best": {
+      "lag": 10,
+      "r": 0.9939453889623954
+    },
+    "k1_minutes": 15.903803444311862
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2008_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8784,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2008-01-01T00:00:00.000Z",
+    "last": "2008-12-31T23:00:00.000Z",
+    "days": 366,
+    "r0": 0.9924800822499957,
+    "best": {
+      "lag": 10,
+      "r": 0.9935312084585699
+    },
+    "k1_minutes": 4.579613725696699
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2009_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8760,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2009-01-01T00:00:00.000Z",
+    "last": "2009-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9929606211340772,
+    "best": {
+      "lag": 0,
+      "r": 0.9929606211340772
+    },
+    "k1_minutes": 1.5655656558433118
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2010_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8760,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2010-01-01T00:00:00.000Z",
+    "last": "2010-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9922142818998656,
+    "best": {
+      "lag": 0,
+      "r": 0.9922142818998656
+    },
+    "k1_minutes": 1.7282660433958907
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2011_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8760,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2011-01-01T00:00:00.000Z",
+    "last": "2011-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9929884210648673,
+    "best": {
+      "lag": 0,
+      "r": 0.9929884210648673
+    },
+    "k1_minutes": -0.5477401886401293
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2012_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8784,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2012-01-01T00:00:00.000Z",
+    "last": "2012-12-31T23:00:00.000Z",
+    "days": 366,
+    "r0": 0.9887357627362664,
+    "best": {
+      "lag": 10,
+      "r": 0.9906149796305829
+    },
+    "k1_minutes": 7.324347250244876
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2013_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8650,
+    "dropped_ambiguous_or_missing_9999": 110,
+    "first": "2013-01-01T00:00:00.000Z",
+    "last": "2013-12-31T23:00:00.000Z",
+    "days": 361,
+    "r0": 0.9911962911138631,
+    "best": {
+      "lag": 0,
+      "r": 0.9911962911138631
+    },
+    "k1_minutes": 6.791258872878301
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2014_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8723,
+    "dropped_ambiguous_or_missing_9999": 37,
+    "first": "2014-01-01T00:00:00.000Z",
+    "last": "2014-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9923320494784434,
+    "best": {
+      "lag": 0,
+      "r": 0.9923320494784434
+    },
+    "k1_minutes": 9.153054064062687
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2015_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8760,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2015-01-01T00:00:00.000Z",
+    "last": "2015-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9930498293892603,
+    "best": {
+      "lag": 0,
+      "r": 0.9930498293892603
+    },
+    "k1_minutes": 1.4127012581118998
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2016_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8784,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2016-01-01T00:00:00.000Z",
+    "last": "2016-12-31T23:00:00.000Z",
+    "days": 366,
+    "r0": 0.9942512469420604,
+    "best": {
+      "lag": 0,
+      "r": 0.9942512469420604
+    },
+    "k1_minutes": 4.912472703860898
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2017_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8760,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2017-01-01T00:00:00.000Z",
+    "last": "2017-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9944435597734224,
+    "best": {
+      "lag": 0,
+      "r": 0.9944435597734224
+    },
+    "k1_minutes": 8.273537172669187
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2018_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8760,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2018-01-01T00:00:00.000Z",
+    "last": "2018-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9927180724875623,
+    "best": {
+      "lag": 0,
+      "r": 0.9927180724875623
+    },
+    "k1_minutes": 3.3501853854211636
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2019_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8760,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2019-01-01T00:00:00.000Z",
+    "last": "2019-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9886114949431872,
+    "best": {
+      "lag": 0,
+      "r": 0.9886114949431872
+    },
+    "k1_minutes": 7.349180568681336
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2020_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8784,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2020-01-01T00:00:00.000Z",
+    "last": "2020-12-31T23:00:00.000Z",
+    "days": 366,
+    "r0": 0.9950093982005818,
+    "best": {
+      "lag": 0,
+      "r": 0.9950093982005818
+    },
+    "k1_minutes": 5.738902488673322
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2021_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8760,
+    "dropped_ambiguous_or_missing_9999": 0,
+    "first": "2021-01-01T00:00:00.000Z",
+    "last": "2021-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9940855074977695,
+    "best": {
+      "lag": 0,
+      "r": 0.9940855074977695
+    },
+    "k1_minutes": 3.0310265041666087
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2022_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8727,
+    "dropped_ambiguous_or_missing_9999": 33,
+    "first": "2022-01-01T00:00:00.000Z",
+    "last": "2022-12-31T23:00:00.000Z",
+    "days": 365,
+    "r0": 0.9928019914993301,
+    "best": {
+      "lag": 0,
+      "r": 0.9928019914993301
+    },
+    "k1_minutes": 1.560689070663552
+  },
+  {
+    "gauge": "ACOR1",
+    "path": "ACOR1/procesados/horarios/200031_horarios_2023_JM.txt",
+    "reference": "coruna-coru-esp-ieo",
+    "values": 8712,
+    "dropped_ambiguous_or_missing_9999": 48,
+    "first": "2023-01-01T00:00:00.000Z",
+    "last": "2023-12-31T23:00:00.000Z",
+    "days": 364,
+    "r0": 0.9917927015103484,
+    "best": {
+      "lag": 0,
+      "r": 0.9917927015103484
+    },
+    "k1_minutes": 1.5960174791998276
+  }
+]
