@@ -304,9 +304,9 @@ export interface SourceMetadata {
    * For a source that never finalizes: how many months after a calendar year
    * ends a harmonic fit takes that year's values as final
    * (`src/fit/series.ts`): the source's own figure where it states one,
-   * otherwise one decided from its record of revisions, with the evidence
-   * beside it. Absent where none is known, and then the source's values never
-   * count as final.
+   * otherwise one decided for it, from its record of revisions where the
+   * store has one, with what it rests on beside it. Absent where none is
+   * set, and then the source's values never count as final.
    */
   settles_after_months?: number;
   /**

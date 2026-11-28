@@ -419,6 +419,51 @@ export async function readObservationsBetween(
   });
 }
 
+/**
+ * `readObservationsBetween`'s values, in time order, handed to `visit` one at
+ * a time from DuckDB's columns instead of returned as rows: a year of 1-minute
+ * values is half a million rows, and a reader that keeps one in five needn't
+ * make an object of each. Returns how many there were.
+ */
+export function scanObservationsBetween(
+  path: string,
+  from: number,
+  to: number,
+  visit: (time: number, level: number, flag: Flag) => void,
+): Promise<number> {
+  return serial(async () => {
+    if (!isRemote(path) && !existsSync(path)) return 0;
+    const db = await connection();
+    if (/^https?:/.test(path)) await db.run("INSTALL httpfs; LOAD httpfs;");
+    // read_parquet globs, so a station ID with a glob character reads only its own file.
+    const glob = /[*?[]/.test(path);
+    const span = `time >= make_timestamp(${Math.round(from) * 1000}) AND time < make_timestamp(${Math.round(to) * 1000})`;
+    // Read whole before any value is visited, so a failed query visits none and leaves nothing open.
+    let result;
+    try {
+      result = await db.run(
+        `SELECT epoch_ms(time)::DOUBLE, level_m::DOUBLE, flag FROM read_parquet(${quote(path)}${glob ? ", filename = true, union_by_name = true" : ""}) WHERE ${span}${glob ? ` AND filename = ${quote(path)}` : ""} ORDER BY time`,
+      );
+    } catch (error) {
+      // A missing remote file is an empty series, not a failure.
+      if (isRemote(path) && isMissing(error)) return 0;
+      throw error;
+    }
+    let count = 0;
+    for (
+      let chunk = await result.fetchChunk();
+      chunk?.rowCount;
+      chunk = await result.fetchChunk()
+    ) {
+      const [times, levels, flags] = [0, 1, 2].map((i) => chunk!.getColumnVector(i));
+      for (let i = 0; i < chunk.rowCount; i++)
+        visit(times!.getItem(i) as number, level(levels!.getItem(i)), flags!.getItem(i) as Flag);
+      count += chunk.rowCount;
+    }
+    return count;
+  });
+}
+
 /** A series file's observations and the datums it holds, in one read. */
 export async function readObservationFile(
   path: string,
