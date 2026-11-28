@@ -113,7 +113,6 @@ The checks aren't free of false positives:
 
 - The held-readings check can mark a real level that rises and falls back the same way, such as a lock basin's.
 - At harbors that dry out at low water, the floor the gauge reads while the harbor is dry is marked as a flatline.
-- CO-OPS values that CO-OPS has verified are marked suspect when they still carry its rate-of-change flag, which can remove real storm values. The flag is rare outside storms.
 
 If a station's suspect values look like real water, compare them with `source_flag`, and with another station on the same gauge or nearby. A value a rule no longer flags is clear again once the checks run over it again.
 

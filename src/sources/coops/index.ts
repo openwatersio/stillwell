@@ -414,21 +414,26 @@ export async function extremes(
 /**
  * Flags from the row. `q` is `v` once verified and `p` while preliminary;
  * hourly heights and high and low waters are verified products and carry no
- * `q`. `f` is a list of 0/1 flags: for 6-minute values, too many outliers (O),
- * flat (F), rate of change (R) and limit (L); for hourly heights and extremes,
- * inferred (I) and limit (L). O counts rejected samples rather than flagging
- * the value, so it's left out.
+ * `q`. `f` is a list of 0/1 flags. For preliminary 6-minute values it is too
+ * many outliers (O), flat (F), rate of change (R) and limit (L); O counts
+ * rejected samples rather than flagging the value, so it's left out. For
+ * verified 6-minute values the first is inferred (I) instead, followed by F, R
+ * and a limit (T). For hourly heights and extremes it is I and L.
  *
- * On a verified 6-minute value (`q` is `v`) or an hourly height, L alone
- * isn't suspect: it's left from CO-OPS's acquisition check against limits that
- * are stale at some stations (erratum `coops-stale-limit-flag`). High and low
- * waters keep L as suspect, since nothing shows their L is stale too.
+ * F, R and the limit are checks CO-OPS runs as the data arrives, and its
+ * verification reviews them: a verified 6-minute value isn't suspect for any
+ * of them, and one it inferred is at least interpolated. Nor is an hourly
+ * height suspect for L, which is left from limits that are stale at some
+ * stations (erratum `coops-stale-limit-flag`). High and low waters keep L as
+ * suspect, since nothing shows their L is stale too.
  */
 export function flagOf(row: Pick<Row, "f" | "q">, hourly = false): Flag {
   const f = (row.f ?? "").split(",").map(Number);
   let flag: Flag = row.q === "p" ? Flag.preliminary : Flag.good;
   if (f.length === 4) {
-    if (f[1] || f[2] || (row.q !== "v" && f[3])) flag = Flag.suspect;
+    if (row.q !== "v") {
+      if (f[1] || f[2] || f[3]) flag = Flag.suspect;
+    } else if (f[0]) flag = Flag.interpolated;
   } else if (f.length === 2) {
     if (f[1] && !hourly) flag = Flag.suspect;
     else if (f[0]) flag = Math.max(flag, Flag.interpolated) as Flag;
