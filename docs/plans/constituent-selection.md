@@ -38,6 +38,15 @@ Which tidal constituents a fit offers a station, and how it decides which to kee
 
 An experiment on 56 gauges offered NOAA's 59 Anchorage compounds after the 79. Over 19 years, 49 of 55 gauges improved on later years and none worsened: Anchorage by 41.7 mm (20% of its residual), seven Dutch gauges by 8.5 to 20.9 mm, five German Bight gauges by 4.1 to 20.4 mm, and 37 gauges by under 1 mm. Thresholds of 2, 4 and 10 and a year-to-year stability filter gave the same gain within a millimeter. Keeping only compounds whose parents predict a detectable size kept a median 26 of the 59 and gave up a quarter of the gain at Anchorage. The experiment tested no list longer than 138, no gap between the fit and the scored year, and no record under two years.
 
+## Criterion
+
+A constituent belongs in a station's fit if it makes predictions of years the fit did not read more accurate. No list is preferred for where it came from, and a fit can be run again when the evidence changes. Four things follow.
+
+- **Candidates.** The starting point is every line the catalog defines that the record can separate. A shorter list has to be justified by scores.
+- **The keeping rule.** It has a stated false-positive rate, measured by injecting known lines into real residuals.
+- **Names.** Where two lines share or nearly share a frequency, the data decide which is present when the record can tell them apart, and a stated physical rule decides when it cannot.
+- **Completeness.** The residual spectrum of a finished fit is the check on what it left out. Lines still standing above the continuum are counted per station.
+
 ## Designs
 
 **A. A fixed list.** The 79, or the 79 with a set of compounds. Simple, and comparable with agencies' constants. The short list fails estuaries. A long one carries noise lines at open coasts, cheaply on long records and less cheaply on short ones, and still names shared-frequency lines by list order.
@@ -61,11 +70,11 @@ A first measurement decides whether design E has a trigger at all. Fit each gaug
 The full comparison follows from that:
 
 - **Gauges.** Several hundred, stratified by class: open coast, shelf, estuary, river.
-- **Record lengths.** 0.5, 1, 2, 4, 10 and 19 years, made by truncating long records, so each rule is scored where it is weakest.
+- **Record lengths.** 0.5, 1, 2, 4, 10 and 19 years, made by truncating long records, so each rule is scored where it is weakest. Each short length is cut from several windows spread across the 18.6-year nodal cycle, since a compound's size follows its parents' through the cycle and each window has its own weather and river flow.
 - **Scoring.** Fit on years before a cutoff and score each of several later years, at gaps of one to five years. Report paired differences per gauge, the residual within each tidal species, the times and heights of high and low water, and the spread of each constant across disjoint windows.
 - **Arms.** The 79; the 79 with NOAA's 59; every separable catalog line under thresholds of 2, 4 and 6, with and without a stability filter; a progressive fit from the residual, under two or three stopping rules; a regularized fit; lists tiered by record length. The robust weights are a factor in each arm, since they change the variance every threshold rests on.
 - **Synthetic check.** Inject known lines into real residuals to measure each rule's false-positive and false-negative rates.
-- **Prerequisites in the fit.** A condition-number diagnostic and a stepwise cut, each of which stands on its own.
+- **Prerequisites in the fit.** A condition-number diagnostic and a stepwise cut, each of which stands on its own. A rule for lines that share or nearly share a frequency, tested first on L2 with 2MN2 and on 2N2 with 2MK2: fit both where the record separates them through their nodal or perigee modulation, and below that length set the astronomical line from the response at its neighbors and give the compound the rest.
 
 ## Not established
 
