@@ -15,7 +15,7 @@ export default {
       response:
         "A line dated day 00 is read as the day after the line before it, or the month's first day at the top of a file, and refused if that falls outside the month it names.",
       evidence:
-        'Every day-00 line is the only missing day of its month and sits between the lines for the days either side of it (2012/01/08 and 2012/01/10 for 0132), and its levels continue the tide from the line before. The full backfill on 2026-11-12 failed every year of these stations on "no day".',
+        'Every day-00 line is the only missing day of its month and sits between the lines for the days either side of it (2012/01/08 and 2012/01/10 for 0132), and its levels continue the tide from the line before. Without the exception, the backfill fails every year of these stations on "no day".',
       // Each month with a day-00 line holds every day, each hour once.
       check: async (store) => {
         for (const [id, month] of [
@@ -59,7 +59,7 @@ export default {
       response:
         "The copies are identical, so the year is read once; a zip whose copies differ is refused.",
       evidence:
-        "The zips' central directories list 1965's file twice, with the same contents in GS01's and GS02's (checked 2026-11-12).",
+        "The zips' central directories list 1965's file twice, with the same contents in GS01's and GS02's.",
       // The evidence compared GS01's and GS02's copies.
       check: async (store, e) => {
         for (const id of e.stations!.slice(0, 2)) {
@@ -84,7 +84,7 @@ export default {
       response:
         "31 May 1952 UTC to the end of 31 October 1952 is flagged `suspect`, keeping the source's own flag as `source_flag`. The step isn't measured, since the record has a gap across it, so the months are flagged, as in GESLA's copy, rather than given a datum epoch of their own.",
       evidence:
-        "Monthly means of JODC's values (checked 2026-11-13) are 3.62 to 3.80 m from June to October 1952 and, after a gap to 19 November, 1.52 m for the rest of November and 1.42 to 1.72 m through 1953; every year from 1953 to 2008, the record's last, averages 1.49 to 1.73 m. GESLA's copy of the gauge, `gesla/ominato-hd04-jpn-jodc_jcg`, has the same step on the same days, which GESLA's metadata marks \"Possible datum issues\" and its datum-jump check flags (erratum `gesla-datum-jumps`).",
+        "Monthly means of JODC's values are 3.62 to 3.80 m from June to October 1952 and, after a gap to 19 November, 1.52 m for the rest of November and 1.42 to 1.72 m through 1953; every year from 1953 to 2008, the record's last, averages 1.49 to 1.73 m. GESLA's copy of the gauge, `gesla/ominato-hd04-jpn-jodc_jcg`, has the same step on the same days, which GESLA's metadata marks \"Possible datum issues\" and its datum-jump check flags (erratum `gesla-datum-jumps`).",
       // The record starts with the span and has a gap after it, so 1953 stands for the levels outside it.
       check: async (store, e) => {
         await flaggedSpan(store, e);

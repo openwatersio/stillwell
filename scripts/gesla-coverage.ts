@@ -1,6 +1,7 @@
 /**
- * Writes src/sources/gesla/coverage.csv (one row per GESLA 4.1 record) and
- * coverage.md (the summary): which records the store also has from their
+ * Writes gesla-coverage.csv (one row per GESLA 4.1 record) and
+ * gesla-coverage.md (the summary) to STILLWELL_REPORTS (default reports/),
+ * for the site's report page: which records the store also has from their
  * originator through `same_as`, and which years each side has that the other
  * lacks. Reads the store (STILLWELL_STORE, a local directory or an HTTPS URL,
  * default the public bucket): stations.parquet, GESLA's list and the years file
@@ -9,13 +10,17 @@
  *   npm run gesla:coverage
  */
 import assert from "node:assert/strict";
-import { writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { DuckDBInstance } from "@duckdb/node-api";
 import { USER_AGENT } from "../src/http.ts";
 import { isMissing } from "../src/store/parquet.ts";
 import { stationListPath, stationsPath, yearsPath } from "../src/store/paths.ts";
 import { CONTRIBUTORS } from "../src/sources/gesla/contributors.ts";
 import { isDropped } from "../src/sources/gesla/dropped.ts";
+import { sources as adapters } from "../src/sources/index.ts";
+import { withheldReason } from "../src/withhold.ts";
 
 assert.equal(ranges([1950, 1951, 1952, 1960, 1962, 1963]), "1950–1952, 1960, 1962–1963");
 assert.equal(ranges([]), "");
@@ -32,7 +37,7 @@ const BACKFILLING = ["usgs", "coops"];
 const REACH: Record<string, { served?: boolean; note: string }> = {
   coops: { served: true, note: "Served: New London 1960" },
   usgs: {
-    note: "Backfill still running; Provincetown 2018 and Inwood 2004 empty, and history mostly from 2007",
+    note: "Provincetown 2018 and Inwood 2004 empty, and history mostly from 2007",
   },
   uhslc: { served: false, note: "Not served: Christmas Island (170) 1980" },
   rws: {
@@ -54,7 +59,8 @@ const REACH: Record<string, { served?: boolean; note: string }> = {
   sfwmd: { served: false, note: "Not served: G-58 2005, S-197 1985" },
 };
 
-const OUT = new URL("../src/sources/gesla/", import.meta.url);
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
+const OUT = resolve(ROOT, process.env.STILLWELL_REPORTS ?? "reports");
 
 const db = await (
   await DuckDBInstance.create(":memory:", { custom_user_agent: USER_AGENT })
@@ -76,7 +82,16 @@ const records = await rows(`
       WHERE list_contains(s.same_as, o.id) AND o.source != 'gesla' AND list_contains(o.products, 'levels')), []) AS others
   FROM read_parquet(${quote(stationListPath(STORE, "gesla"))}) g JOIN st s USING (id)
   ORDER BY g.id`);
-const list = records.filter((r) => !isDropped(r.id.slice("gesla/".length)));
+// A record withheld since the store's files were last published is still in them until the next refresh.
+const shown = (id: string) => {
+  const adapter = adapters[id.slice(0, id.indexOf("/"))];
+  return !adapter || withheldReason(adapter, id) === null;
+};
+const list = records.filter((r) => !isDropped(r.id.slice("gesla/".length)) && shown(r.id));
+for (const r of list) {
+  r.others = r.others.filter(shown);
+  r.same_as = [...r.same_as].filter(shown);
+}
 for (const r of list)
   r.others.sort((a: string, b: string) => +(b === r.preferred) - +(a === r.preferred));
 
@@ -89,16 +104,15 @@ const linked = new Map<string, Record<string, any>>(
 );
 const sources = [...new Set([...linked.values()].map((s) => s.source as string))].sort();
 
-// Years with a file, in any epoch. A row with no year marks a station whose rows a
+// Years with a file of values a reader can use, in any epoch: a year of nothing but fill, stored as `bad` rows, holds no record. A row with no year marks a station whose rows a
 // run is rewriting, so its years may be short.
 const years = new Map<string, Set<number>>();
 const marked = new Set<string>();
-const withYears = new Map<string, number>();
 for (const source of new Set(["gesla", ...sources, ...BACKFILLING])) {
   let found: Record<string, any>[];
   try {
     found = await rows(
-      `SELECT DISTINCT id, year FROM read_parquet(${quote(yearsPath(STORE, source))}) WHERE year IS NULL OR hours > 0`,
+      `SELECT DISTINCT id, year FROM read_parquet(${quote(yearsPath(STORE, source))}) WHERE year IS NULL OR (hours > 0 AND coalesce(good, 0) + coalesce(interpolated, 0) + coalesce(preliminary, 0) + coalesce(suspect, 0) > 0)`,
     );
   } catch (error) {
     // A source's years file starts with its first `ingest years` run.
@@ -110,10 +124,16 @@ for (const source of new Set(["gesla", ...sources, ...BACKFILLING])) {
     if (year === null) marked.add(id);
     else (years.get(id) ?? years.set(id, new Set()).get(id)!).add(year);
   }
-  withYears.set(source, new Set(found.filter((r) => r.year !== null).map((r) => r.id)).size);
 }
-const progress = await rows(`SELECT source, count(*) AS stations FROM st
-  WHERE source IN (${BACKFILLING.map(quote).join(",")}) AND list_contains(products, 'levels') GROUP BY source ORDER BY source`);
+// Each backfilling source's listed stations with levels, and how many of those have years.
+const progress = (
+  await rows(`SELECT source, list(id) AS ids FROM st
+    WHERE source IN (${BACKFILLING.map(quote).join(",")}) AND list_contains(products, 'levels') GROUP BY source ORDER BY source`)
+).map((p) => ({
+  source: p.source as string,
+  stations: (p.ids as string[]).length,
+  withYears: (p.ids as string[]).filter((id) => years.has(id)).length,
+}));
 
 interface Row {
   id: string;
@@ -183,8 +203,9 @@ for (const [gauge, group] of Map.groupBy(table, (r) => r.gauge)) {
   });
 }
 
-await writeFile(new URL("coverage.csv", OUT), csv(table));
-await writeFile(new URL("coverage.md", OUT), summary(table));
+await mkdir(OUT, { recursive: true });
+await writeFile(resolve(OUT, "gesla-coverage.csv"), csv(table));
+await writeFile(resolve(OUT, "gesla-coverage.md"), summary(table));
 console.log(`${table.length} records, ${table.filter((r) => r.originators.length).length} linked`);
 
 function yearsOf(ids: string[]): number[] {
@@ -355,11 +376,11 @@ function summary(rows: Row[]): string {
 
   return `# GESLA coverage
 
-Generated by \`npm run gesla:coverage\` from the store's station lists and years files; don't edit by hand. [coverage.csv](coverage.csv) has one row per record. It counts GESLA 4.1's ${rows.length} records in the store (less the records \`isDropped\` in [dropped.ts](dropped.ts) finds, whose values are another gauge's), and for each finds the originator's series of the gauge through \`same_as\`: any other source's series with levels, except UHSLC's series at a gauge GESLA also holds from another agency, such as BOM or NOAA, whose originator that agency is; those are listed apart as relays (\`uhslc_relay\`), for every record of the gauge, GESLA's UHSLC records included. Elsewhere UHSLC is the originator. Where a gauge has several originator series, such as a USGS and a CO-OPS series, a year counts if any has it. A year counts on a side when the store has a file of levels for it, so a year of a few hours counts as much as a whole one, and a file with no values doesn't count; a year counts whatever its values' flags. A record is live when the poller polls one of its originator series (\`live\` and \`active\`).
+Generated by \`npm run gesla:coverage\` from the store's station lists and years files, when the site builds. The CSV has one row per record. It counts GESLA 4.1's ${rows.length} records in the store (less the records \`isDropped\` in [dropped.ts](/src/sources/gesla/dropped.ts) finds, whose values are another gauge's, and withheld records), and for each finds the originator's series of the gauge through \`same_as\`: any other source's series with levels, except UHSLC's series at a gauge GESLA also holds from another agency, such as BOM or NOAA, whose originator that agency is; those are listed apart as relays (\`uhslc_relay\`), for every record of the gauge, GESLA's UHSLC records included. Elsewhere UHSLC is the originator. Where a gauge has several originator series, such as a USGS and a CO-OPS series, a year counts if any has it. A year counts on a side when the store has a file of levels for it, so a year of a few hours counts as much as a whole one, and a file with no values doesn't count; a year counts whatever its values' flags. A record is live when the poller polls one of its originator series (\`live\` and \`active\`).
 
 GESLA often holds a gauge more than once, from two contributors or in several versions, so the CSV's \`gesla_only_years\` are one record's years the originator lacks, and \`originator_only_years\` the originator's years no GESLA record of the gauge has. Station-year totals below count each gauge once.
 
-The ${BACKFILLING.join(" and ")} history backfills were still running when this was generated (${progress.map((p) => `${p.source} ${withYears.get(p.source) ?? 0} of ${p.stations} stations with years`).join(", ")}), so their gaps will shrink. ${markedRows ? `${markedRows} records' series are marked in the years file (\`years_marked\`): a run was rewriting them, or stopped partway or couldn't read a file, so their years may be short. ` : ""}Regenerate with \`npm run gesla:coverage\` after a backfill campaign, first taking a finished source out of \`BACKFILLING\` and updating \`REACH\` in [the script](../../../scripts/gesla-coverage.ts); it reads the public store, or a local one through \`STILLWELL_STORE\`.
+${progress.length ? `The ${progress.map((p) => p.source).join(" and ")} history backfills were still running when this was generated (${progress.map((p) => `${p.source} ${p.withYears} of ${p.stations} stations with years`).join(", ")}), so their gaps will shrink. ` : ""}${markedRows ? `${markedRows} records' series are marked in the years file (\`years_marked\`): a run was rewriting them, or stopped partway or couldn't read a file, so their years may be short. ` : ""}When a backfill campaign finishes, take the source out of \`BACKFILLING\` and update \`REACH\` in [the script](/scripts/gesla-coverage.ts).
 
 - **${linkedRows.length}** of ${rows.length} records are linked to the originator's series, and **${linkedRows.filter((r) => r.live).length}** of those to one that the poller polls. Another **${unlinked.filter((r) => r.relays.length).length}** have only UHSLC's copy.
 - **${linkedRows.filter((r) => r.geslaOnly.length).length}** linked records have years their originator lacks: **${sum(linkedGauges, (x) => x.geslaOnly.length)}** station-years over ${linkedGauges.filter((x) => x.geslaOnly.length).length} gauges. **${unlinked.length}** records have no originator series, **${sum(gauges(unlinked), (x) => x.gesla.length)}** station-years.
@@ -375,24 +396,28 @@ ${contributorRows.join("\n")}
 
 ## Records with no originator series
 
-The records with no originator series in the store, by contributor, most first: the adapters for the first rows' originators would add the most. "None linked" marks a contributor with no originator series in the store at all. Station-years are the unlinked records' years, each gauge once; "UHSLC copy" counts the unlinked records whose gauge the store also has from UHSLC's relay; the rest only GESLA has. "Contributor commercial use" is the contributor's terms in [contributors.ts](contributors.ts); a record's own, in the CSV, can be stricter.
+The records with no originator series in the store, by contributor, most first: the adapters for the first rows' originators would add the most. "None linked" marks a contributor with no originator series in the store at all. Station-years are the unlinked records' years, each gauge once; "UHSLC copy" counts the unlinked records whose gauge the store also has from UHSLC's relay; the rest only GESLA has. "Contributor commercial use" is the contributor's terms in [contributors.ts](/src/sources/gesla/contributors.ts); a record's own, in the CSV, can be stricter.
 
 | Contributor | Records | Unlinked | Station-years | UHSLC copy | Contributor commercial use | Countries |
 | --- | --: | --: | --: | --: | --- | --- |
 ${missing.map(([c, g, u]) => `| ${c} | ${g.length} | ${u.length === g.length ? `${u.length}, none linked` : u.length} | ${sum(gauges(u), (x) => x.gesla.length)} | ${u.filter((r) => r.relays.length).length} | ${terms(c)} | ${countries(u)} |`).join("\n")}
 
-CMEMS's records come from national agencies, so their countries say which feed would cover them. Some contributors need permission first: CHS's terms for MEDS's gauges bar commercial use without a license, and JODC, UNAM and BOM have been asked ([contributors.md](contributors.md)).
+CMEMS's records come from national agencies, so their countries say which feed would cover them. Some contributors need permission first: CHS's terms for MEDS's gauges bar commercial use without a license, and JODC, UNAM and BOM have been asked ([contributors.md](/src/sources/gesla/contributors.md)).
 
 ## Year gaps by source
 
 Linked gauges, each once, by the source holding the originator's first year, or the first originator series where none has years yet. "Not backfilled" counts gauges whose originator series have no years in the store yet, and the GESLA years they hold. The rest split GESLA's extra years by where they fall against the originator's years in the store: before its first year, in a gap between its first and last, or after its last. Years before the first are a backfill shortfall where the source serves them, and years only GESLA has where it doesn't. "Reach" says which, from the source's README or a spot check through the adapter, on 2026-11-12 (CMEMS on 2026-11-15), of one week of July at one or two gauges, in a year GESLA has; a check speaks for the source's other gauges only as a sample.
 
-Of the ${total} GESLA-only station-years at linked gauges, ${shortfall} (not backfilled, or before the first year) are at gauges one of whose sources serves them, by the checks: a backfill shortfall. ${notServed} are before the first year at gauges whose every source, by the checks, doesn't reach them, so GESLA is the store's only copy. ${open} are still open: at gauges whose originator series have no years yet at a source no check shows serving them, or at sources without a settled check, such as USGS, whose backfill is still running, and CRMS, whose site's later gauge would cover most. The other ${total - shortfall - notServed - open} fall in gaps or after the originator's last year.
+Of the ${total} GESLA-only station-years at linked gauges, ${shortfall} (not backfilled, or before the first year) are at gauges one of whose sources serves them, by the checks: a backfill shortfall. ${notServed} are before the first year at gauges whose every source, by the checks, doesn't reach them, so GESLA is the store's only copy. ${open} are still open: at gauges whose originator series have no years yet at a source no check shows serving them, or at sources without a settled check, such as CRMS, whose site's later gauge would cover most. The other ${total - shortfall - notServed - open} fall in gaps or after the originator's last year.
 
-At CRMS, 350 of the GESLA-only years were in a later gauge of the site (\`H02\`), which GESLA's records didn't link to on 2026-11-12. The rest are years CPRA's export doesn't give for the series it lists: before the site's first listed series (366 years), after its last (106), or at a site whose listed series has no values (140). Some of the years before the first series are the site's marsh well (\`W01\`), which CPRA gives and the adapter leaves out; the GESLA adapter flags them (erratum \`gesla-crms0008-marsh-well\` and eight like it). CRMS0176's and CRMS1446's later years are likely another site's gauge, which CPRA lists under the site as \`H0X\` and the adapter leaves out ([crms README](../crms/README.md)).
+A check of CRMS on 2026-11-12 found 350 of its GESLA-only years in a later gauge of the site (\`H02\`), which GESLA's records didn't link to. The rest are years CPRA's export doesn't give for the series it lists: before the site's first listed series (366 years), after its last (106), or at a site whose listed series has no values (140). Some of the years before the first series are the site's marsh well (\`W01\`), which CPRA gives and the adapter leaves out; the GESLA adapter flags them (erratum \`gesla-crms0008-marsh-well\` and eight like it). CRMS0176's and CRMS1446's later years are likely another site's gauge, which CPRA lists under the site as \`H0X\` and the adapter leaves out ([crms README](/src/sources/crms/README.md)).
 
 | Source | Gauges | Not backfilled | Their years | Before first | In a gap | After last | Earliest year | Reach |
 | --- | --: | --: | --: | --: | --: | --: | --: | --- |
 ${gapRows.join("\n")}
+
+## Credit
+
+The record names, contributors and years come from ${adapters.gesla!.metadata.attribution}. ${adapters.gesla!.metadata.terms}
 `;
 }

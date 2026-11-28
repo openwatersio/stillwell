@@ -16,7 +16,8 @@ import {
 import { csvFields } from "./csv.ts";
 import { qcFor, refuseOtherDatum } from "./store/recent.ts";
 import { judgeFetched } from "./store/requalify.ts";
-import { possible } from "./span.ts";
+import { Dropped, leaveOutInto, possible, tallying } from "./span.ts";
+import { Flag } from "./schema.ts";
 import type {
   Epoch,
   StoredStation,
@@ -63,6 +64,10 @@ const DAY_MS = 86_400_000;
  * Provisional years are fetched on every run, so a long campaign of runs
  * uses `--skip-written` (`yearWritten`) instead.
  *
+ * A year whose every level is outside the store's span, which backfill writes as rows
+ * flagged `bad`, isn't done either, so a source's later fix reaches it; `--skip-written`
+ * skips it like any other file.
+ *
  * A year the source returns nothing for writes no file, so it is fetched again
  * on every run in either mode; adapters that bound requests to each series'
  * dates (USGS, CO-OPS) send no request for those years outside them, and
@@ -79,7 +84,9 @@ export function yearDone(
 ): boolean {
   if (!wholeEndedYear(from, to, now)) return false;
   const unchecked = qcStart != null && to.getTime() <= Date.parse(qcStart);
-  if (!file || (file.preliminary > 0 && !unchecked) || file.months < 12) return false;
+  // A year of nothing but fill is asked for again, in case the source has since sent levels.
+  if (!file || file.usable === 0 || (file.preliminary > 0 && !unchecked) || file.months < 12)
+    return false;
   return file.last >= to.getTime() - 7 * DAY_MS;
 }
 
@@ -128,7 +135,7 @@ export function wholeEndedYear(from: Date, to: Date, now: number): boolean {
  * Station IDs from a file, one per line, for `--first`: a plain list (blank
  * lines and `#` comments skipped), or a CSV with a header, whose
  * `originator_id`, `id` or `station` column is used, so
- * docs/ticon-inventory.csv works as it is. IDs may be bare (`07010000`) or
+ * the TICON inventory's CSV works as it is. IDs may be bare (`07010000`) or
  * carry their source (`usgs/07010000`); ones for another source are dropped.
  */
 export function parseStationList(text: string, sourceId: string, csv: boolean): string[] {
@@ -455,10 +462,29 @@ export function readerOf(product: Product) {
 }
 
 /**
+ * What a year's fetch left out as outside `SPAN_M` (`dropped`, from the fetch
+ * and the stored rows it replaces), and whether that was every level there
+ * was (`allOutOfSpan`): such a year keeps its rows, flagged `bad`, since the
+ * source answered with values, none of them a level, and it never counts as an
+ * empty year.
+ */
+export interface YearReport {
+  dropped: Dropped;
+  allOutOfSpan: boolean;
+}
+
+/**
  * Fetch one year of a series and merge it into its file, read through
  * `files`. Returns how many rows the year's file now holds, undefined when
  * nothing changed, or `empty` when the source returned nothing for the year.
  * A year file of levels it writes goes in `written`, for the source's years.
+ *
+ * Levels outside `SPAN_M` are left out of the fetch and of the rows it
+ * replaces, and counted in `report`. When they are all the fetch holds, the
+ * year isn't empty: with no level in its file, the year is written as those
+ * rows, flagged `bad`, so it counts as written and as bad values, not as an
+ * outage that `--skip-written` would record as done. A year whose file holds
+ * levels keeps them, as it does when a fetch comes back empty.
  */
 export async function backfillYear(
   source: Source,
@@ -469,6 +495,7 @@ export async function backfillYear(
   epoch: Epoch,
   files: SeriesFiles<Observation> | SeriesFiles<PublishedExtreme>,
   written: Map<string, YearStats>,
+  report: YearReport = { dropped: new Dropped(), allOutOfSpan: false },
 ): Promise<number | "empty" | undefined> {
   // The epoch's own datum, which a closed epoch keeps when the station's moves on.
   station = { ...station, datum: epoch.datum };
@@ -479,14 +506,34 @@ export async function backfillYear(
     const series = files as SeriesFiles<Observation>;
     const get = product === "levels" ? source.observations : source.predictions;
     if (!get) return undefined;
-    const rows = await get(station, from, to);
+    const fetched = await tallying(() => get(station, from, to), product === "levels");
+    report.dropped.merge(fetched.dropped);
+    let rows = fetched.result;
+    // The levels the source sent, every one outside the span.
+    const bad = !rows.length && fetched.rows.length > 0;
     // An empty fetch is an outage, a year the source no longer publishes, or a
     // datum it no longer serves; it never empties a file.
-    if (!rows.length) return "empty";
+    if (!rows.length && !bad) return "empty";
+    // Flagged bad here, since no gauge reads such a level; the source's own flag stays as it sent it, where it's known.
+    if (bad)
+      rows = fetched.rows.map((r) => ({
+        time: r.time,
+        level: r.level,
+        flag: Flag.bad,
+        source_flag: (r.flag ?? Flag.bad) as Flag,
+      }));
     const { rows: stored, datums } = await series.get(year);
     await refuseOtherDatum(path, station, datums);
     // A stored level outside `SPAN_M` goes, as a fetch drops one.
-    const existing = product === "levels" ? stored.filter((r) => possible(r.level)) : stored;
+    // A year of placeholders read again isn't counted a second time.
+    const existing =
+      product !== "levels"
+        ? stored
+        : bad
+          ? stored.filter((r) => possible(r.level))
+          : leaveOutInto(stored, report.dropped);
+    // The levels it holds stay, as they do when the fetch is empty.
+    if (bad && existing.length) return "empty";
     const keepAll = product === "levels" && source.keepsStored;
     let merged = mergeFetched(existing, rows, ...range, undefined, keepAll);
     if (product === "levels")
@@ -498,7 +545,9 @@ export async function backfillYear(
         [...(await series.get(year - 1)).rows, ...(await series.get(year + 1)).rows],
         keepAll,
       );
-    if (!merged.length || sameRows(stored, merged)) return undefined;
+    // Fill values such as 999,999.06 don't survive the file's FLOAT, so they're compared as it reads them back.
+    if (!merged.length || sameRows(stored, bad ? asWritten(merged) : merged)) return undefined;
+    report.allOutOfSpan = bad;
     let stats: YearStats;
     try {
       stats = await writeObservations(path, merged, station.datum);
@@ -513,7 +562,9 @@ export async function backfillYear(
   const series = files as SeriesFiles<PublishedExtreme>;
   const get = product === "extremes" ? source.extremes : source.predictedExtremes;
   if (!get) return undefined;
-  const rows = await get(station, from, to);
+  const fetched = await tallying(() => get(station, from, to));
+  report.dropped.merge(fetched.dropped);
+  const rows = fetched.result;
   if (!rows.length) return "empty";
   const { rows: existing, datums } = await series.get(year);
   await refuseOtherDatum(path, station, datums);

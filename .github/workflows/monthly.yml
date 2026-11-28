@@ -62,10 +62,10 @@ jobs:
       # The sources come from each adapter's metadata (src/sources/jobs.ts).
       # The registry imports no packages (test/jobs.test.ts checks), so it
       # needs Node but not npm ci.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
       - id: plan
@@ -119,7 +119,8 @@ jobs:
     runs-on: ubuntu-latest
     # CO-OPS's datums take up to 2 hours (refreshBudgetMs) and analysis's
     # requalify 2 hours. The requalify of the last two months starts stations
-    # for at most 90 minutes, and none after the job's fifth hour.
+    # for at most 90 minutes, and none after the job's fifth hour. The fits
+    # start stations for at most 2 hours, and none after five and a half.
     timeout-minutes: 360
     # The environment holds the R2 credentials and only runs on main.
     environment: lake
@@ -127,8 +128,8 @@ jobs:
       contents: read
     steps:
       - run: echo "STARTED=$(date +%s)" >> "$GITHUB_ENV"
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -175,6 +176,15 @@ jobs:
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
           CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
           CCO_REFERER: ${{ secrets.CCO_REFERER }}
+      # Not on a refresh of named sources, such as the poller's on a datum change, which shouldn't hold the source's group for the fits' two hours.
+      - if: ${{ !cancelled() && !inputs.sources }}
+        run: scripts/monthly.sh fit "$SOURCE"
+        env:
+          SOURCE: ${{ matrix.source }}
+          STILLWELL_STORE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
   # Pairs of stations within 10 km, and every linked pair, compared by their
   # hourly levels (src/matches.ts), for publish to link those that agree within
@@ -199,8 +209,8 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -240,8 +250,8 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -275,10 +285,10 @@ jobs:
       # started, so a source registered since isn't dropped from
       # stations.parquet. The job's steps and settings stay the run's. The
       # lists it reads may come from older code, as any night's publish does.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           ref: main
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -317,8 +327,8 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -363,10 +373,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -381,7 +391,7 @@ jobs:
           SOURCES: ${{ matrix.sources }}
           REGION: ${{ matrix.region }}
       # The Errata check workflow reads findings.json into the errata report.
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: cross-check ${{ matrix.region }}
           path: |

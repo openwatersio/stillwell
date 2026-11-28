@@ -6,6 +6,7 @@ sidebar:
 ---
 
 import Schema from "../../../../components/Schema.astro";
+import QueryResult from "../../../../components/QueryResult.astro";
 
 Every file is under `https://stillwell.openwaters.io/`, readable over HTTPS without an account. The store also holds files its ingest keeps for itself, such as `stations/bounds/`, which aren't described here.
 
@@ -29,6 +30,13 @@ Every file is under `https://stillwell.openwaters.io/`, readable over HTTPS with
 - [`stations/analysis/<source>.parquet`](#station-analysis): what the store measures from each station's levels.
 - `history/stations/<source>/<time>.parquet` and `.json`: each refresh's previous list of a source's stations, in the layout of its time, and a report of what the refresh changed.
 
+## Harmonic constants
+
+- [`fits/<source>.parquet`](#harmonic-fits): each station's harmonic fit, with its window, its scores on a year it didn't read, and what it read.
+- [`constituents/<source>.parquet`](#harmonic-fits): the constants of each fit, a row per candidate constituent.
+- [`fits/references/<source>.parquet`](#reference-scores): the scores, on a fit's held-out year, of the constants `@slackwater/database` holds for the same gauge.
+- [`fits/datums/<source>.parquet`](#tidal-datums): the tidal datums of each fit, observed from the station's levels and predicted from its constants.
+
 ## Reading one station
 
 `stations.parquet`, `stations/offsets.parquet`, `stations/years/<source>.parquet` and `stations/analysis/<source>.parquet` are sorted by station, in row groups of 2,048 rows whose statistics give each group's first and last station. A reader that filters on one station and fetches only the byte ranges it needs, as DuckDB, Polars and hyparquet do, reads the file's footer and the one or two groups holding that station rather than the whole file. `stations/links.parquet` has the same groups sorted by `a`, so only a filter on `a` skips them. The files under `recent/` are sorted by `station` in much larger row groups.
@@ -48,3 +56,56 @@ Every file is under `https://stillwell.openwaters.io/`, readable over HTTPS with
 `stations/analysis/<source>.parquet` has a row for each station whose levels the store has measured: whether they carry a tide, the step between values that `stations.parquet` uses as `interval_s` where the source gives none, and the measures behind them.
 
 <Schema resource="analysis" />
+
+## Harmonic fits
+
+`fits/<source>.parquet` has a row for each station the store has tried to fit harmonic constants for. A fit reads up to 19 years of final values stamped on a UTC hour, in the station's current datum, and is scored on the year after them, which it didn't read. The row gives the window, the scores and what the fit read, or the reason the station has no constants. [Harmonic fits](https://github.com/openwatersio/stillwell/blob/main/docs/fits.md) in the repository gives the method and the reason for each choice.
+
+A fit is a measurement, published whatever its size. No row says whether a gauge has enough tide to predict. `mean_range_m`, `variance_explained`, each constituent's `snr` and its scatter between years are there for a reader to set a threshold with.
+
+<Schema resource="fits" />
+
+`constituents/<source>.parquet` has a row for each candidate constituent of each station with constants, in the order of the fit's list of candidates. The rows with `kept` true are the fit's constants. The others say why they were left out. The two files are written one after the other, so join them on `id` and `version`, as the query below does: a station's candidate rows can be a fit ahead of its row in the other file for as long as one run takes to write both.
+
+Kungsvik's ten largest constants:
+
+<QueryResult
+  sql={`SELECT c.name, round(c.amplitude_m * 1000, 1) AS amplitude_mm, round(c.phase_deg, 2) AS phase_deg, round(c.snr) AS snr
+FROM 'https://stillwell.openwaters.io/constituents/smhi.parquet' c
+JOIN 'https://stillwell.openwaters.io/fits/smhi.parquet' f USING (id, version)
+WHERE c.id = 'smhi/2130' AND c.kept
+ORDER BY c.amplitude_m DESC
+LIMIT 10`}
+/>
+
+To predict from a fit, sum its kept constituents and add the fit's `z0_m`, the window's mean level in the station's datum. Phases are Greenwich lags with time in UTC. The amplitudes and phases were fitted under the nodal corrections the fit's `node_corrections` names, Schureman's (1958), and a prediction has to apply the same ones: constants fitted under one family of corrections predict slightly differently under another. The constituent's name is needed with its Doodson numbers, since NO1 and M1, and MO3 and 2MK3, share numbers and differ in their correction.
+
+<Schema resource="constituents" />
+
+## Reference scores
+
+`fits/references/<source>.parquet` has a row for each fit and each record of constants that [`@slackwater/database`](https://www.npmjs.com/package/@slackwater/database) holds for the same gauge. The record's constants are scored on the fit's held-out year, over the same hours and with the same code as the fit, so `held_out_rms_m` here compares with `held_out_rms_m` in `fits/<source>.parquet`. No row says which constants are better. `variance_difference_se_m2` is the standard error of the fit's residual variance minus the record's.
+
+A record counts as the station's gauge in one of two ways, given in `link`. With `id`, the record carries the station's own ID in its source and lies within 10 km. With `levels`, it carries the ID of a linked series, named in `linked`, whose hourly levels agree with the station's within 1 cm RMS with no lag. A record reached only through a link whose levels haven't been compared has no row.
+
+Each record is predicted under the nodal corrections in `node_corrections`. Where `node_corrections_assumed` is true, the record's source doesn't state which corrections it fitted under, and the score is under the IHO's. `seen` says whether the span the record was analyzed over includes the held-out year, and is null where the record gives no span. `reference_license` and `reference_commercial_use` give the record's terms.
+
+Join on `id`, `version` and `fitted`: a fit's `version` covers its window and constants and not the held-out year's values, and the two files are written one after the other. Kungsvik's fit and the records scored against it:
+
+<QueryResult
+  sql={`SELECT r.reference, r.held_out, round(f.held_out_rms_m * 1000, 2) AS fit_rms_mm, round(r.held_out_rms_m * 1000, 2) AS reference_rms_mm, r.seen, r.reference_license
+FROM 'https://stillwell.openwaters.io/fits/references/smhi.parquet' r
+JOIN 'https://stillwell.openwaters.io/fits/smhi.parquet' f USING (id, version, fitted)
+WHERE r.id = 'smhi/2130'
+ORDER BY r.reference`}
+/>
+
+<Schema resource="references" />
+
+## Tidal datums
+
+`fits/datums/<source>.parquet` has a row for each station with constants: tidal datums reduced from the station's own measured levels, and the datums of a 19-year prediction from its constants, each as a height in meters above the station's `datum` in its current epoch. The observed datums, MHHW, MHW, MSL, MTL, MLW and MLLW, are NOAA's first reduction over the longest run of whole years of complete months the station has from the start of the fit's window to the end of its held-out year, and `reason` says why a station has none. The predicted ones, HAT and LAT among them, cover 2007 through 2025 for every station. Join a row to its fit on `id`, `version` and `fitted`. [Tidal datums](https://github.com/openwatersio/stillwell/blob/main/docs/fits.md#tidal-datums) in the repository gives the method.
+
+<Schema resource="fit-datums" />
+
+These datums aren't the station's `datums` in `stations.parquet`, which come from the source, slackwater-database or a linked series, and which of them is the station's chart datum is slackwater-database's choice.

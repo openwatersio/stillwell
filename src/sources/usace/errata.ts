@@ -51,12 +51,12 @@ export default {
       stations: [],
       handling: "dropped",
       error:
-        "Some CWMS locations sit at 0,0 or at a placeholder such as 9.09,9.09 (Anoka), and a few have the longitude's sign dropped (Buck Creek, Pine Bluff), which puts them in Asia.",
-      response: "Locations outside the contiguous US are left out.",
+        "Some CWMS locations with an observed stage series sit at 0,0, at a placeholder such as 9.09,9.09 (Anoka) or −3.4 × 10³⁸, or have no position.",
+      response:
+        "A location with no position, or one outside the contiguous US, is left out of the station list. The refresh fails for a station already listed that CWMS moves to one, until a `POSITIONS` entry or `RETIRED` settles it.",
       evidence:
-        "CWMS location catalogs: locations at 0,0; Anoka at 9.09,9.09; Buck Creek and Pine Bluff with a positive longitude.",
-      report:
-        "Not reported yet. The locations are mostly MVS's and LRL's; on 2026-11-07 the New Orleans District was asked who takes them.",
+        "CWMS location and stage-series catalogs of the nine offices, read 2026-11-24 with the adapter's rules: a location that has an observed series (`observed()` in `src/sources/usace/index.ts`) and no position in the contiguous US, once `published-latitude` and `published-longitude` stand in for a location with neither coordinate. That is 154 locations. Three more, whose longitude lost its sign, are placed by erratum `usace-longitude-sign`.\n\n| Office | Locations | Position |\n| --- | --- | --- |\n| MVS | 72 | 0,0, such as `Baton Rouge-Mississippi`, `St Paul-Mississippi` and `Kansas City-Missouri`; they are MVS's own entries for other districts' gauges |\n| MVS | 1 | 9.09, 9.09, `Anoka-Mississippi` |\n| MVS | 1 | none, `Fayette-Moniteau Cr` |\n| LRL | 62 | none, such as `Alpine`, `Madison`, `Cairo` and `Muncie` |\n| LRL | 7 | 0,0: `Olmsted`, `Olmsted-HW`, `Olmsted-OLMI2`, `Olmsted-TW`, `Clifty Creek`, `FarmersTW` and `Shawneetown` |\n| LRL | 6 | −3.4028235 × 10³⁸: `Brownsville`, `BrownsvilleWtrT`, `CHSI2`, `MURI2`, `MammothCave` and `NMDM7` |\n| LRH | 4 | none: `NewCumberlandLD-Pool`, `NewCumberlandLD-Tailwater`, `PikeIslandLD-Pool` and `PikeIslandLD-Tailwater` |\n| LRC | 1 | none, `Shawano` |\n\nMVM, MVN, LRP and LRN have none.",
+      report: "Not sent: held until upstream reports go out.",
       check: async (store) => {
         const usace = (await store.rows("stations.parquet")).filter((r) => r.source === "usace");
         if (!usace.length) throw new Error("the store lists no USACE stations");
@@ -142,8 +142,22 @@ export default {
         "The station refresh moves each station to the USGS gauge's position, listed in `POSITIONS` in `src/positions.ts`. An entry applies only while CWMS still serves the position it was written against. If CWMS moves the station, the station keeps CWMS's position, and the refresh reports the entry and fails the run until a person checks it.",
       evidence:
         "| Station | CWMS | USGS gauge | Off by |\n| --- | --- | --- | --- |\n| `MVK.Olive_Branch`, Coldwater River at Olive Branch | 37.9075, −89.7533 | 07275900, 34.9075, −89.7533 | 334 km; latitude 3° off |\n| `MVK.Oxford`, Yocona River at Oxford | 32.2733, −89.5214 | 07274000, 34.2733, −89.5214 | 222 km; latitude 2° off |\n| `MVN.Bayou_Boeuf-Amelia` | 29.8691, −90.5950 | 073814675, 29.6683, −91.0997, railroad bridge at Amelia | 54 km |\n| `MVN.Chicot_Pass-Myette`, Chicot Pass near Myette Point | 30.0680, −91.4740, the same as `MVN.Chicot_Pass` near West Fork | 073815450, 29.8927, −91.4457 | 20 km |\n| `LRN.RoaringR_Hilham`, Roaring River near Hilham | 36.3409, −85.5902 | 03418000, 36.3409, −85.4264 | 15 km |\n| `LRN.WFBrownsCr_Glen`, West Fork Browns Creek at Glendale Lane | 36.2177, −86.8202 | 03431100, 36.0943, −86.7939 | 14 km |\n\nFound by matching every USACE station's river and place names against USGS and the other districts' catalogs on 2026-11-08. MVN's Baton Rouge, 113 km south, is [#64](https://github.com/openwatersio/stillwell/issues/64).",
-      report:
-        "Not sent. It goes to MVK and MVN Water Management for their gauges, and to the Nashville District for LRN's.",
+      report: "Not sent: held until upstream reports go out.",
+      check: async (store, e) => {
+        for (const id of e.stations!) await moved(store, id);
+      },
+    },
+    {
+      id: "usace-longitude-sign",
+      stations: ["usace/MVK.Pine_Bluff", "usace/LRL.BuckCreek", "usace/LRH.PleasantHill-Outflow"],
+      handling: "corrected",
+      error:
+        "The CWMS location catalog drops the minus sign of the longitude at three locations, which puts them in Asia.",
+      response:
+        "The station refresh moves each station to USGS's gauge's position, listed in `POSITIONS` in `src/positions.ts`. An entry applies only while CWMS still serves the position it was written against. If CWMS moves the station, the refresh fails until the entry's `served` position is updated, or the station is retired in `RETIRED` in `src/sources/usace/index.ts`. Once CWMS restores the sign, the refresh reports each entry as stale until it is deleted.",
+      evidence:
+        "Positions read 2026-11-24. Each USGS record is a gauge at the same structure, from the USGS site service.\n\n| Station | CWMS | USGS gauge | Off by |\n| --- | --- | --- | --- |\n| `MVK.Pine_Bluff`, Arkansas River at Pine Bluff, AR | 34.29028, +91.99556 | 07263650, Arkansas River at Pine Bluff, AR: 34.29027778, −91.9955556 | 0 km, with the sign restored |\n| `LRL.BuckCreek`, Buck Creek below C J Brown Reservoir | 39.951389, +83.754167 | 03268100, Buck Creek bl CJ Brown Reservoir nr Springfield OH: 39.951449, −83.7540936 | 0.01 km |\n| `LRH.PleasantHill-Outflow` | 40.620518, +82.323769 | 03133500, Clear Fork bl Pleasant Hill Dam nr Perrysville OH: 40.6203379, −82.3243284 | 0.05 km |\n\nWith the sign restored, each CWMS position is within 60 m of its gauge, on the stream and at the dam its name gives.",
+      report: "Not sent: held until upstream reports go out.",
       check: async (store, e) => {
         for (const id of e.stations!) await moved(store, id);
       },
@@ -309,7 +323,7 @@ export default {
       error:
         "These 82 CWMS series hold levels no gauge can read, outside the store's span of −500 to 9,000 m: 409,338 values in 147 station-years from 1982 to 2026. Most are 99,999 ft (30,479.695 m) or −99,999 ft, and −1.04 × 10³⁸ m at the Cumberland River gauges; the rest are values such as 999,999 ft and 9,999,999 ft, up to 2 × 10¹⁶ m.",
       response:
-        "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. A year file of nothing else keeps its rows, flagged `bad`, with a warning, until `ingest delete-years` deletes it.",
+        "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. Backfill writes a year of nothing else as its rows flagged `bad`, and requalify and compaction keep such a file, with a warning, until `ingest delete-years` deletes it.",
       evidence:
         "November 2026. A scan of the range of levels in every year file of every source in the store (335,320 files) found 383 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span.",
       check: (store) => impossibleDropped(store, "usace/MVK.Helena", 2026),

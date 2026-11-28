@@ -40,6 +40,7 @@ import {
 } from "./store/paths.ts";
 import type { Source } from "./schema.ts";
 import { dropYears } from "./store/years.ts";
+import { dropFits } from "./fit/store.ts";
 
 /** Why a station, by its store ID, is withheld, or null; null for another source's station. */
 export function withheldReason(source: Source, id: string): string | null {
@@ -50,7 +51,7 @@ export function withheldReason(source: Source, id: string): string | null {
 
 /**
  * Drop withheld stations' rows from the source's bounds, years, daily files,
- * empty-years record, backfilled years, requalify list and analysis, with its history, in `store`, rewriting only a file that holds one. Returns
+ * empty-years record, backfilled years, requalify list, analysis, with its history, and fits, in `store`, rewriting only a file that holds one. Returns
  * the station IDs it dropped rows for.
  */
 export async function dropWithheldRows(store: string, source: Source): Promise<string[]> {
@@ -103,6 +104,8 @@ export async function dropWithheldRows(store: string, source: Source): Promise<s
     );
   }
   for (const station of await dropAnalysis(store, id, held)) dropped.add(station);
+  // Constants fitted to a station's values leave with them.
+  for (const station of await dropFits(store, id, held)) dropped.add(station);
   // Last, so the values themselves are gone even if this file can't be written.
   for (const station of await dropYears(store, id, held)) dropped.add(station);
   return [...dropped].sort();
@@ -267,7 +270,8 @@ export async function removePrefixes(store: string, prefixes: string[]): Promise
  * `drop` names, such as GESLA's records that hold another gauge's values, and
  * their rows in the years file and the analysis, and the backfilled years of
  * every station `drop` names, files or not, so a run after an earlier one
- * clears what that left; `cleared` lists those, or with `dryRun` would. Deletes only the directories that have files, and with `dryRun`
+ * clears what that left; `cleared` lists those, or with `dryRun` would. The
+ * rows of every station `drop` names go from the fit files too, files or not. Deletes only the directories that have files, and with `dryRun`
  * deletes nothing, returning what it would delete. The bounds keep them until
  * `compact --rebuild-bounds`.
  */
@@ -300,6 +304,8 @@ export async function dropFiles(
       path,
       recorded.filter((r) => !dropped.has(r.id)),
     );
+  // Before the files and whether or not any are left, so a drop stopped after deleting them still takes these on its next run.
+  await dropFits(store, source, (id) => dropped.has(id));
   if (!ids.length) return { ids, prefixes, cleared };
   await remove(store, prefixes);
   const gone = new Set(ids);

@@ -52,7 +52,6 @@ describe("sourcesFor", () => {
       "crms",
       "dwr",
       "jma",
-      "kartverket",
       "linz",
       "marine-institute",
       "refmar",
@@ -199,6 +198,22 @@ describe("Monthly workflow", () => {
     assert.ok(index("monthly.sh analyze") < index("monthly.sh requalify-recent"));
     const lists = script.slice(script.indexOf("  lists)"));
     assert.ok(lists.indexOf("analyze ||") < lists.indexOf("requalify_recent ||"));
+  });
+
+  it("fits last in the list job, which holds the source's group, with a budget", () => {
+    const steps = jobs.lists!.steps;
+    const at = steps.findIndex((s) => s.run?.includes("monthly.sh fit"));
+    // After every step that changes the levels or verdicts a fit reads.
+    assert.equal(at, steps.length - 1);
+    // A refresh of named sources, such as the poller's on a datum change, skips it, as it skips the requalify.
+    assert.equal(steps[at]!.if, "${{ !cancelled() && !inputs.sources }}");
+    const script = readFileSync("scripts/monthly.sh", "utf8");
+    // Only a source that has fits: a source's first fit is run by hand.
+    assert.match(script, /ingest fit "\$SOURCE" --budget "\$budget" --only-fitted/);
+    const lists = script.slice(script.indexOf("  lists)"));
+    assert.ok(lists.indexOf("backfills lists ||") < lists.indexOf("fit ||"));
+    // In the script's own run of the list job, only with --full, as the workflow's step is.
+    assert.match(lists, /--full "\* \]\]; then fit \|\| status=1; fi/);
   });
 
   it("runs every source's list backfills after its refresh, with the refresh's source keys", () => {

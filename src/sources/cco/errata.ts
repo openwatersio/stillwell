@@ -1,4 +1,5 @@
 import type { ErrataFile, Erratum, StoreReader } from "../../errata.ts";
+import { Flag } from "../../schema.ts";
 
 /** A station's levels in the years from `since` to before `until`; throws when the store holds none. */
 async function levels(store: StoreReader, id: string, since: number, until = since + 1) {
@@ -28,7 +29,7 @@ export default {
       error:
         "CCO's levels hold fill values where a gauge sent nothing, with no flag: 999.9999 or −999.9999, and at some gauges exactly 99.999, −99.999, −10 or −9.99999. A year of Exmouth's has 16 readings of 999.9999 from 18:30 on 18 December 2019, Hastings Pier's 2019 has 2 on 19 June, and Swanage Pier's 2018 has 2 of −999.9999 on 23 April. Deal Pier has 3,249 readings of exactly ±99.999 between April 2012 and August 2020, Brighton 167 of −9.99999 between August 2018 and September 2020, and Arun Platform 1 on 10 February 2014. GESLA's records of CCO's gauges and CMEMS's copies of them hold such values too, and erratum `gesla-fill-values` and `cmems-fill-values` leave out only those outside the store's span. The store's span of −500 to 9,000 m admits 999.9999, 99.999 and −10, and its QC marks the rest doubtful or bad after the fact.",
       response:
-        "A level of 999 m or more in either direction, or exactly 99.999, −99.999, −10 or −9.99999, is left out as missing, as is 9999. No tide reaches those, and no gauge here reads exactly −10 or −9.99999.",
+        "A level of 999 m or more in either direction, or exactly 99.999, −99.999, −10 or −9.99999, is left out as missing, as is 9999. No tide reaches those, and no gauge here reads exactly −10 or −9.99999. A fetch counts the ones outside the store's span, and backfill writes a year of nothing else as its rows flagged `bad`.",
       evidence:
         "Every stored CCO reading, 13.1 million from 2005 to 2026, read on 2026-11-17: the sentinels above, found by the exact level. 999.9999 and −999.9999 were found in one year of readings at six sites, 2013 to 2020, read from the API on 2026-11-16: Deal Pier 2015, Arun Platform 2012, Brighton 2020, Swanage Pier 2018, Exmouth 2019 and Hastings Pier 2019. The other years of those, and the other sites, weren't scanned from the API.",
       reported: "2026-11-17",
@@ -46,7 +47,9 @@ export default {
         });
         for (const [id, since, until] of years) {
           const fill = (await levels(store, id, since, until)).filter(
-            (o) => Math.abs(o.level) >= 999 || FILL.some((f) => Math.abs(o.level - f) < 5e-5),
+            (o) =>
+              o.flag !== Flag.bad &&
+              (Math.abs(o.level) >= 999 || FILL.some((f) => Math.abs(o.level - f) < 5e-5)),
           );
           if (fill.length)
             throw new Error(
@@ -57,21 +60,20 @@ export default {
     },
     {
       id: "cco-duplicate-stamps",
-      stations: ["cco/87", "cco/95", "cco/102"],
+      stations: ["cco/87", "cco/95"],
       handling: "dropped",
       error:
-        "For stretches of 2011 at West Bay Harbour and of 2010 and 2011 at Port Isaac, CCO sends each reading twice, stamped a second apart, as 11:20:02 and 11:20:03, with nearly the same level. West Bay Harbour has 6,513 such pairs, about 6,500 of them within 5 mm and about 6,150 within 2 mm, and Port Isaac 4,184, about 4,100 within 5 mm and about 3,450 within 2 mm, counted on the stored levels, which are single-precision. Lymington has 5 pairs a second apart between 2013 and 2017, 2 within 5 mm. Arun Platform has 11 pairs in 2012 and 2013 and Sandown Pier 1 in 2017, on the days the clocks changed, whose levels differ.",
+        "For stretches of 2011 at West Bay Harbour, CCO sends each reading twice, stamped a second apart, as 11:20:02 and 11:20:03, with nearly the same level. West Bay Harbour has 6,513 such pairs, about 6,500 of them within 5 mm and about 6,150 within 2 mm, counted on the stored levels, which are single-precision. Lymington has 5 pairs a second apart between 2013 and 2017, 2 within 5 mm. Arun Platform has 11 pairs in 2012 and 2013 and Sandown Pier 1 in 2017, on the days the clocks changed, whose levels differ.",
       response:
-        "A reading within 2 seconds of the last one kept, with a level within 5 mm of it, is left out, so the first of each pair stays: about 10,600 readings. A pair whose levels differ by more is kept.",
+        "A reading within 2 seconds of the last one kept, with a level within 5 mm of it, is left out, so the first of each pair stays: about 6,500 readings. The rule applies at every site. A pair whose levels differ by more is kept.",
       evidence:
         "Every stored CCO reading, read on 2026-11-17, compared with the one before it at the same site: West Bay Harbour on 30 March 2011 has 11:20:02 and 11:20:03, 2.081 and 2.080 m, then 11:30:02 and 11:30:03, 2.099 m twice.",
       reported: "2026-11-17",
       report:
-        "Sent to the Channel Coastal Observatory's API team on 2026-11-17. The observatory said on 2026-11-18 that the Port Isaac duplicates are gone after its quality-controlled files were loaded; West Bay Harbour's remain until its quality-controlled files are loaded.",
+        "Sent to the Channel Coastal Observatory's API team on 2026-11-17. The observatory said on 2026-11-18 that West Bay Harbour's duplicates remain until its quality-controlled files are loaded. Port Isaac's, which the first report also named, are gone from its API.",
       check: async (store, e) => {
         const years = sample(e, {
           "cco/95": [2011],
-          "cco/102": [2010, 2012],
           "cco/87": [2013, 2018],
         });
         for (const [id, since, until] of years) {
@@ -90,47 +92,29 @@ export default {
         }
       },
     },
+  ],
+  questions: [
     {
-      id: "cco-empty-window-answers",
-      stations: "every station",
-      handling: "avoided",
-      error:
-        'A request for a window with no readings answers `{"type":"FeatureCollection","features":]}`, which isn\'t JSON. Lymington and Brighton instead answer HTTP 500 for a window before their first reading.',
-      response:
-        "The adapter reads the first as no values. The second is an error, so a backfill of those two sites starts at their first year (README, Running ingest).",
-      evidence:
-        "Requests of 2026-11-16: Herne Bay for 1 June 2001 answers the first body; Lymington for 1 June 2008 and Brighton for 1 June 2005 answer 500 with `Internal Server Error`.",
-      reported: "2026-11-17",
-      report:
-        "Sent to the Channel Coastal Observatory's API team on 2026-11-17. The observatory said on 2026-11-18 that it fixed both bugs on the morning of 2026-11-17: an empty window now returns a valid empty FeatureCollection, and requests before Lymington's or Brighton's first reading no longer return HTTP 500.",
-      // Each of Lymington's and Brighton's first years starts at its first reading, after the day its 500 answered, with nothing in the year before.
-      check: async (store) => {
-        const rows = await store.rows("stations.parquet");
-        for (const [id, answered500] of [
-          ["cco/87", "2008-06-01"],
-          ["cco/88", "2005-06-01"],
-        ] as const) {
-          const first =
-            Number(
-              (rows.find((r) => r.id === id)?.first as { micros?: unknown } | undefined)?.micros,
-            ) / 1000;
-          if (!Number.isFinite(first))
-            throw new Error(`stations.parquet has no first value for ${id}`);
-          if (first <= Date.parse(answered500))
-            throw new Error(
-              `${id}'s first reading is ${new Date(first).toISOString()}, not after ${answered500}`,
-            );
-          const year = new Date(first).getUTCFullYear();
-          const start = (await levels(store, id, year))[0]!.time;
-          if (start !== first)
-            throw new Error(
-              `${id}'s ${year} starts at ${new Date(start).toISOString()}, not its first reading, ${new Date(first).toISOString()}`,
-            );
-          const before = (await store.levels(id, `${year - 1}-01-01`, `${year}-01-01`)).length;
-          if (before) throw new Error(`the store holds ${before} ${id} levels in ${year - 1}`);
-        }
-      },
+      id: "cco-qc-west-bay-penarth",
+      stations: ["cco/95", "cco/119"],
+      question:
+        "When will the quality-controlled annual files for West Bay Harbour and Penarth be loaded into the API? Both still hold the earlier readings, with placeholder values and no flags from before 2026.",
+      why: "The store re-reads those two gauges' history through the API once the files are loaded, which drops their placeholder values and brings in the flags, and lets `cco-duplicate-stamps` retire at West Bay Harbour.",
+      meanwhile:
+        "The store keeps the readings it holds, drops placeholder values and duplicate stamps as the adapter finds them, and leaves the other gauges' history as it is. The history re-read waits until the files are loaded.",
+      asked: null,
+      answer: null,
+    },
+    {
+      id: "cco-truncated-answer",
+      stations: ["cco/89"],
+      question:
+        "A request for Herne Bay's tides for the year ending 31 December 2003 (`duration=8760`) once came back cut off after about 10 MB, in the middle of a reading, with status 200. Two repeats returned the full 29.7 MB. Is a very large answer cut off when the server is busy, and is a shorter window safer?",
+      why: "The adapter reads a year at a time, as the observatory's page allows. A cut-off body fails to parse. If the observatory says to ask for less, the adapter shortens its windows.",
+      meanwhile: "A cut-off answer fails to parse and the run stops; a rerun reads the year again.",
+      asked: null,
+      answer: null,
     },
   ],
-  retired: ["cco-west-bay-position"],
+  retired: ["cco-empty-window-answers", "cco-west-bay-position"],
 } satisfies ErrataFile;

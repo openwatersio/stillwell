@@ -400,7 +400,15 @@ export default {
       evidence:
         "The 2021 to 2024 sensor 40 and 41 files, monthly medians, November 2026; the README's gauge history and calibration. GESLA's copy (`gesla/korotiti_bay-gbit-nzl-ttw`) holds the same values at all 2,795 times the two share, on 119 of the 150 days read in five 30-day pieces spread over the span's 1,137.",
       check: async (store, e) => {
-        await flaggedSpan(store, e);
+        await flaggedSpan(store, e, ["linz/GBIT"]);
+        // The new sensors' zero sits below the one before the span (`linz-korotiti-bay-step-2024`), so GESLA's datum-jump rule (`gesla-datum-jumps`) flags the copy's values from the day the span ends, which isn't judged as spill from the span.
+        const gesla = "gesla/korotiti_bay-gbit-nzl-ttw";
+        await flaggedSpan(store, e, [gesla], { untilDay: false });
+        const after = await store.levels(gesla, e.until!, dayAfter(e.until!, 1));
+        if (!after.length || after.some((o) => o.flag < Flag.suspect))
+          throw new Error(
+            `${gesla}'s levels on ${e.until} aren't all suspect, as the datum-jump rule flags them`,
+          );
         const s = await store.station("linz/GBIT");
         if (s?.datums && "CD" in s.datums)
           throw new Error("the store publishes GBIT's chart datum");
@@ -1179,6 +1187,41 @@ export default {
         await absent(store, "linz/SCOT", `${e.since}T01:00`, "2025-11-20T01:00");
         await epochFrom(store, "linz/SCOT", "2025-11-20");
       },
+    },
+  ],
+  questions: [
+    {
+      id: "linz-calibration-history",
+      stations: "every station",
+      question:
+        "For each gauge, the calibration results at every visit or sensor replacement since the record began: the date, the benchmark used, and the height of tide gauge zero (TG0) below it. The README files give one calibration at ten gauges, none at six (Devonport, Gisborne, Napier, Port Chalmers, Tauranga, Wellington), and yearly tables only for Cape Roberts and Scott Base. Which sensor, 40 or 41, does each calibration apply to? The two sensors differ by 0.3 to 1.5 m on a yearly cycle at Lottin Point, Kaikoura, Korotiti Bay, Fishing Rock, Boat Cove and Napier. Is one of them the reference?",
+      why: "The store could put each gauge's levels on one continuous height reference, with chart datum on every epoch, instead of on each sensor's own tide gauge zero.",
+      meanwhile:
+        "The store keeps each level above the tide gauge zero of its time and opens a datum epoch where the data show a step. It sets `datums.CD` only where a README gives chart datum against TG0, and reads sensor 40, with sensor 41 where sensor 40 fails.",
+      asked: null,
+      answer: null,
+    },
+    {
+      id: "linz-steps-in-the-zero",
+      stations: ["linz/NAPT", "linz/WLGT", "linz/OTAT", "linz/TAUT", "linz/GIST"],
+      question:
+        'What happened at these steps? Compared with UHSLC\'s hourly records, both sensors step down together at Napier at 18:51 UTC on 24 February 2008 (0.34 m; the README says "step in data on February 25"); at Wellington on 30 May 2012 (0.26 m) and between 20:25 and 21:56 UTC on 15 April 2021 (0.38 m; the README lists no work in April 2021); at Port Chalmers on 26 May 2021 (0.56 m); at Tauranga between 22:17 and 23:17 UTC on 20 March 2024 (0.47 m; the README lists nothing in 2024); and at Gisborne on 25 to 26 September 2013 (0.57 m), 11 to 12 May 2021 (0.41 m) and 12 to 13 December 2024 (0.54 m; none listed except the 2024 sensor replacement). The sizes are 30-day median offsets against UHSLC, good to about 0.01 to 0.08 m.',
+      why: "Whether each step is a move of the gauge's zero, which the store should carry as a datum change, or an error in the levels.",
+      meanwhile:
+        "The store records each step in an erratum and a datum epoch, with a note on how far the levels before it sit above the same water since.",
+      asked: null,
+      answer: null,
+    },
+    {
+      id: "linz-quality-controlled-series",
+      stations: "every station",
+      question:
+        "Does LINZ publish the quality-controlled series it uses for tsunami warning or for the reference ports, and where? We also have a list of spells when sensor 40 was stuck or erratic, such as Sumner from June 2016 to 2020, and can send it to whoever looks after the data.",
+      why: "The store could take LINZ's own checked values, with quality flags, in place of the unchecked ones it reads now.",
+      meanwhile:
+        "LINZ sends no quality flag, so the store marks day files `preliminary` and year files `good`, which here means final and not checked, and flags the sensor faults it has found in its errata.",
+      asked: null,
+      answer: null,
     },
   ],
   retired: [],

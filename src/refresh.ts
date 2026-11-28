@@ -39,18 +39,12 @@ import {
   PRODUCTS,
 } from "./store/paths.ts";
 import type { StoredStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
-import { covers, errataOf, published, type Erratum } from "./errata.ts";
+import { covers, errataOf, published, type Erratum, type Question } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { linkShifts, readLinks } from "./links.ts";
 import { readMatches } from "./matches.ts";
 import { JSON_FILES, dataPackage } from "./store/files.ts";
-import {
-  offsetRows,
-  ticonOriginators,
-  tideStations,
-  withDatums,
-  type DatumReport,
-} from "./datums.ts";
+import { offsetRows, tideStations, withDatums, type DatumReport } from "./datums.ts";
 import { isDropped } from "./sources/gesla/dropped.ts";
 import { backfillStatus } from "./backfilled.ts";
 import { usableShares, writeYears } from "./store/years.ts";
@@ -263,14 +257,16 @@ async function renumberAboveFiles(
  * preferred series as the file is built (`src/same-as.ts`), and the result
  * says what was linked. Each station carries the IDs of its `errata`, and
  * `errata.json` those of the sources the store holds (each source's
- * `errata.ts`, read by `src/errata.ts`); the result names any station an erratum lists that a source in the store
- * doesn't, a typo or a station since removed.
+ * `errata.ts`, read by `src/errata.ts`); the result names any station an erratum or a
+ * question to an agency lists that a source in the store doesn't, a typo or a station since
+ * removed. Questions aren't published.
  */
 export async function publishStations(
   store: string,
   all: Source[],
   expected: string[],
   errata: Erratum[],
+  questions: Pick<Question, "id" | "stations">[] = [],
 ): Promise<
   | { count: number; links: LinkReport; datums: DatumReport; unknownErrata: string[] }
   | { missing: string[] }
@@ -281,7 +277,6 @@ export async function publishStations(
   const { stations: linked, report: datums } = withDatums(
     gauges,
     await tideStations(),
-    await ticonOriginators(),
     linkShifts(await readLinks(store), gauges),
   );
   // A store's errata are its own sources' and those listing their copies; a restricted source's stay out of the public store, even where a public copy is listed.
@@ -330,7 +325,7 @@ export async function publishStations(
   const ids = new Set(linked.map((s) => s.id));
   // A withheld station is gone on purpose, though an erratum may still name it.
   const withheld = (id: string) => listed.some((s) => withheldReason(s, id) !== null);
-  const unknownErrata = errata.flatMap((e) =>
+  const unknownErrata = [...errata, ...questions].flatMap((e) =>
     (e.stations ?? [])
       .filter((id) => held.has(id.slice(0, id.indexOf("/"))) && !ids.has(id) && !withheld(id))
       .map((id) => `${e.id} ${id}`),
@@ -421,7 +416,7 @@ async function linkedStations(
 export async function stationsToMeasure(store: string, all: Source[]): Promise<StoredStation[]> {
   const built = await linkedStations(store, all, []);
   if ("missing" in built) return [];
-  return withDatums(built.gauges, await tideStations(), await ticonOriginators()).stations;
+  return withDatums(built.gauges, await tideStations()).stations;
 }
 
 /**
@@ -461,6 +456,7 @@ export function sourceEntry(
       ...metadata.license,
       commercial_use: metadata.license.commercial_use && stations.every((st) => st.commercial_use),
     },
+    settles_after_months: metadata.settles_after_months ?? null,
     stations: stations.filter((st) => st.status === "active").length,
     backfill:
       since === undefined ? null : { since, complete, incomplete: judged.length - complete },

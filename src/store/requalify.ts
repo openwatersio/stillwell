@@ -1,7 +1,7 @@
 import { availableParallelism, totalmem } from "node:os";
 import { Worker } from "node:worker_threads";
 import { fromSource, nearContext, qc, withSourceFlag, type QcOptions } from "../qc.ts";
-import { possible } from "../span.ts";
+import { Dropped, leaveOutInto } from "../span.ts";
 import { Flag, Unjudged, type StoredStation, type Observation, type Source } from "../schema.ts";
 import { mergeFetched, sameRows } from "./merge.ts";
 import {
@@ -30,7 +30,7 @@ export async function requalify(
   start: number,
   end: number,
   written = new Map<string, YearStats>(),
-): Promise<{ files: number; changed: number; dropped: number; warnings: string[] }> {
+): Promise<{ files: number; changed: number; dropped: Dropped; warnings: string[] }> {
   // Every epoch's datums and errata spans first, so a file to resolve by hand,
   // or a source's error, stops the station before any is written.
   const plans = [];
@@ -67,7 +67,7 @@ export async function requalify(
   const opts = qcFor(station);
   let files = 0;
   let changed = 0;
-  let dropped = 0;
+  const dropped = new Dropped();
   for (const { years, wanted, path, suspect, unjudged } of plans) {
     // Each year once, and only the three a step needs.
     const cache = new Map<number, Promise<{ rows: Observation[]; datums: string[] }>>();
@@ -92,10 +92,11 @@ export async function requalify(
       if (datums.length !== 1)
         throw new Error(`${path(year)}'s datums changed while requalify ran`);
       // A level outside `SPAN_M` goes, as a fetch drops one.
-      const had = stored.filter((r) => possible(r.level));
+      const out = new Dropped();
+      const had = leaveOutInto(stored, out);
       // A year that would be left with no rows keeps its file, since a year file always has some.
       if (!had.length && stored.length) {
-        warnings.push(`${year} holds only levels outside −500 to 9,000 m, so its file is kept`);
+        warnings.push(`${year} holds only ${out.describe()}, so its file is kept`);
         continue;
       }
       // Kept flags can only get worse, so a looser rule doesn't clear a mark there.
@@ -106,7 +107,7 @@ export async function requalify(
       if (sameRows(stored, next)) continue;
       const flags = new Map(had.map((r) => [r.time, r.flag]));
       changed += next.filter((r) => flags.get(r.time) !== r.flag).length;
-      dropped += stored.length - had.length;
+      dropped.merge(out);
       written.set(path(year), await writeObservations(path(year), next, datums[0]!));
       files++;
     }
@@ -194,7 +195,8 @@ function spawn(): Pooled {
     pooled.tasks.delete(message.id);
     if (!pooled.tasks.size) worker.unref();
     if ("error" in message) task.reject(new Error(message.error));
-    else task.resolve(message.result);
+    // A worker's reply is plain data, so the tally is rebuilt as the class the caller expects.
+    else task.resolve({ ...message.result, dropped: new Dropped().merge(message.result.dropped) });
   });
   // An error is followed by an exit; either fails the worker's stations, and the next call starts another.
   const die = (error: Error) => {

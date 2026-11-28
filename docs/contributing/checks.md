@@ -6,7 +6,7 @@
 npm run ticon:inventory
 ```
 
-Reads a slackwater-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the store's station lists (`STILLWELL_STORE`, default the public bucket over HTTPS, so a local store needs every public source refreshed; restricted sources are left out), and writes the [TICON inventory](../ticon-inventory.md): the store series for each TICON record's originator, where there is one, for every record slackwater-database ships, and how far along each one is.
+Reads a slackwater-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the store's station lists (`STILLWELL_STORE`, default the public bucket over HTTPS, so a local store needs every public source refreshed; restricted sources are left out), and writes the TICON inventory to `reports/` (`STILLWELL_REPORTS`): the store series for each TICON record's originator, where there is one, for every record slackwater-database ships, and how far along each one is. The Site workflow writes it before each build, from slackwater-database at the version this repository installs, and the [inventory page](https://openwatersio.github.io/stillwell/reports/ticon-inventory/) shows it. Nothing in the store pipeline reads it.
 
 ## Clock check
 
@@ -14,7 +14,25 @@ Reads a slackwater-database checkout (`TIDE_DATABASE`, default `../slackwater-da
 npm run clock-check -- 2020 uhslc/329=hong_kong-329-hkg-uhslc_fd uhslc/057=honolulu-1612340-usa-noaa
 ```
 
-Cross-correlates a year of each station's levels, or the dates given as `<start>/<end>` in place of the year for a source that keeps less (the EA's readings API keeps 30 days), fetched through its adapter with the station as the store's list has it (`STILLWELL_STORE`, default the public bucket, or the adapter's own list when the store has none), against the prediction from a TICON record's constants in a slackwater-database checkout (`TIDE_DATABASE`, default `../slackwater-database`), at lags of up to 3 hours in 10-minute steps, and prints a Markdown table of the best lag. It exits nonzero when a series fits best 30 minutes or more off, or has fewer than 30 days of values to check (or, for a range shorter than a month, values on fewer than all but one of its days, as for SMN's 5), which is how local time labeled UTC, or Hong Kong's early stamps, show up. A positive lag means the stamps run late. A TICON record fitted to the same series only shows a clock that changed since, so check against another originator's record for the same gauge where TICON has one. The semidiurnal tide repeats every 12.42 hours, so a 12-hour error, such as New Zealand or Fiji local time labeled UTC, looks like a lag of under half an hour there; the K1 column, from K1's phase in a fit of the year against TICON's, shows it, and fails the check at 3 hours or more. Values spanning under 183 days are too short to fit K1, so it shows `no K1`, and a lag of 20 minutes or more fails, since that's where a 12-hour error shows.
+Cross-correlates a year of each station's levels, or the dates given as `<start>/<end>` in place of the year for a source that keeps less (the EA's readings API keeps 30 days), fetched through its adapter with the station as the store's list has it (`STILLWELL_STORE`, default the public bucket, or the adapter's own list when the store has none), against the prediction from a record's constants in a slackwater-database checkout (`TIDE_DATABASE`, default `../slackwater-database`): a TICON record by its name, or a record of another dataset there that holds harmonic constituents, such as `dmi/30357`, at lags of up to 3 hours in 10-minute steps, and prints a Markdown table of the best lag. It exits nonzero when a series fits best 30 minutes or more off, or has fewer than 30 days of values to check (or, for a range shorter than a month, values on fewer than all but one of its days, as for SMN's 5), which is how local time labeled UTC, or Hong Kong's early stamps, show up. A positive lag means the stamps run late. A record fitted to the same series, or a copy of it, only shows a clock that changed since, so check against constants fitted to another originator's observations of the gauge where there are any. The semidiurnal tide repeats every 12.42 hours, so a 12-hour error, such as New Zealand or Fiji local time labeled UTC, looks like a lag of under half an hour there; the K1 column, from K1's phase in a fit of the year against the record's, shows it, and fails the check at 3 hours or more. Values spanning under 183 days are too short to fit K1, so it shows `no K1`, and a lag of 20 minutes or more fails, since that's where a 12-hour error shows.
+
+## Pair check
+
+```bash
+npm run pair-check -- 2025 coops/8725520=sfwmd/VALI75
+```
+
+Compares two records of one gauge from different originators, which is the independent clock check wherever the store holds one: a TICON record fitted to the same series, or a copy of the source's own data in an aggregator's records, shows only that a clock hasn't changed. It reads a year of each station's `good` and `preliminary` levels from the latest datum epoch that holds part of the year, within its span (a station with more than one epoch in the year is noted), reads the second series at each of the first's times shifted by lags of up to 3 hours in 10-minute steps (interpolating between readings 20 minutes apart or less, so where either series has sparser readings, such as hourly values, only lags that land on one of them are tried), and prints the RMS of the difference at the best lag and at zero, the number of lags it could try, and the mean difference. Where both stations name a datum, or one names the other's, it also prints how far the mean is from the offset between them, which checks the datum, though a bare `NAVD88` or `NGVD29` names more than one realization, so a difference of a few centimeters can be the realization rather than a fault. A positive lag means the first series' stamps run late, as in the clock check. A lag counts when its RMS, with the mean removed, is under three quarters of the zero-lag RMS and at least 0.5 cm lower, and the command then exits nonzero, as it does for a pair with under 200 shared readings or files it can't read, which it marks `not checked` or `not read`. A pair under 2 mm RMS at zero lag is marked `same values`: one record's values held twice say nothing about either clock, though two sensors could agree that closely at a still gauge, so look at where the second record comes from. The mean is removed first, so a pair a constant apart is marked too, and its mean column says by how much. Nearby gauges on a tide can fit best at the tide's travel time, and river gauges at a lag that has nothing to do with a clock, so read a lag with the gauges' positions.
+
+The candidate pairs are in `stations/matches.parquet` (`a`, `b`, and the `rms_m` and `lag_h` of their hourly levels) and in each station's `same_as`. A pair under `DIFFER_M` (3 cm, in [`src/matches.ts`](../../src/matches.ts)) RMS is near enough to one gauge for a clock to show. List a source's pairs with another source's records in DuckDB, and take the year from the pair's `until`:
+
+```sql
+SELECT a, b, year(until - INTERVAL 1 DAY) AS year
+FROM read_parquet('https://stillwell.openwaters.io/stations/matches.parquet')
+WHERE (a LIKE 'coops/%') <> (b LIKE 'coops/%') AND months >= 6 AND rms_m < 0.03;
+```
+
+A pair is independent when the two records come from different agencies. An aggregator's record takes its originator from its institution, contributor or name suffix, and a record that copies the source's own data doesn't count. Records of one agency's gauges that the agency itself passes to another, such as a data service's copy of its gauge, don't count either.
 
 ## Cross-station checks
 
@@ -61,6 +79,28 @@ npm run evaluate:rws
 ```
 
 Each writes `docs/results/<source>.json` and prints a Markdown table for the [HRoI evaluation](../hroi-evaluation.md). The RWS one downloads about 50 years of 10-minute data in total the first time, which takes 20–30 minutes.
+
+## Fit calibration
+
+```bash
+STILLWELL_STORE=<copy> npm run calibrate:fits
+```
+
+Fits a fixed list of CO-OPS reference stations from the store and compares the constants with the ones NOAA publishes for the same gauges, into the [fit calibration](../results/fit-calibration.md) and its `docs/results/fit-calibration.json`. Run it again whenever a change to [`src/fit/`](../../src/fit/) or the engine could move a fit's constants, and commit both files. [`src/fit/calibration-stations.ts`](../../src/fit/calibration-stations.ts) holds the stations, why each is there and the years NOAA analyzed.
+
+It reads a copy of the store in a local directory that `STILLWELL_STORE` names, refuses a URL and the checkout's own `data` by its path, and never writes to the store. The copy needs `stations/coops.parquet`, `stations/years/coops.parquet` and, for each listed station, every year file the fits read, in each of its epochs' directories: NOAA's analysis years, the held-out year, the 19 years before it and the year before those. The script checks that each year file in the copy has a row in the copy's years file with that file's version, and stops where one doesn't, before the fits and again after them, so a copy taken while the store was being written is used only where its years file describes its files. A copy can also mark a station as being written. The reader refuses such a station, so the script drops the marker once that check has passed, and the report names the stations. Marked stations vote for no final year, so the run stops where the source's last year of final values would differ with their rows counted.
+
+NOAA's constants come from the CO-OPS metadata API at each run, through the adapter's paced requests. Each station's entry pins NOAA's comment on its constants, which names the analysis years, and the run stops where the comment differs by a character, until the entry's years are set from the new one. It also stops on an answer that lacks one of NOAA's standard 37 constituents, names one twice, holds an amplitude under zero or a phase outside 0 to 360, or has another number of constituents than the station's entry expects, and where the store holds under two thirds of the hours of a year NOAA analyzed.
+
+One station takes about seven minutes on one core, on a worker thread with the heap and DuckDB limits the store's own fits have ([`src/fit/workers.ts`](../../src/fit/workers.ts)). `--concurrency` sets how many are fitted at once, four by default. Every run fits every station, so the report's stations share one engine, method and final year, and a run in which any station fails writes nothing. `--report` rewrites the Markdown from the JSON without fitting. A test fails while the JSON names another method, set of nodal corrections, candidate list, list of shallow-water compounds, spelling or pinned station than the code has, until the calibration is run again. It doesn't compare the engine's version, which the report names: after a release of the engine the report is of the earlier one until someone runs it again.
+
+### Kartverket
+
+```bash
+STILLWELL_STORE=<copy> npm run calibrate:kartverket
+```
+
+Fits Kartverket's gauges the way Kartverket analyzes them and compares the constants with the ones its tide API publishes, into the [Kartverket calibration](../results/kartverket-calibration.md) and its JSON. `GAUGES` in [`src/fit/kartverket-report.ts`](../../src/fit/kartverket-report.ts) holds the gauges. It reads a copy of the store as the calibration against NOAA does, with the same checks of the copy: `stations/kartverket.parquet`, `stations/years/kartverket.parquet` and each gauge's year files from 1991 on. Kartverket's constants come from its API at each run, and the run stops where a gauge's constants are from another period than the one its gauges were chosen by, or name a constituent the engine's catalog doesn't have at that speed. `--concurrency` and `--report` work as they do there, and a test holds the checked-in Markdown to what its JSON renders to. The JSON records a digest of what is this comparison's alone, byte for byte: the script, the parser and the filter, with the gauges, limits and candidate list (`kartverketDigest` in [`src/fit/kartverket-report.ts`](../../src/fit/kartverket-report.ts)). A test fails when it isn't the code's, and the remedy is a rerun, never a digest set by hand. Code shared with the fits isn't in it, and neither is the engine's version: the report names the engine and `METHOD` it ran with, and describes those until it is run again.
 
 ## Published files
 

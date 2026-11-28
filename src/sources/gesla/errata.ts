@@ -947,7 +947,7 @@ export default {
       error:
         "Some GESLA 4.1 records change datum partway through while every value stays flagged correct and usable, so a record mixes two zeros meters apart.",
       response:
-        "The adapter checks every coastal record's raw levels for jumps of more than 0.75 m in the 30-day median, and flags each segment that sits more than 0.75 m from the record's longest segment as suspect, keeping GESLA's own flag in `source_flag`. The stations listed are the ones found so far; the check covers any other coastal record. `datumJumps` takes daily means of the usable values on days they span at least 12 hours of, finds where the median of the next 30 such days differs from the previous 30 days (as few as 5 near the record's ends) by more than 0.75 m, places the jump at the largest day-to-day step nearby (at least half of 0.75 m, since a jump partway through a day splits across two days), and flags every segment whose median is more than 0.75 m from the longest segment's. Rivers and lakes aren't checked, tidal ones included, since their floods move monthly medians that far: the check would flag 30% of the Connecticut at Hartford's values and 15% of the Columbia at Vancouver's. It leaves the earthquake steps at Ayukawa and Onahama (Tōhoku, 2011), Kaikōura and Wellington (2016) alone.",
+        "The adapter checks every coastal record's raw levels for jumps of more than 0.75 m in the 30-day median, and flags each segment that sits more than 0.75 m from the record's longest segment as suspect, keeping GESLA's own flag in `source_flag`. The stations listed are the ones found so far; the check covers any other coastal record. `datumJumps` takes daily means of the usable values on days they span at least 12 hours of, finds where the median of the next 30 such days differs from the previous 30 days (as few as 5 near the record's ends) by more than 0.75 m, places the jump at the largest day-to-day step nearby (at least half of 0.75 m, since a jump partway through a day splits across two days), and flags every segment whose median is more than 0.75 m from the longest segment's. Values in another erratum's span are suspect already, so requalify leaves them out of the medians, and erratic readings, such as Holyhead's in February 2026, don't flag the sound ones around them. Rivers and lakes aren't checked, tidal ones included, since their floods move monthly medians that far: the check would flag 30% of the Connecticut at Hartford's values and 15% of the Columbia at Vancouver's. It leaves the earthquake steps at Ayukawa and Onahama (Tōhoku, 2011), Kaikōura and Wellington (2016) alone.",
       evidence:
         "Monthly means of the usable values (QC flag 1, use flag 1):\n\n| Record | Off segment | Main level |\n| --- | --- | --- |\n| Cape d'Or, MEDS 240 | 1965-06 to 1965-10: 23.5 to 32.3 m | 5.7 to 6.3 m, 1969 to 1979 |\n| Mazatlán float, UNAM 16 | 2021-06-20 to 2021-11-24: −0.1 to 1.5 m | 2.2 to 2.4 m |\n| Mazatlán radar, UNAM 16 | to 2021-11-25: 2.8 to 3.4 m | 2.2 to 2.6 m |\n| Ōminato, JCG HD04 | 1952: 3.6 to 3.8 m | 1.4 to 1.8 m, 1953 on |\n| Gorge at Craigflower, MEDS 7124 | 1969: 2.0 to 2.3 m | 0.8 m, 2011 |\n| Papeete, UHSLC's gauge, from CMEMS | 2010-09-14 to 2011-09-12: 1.43 to 1.52 m | 0.44 to 0.56 m, 2009 to 2012 |\n\nGESLA's metadata marks Cape d'Or and the Mazatlán float record \"Possible datum and quality control issues\", and Ōminato and Gorge at Craigflower \"Possible datum issues\", but leaves the values usable. The check found Ōminato and Gorge at Craigflower in a random sample of 80 coastal records, and nothing in the other 78. Papeete's CMEMS record of UHSLC's gauge (`papeeteuhslctg_01minute-pap-fra-cmems`) has the same 0.95 m step, on the same days, as REFMAR's own record of that gauge (erratum `refmar-papeete-uhslc-2010-offset`), and the check flags it in the store. GESLA's other Papeete records covering 2010 and 2011 (UHSLC's 015 and 015B, REFMAR's 383 and CMEMS's copy of it) don't have it.",
       check: async (store, e) => {
@@ -1028,34 +1028,6 @@ export default {
       evidence:
         "The data rows of the two files from GESLA's CloudFront links are byte-identical, and both match the store's `smhi/2545` (Arkö) to 0 mm on all 98,855 shared hours. Against SMHI's own Uddevalla series they correlate at r 0.19 to 0.36 hourly. SMHI's Uddevalla matches GESLA's CMEMS copy to 0 mm and nearby Stenungsund at r 0.98. The record starts at Arkö's first hour (2014-04-02), not Uddevalla's (2010-12-15). TICON-4's two records have identical constants (M2 0.008 m) and MSL (0.108 m), while TICON-4's CMEMS Uddevalla has M2 0.141 m. Of GESLA's 71 SMHI records, this is the only one whose start disagrees with SMHI's station of the same ID.",
       check: (store, e) => dropped(store, station(e), 2015, "gesla/arko-2545-swe-smhi"),
-    },
-    {
-      id: "gesla-st-pauli-wrong-minute",
-      stations: ["gesla/stpaulitg-stp-deu-cmems"],
-      since: "2025-03-01",
-      until: "2026-06-01",
-      handling: "kept",
-      error:
-        "From March 2025, GESLA 4.1's St. Pauli record (from CMEMS) has about 16% of its 10-minute values taken from a different minute than its timestamp says. Most are 1 or 2 cm off, but some are up to 42 cm off at mid-tide. GESLA flags all of them as correct and usable.",
-      response:
-        "The store keeps the values as GESLA serves them. The group's preferred station is `pegelonline/5952050`, which takes its history from HPA's own archive on kuestendaten.de, and that archive has the right values.",
-      evidence:
-        "I compared GESLA's record (`stpaulitg-stp-deu-cmems`, created 2026-07-19) with HPA's 1-minute file for gauge 5952050 from kuestendaten.de (downloaded 2026-11-09, shifted from UTC+1 to UTC).\n\n- From 1999-11-01 to 2025-02-28, every one of about 1.3 million shared 10-minute times differs by exactly 5.004 m, which is the gauge zero's offset to NHN. That holds for all 12,954 times in December 2024 to February 2025 too.\n- From 2025-03-01 03:40 to the end of the record on 2026-05-31, 12,838 of 65,622 shared times differ. Of those, 10,207 are off by 1 cm, 1,991 by 2 cm, 640 by 3 to 9 cm and 101 by more than 5 cm, up to 42 cm. Every month from March 2025 to May 2026 has between 759 and 931.\n- At 11,803 of the 12,838, GESLA's value equals HPA's value from a minute within 10 minutes of the stated time, most often 1 minute before or after. The large differences come from minutes 5 to 29 away, on the steep part of the tide. 5,495 are single points with both 10-minute neighbors matching HPA exactly.\n- HPA's series is smooth around these times. Its largest 1-minute step near the 101 large differences is 3 cm. Against Seemannshöft and Blankenese, two HPA gauges downstream, HPA's St. Pauli value is the one that fits the local difference between the gauges at 100 of the 101 large differences. The median departure is 1 cm for HPA and 6 cm for GESLA.\n- Example (UTC, meters above gauge zero): on 2025-05-14 06:10, HPA has 6.12 and GESLA 5.82. Seemannshöft has 6.04, and both copies have 6.29 at 06:00 and 5.98 at 06:20.\n\nThere's no third copy to compare with. PEGELONLINE's REST API keeps 31 days, and BSH's `508P` holds predictions only.",
-      // Kept as served: 2025-05-14 06:10 holds a value from another minute, 16 cm below the next on a falling tide (HPA has it 14 cm above).
-      check: async (store, e) => {
-        const rows = await levels(store, station(e), "2025-05-14", "2025-05-15");
-        const at = (hhmm: string) =>
-          rows.find((o) => o.time === Date.parse(`2025-05-14T${hhmm}:00Z`))?.level;
-        const [before, wrong, after] = [at("06:00"), at("06:10"), at("06:20")];
-        if (before === undefined || wrong === undefined || after === undefined)
-          throw new Error(
-            "the store holds no St. Pauli value at 06:00, 06:10 or 06:20 on 2025-05-14",
-          );
-        if (!(wrong < after - 0.1 && after < before))
-          throw new Error(
-            `St. Pauli reads ${before}, ${wrong} and ${after} m at 06:00, 06:10 and 06:20 on 2025-05-14, not GESLA's dip`,
-          );
-      },
     },
     {
       id: "gesla-usgs-nj-2003-daylight-time",
@@ -1320,7 +1292,7 @@ export default {
       error:
         "These 31 GESLA records hold levels no gauge can read, outside the store's span of −500 to 9,000 m, as values rather than as GESLA's null of −99.9999: 42,040 values in 142 record-years from 2008 to 2026. Most are fill values: 999,999.06 m in CMEMS's AWG, K14 and L9 records, 99,999.01 m at Ceuta, −9,999.99 m at Pont Seudre, −10,000 m at Bayonne and Villefranque, and −6,999 m in Toitū Te Whenua's Cape Roberts. The CCO and CMEMS records of England's regional coastal monitoring gauges (Arun Platform, Brighton, Deal Pier, Exmouth, Hastings Pier, Sandown Pier, Scarborough, Second Severn Crossing, Swanage Pier and Teignmouth) hold hundreds of different values from about −1.05 × 10¹¹ m to 214,000 m, and Marienleuchte's and Saint-Pierre-et-Miquelon's records similar ones.",
       response:
-        "The adapter leaves out a value outside the store's span (`SPAN_M` in src/span.ts) as missing, as it does GESLA's null, and requalify drops any the store holds.",
+        "The adapter leaves out a value outside the store's span (`SPAN_M` in src/span.ts) as missing, as it does GESLA's null, counts them, and requalify drops any the store holds. Backfill writes a year of nothing else as its rows flagged `bad`, and requalify and compaction keep such a file, with a warning.",
       evidence:
         "November 2026. A scan of the range of levels in every one of the store's GESLA and CMEMS year files (145,149 files) found 205 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span.",
       // Cape Roberts' −6,999 m, most of its 2010, are left out, or kept flagged bad where nothing else is left.
@@ -1531,6 +1503,7 @@ export default {
     },
   ],
   retired: [
+    "gesla-st-pauli-wrong-minute",
     "gesla-kilrush-2025-01-09-offset",
     "gesla-eemshaven-waddenzee-2016-offset",
     "gesla-buesum-cmems-spikes",

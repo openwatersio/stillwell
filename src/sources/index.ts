@@ -1,6 +1,6 @@
 import { readErrata, withErrata, type ErrataFile } from "../errata.ts";
 import type { Observation, Source } from "../schema.ts";
-import { possible } from "../span.ts";
+import { Dropped, inSpan, sweepDrops, tallying } from "../span.ts";
 import { source as bodc } from "./bodc/index.ts";
 import { source as bom } from "./bom/index.ts";
 import { source as bsh } from "./bsh/index.ts";
@@ -44,6 +44,7 @@ import ignErrata from "./ign/errata.ts";
 import ispraErrata from "./ispra/errata.ts";
 import jmaErrata from "./jma/errata.ts";
 import jodcErrata from "./jodc/errata.ts";
+import kartverketErrata from "./kartverket/errata.ts";
 import linzErrata from "./linz/errata.ts";
 import marineInstituteErrata from "./marine-institute/errata.ts";
 import pegelonlineErrata from "./pegelonline/errata.ts";
@@ -107,6 +108,7 @@ export const errataFiles: Record<string, ErrataFile> = {
   ispra: ispraErrata,
   jma: jmaErrata,
   jodc: jodcErrata,
+  kartverket: kartverketErrata,
   linz: linzErrata,
   "marine-institute": marineInstituteErrata,
   pegelonline: pegelonlineErrata,
@@ -119,8 +121,12 @@ export const errataFiles: Record<string, ErrataFile> = {
   usgs: usgsErrata,
 };
 
-/** Every source's errata, and what's wrong with any, which `publish` and the tests fail on. */
-export const { errata, problems: errataProblems } = readErrata(errataFiles, Object.keys(adapters));
+/** Every source's errata and questions, and what's wrong with any, which `publish` and the tests fail on. */
+export const {
+  errata,
+  questions,
+  problems: errataProblems,
+} = readErrata(errataFiles, Object.keys(adapters));
 
 /**
  * `source` with every observed level it fetches outside `SPAN_M` left out, since no
@@ -130,7 +136,8 @@ export const { errata, problems: errataProblems } = readErrata(errataFiles, Obje
  * Transient withdrawals reach the merge without being treated as numerical levels.
  */
 export function withinSpan(source: Source): Source {
-  const keep = (rows: Observation[]) => rows.filter((r) => r.withdrawn || possible(r.level));
+  const keep = (rows: Observation[]) =>
+    rows.filter((r) => r.withdrawn || inSpan(r.level, r.time, r.source_flag ?? r.flag));
   const { observations, recent } = source;
   return {
     ...source,
@@ -138,13 +145,22 @@ export function withinSpan(source: Source): Source {
       observations: async (station, start, end) => keep(await observations(station, start, end)),
     }),
     ...(recent && {
-      recent: async (stations, start, end) =>
-        new Map(
-          [...(await recent(stations, start, end))].map(([id, rows]) => [
-            id,
-            rows instanceof Error ? rows : keep(rows),
-          ]),
-        ),
+      recent: async (stations, start, end) => {
+        const answer = await recent(stations, start, end);
+        const out = new Map<string, Observation[] | Error>();
+        const by = new Map<string, Dropped>();
+        for (const [id, rows] of answer) {
+          if (rows instanceof Error) out.set(id, rows);
+          else {
+            // Each station's own, so a poller can say which one sent only fill.
+            const { result, dropped } = await tallying(async () => keep(rows));
+            out.set(id, result);
+            if (dropped.count) by.set(id, dropped);
+          }
+        }
+        sweepDrops.set(out, by);
+        return out;
+      },
     }),
   };
 }

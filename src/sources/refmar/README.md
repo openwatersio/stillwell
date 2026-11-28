@@ -10,6 +10,7 @@ Observed sea levels at French tide gauges, in metropolitan France and overseas, 
 - **Times:** UTC. Every gauge's `fuseau_horaire` is 0, and the service documents its timestamps as UTC ("la date et l'heure de la donnée en UTC"). Brest, Nouméa, Papeete, Dzaoudzi, Fort-de-France and Marseille match UHSLC's records of the same gauges within 10 minutes, Nouméa (UTC+11) and Papeete (UTC−10) included. Pointe-à-Pitre's clock (erratum `refmar-pointe-a-pitre-clock`) and Kerguelen's raw series (erratum `refmar-kerguelen-raw-hour-late`) are exceptions.
 - **Flags:** a value's flag comes from its series. Validated values are `good` and raw values `preliminary`. SHOM replaces raw values with validated ones as it releases them.
 - **Freshness:** raw 10-minute values arrive about a day behind, and the poller keeps the live gauges' raw values. Validation runs about two weeks behind at Brest. A partner gauge with a year of record and no validated value, which SHOM doesn't validate, is read for validated values only in January.
+- **Independent checks:** the [pair check](../../../docs/contributing/checks.md#pair-check) on the one REFMAR gauge another agency also records, `refmar/383` against CO-OPS's 1732417 (and GESLA's copy), over 2002: best lag 0 at 1.2 cm RMS. The other REFMAR gauges have only copies, from CMEMS (SHOM as institution) and UHSLC, which show only that the clock hasn't changed since. The datums are unchecked (ZH against CO-OPS's station datum).
 
 ## Known limits
 
@@ -27,10 +28,10 @@ Observed sea levels at French tide gauges, in metropolitan France and overseas, 
 The Monthly workflow refreshes REFMAR's list on the 2nd with every other source's. The first list has to be in the store before anything else runs: dispatch Monthly with `sources: refmar` once, or the poller, Compact daily and the refetch fail with no list. Then backfill through the Ingest workflow:
 
 ```bash
-node scripts/ingest.ts backfill refmar all 1821 2026 --skip-written --first docs/ticon-inventory.csv
+node scripts/ingest.ts backfill refmar all 1821 2026 --skip-written
 ```
 
-It starts at 1821, where TICON's Saint-Nazaire record does. A month before a gauge's first observation isn't asked for, so the early start costs nothing at gauges dated later. The record is about 75,000 station-months. Each month takes one request, or two from 2005 on where it isn't validated to its end, at most two a second, so the whole record is about 80,000 to 90,000 requests, 12 hours or more: three or four Ingest runs, each dispatched with `timeout` at 360 minutes and resuming where `--skip-written` finds the last one stopped. A year with no values writes no file, so each run asks again for the empty years between a gauge's starting year and its first values, and after an `OLD` gauge's last, a few thousand requests a run. `--first` puts the gauges TICON has a REFMAR record for first. The current year is fetched whole on every run, so it's backfilled on its own, `backfill refmar all 2026 2027`.
+It starts at 1821, where TICON's Saint-Nazaire record does. A month before a gauge's first observation isn't asked for, so the early start costs nothing at gauges dated later. The record is about 75,000 station-months. Each month takes one request, or two from 2005 on where it isn't validated to its end, at most two a second, so the whole record is about 80,000 to 90,000 requests, 12 hours or more: three or four Ingest runs, each dispatched with `timeout` at 360 minutes and resuming where `--skip-written` finds the last one stopped. A year with no values writes no file, so each run asks again for the empty years between a gauge's starting year and its first values, and after an `OLD` gauge's last, a few thousand requests a run. The current year is fetched whole on every run, so it's backfilled on its own, `backfill refmar all 2026 2027`.
 
 ### Scheduled runs
 

@@ -697,6 +697,631 @@ export const FILES = {
     ],
     sort: ["id"],
   },
+  fits: {
+    path: "fits/<source>.parquet",
+    example: "fits/smhi.parquet",
+    title: "Harmonic fits",
+    description:
+      "One row per station the store has tried to fit harmonic constants for: the window the fit read, how it scored on a year it didn't read, and what it read, or why the station has no constants. The constants are in `constituents/<source>.parquet`. A fit is a measurement, and no row says whether a gauge has enough tide to predict. A fit's terms are its station's: join `stations.parquet` on `id` for its license, commercial use and attribution.",
+    columns: [
+      { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
+      { name: "fitted", type: "TIMESTAMPTZ", description: "When the fit ran." },
+      {
+        name: "reason",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "Why the station has no constants, such as too short a record of final values; null where it has them.",
+      },
+      {
+        name: "version",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "A digest of the fit's window and kept constants, which changes when either does; null without constants.",
+      },
+      {
+        name: "since",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description: "The start of the fit's window: up to 19 years before the held-out year.",
+      },
+      {
+        name: "until",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description: "The end of the fit's window, exclusive: the start of the held-out year.",
+      },
+      {
+        name: "hours",
+        type: "INTEGER",
+        nullable: true,
+        description: "How many values the fit read: final values stamped on a UTC hour.",
+      },
+      {
+        name: "z0_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The mean level over the fit's window, in meters in the station's current datum: a prediction from the constants is added to it.",
+      },
+      {
+        name: "rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The RMS of the fit's residual over its window, in meters, under the fit's robust weights, which count surges and spikes for less.",
+      },
+      {
+        name: "years",
+        type: "INTEGER",
+        nullable: true,
+        description:
+          "How many calendar years of the window, each with two thirds of its hours, were also fitted on their own for the yearly scatter in the constituents file.",
+      },
+      {
+        name: "node_corrections",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "The nodal corrections the fit used: `schureman`, for Schureman's (1958), as NOAA's analyses use. A prediction from the constants has to use the same one.",
+      },
+      {
+        name: "engine",
+        type: "VARCHAR",
+        description:
+          "The software that fitted and its version, as provenance. A prediction from the constants needs `node_corrections` and each constituent's Doodson numbers, and no particular software.",
+      },
+      {
+        name: "held_out",
+        type: "INTEGER",
+        nullable: true,
+        description:
+          "The UTC year the fit is scored on, which it didn't read: the latest year of final values in which half the station's hours can be scored, an hour counting when the 71 hours around it all have values.",
+      },
+      {
+        name: "held_out_hours",
+        type: "INTEGER",
+        nullable: true,
+        description: "How many hours of the held-out year are scored.",
+      },
+      {
+        name: "held_out_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The RMS of observed minus predicted levels over the held-out year in the tidal band, in meters: hourly, after a Godin filter (running means of 24, 24 and 25 hours) takes out the slower part.",
+      },
+      {
+        name: "variance_explained",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The share of the tidal band's variance the constants explain over the held-out year: one minus the residual's variance over the observed levels', both after the Godin filter.",
+      },
+      {
+        name: "d1_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The held-out residual's RMS in the diurnal band, in meters.",
+      },
+      {
+        name: "d2_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The held-out residual's RMS in the semidiurnal band, in meters.",
+      },
+      {
+        name: "d4_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The held-out residual's RMS in the quarter-diurnal band, in meters.",
+      },
+      {
+        name: "d6_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The held-out residual's RMS in the sixth-diurnal band, in meters.",
+      },
+      {
+        name: "turns",
+        type: "INTEGER",
+        nullable: true,
+        description:
+          "Observed high and low waters of the held-out year with a predicted one of the same kind within 3 hours. One picker finds the turns of both hourly series.",
+      },
+      {
+        name: "turns_missed",
+        type: "INTEGER",
+        nullable: true,
+        description: "Observed high and low waters of the held-out year without one.",
+      },
+      {
+        name: "turn_time_mean_min",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "Predicted minus observed time of the matched turns, in minutes: the mean. Negative is early.",
+      },
+      {
+        name: "turn_time_rms_min",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed time of the matched turns, in minutes: the RMS.",
+      },
+      {
+        name: "turn_height_mean_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed height of the matched turns, in meters: the mean.",
+      },
+      {
+        name: "turn_height_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed height of the matched turns, in meters: the RMS.",
+      },
+      {
+        name: "mean_range_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "Mean high water minus mean low water of the curve the constants predict over the held-out year, in meters.",
+      },
+      {
+        name: "settled_before",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description:
+          "For a source that never finalizes its values, the instant before which the fit read them as final (`settles_after_months` in `sources.json`); null for a source that finalizes.",
+      },
+      {
+        name: "source_qc_start",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description:
+          "The station's `source_qc_start` when the fit ran: preliminary values before it were read as final.",
+      },
+      {
+        name: "inputs",
+        type: "VARCHAR",
+        description:
+          "What the fit read, as JSON: `versions`, each year file's version by `<epoch> <year>`, as the years file gives it; `epochs`, the station's datum epochs with their `to_current`; `errata`, each erratum touching the station in the years read, with its handling; and `digest`, of everything the fit depends on, which changes when the station is due another fit.",
+      },
+    ],
+    sort: ["id"],
+  },
+  references: {
+    path: "fits/references/<source>.parquet",
+    example: "fits/references/smhi.parquet",
+    title: "Reference scores",
+    description:
+      "One row per fit and slackwater-database record of the same gauge: how the record's constants predict the fit's held-out year, scored by the code that scores the fit, on the same hours. The fit's own scores are in `fits/<source>.parquet`. A station whose gauge has no record in the database has no rows, and a source that has never had one has no file. Each row carries its record's terms: a product that bars non-commercial data filters on `reference_commercial_use`. The rows are measurements: none says which constants are better.",
+    columns: [
+      {
+        name: "id",
+        type: "VARCHAR",
+        description: "The station's `id` in `stations.parquet`.",
+      },
+      {
+        name: "version",
+        type: "VARCHAR",
+        description:
+          "The `version` of the fit the record is scored against, in `fits/<source>.parquet`. The files are written one after another, so join them on `id`, `version` and `fitted`.",
+      },
+      {
+        name: "fitted",
+        type: "TIMESTAMPTZ",
+        description:
+          "The `fitted` of that fit. A fit's `version` covers its window and constants and not the held-out year's values, so rows whose `fitted` isn't the fit's are from an earlier fit and aren't comparable with its scores.",
+      },
+      {
+        name: "reference",
+        type: "VARCHAR",
+        description:
+          "The record's ID in slackwater-database, such as `ticon/kungsvik-2130-swe-smhi`. Every record linked as `link` says is scored where the database accepts it or keeps it only as another's duplicate. One it rejects for its constants, clock, datum or range isn't.",
+      },
+      {
+        name: "reference_source",
+        type: "VARCHAR",
+        description: "The name slackwater-database gives the record's source.",
+      },
+      {
+        name: "reference_license",
+        type: "VARCHAR",
+        description:
+          "The record's license in slackwater-database, such as `cc-by-4.0`, in its spelling.",
+      },
+      {
+        name: "reference_commercial_use",
+        type: "BOOLEAN",
+        description:
+          "Whether the record's terms allow commercial use. The row's scores are measured against the record's constants, so they follow its terms as well as the station's.",
+      },
+      {
+        name: "reference_attribution",
+        type: "VARCHAR",
+        description: "The credit slackwater-database asks for wherever the record is shown.",
+      },
+      {
+        name: "release",
+        type: "VARCHAR",
+        description:
+          "The `@slackwater/database` release the constants were read from when the row was scored. A later release that leaves the record's constants as they were doesn't score it again, so this can be older than the latest release.",
+      },
+      {
+        name: "digest",
+        type: "VARCHAR",
+        description:
+          "A digest of the constants scored: the first 16 hex digits of the SHA-256 of the array of `[name, amplitude, phase]` in the record's order, as JavaScript's `JSON.stringify` writes it, with no spaces and each number in its shortest form that reads back the same, the amplitudes in meters and phases in degrees as the release's database file gives them. A score describes the record only while its constants have this digest.",
+      },
+      {
+        name: "link",
+        type: "VARCHAR",
+        description:
+          "Why the record counts as the station's gauge: `id`, it carries the station's own ID in its source and is within 10 km; `levels`, it carries the ID of `linked`, another series of the gauge whose hourly levels agree with the station's within 1 cm RMS with no lag in `stations/matches.parquet`, which compares the latest years both hold.",
+      },
+      {
+        name: "linked",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "For `levels`, the `id` of the series the record belongs to, whose comparison with the station is in `stations/matches.parquet`; null for `id`.",
+      },
+      {
+        name: "node_corrections",
+        type: "VARCHAR",
+        description:
+          "The nodal corrections the record's constants were predicted under for this score: `iho` or `schureman`. The fit itself is predicted under its own, in `fits/<source>.parquet`.",
+      },
+      {
+        name: "node_corrections_assumed",
+        type: "BOOLEAN",
+        description:
+          "False where the corrections the record's source fits under are known, as NOAA's are. True where they aren't, as for TICON's records, and the record is predicted under the IHO's, which slackwater-database's predictions use by default; constants fitted under other corrections then score worse than they would under their own.",
+      },
+      {
+        name: "seen",
+        type: "BOOLEAN",
+        nullable: true,
+        description:
+          "Whether the span the record says it was analyzed over includes any of the held-out year, which then favors it over the fit, which didn't read the year; null where the record gives no span.",
+      },
+      {
+        name: "constituents",
+        type: "INTEGER",
+        description: "How many constants the record has.",
+      },
+      {
+        name: "unpredicted",
+        type: "INTEGER",
+        description:
+          "How many of them the fitting engine doesn't define, which predict nothing in this score.",
+      },
+      {
+        name: "scored",
+        type: "TIMESTAMPTZ",
+        description: "When the row was scored.",
+      },
+      {
+        name: "held_out",
+        type: "INTEGER",
+        description: "The UTC year scored: the fit's `held_out`.",
+      },
+      {
+        name: "held_out_hours",
+        type: "INTEGER",
+        description: "How many hours of the held-out year are scored: the same hours as the fit's.",
+      },
+      {
+        name: "held_out_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The RMS of observed minus the record's predicted levels over the held-out year in the tidal band, in meters, taken as the fit's `held_out_rms_m` is.",
+      },
+      {
+        name: "variance_difference_se_m2",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The standard error of the fit's residual variance minus the record's (`held_out_rms_m` squared, each), in square meters: how far that difference could move by chance in the year scored. It is taken from the means of 30-day blocks, so the weather's hour-to-hour correlation doesn't shrink it; null where fewer than two blocks have a week of scored hours.",
+      },
+      {
+        name: "d1_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The record's held-out residual RMS in the diurnal band, in meters.",
+      },
+      {
+        name: "d2_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The record's held-out residual RMS in the semidiurnal band, in meters.",
+      },
+      {
+        name: "d4_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The record's held-out residual RMS in the quarter-diurnal band, in meters.",
+      },
+      {
+        name: "d6_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The record's held-out residual RMS in the sixth-diurnal band, in meters.",
+      },
+      {
+        name: "turns",
+        type: "INTEGER",
+        description:
+          "Observed high and low waters of the held-out year with one the record predicts, of the same kind, within 3 hours.",
+      },
+      {
+        name: "turns_missed",
+        type: "INTEGER",
+        description: "Observed high and low waters of the held-out year without one.",
+      },
+      {
+        name: "turn_time_mean_min",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "Predicted minus observed time of the matched turns, in minutes: the mean. Negative is early.",
+      },
+      {
+        name: "turn_time_rms_min",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed time of the matched turns, in minutes: the RMS.",
+      },
+      {
+        name: "turn_height_mean_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed height of the matched turns, in meters: the mean.",
+      },
+      {
+        name: "turn_height_rms_m",
+        type: "DOUBLE",
+        nullable: true,
+        description: "Predicted minus observed height of the matched turns, in meters: the RMS.",
+      },
+    ],
+    sort: ["id", "reference"],
+  },
+  constituents: {
+    path: "constituents/<source>.parquet",
+    example: "constituents/smhi.parquet",
+    title: "Harmonic constituents",
+    description:
+      "One row per fitted station and candidate constituent, in the order of the fit's list of candidates within a station: the constants of the candidates the fit kept, and why it left each of the others out. Each row gives its constituent's name and Doodson numbers, so the constants can be used with any prediction software that applies the nodal corrections `fits/<source>.parquet` names. The name is needed with the numbers: NO1 and M1, and MO3 and 2MK3, share numbers and differ in their nodal correction.",
+    columns: [
+      { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
+      {
+        name: "version",
+        type: "VARCHAR",
+        description:
+          "The `version` of the row's fit in `fits/<source>.parquet`. The two files are written one after the other, so join them on `id` and `version`.",
+      },
+      {
+        name: "name",
+        type: "VARCHAR",
+        description: "The constituent's name, as IHO's list spells it.",
+      },
+      {
+        name: "rank",
+        type: "INTEGER",
+        description:
+          "The candidate's place in the list of candidates its fit started from, from 1. [Harmonic fits](https://github.com/openwatersio/stillwell/blob/main/docs/fits.md#constituents) gives the rule for which constituent a candidate is tested against.",
+      },
+      {
+        name: "doodson",
+        type: "INTEGER[]",
+        description:
+          "The line the name means here: the multiples of τ, s, h, p, N′ and p′ in its argument, then its phase constant in quarter cycles.",
+      },
+      {
+        name: "speed",
+        type: "DOUBLE",
+        description: "The constituent's speed, in degrees per hour.",
+      },
+      {
+        name: "kept",
+        type: "BOOLEAN",
+        description:
+          "Whether the constituent is one of the fit's constants. A prediction uses the kept rows.",
+      },
+      {
+        name: "reason",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "Why a candidate isn't kept: `rayleigh`, the record can't separate it from `conflict`; `snr`, its signal-to-noise ratio is under 2 in a fit without robust weights, which is how candidates are tested; `nyquist`, the sampling can't resolve it; `rankDeficient`, the fit can't tell it from the other candidates it holds; `seasonal`, Sa or Ssa whose amplitude is under twice the standard error of its mean over the yearly fits; `unknown`, the fitting engine doesn't define it. Null for a kept one.",
+      },
+      {
+        name: "conflict",
+        type: "VARCHAR",
+        nullable: true,
+        description: "The constituent a `rayleigh` candidate couldn't be separated from.",
+      },
+      {
+        name: "amplitude_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The fitted amplitude, in meters, unrounded; null for a candidate that wasn't fitted.",
+      },
+      {
+        name: "phase_deg",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The fitted phase, in degrees: the Greenwich phase lag, with time in UTC.",
+      },
+      {
+        name: "amplitude_ci_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The half-width of the amplitude's 95% confidence interval, in meters, from the residual spectrum around the constituent.",
+      },
+      {
+        name: "phase_ci_deg",
+        type: "DOUBLE",
+        nullable: true,
+        description: "The half-width of the phase's 95% confidence interval, in degrees.",
+      },
+      {
+        name: "snr",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "The signal-to-noise ratio: amplitude squared over its variance. For a candidate cut for `snr`, its value in the fit that cut it.",
+      },
+      {
+        name: "yearly_amplitude_sd_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "For M2, S2, K1 and O1: the standard deviation of the amplitude between the yearly fits, in meters.",
+      },
+      {
+        name: "yearly_phase_sd_deg",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "For M2, S2, K1 and O1: the circular standard deviation of the phase between the yearly fits, in degrees.",
+      },
+      {
+        name: "yearly_se_m",
+        type: "DOUBLE",
+        nullable: true,
+        description:
+          "For Sa and Ssa: the standard error of the mean of the yearly fits, in meters, which decides whether they are kept.",
+      },
+    ],
+    sort: ["id", "rank"],
+  },
+  "fit-datums": {
+    path: "fits/datums/<source>.parquet",
+    example: "fits/datums/smhi.parquet",
+    title: "Tidal datums",
+    description:
+      "One row per station with constants in `fits/<source>.parquet`: tidal datums reduced from the station's own measured levels, and the datums of a 19-year prediction from its constants, each as heights above the station's zero, by `@slackwater/datums`. The observed datums cover the latest whole years of complete months the station has from the start of the fit's window to the end of its held-out year, and `reason` says why a station has none. Which of them is a station's chart datum is slackwater-database's choice, and `stations.parquet` doesn't read this file.",
+    columns: [
+      { name: "id", type: "VARCHAR", description: "The station's `id` in `stations.parquet`." },
+      {
+        name: "version",
+        type: "VARCHAR",
+        description:
+          "The `version` of the fit whose constants filled gaps and made the prediction, in `fits/<source>.parquet`. The files are written one after another, so join them on `id`, `version` and `fitted`.",
+      },
+      {
+        name: "fitted",
+        type: "TIMESTAMPTZ",
+        description:
+          "The `fitted` of that fit. A row whose `version` or `fitted` isn't its fit's is from an earlier fit.",
+      },
+      { name: "reduced", type: "TIMESTAMPTZ", description: "When the datums were reduced." },
+      {
+        name: "reason",
+        type: "VARCHAR",
+        nullable: true,
+        description:
+          "Why the station has no observed datums, such as no whole year of complete months; null where it has them. The predicted datums don't depend on it.",
+      },
+      {
+        name: "datum",
+        type: "VARCHAR",
+        description:
+          "The zero every height in the row is above: the station's `datum` in its current epoch, which the fit moved every epoch's levels into.",
+      },
+      {
+        name: "epoch",
+        type: "INTEGER",
+        description: "The station's current datum epoch, whose `datum` that is.",
+      },
+      {
+        name: "since",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description:
+          "The start of the observed reduction's window: the longest run of complete UTC calendar months that is a whole number of years, the latest on a tie, within the 19 years up to the last complete month read. Null without observed datums.",
+      },
+      {
+        name: "until",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description: "The end of that window, exclusive.",
+      },
+      {
+        name: "months",
+        type: "INTEGER",
+        nullable: true,
+        description: "How many months the window holds, a multiple of 12.",
+      },
+      {
+        name: "observed_hours",
+        type: "INTEGER",
+        nullable: true,
+        description:
+          "Hours of the window with a measured value: one flagged good or preliminary. A value a source marks both provisional and estimated is stored as preliminary, so it counts here.",
+      },
+      {
+        name: "inferred_hours",
+        type: "INTEGER",
+        nullable: true,
+        description:
+          "Hours of the window filled from the fit's prediction plus the residual interpolated across a gap of up to 23 hours.",
+      },
+      {
+        name: "observed",
+        type: "MAP(VARCHAR, DOUBLE)",
+        nullable: true,
+        description:
+          "The observed datums, NOAA's first reduction over the window: `MHHW`, `MHW`, `MSL`, `MTL`, `MLW` and `MLLW`, in meters above `datum`. Null without them.",
+      },
+      {
+        name: "predicted_since",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description:
+          "The start of the 19 years the fit's constants are predicted over: the epoch `@slackwater/datums` pins, the same for every station.",
+      },
+      {
+        name: "predicted_until",
+        type: "TIMESTAMPTZ",
+        nullable: true,
+        description: "The end of those 19 years, exclusive.",
+      },
+      {
+        name: "predicted",
+        type: "MAP(VARCHAR, DOUBLE)",
+        nullable: true,
+        description:
+          "The datums of that prediction, in meters above `datum`, on top of the fit's `z0_m`, the mean level over its window: `HAT` and `LAT`, the highest and lowest predicted tide, the Large Tide levels `HHWLT` and `LLWLT`, `MHHW`, `MHW`, `MSL`, `MTL`, `MLW` and `MLLW` of the predicted turns, `MHWS` and `MLWS` from the M2 and S2 amplitudes, `NLLW` and `ALLW` (Indian Spring Low Water) and `TLT` (China's Theoretical Lowest Tide), each where the package can compute it. Null, with `predicted_since` and `predicted_until`, where the fit kept no daily or faster constituent.",
+      },
+      {
+        name: "ignored",
+        type: "VARCHAR[]",
+        description:
+          "Constituents the fit kept that the package's prediction engine doesn't define, which neither filled gaps nor entered the prediction; empty where none.",
+      },
+      {
+        name: "package",
+        type: "VARCHAR",
+        description:
+          "The package that reduced the datums and its version, such as `@slackwater/datums@0.1.0-beta.0`.",
+      },
+      {
+        name: "digest",
+        type: "VARCHAR",
+        description:
+          "A digest of what the datums depend on besides their fit: the package's version and the method's. The row is reduced again when it changes.",
+      },
+    ],
+    sort: ["id"],
+  },
   recent: {
     path: "recent/<source>/<YYYY-MM-DD>.parquet",
     example: "recent/rws/2026-11-19.parquet",
@@ -828,6 +1453,7 @@ export const SOURCES_SCHEMA: JsonSchema = {
       "license",
       "attribution",
       "contact",
+      // `settles_after_months` isn't required, so a file published before it was kept still passes.
       "finalizes",
       "stations",
       "backfill",
@@ -879,6 +1505,11 @@ export const SOURCES_SCHEMA: JsonSchema = {
         type: "boolean",
         description:
           "Whether values the source publishes as preliminary become final later. Where false, `preliminary` values stay so.",
+      },
+      settles_after_months: {
+        type: nullable("integer"),
+        description:
+          "For a source that never finalizes: how many months after a calendar year ends its values are read as final: the source's own figure where it states one, otherwise one decided for it, from its record of revisions where the store has one. The source's README says which and what it rests on. Null for a source that finalizes, and where none is set.",
       },
       stations: { type: "integer", description: "How many active stations the source has." },
       backfill: {

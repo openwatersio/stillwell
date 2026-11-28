@@ -12,13 +12,38 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
       - run: npm ci
       - run: npm run check
+
+  # Runs the report scripts the Site workflow runs before each build, against the public store and slackwater-database
+  # at the version the repository installs, so a change that breaks one fails here rather than on main.
+  reports:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      - id: tide
+        run: echo "version=$(node -p "require('./node_modules/@slackwater/database/package.json').version")" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: openwatersio/slackwater-database
+          ref: v${{ steps.tide.outputs.version }}
+          path: slackwater-database
+      - run: npm run ticon:inventory
+        env:
+          TIDE_DATABASE: slackwater-database
+      - run: npm run gesla:coverage
 
   # Deploys the Workers (workers/) on every push to main, the live Worker's poller image included, once the
   # `cloudflare` environment holds CLOUDFLARE_API_TOKEN and the repository variable CLOUDFLARE_ACCOUNT_ID is set;
@@ -36,8 +61,8 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -56,8 +81,8 @@ jobs:
   lockfile:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
       - name: Check the lockfile regenerates from package.json

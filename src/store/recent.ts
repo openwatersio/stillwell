@@ -3,8 +3,8 @@ import { readBackfilled, recordYear, writeBackfilled } from "../backfilled.ts";
 import { withheldReason } from "../withhold.ts";
 import { Blocked } from "../http.ts";
 import { FLATLINE_S, fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
-import { possible } from "../span.ts";
-import { DatumChanged, isHeld, recentWindow } from "../epochs.ts";
+import { Dropped, leaveOutInto, possible, tallying } from "../span.ts";
+import { currentEpoch, DatumChanged, isHeld, recentWindow } from "../epochs.ts";
 import {
   Flag,
   type Epoch,
@@ -72,10 +72,36 @@ export interface RunSummary {
   values: number;
   /** Files written. */
   files: number;
-  /** Stored levels outside `SPAN_M` that requalify dropped. */
-  dropped?: number;
+  /** Levels outside `SPAN_M` the run left out, whether fetched or stored, and why. */
+  dropped?: Dropped;
+  /** The same, by station, for the ones whose fetch lost levels, so a station that went quiet shows why. */
+  droppedBy?: Map<string, Dropped>;
   /** Seconds spent in each phase of the run, in the order they first ran. */
   seconds?: Record<string, number>;
+}
+
+/** Adds `dropped` to the run's total and, when it names a station, that station's. */
+export function noteDropped(summary: RunSummary, dropped: Dropped, station?: string): void {
+  if (!dropped.count) return;
+  (summary.dropped ??= new Dropped()).merge(dropped);
+  if (station) {
+    summary.droppedBy ??= new Map();
+    summary.droppedBy.set(
+      station,
+      (summary.droppedBy.get(station) ?? new Dropped()).merge(dropped),
+    );
+  }
+}
+
+/** `work`, a source's fetch, with the levels it left out as outside `SPAN_M` counted in the run's summary. */
+export async function fetchCounting<T>(
+  summary: RunSummary,
+  station: string | undefined,
+  work: () => Promise<T>,
+): Promise<T> {
+  const { result, dropped } = await tallying(work);
+  noteDropped(summary, dropped, station);
+  return result;
 }
 
 /** Runs a phase of work and adds the time it took to its phase's total. */
@@ -98,6 +124,43 @@ export function timer(title: string, seconds: Record<string, number>): Timer {
       console.log(`${title}: ${phase} ${took.toFixed(1)}s`);
     }
   };
+}
+
+/** A break in a station's values must be longer than this to count as a gap, where three of its intervals are shorter. */
+const GAP_MS = HOUR_MS / 2;
+
+/**
+ * Where a fetch starts so that it covers what a station's window lacks, for a
+ * source that fills its values in late (`fillsLate`), or null where the
+ * window lacks nothing. `times` are the window's, in any order, and `since`
+ * is where the fetch starts otherwise.
+ *
+ * A break between two values longer than three of the station's intervals,
+ * and longer than half an hour, is a gap, as is one before its first value,
+ * and the fetch starts at the first. A station with no interval has no such
+ * gaps to tell. A newest value older than `since` is where the station
+ * stopped, so the fetch starts there, and a station with no values is asked
+ * for all of it. Nothing is asked from before `from`, the oldest time a value
+ * can still reach the year files from.
+ */
+export function gapStart(
+  times: number[],
+  { interval_s, from, since }: { interval_s: number | null; from: number; since: number },
+): number | null {
+  const sorted = times.filter((t) => t >= from).sort((a, b) => a - b);
+  const newest = sorted.at(-1);
+  if (newest === undefined) return from < since ? from : null;
+  if (interval_s) {
+    const longest = Math.max(GAP_MS, 3 * interval_s * 1000);
+    // The last value before `from` says how long a break across it is; with none, the window starts in one.
+    let before = -Infinity;
+    for (const time of times) if (time < from && time > before) before = time;
+    for (const time of sorted) {
+      if (time - before > longest) return Math.max(before, from);
+      before = time;
+    }
+  }
+  return newest < since ? newest : null;
 }
 
 interface RunOptions {
@@ -126,7 +189,9 @@ interface RunOptions {
  * each value. Each row carries the datum epoch it belongs to: rows from
  * before the station's current epoch stay as they are, fetching never reaches
  * back before the current epoch's start, and a station whose new epoch is
- * held isn't fetched but keeps what it had. A station is stale when its
+ * held isn't fetched but keeps what it had. With `gapsFrom`, a station fetched
+ * on its own looks back to what its window lacks (`gapStart`), and that fetch
+ * adds and replaces values without deleting any. A station is stale when its
  * newest value is older than three of its intervals, and at least `staleHours`.
  */
 export async function refreshStation({
@@ -137,6 +202,7 @@ export async function refreshStation({
   since,
   now,
   keepFrom,
+  gapsFrom,
   staleHours = 6,
   summary,
 }: {
@@ -147,11 +213,27 @@ export async function refreshStation({
   since: number;
   now: number;
   keepFrom: number;
+  /** On a station's turn at a source that fills values in late: how far back a gap is asked again. */
+  gapsFrom?: number;
   staleHours?: number;
   summary: RunSummary;
 }): Promise<{ rows: StationObservation[]; fresh: number }> {
   const rows: StationObservation[] = [];
-  const lookback = swept ? since : Math.min(since, now - 2 * (station.interval_s ?? 0) * 1000);
+  const usual = swept ? since : Math.min(since, now - 2 * (station.interval_s ?? 0) * 1000);
+  // A held station isn't fetched, and a fetch never reaches before the current epoch.
+  const begins = isHeld(station.epochs) ? null : currentEpoch(station.epochs).since;
+  const gap =
+    gapsFrom !== undefined && !swept && !isHeld(station.epochs)
+      ? gapStart(
+          previous.map((r) => r.time),
+          {
+            interval_s: station.interval_s,
+            from: Math.max(gapsFrom, keepFrom, begins === null ? -Infinity : Date.parse(begins)),
+            since: usual,
+          },
+        )
+      : null;
+  const lookback = gap === null ? usual : Math.min(usual, gap);
   const window = recentWindow(station.epochs, previous, keepFrom, lookback);
   // Rows from other epochs are in another reference, and stay as they are.
   rows.push(...window.other);
@@ -168,7 +250,9 @@ export async function refreshStation({
     // A sweep covers the whole window, so values from before the current epoch are left out.
     const got = swept
       ? (answer ?? []).filter((o) => o.time >= window.from)
-      : await source.observations!(station, new Date(window.from), new Date(now));
+      : await fetchCounting(summary, station.id, () =>
+          source.observations!(station, new Date(window.from), new Date(now)),
+        );
     // QC the whole window, so spikes and flatlines are judged against their neighbors.
     // What we had starts again from the source's flags, so a mark can clear,
     // except within a flatline's length of the window's start, where a run
@@ -197,10 +281,15 @@ export async function refreshStation({
               ),
             ];
       // Seven days can't fit a tide, so residual jumps wait for the year's requalify.
-      merged = qc(mergeFetched(start, withSourceFlag(got), window.from, now, now), {
-        ...opts,
-        jumps: false,
-      });
+      // A fetch that reaches back for a gap only adds and replaces: an answer that lacks a value
+      // the window holds, days back, says less than one of the last hours does.
+      merged = qc(
+        mergeFetched(start, withSourceFlag(got), window.from, now, now, lookback < usual),
+        {
+          ...opts,
+          jumps: false,
+        },
+      );
     }
   } catch (error) {
     // Keep what we had; a failed fetch mustn't empty the window.
@@ -361,7 +450,11 @@ export async function compactRecent({
               for (const r of incoming) if (r.time < from) from = r.time;
               let later: FileBounds | null = null;
               let added = 0;
-              const { before, stats } = await foldObservationFile(
+              // The folded days' own, always; the file's, only when its rewrite takes them out.
+              const fromIncoming = new Dropped();
+              const fromFile = new Dropped();
+              let kept = false;
+              const { before, stats, replaced } = await foldObservationFile(
                 file,
                 from,
                 epoch.datum,
@@ -371,12 +464,16 @@ export async function compactRecent({
                   // A level outside `SPAN_M` goes, among the stored rows the fold rewrites
                   // and the window's, which may hold some fetched before fetches dropped them.
                   const merged = upsert(
-                    existing.filter((r) => possible(r.level)),
-                    incoming.filter((r) => possible(r.level)),
+                    leaveOutInto(existing, fromFile),
+                    leaveOutInto(incoming, fromIncoming),
                   );
                   // Rows that would all go stay as they are, since a year file always has some.
                   if (!merged.length) {
                     later = spanOf(existing, window);
+                    kept = true;
+                    (summary.warned ??= []).push(
+                      `${label}: holds only ${fromFile.merge(fromIncoming).describe()}, so its file is kept`,
+                    );
                     return null;
                   }
                   later = spanOf(merged, window);
@@ -405,7 +502,10 @@ export async function compactRecent({
                 const store = storeFor(station);
                 carried.set(store, [...(carried.get(store) ?? []), [station.id, epochId, year]]);
               }
+              noteDropped(summary, fromIncoming, station.id);
+              noteDropped(summary, replaced, station.id);
               if (!stats) continue;
+              if (!kept) noteDropped(summary, fromFile, station.id);
               written.set(file, stats);
               summary.files++;
               summary.values += added;
@@ -506,8 +606,8 @@ function spanOf(rows: Observation[], window: Span | null): FileBounds | null {
   if (!window) return null;
   // A loop, not Math.min(...): a one-minute year file has too many rows to spread.
   let [first, last, preliminary, screened] = [Infinity, -Infinity, Infinity, false];
-  for (const { time, flag, source_flag } of rows)
-    if (time >= window[0] && time < window[1]) {
+  for (const { time, level, flag, source_flag } of rows)
+    if (time >= window[0] && time < window[1] && possible(level)) {
       if (time < first) first = time;
       if (time > last) last = time;
       // As readTimeBounds: without `source_flag`, only a good or interpolated flag is the source's.
@@ -887,11 +987,7 @@ export function formatSummary(s: RunSummary, listed = 20): string {
     "| -: | -: | -: | -: | -: | -: |",
     `| ${s.stations} | ${s.updated} | ${s.stale.length} | ${s.failed.length} | ${s.values} | ${s.files} |`,
   ];
-  if (s.dropped)
-    lines.push(
-      "",
-      `Dropped ${s.dropped} stored levels outside −500 to 9,000 m. Run \`compact <source> --rebuild-bounds\` and \`publish\`, since a station's first or last value may be among them.`,
-    );
+  if (s.dropped?.count) lines.push("", `Left out ${s.dropped.describe()}.`);
   const phases = Object.entries(s.seconds ?? {});
   if (phases.length) {
     lines.push("", "| Phase | Seconds |", "| - | -: |");
@@ -905,7 +1001,10 @@ export function formatSummary(s: RunSummary, listed = 20): string {
   ] as const)
     if (items.length) {
       lines.push("", `${what}${items.length > listed ? ` (first ${listed})` : ""}:`, "");
-      for (const item of items.slice(0, listed)) lines.push(`- ${item}`);
+      for (const item of items.slice(0, listed)) {
+        const lost = what === "Stale" ? s.droppedBy?.get(item) : undefined;
+        lines.push(`- ${item}${lost ? `: its fetch left out ${lost.describe()}` : ""}`);
+      }
     }
   return lines.join("\n") + "\n";
 }

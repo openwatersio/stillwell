@@ -2,14 +2,14 @@
 # One source's part of the Monthly workflow, which the workflow's jobs run.
 #
 #   scripts/monthly.sh lists <source> [--full] [--accept-epochs] [--accept-withheld]
-#   scripts/monthly.sh refresh|analyze|requalify-recent|list-backfills <source> [...]
+#   scripts/monthly.sh refresh|analyze|requalify-recent|list-backfills|fit <source> [...]
 #   scripts/monthly.sh refetch <source>
 #
 # `lists` runs the list job's steps in order, each even when one before it failed, as the workflow's
 # `!cancelled()` steps do, and fails if any did: `refresh` (the station list, without publishing, which
 # Monthly's or Compact daily's publish does), `analyze`, `requalify-recent` with `--full` (a full refresh,
-# not one of named sources), and `list-backfills`, the source's own backfills after its list. STARTED, the job's start in epoch seconds,
-# bounds requalify-recent's budget, now when unset. The store and its credentials come from the
+# not one of named sources), `list-backfills`, the source's own backfills after its list, and `fit`, with `--full`. STARTED, the job's start in epoch seconds,
+# bounds requalify-recent's and fit's budgets, now when unset. The store and its credentials come from the
 # environment, as for scripts/ingest.ts. Dates are GNU date's, as on the runners.
 set -euo pipefail
 
@@ -72,6 +72,24 @@ backfills() {
   return "$status"
 }
 
+# Harmonic constants for the source's stations whose fit is due (src/fit/store.ts), last in the list job, so
+# they read the levels and verdicts the steps before it left, and in the source's lane, since a fit reads year
+# files a backfill or compaction would rewrite. A fit is a minute or more of computation a station, so it starts
+# stations for at most 2 hours, and none once the job has run 5 and a half, the largest tides first. The rest
+# stay due for the next run: in most months only stations whose levels changed are due, and when a source's
+# final year moves on or the candidate list changes, all of them are, and a large source takes several runs
+# to catch up. Only a source
+# with a station that has constants is fitted (`--only-fitted`), so a source's first fit is a run by hand from
+# the Ingest workflow, which a maintainer makes once the source's fits can be trusted. Only a full refresh runs it.
+fit() {
+  local left budget
+  left=$(((STARTED + 330 * 60 - $(date +%s)) / 60))
+  budget=$((left < 120 ? left : 120))
+  # With no time left it still runs, to say how many stations are due.
+  if [ "$budget" -lt 0 ]; then budget=0; fi
+  ingest fit "$SOURCE" --budget "$budget" --only-fitted
+}
+
 case "$step" in
   lists)
     status=0
@@ -79,15 +97,17 @@ case "$step" in
     analyze || status=1
     if [[ " $* " == *" --full "* ]]; then requalify_recent || status=1; fi
     backfills lists || status=1
+    if [[ " $* " == *" --full "* ]]; then fit || status=1; fi
     exit "$status"
     ;;
   refresh) refresh "$@" ;;
   analyze) analyze ;;
   requalify-recent) requalify_recent ;;
   list-backfills) backfills lists ;;
+  fit) fit ;;
   refetch) backfills refetch ;;
   *)
-    echo "usage: monthly.sh lists|refresh|analyze|requalify-recent|list-backfills|refetch <source> [options]" >&2
+    echo "usage: monthly.sh lists|refresh|analyze|requalify-recent|list-backfills|fit|refetch <source> [options]" >&2
     exit 2
     ;;
 esac

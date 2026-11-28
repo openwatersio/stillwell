@@ -30,7 +30,12 @@ concurrency:
   queue: max
 
 jobs:
+  # Every job runs only on a first attempt. A re-run of failed jobs keeps the first attempt's plan, which is older than
+  # the record, so its step could run again after a retry or skip moved the record on, and `plan` isn't re-run to stop
+  # it. A re-run does nothing; dispatch `retry`, `skip` or `next` instead. A step whose record didn't save stays
+  # `running` at that step, so the next run takes it again.
   plan:
+    if: github.run_attempt == 1
     runs-on: ubuntu-latest
     environment: lake
     permissions:
@@ -43,9 +48,10 @@ jobs:
       lane: ${{ steps.next.outputs.lane }}
       timeout: ${{ steps.next.outputs.timeout }}
       stopped: ${{ steps.next.outputs.stopped }}
+      stopped_since: ${{ steps.next.outputs.stopped_since }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -68,25 +74,63 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
-  # A migration that can't run, or a failure, stops every migration not yet done: one issue says so.
+  # A migration that can't run, or a failure, stops every migration not yet done. Each run while stopped says why in
+  # its summary. One issue says so once a day has passed since a failed step last failed, which leaves the merged change's own
+  # follow-up time to handle it, and at once for any other stop. An open one takes each new stop a run finds. It closes
+  # when a run finds nothing left to run, or when a step succeeds (`record`).
   stopped:
     needs: plan
-    if: needs.plan.outputs.stopped != ''
+    if: github.run_attempt == 1
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       issues: write
     steps:
       - run: |
+          # A step about to run may fail again, so a run that takes a step leaves the issue alone.
+          [ -n "$STOPPED" ] || [ -z "$ID" ] || exit 0
           title="Migrations are stopped"
-          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number,title --jq "map(select(.title == \"$title\"))[0].number // empty")
-          [ -n "$open" ] || gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "The Migrations workflow stopped: $STOPPED. Every migration not yet done waits. Close this issue once it's fixed."
+          # A failed step is retried or skipped; any other stop's own text says what to do. Said before any issue call,
+          # so an API error can't lose it.
+          if [ -n "$STOPPED" ]; then
+            if [ -n "$SINCE" ]; then help="$FAILED"; else help="$OTHER"; fi
+            echo "::warning::Migrations are stopped: $STOPPED"
+            printf '%s\n\n%s\n' "Migrations are stopped: $STOPPED." "$help" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          # With nothing to run, an API error only leaves the issue for the next run, so the run stays green.
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --limit 1000 --json number,title --jq "map(select(.title == \"$title\"))[0].number // empty") || [ -z "$STOPPED" ] || exit 1
+          if [ -z "$STOPPED" ]; then
+            [ -z "$open" ] || gh issue close "$open" --repo "$GITHUB_REPOSITORY" --comment "No migration is left to run in [this run]($RUN)." || echo "::warning::Couldn't close issue #$open"
+            exit 0
+          fi
+          body="Migrations are stopped${SINCE:+ since $SINCE}: $STOPPED. $help This issue closes on its own when a migration step next succeeds, or nothing is left to run."
+          # An open issue takes a new stop at once, whatever its age; one that already names this stop keeps any edits.
+          if [ -n "$open" ]; then
+            current=$(gh issue view "$open" --repo "$GITHUB_REPOSITORY" --json body --jq .body)
+            case "$current" in
+              *"$STOPPED"*) ;;
+              *) gh issue edit "$open" --repo "$GITHUB_REPOSITORY" --body "$body" ;;
+            esac
+            exit 0
+          fi
+          # A time that doesn't parse counts as a day old, so the issue still opens.
+          if [ -n "$SINCE" ] && since=$(date -d "$SINCE" +%s) && [ $(( $(date +%s) - since )) -lt 86400 ]; then
+            echo "Stopped since $SINCE, under a day: no issue yet"
+            exit 0
+          fi
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "$body"
         env:
+          ID: ${{ needs.plan.outputs.id }}
           STOPPED: ${{ needs.plan.outputs.stopped }}
+          SINCE: ${{ needs.plan.outputs.stopped_since }}
+          FAILED: "Every migration not yet done waits. Fix the cause, merged to `main`, then run the Migrations workflow with `retry` and the migration's name, or with `skip` if its remaining steps can't or needn't run (src/migrations/README.md)."
+          OTHER: "Every migration not yet done waits until the cause is fixed (src/migrations/README.md)."
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_TOKEN: ${{ github.token }}
 
   step:
     needs: plan
-    if: needs.plan.outputs.id != ''
+    if: github.run_attempt == 1 && needs.plan.outputs.id != ''
     runs-on: ubuntu-latest
     environment: lake
     # The source's group, which its scheduled jobs and Ingest runs take too, so a step never rewrites a file one of
@@ -99,8 +143,8 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -129,7 +173,7 @@ jobs:
   # Records how the step ended.
   record:
     needs: [plan, step]
-    if: always() && needs.plan.outputs.id != '' && needs.step.result != 'skipped'
+    if: always() && github.run_attempt == 1 && needs.plan.outputs.id != '' && needs.step.result != 'skipped'
     runs-on: ubuntu-latest
     environment: lake
     permissions:
@@ -137,8 +181,8 @@ jobs:
       issues: write
       actions: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -160,23 +204,31 @@ jobs:
         run: |
           node scripts/migrations.ts done "$ID" "$STEP"
           gh workflow run migrations.yml --ref main
-        env:
-          ID: ${{ needs.plan.outputs.id }}
-          STEP: ${{ needs.plan.outputs.step }}
-          GH_TOKEN: ${{ github.token }}
-          STILLWELL_STORE: s3://water-levels
-          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
-          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
-          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
-      - if: steps.result.outputs.result == 'failure'
-        run: |
-          node scripts/migrations.ts fail "$ID" "$STEP" "step $STEP failed in $RUN"
-          gh issue create --repo "$GITHUB_REPOSITORY" --title "Migration $ID failed" --body "Step $STEP of \`src/migrations/$ID.ts\` failed in [this run]($RUN), and every migration not yet done waits. Fix the cause, then run the Migrations workflow with \`retry\` and \`$ID\`, or with \`skip\` if the remaining steps can't or needn't run."
+          # The step is recorded and the next run started, so an issue call that fails only leaves the issue for the
+          # next run that finds nothing left, and doesn't fail the job.
+          title="Migrations are stopped"
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --limit 1000 --json number,title --jq "map(select(.title == \"$title\"))[0].number // empty") || open=""
+          [ -z "$open" ] || gh issue close "$open" --repo "$GITHUB_REPOSITORY" --comment "Step $STEP of \`$ID\` succeeded in [this run]($RUN)." || echo "::warning::Couldn't close issue #$open"
         env:
           ID: ${{ needs.plan.outputs.id }}
           STEP: ${{ needs.plan.outputs.step }}
           RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_TOKEN: ${{ github.token }}
+          STILLWELL_STORE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+      # The step's red run is the failure's notice: the next runs say they're stopped, and the stopped job opens an
+      # issue only if the stop lasts. A step that ran out of time is cancelled, not failed, so this job fails too.
+      - if: steps.result.outputs.result == 'failure'
+        run: |
+          node scripts/migrations.ts fail "$ID" "$STEP" "step $STEP failed in $RUN"
+          echo "Step $STEP of \`src/migrations/$ID.ts\` failed, and every migration not yet done waits. Fix the cause, merged to \`main\`, then run the Migrations workflow with \`retry\` and \`$ID\`, or with \`skip\` if the remaining steps can't or needn't run." >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+        env:
+          ID: ${{ needs.plan.outputs.id }}
+          STEP: ${{ needs.plan.outputs.step }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           STILLWELL_STORE: s3://water-levels
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}

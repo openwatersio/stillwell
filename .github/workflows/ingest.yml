@@ -36,13 +36,13 @@ jobs:
           set -f
           # The command and sources are the words that aren't an option or
           # its value; every ingest option takes a value but --accept-epochs, --accept-withheld, --accept-matches, --prune, --no-publish,
-          # --refetch, --skip-written, --skip-unscreened, --with-inactive, --rebuild-bounds, --rebuild-years, --all, --requalify and --dry-run.
+          # --refetch, --skip-written, --skip-unscreened, --with-inactive, --rebuild-bounds, --rebuild-years, --all, --requalify, --only-fitted and --dry-run.
           words=()
           skip=
           for arg in $ARGS; do
             if [ -n "$skip" ]; then skip=; continue; fi
             case "$arg" in
-              --accept-epochs | --accept-withheld | --accept-matches | --prune | --no-publish | --refetch | --skip-written | --skip-unscreened | --with-inactive | --rebuild-bounds | --rebuild-years | --all | --requalify | --dry-run | --*=* | --) ;;
+              --accept-epochs | --accept-withheld | --accept-matches | --prune | --no-publish | --refetch | --skip-written | --skip-unscreened | --with-inactive | --rebuild-bounds | --rebuild-years | --all | --requalify | --only-fitted | --dry-run | --*=* | --) ;;
               --*) skip=1 ;;
               *) words+=("$arg") ;;
             esac
@@ -51,7 +51,7 @@ jobs:
             # links reads levels and writes only its own file, in the group Monthly's job takes.
             links) group=links ;;
             matches) group=matches ;;
-            backfill | compact | requalify | withhold | drop | misplaced | delete-years | years | analyze) [ -n "${words[1]:-}" ] && group="store-${words[1]}" || group=store ;;
+            backfill | compact | requalify | withhold | drop | misplaced | delete-years | years | analyze | fit) [ -n "${words[1]:-}" ] && group="store-${words[1]}" || group=store ;;
             stations)
               echo "::error::Refresh station lists with the Monthly workflow, which runs each source in its own group and then publishes"
               exit 1
@@ -90,10 +90,10 @@ jobs:
       # started or, on a re-run, first ran, so one that waited in the store
       # group doesn't drop a source registered since. Any other command keeps
       # the run's commit, whose group job picked its lock.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           ref: ${{ inputs.args == 'publish' && 'main' || github.sha }}
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm
@@ -134,8 +134,8 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .mise.toml
           cache: npm

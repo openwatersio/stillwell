@@ -1,3 +1,4 @@
+import { Dropped, SPAN_M } from "../span.ts";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
@@ -166,10 +167,16 @@ export function foldObservationFile(
   from: number,
   datum: string,
   window: [number, number] | null,
-  fold: (rows: Observation[], datums: string[]) => Promise<Observation[] | null>,
-): Promise<{ before: FileBounds | null; stats: YearStats | null }> {
+  fold: (
+    rows: Observation[],
+    datums: string[],
+    /** Whether the rows before `from` are all levels outside the store's span, as a year of fill is. */
+    earlierOut: boolean,
+  ) => Promise<Observation[] | null>,
+): Promise<{ before: FileBounds | null; stats: YearStats | null; replaced: Dropped }> {
   return serial(async () => {
     const db = await connection();
+    const replaced = new Dropped();
     let read: string | undefined;
     let write: string | undefined;
     try {
@@ -220,7 +227,7 @@ export function foldObservationFile(
       let before: FileBounds | null = null;
       if (window) {
         const ms = (t: number) => String(Math.max(-8.64e15, Math.min(8.64e15, t)));
-        const inside = `time_ms < ${from} AND time_ms >= ${ms(window[0])} AND time_ms < ${ms(window[1])}`;
+        const inside = `time_ms < ${from} AND time_ms >= ${ms(window[0])} AND time_ms < ${ms(window[1])} AND level_m BETWEEN ${SPAN_M[0]} AND ${SPAN_M[1]}`;
         const [r] = (
           await db.runAndReadAll(
             `SELECT min(time_ms) FILTER (WHERE ${inside}) AS first, max(time_ms) FILTER (WHERE ${inside}) AS last, min(time_ms) FILTER (WHERE ${inside} AND coalesce(source_flag, flag) = ${Flag.preliminary}) AS preliminary, count(*) FILTER (WHERE ${inside} AND CASE WHEN source_flag IS NULL THEN flag < ${Flag.preliminary} ELSE source_flag != ${Flag.preliminary} END) AS screened FROM ${read}`,
@@ -234,13 +241,29 @@ export function foldObservationFile(
             Number(r!.screened) > 0,
           ];
       }
-      const merged = await fold(later, datums);
-      if (!merged) return { before, stats: null };
-      await db.run(
-        `INSERT INTO ${write} (time_ms, level_m, flag, received_ms, source_flag) SELECT time_ms, level_m, flag, received_ms, source_flag FROM ${read} WHERE time_ms < ${from}`,
-      );
+      const [earlier] = (
+        await db.runAndReadAll(
+          `SELECT count(*) AS n, count(*) FILTER (WHERE level_m BETWEEN ${SPAN_M[0]} AND ${SPAN_M[1]}) AS ok FROM ${read} WHERE time_ms < ${from}`,
+        )
+      ).getRowObjects();
+      const earlierOut = Number(earlier!.n) > 0 && Number(earlier!.ok) === 0;
+      const merged = await fold(later, datums, earlierOut);
+      if (!merged) return { before, stats: null, replaced };
+      // A year of fill gives way to the levels the fold brings, so the file never holds both.
+      if (earlierOut && merged.length) {
+        before = null;
+        for (const r of (
+          await db.runAndReadAll(
+            `SELECT level_m, count(*) AS n FROM ${read} WHERE time_ms < ${from} GROUP BY level_m`,
+          )
+        ).getRowObjects())
+          replaced.add(Number(r.level_m), Number(r.n));
+      } else
+        await db.run(
+          `INSERT INTO ${write} (time_ms, level_m, flag, received_ms, source_flag) SELECT time_ms, level_m, flag, received_ms, source_flag FROM ${read} WHERE time_ms < ${from}`,
+        );
       await appendObservations(write, merged);
-      return { before, stats: await writeObservationTable(path, write, datum) };
+      return { before, stats: await writeObservationTable(path, write, datum), replaced };
     } finally {
       await (read ? dropTable(read) : Promise.resolve()).finally(() => write && dropTable(write));
     }
@@ -370,16 +393,18 @@ export async function readHourly(path: string): Promise<Map<number, number> | nu
 /**
  * A series file's observations at times from `from` to before `to` (epoch ms),
  * filtered in the query, so a remote read fetches only the row groups that
- * hold them rather than the whole year.
+ * hold them rather than the whole year. With `onTheHour`, only values stamped
+ * on a UTC hour, which is what a harmonic fit samples.
  */
 export async function readObservationsBetween(
   path: string,
   from: number,
   to: number,
+  onTheHour = false,
 ): Promise<Observation[]> {
   // read_parquet globs, so a station ID with a glob character reads only its own file.
   const glob = /[*?[]/.test(path);
-  const span = `time >= make_timestamp(${Math.round(from) * 1000}) AND time < make_timestamp(${Math.round(to) * 1000})`;
+  const span = `time >= make_timestamp(${Math.round(from) * 1000}) AND time < make_timestamp(${Math.round(to) * 1000})${onTheHour ? " AND epoch_ms(time) % 3600000 = 0" : ""}`;
   const rows = await read(
     path,
     OBSERVATION_COLUMNS,
@@ -391,6 +416,51 @@ export async function readObservationsBetween(
   return rows.map((r) => {
     delete r.filename;
     return observation(r);
+  });
+}
+
+/**
+ * `readObservationsBetween`'s values, in time order, handed to `visit` one at
+ * a time from DuckDB's columns instead of returned as rows: a year of 1-minute
+ * values is half a million rows, and a reader that keeps one in five needn't
+ * make an object of each. Returns how many there were.
+ */
+export function scanObservationsBetween(
+  path: string,
+  from: number,
+  to: number,
+  visit: (time: number, level: number, flag: Flag) => void,
+): Promise<number> {
+  return serial(async () => {
+    if (!isRemote(path) && !existsSync(path)) return 0;
+    const db = await connection();
+    if (/^https?:/.test(path)) await db.run("INSTALL httpfs; LOAD httpfs;");
+    // read_parquet globs, so a station ID with a glob character reads only its own file.
+    const glob = /[*?[]/.test(path);
+    const span = `time >= make_timestamp(${Math.round(from) * 1000}) AND time < make_timestamp(${Math.round(to) * 1000})`;
+    // Read whole before any value is visited, so a failed query visits none and leaves nothing open.
+    let result;
+    try {
+      result = await db.run(
+        `SELECT epoch_ms(time)::DOUBLE, level_m::DOUBLE, flag FROM read_parquet(${quote(path)}${glob ? ", filename = true, union_by_name = true" : ""}) WHERE ${span}${glob ? ` AND filename = ${quote(path)}` : ""} ORDER BY time`,
+      );
+    } catch (error) {
+      // A missing remote file is an empty series, not a failure.
+      if (isRemote(path) && isMissing(error)) return 0;
+      throw error;
+    }
+    let count = 0;
+    for (
+      let chunk = await result.fetchChunk();
+      chunk?.rowCount;
+      chunk = await result.fetchChunk()
+    ) {
+      const [times, levels, flags] = [0, 1, 2].map((i) => chunk!.getColumnVector(i));
+      for (let i = 0; i < chunk.rowCount; i++)
+        visit(times!.getItem(i) as number, level(levels!.getItem(i)), flags!.getItem(i) as Flag);
+      count += chunk.rowCount;
+    }
+    return count;
   });
 }
 
@@ -482,6 +552,8 @@ export interface YearFile {
   last: number;
   /** Values with no `received` time, which only backfill writes. */
   backfilled: number;
+  /** Values within the store's span; none in a year of fill. Unset in a record built by hand. */
+  usable?: number;
 }
 
 /**
@@ -503,7 +575,7 @@ export async function readYearFiles(
     const reader = await db.runAndReadAll(
       // The empty row names `source_flag` and `received`, so files written
       // before they existed read them as null rather than fail to bind.
-      `SELECT filename, count(*) FILTER (WHERE coalesce(source_flag, flag) = ${Flag.preliminary}) AS preliminary, count(DISTINCT month(time)) AS months, epoch_ms(max(time)) AS last, count(*) FILTER (WHERE received IS NULL) AS backfilled FROM (SELECT NULL::VARCHAR AS filename, NULL::TIMESTAMPTZ AS time, NULL::UTINYINT AS flag, NULL::UTINYINT AS source_flag, NULL::TIMESTAMPTZ AS received WHERE false UNION ALL BY NAME SELECT * FROM read_parquet([${files.join(", ")}], filename = true, union_by_name = true)) GROUP BY filename ORDER BY filename`,
+      `SELECT filename, count(*) FILTER (WHERE coalesce(source_flag, flag) = ${Flag.preliminary}) AS preliminary, count(DISTINCT month(time)) AS months, epoch_ms(max(time)) AS last, count(*) FILTER (WHERE received IS NULL) AS backfilled, count(*) FILTER (WHERE level_m BETWEEN ${SPAN_M[0]} AND ${SPAN_M[1]}) AS usable FROM (SELECT NULL::VARCHAR AS filename, NULL::TIMESTAMPTZ AS time, NULL::FLOAT AS level_m, NULL::UTINYINT AS flag, NULL::UTINYINT AS source_flag, NULL::TIMESTAMPTZ AS received WHERE false UNION ALL BY NAME SELECT * FROM read_parquet([${files.join(", ")}], filename = true, union_by_name = true)) GROUP BY filename ORDER BY filename`,
     );
     return reader.getRowObjects();
   });
@@ -522,6 +594,7 @@ export async function readYearFiles(
         months: Number(r.months),
         last: Number(r.last),
         backfilled: Number(r.backfilled),
+        usable: Number(r.usable),
       },
     ]),
   );
@@ -964,7 +1037,8 @@ export async function readTimeBounds(
   const windows = files
     .map((f) => `(${quote(f.file)}, ${ms(f.window[0])}, ${ms(f.window[1])})`)
     .join(", ");
-  const inside = "epoch_ms(p.time) >= w.lo AND epoch_ms(p.time) < w.hi";
+  // Levels outside the span are fill, so a year of nothing else bounds nothing.
+  const inside = `epoch_ms(p.time) >= w.lo AND epoch_ms(p.time) < w.hi AND p.level_m BETWEEN ${SPAN_M[0]} AND ${SPAN_M[1]}`;
   const preliminary = `${inside} AND coalesce(p.source_flag, p.flag) = ${Flag.preliminary}`;
   // Without `source_flag`, a suspect or bad flag may be QC's alone, so only a
   // good or interpolated one says the source screened it.
@@ -973,7 +1047,7 @@ export async function readTimeBounds(
     const db = await connection();
     const reader = await db.runAndReadAll(
       // The empty row names `source_flag`, so files written before it existed read it as null.
-      `SELECT p.filename, count(w.path) AS asked, epoch_ms(min(p.time) FILTER (WHERE ${inside})) AS first, epoch_ms(max(p.time) FILTER (WHERE ${inside})) AS last, epoch_ms(min(p.time) FILTER (WHERE ${preliminary})) AS preliminary, count(*) FILTER (WHERE ${screened}) AS screened FROM (SELECT NULL::VARCHAR AS filename, NULL::TIMESTAMPTZ AS time, NULL::UTINYINT AS flag, NULL::UTINYINT AS source_flag WHERE false UNION ALL BY NAME SELECT * FROM read_parquet([${files.map((f) => quote(f.file)).join(", ")}], filename = true, union_by_name = true)) p LEFT JOIN (VALUES ${windows}) w(path, lo, hi) ON p.filename = w.path GROUP BY p.filename`,
+      `SELECT p.filename, count(w.path) AS asked, epoch_ms(min(p.time) FILTER (WHERE ${inside})) AS first, epoch_ms(max(p.time) FILTER (WHERE ${inside})) AS last, epoch_ms(min(p.time) FILTER (WHERE ${preliminary})) AS preliminary, count(*) FILTER (WHERE ${screened}) AS screened FROM (SELECT NULL::VARCHAR AS filename, NULL::TIMESTAMPTZ AS time, NULL::FLOAT AS level_m, NULL::UTINYINT AS flag, NULL::UTINYINT AS source_flag WHERE false UNION ALL BY NAME SELECT * FROM read_parquet([${files.map((f) => quote(f.file)).join(", ")}], filename = true, union_by_name = true)) p LEFT JOIN (VALUES ${windows}) w(path, lo, hi) ON p.filename = w.path GROUP BY p.filename`,
     );
     return reader.getRowObjects();
   });

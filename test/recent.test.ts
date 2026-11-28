@@ -26,6 +26,7 @@ import {
   timer,
   lastDays,
   emptySummary,
+  gapStart,
   refreshStation,
   writePreliminary,
   type RunSummary,
@@ -348,6 +349,60 @@ describe("refreshStation", () => {
     );
   });
 
+  it("fetches from a gap in the window for a source that fills values in late", async () => {
+    const a = station("a");
+    const asked: number[] = [];
+    const filled = [at(NOW - 2 * DAY, 0.2), at(NOW - 2 * DAY + 600_000, 0.25), at(NOW - HOUR, 0.3)];
+    const previous: StationObservation[] = [];
+    const src: Source = {
+      ...source({}),
+      // What the window holds, and what the gap has since been filled with.
+      observations: async (_, start) => {
+        asked.push(start.getTime());
+        return [...previous.map((r) => at(r.time, r.level)), ...filled]
+          .filter((o) => o.time >= start.getTime())
+          .sort((x, y) => x.time - y.time);
+      },
+    };
+    // Every 10 minutes for 7 days, but for a day that ended a day ago.
+    for (let t = NOW - 7 * DAY; t < NOW - HOUR; t += 600_000)
+      if (t < NOW - 2 * DAY || t >= NOW - DAY)
+        previous.push({ ...at(t, 0.1, t), station: a.id, epoch: 1 });
+    const run = async (gapsFrom?: number) => {
+      const summary = emptySummary("gaps", 1);
+      const { rows } = await refreshStation({
+        source: src,
+        station: a,
+        previous,
+        swept: undefined,
+        since: NOW - 6 * HOUR,
+        now: NOW,
+        keepFrom: NOW - 7 * DAY,
+        gapsFrom,
+        summary,
+      });
+      return { rows, summary };
+    };
+    // Outside the station's turn, the usual look-back.
+    await run();
+    assert.deepEqual(asked, [NOW - 6 * HOUR]);
+    const { rows, summary } = await run(NOW - 5 * DAY);
+    assert.equal(asked[1], NOW - 2 * DAY - 600_000);
+    // The values the gap now has arrive as new, and those before it stay.
+    const got = rows.filter((r) => r.received === NOW).map((r) => r.time - NOW);
+    assert.deepEqual(got, [-2 * DAY, -2 * DAY + 600_000, -HOUR]);
+    assert.equal(summary.values, 3);
+    assert.equal(rows.filter((r) => r.time < NOW - 2 * DAY).length, 5 * 144);
+    // Never from before the current epoch's start, nor for a station whose new epoch is held.
+    const begins = NOW - 36 * HOUR;
+    a.epochs = [epoch(1, "NAP", { since: new Date(begins).toISOString() })];
+    await run(NOW - 5 * DAY);
+    assert.equal(asked[2], begins);
+    a.epochs = [epoch(1, "NAP"), epoch(2, "NAP", { state: "held" })];
+    await run(NOW - 5 * DAY);
+    assert.equal(asked.length, 3);
+  });
+
   it("keeps every station's window when a sweep throws", async () => {
     const [a, b] = [station("a"), station("b")];
     const { rows, summary } = await refresh({
@@ -457,6 +512,70 @@ async function writeDays(root: string, batches: StationObservation[][]): Promise
   for (const [day, rows] of days) await writeRecent(recentDayPath(root, "test", day), [rows]);
 }
 
+describe("gapStart", () => {
+  const MIN = 60_000;
+  const from = NOW - 5 * DAY;
+  const since = NOW - 12 * HOUR;
+  // A value every 10 minutes over [a, b).
+  const run = (a: number, b: number) =>
+    Array.from({ length: Math.ceil((b - a) / (10 * MIN)) }, (_, i) => a + i * 10 * MIN);
+  const find = (times: number[], extra: Partial<Parameters<typeof gapStart>[1]> = {}) =>
+    gapStart(times, { interval_s: 600, from, since, ...extra });
+
+  it("finds nothing in a window with every value", () => {
+    assert.equal(find(run(NOW - 7 * DAY, NOW)), null);
+  });
+
+  it("starts at the value before the first break longer than three intervals and half an hour", () => {
+    const stopped = NOW - 3 * DAY;
+    const times = [...run(NOW - 7 * DAY, stopped), ...run(stopped + 50 * MIN, NOW)];
+    assert.equal(find(times), stopped - 10 * MIN);
+    // Two missing values are a break of three intervals, which is no gap.
+    const short = [...run(NOW - 7 * DAY, stopped), ...run(stopped + 20 * MIN, NOW)];
+    assert.equal(find(short), null);
+    // Half an hour is over three of a 1-minute gauge's intervals, and no longer than half an hour.
+    assert.equal(find(short, { interval_s: 60 }), null);
+    assert.equal(
+      find([...run(NOW - 7 * DAY, stopped), ...run(stopped + 30 * MIN, NOW)], { interval_s: 60 }),
+      stopped - 10 * MIN,
+    );
+  });
+
+  it("looks between values only where the interval is known", () => {
+    const stopped = NOW - 3 * DAY;
+    const times = [...run(NOW - 7 * DAY, stopped), ...run(stopped + DAY, NOW)];
+    assert.equal(find(times, { interval_s: null }), null);
+  });
+
+  it("starts where a station stopped, whatever its interval", () => {
+    const stopped = NOW - 2 * DAY;
+    assert.equal(find(run(NOW - 7 * DAY, stopped)), stopped - 10 * MIN);
+    assert.equal(find(run(NOW - 7 * DAY, stopped), { interval_s: null }), stopped - 10 * MIN);
+    // Within the usual look-back, the usual fetch covers it.
+    assert.equal(find(run(NOW - 7 * DAY, NOW - HOUR)), null);
+  });
+
+  it("asks nothing from before `from`", () => {
+    // A break that ended before it is past repair.
+    const old = [...run(NOW - 7 * DAY, NOW - 6.5 * DAY), ...run(NOW - 6 * DAY, NOW)];
+    assert.equal(find(old), null);
+    // One that spans it is asked from there, as is a window that starts after it.
+    const spans = [...run(NOW - 7 * DAY, NOW - 6 * DAY), ...run(NOW - 4 * DAY, NOW)];
+    assert.equal(find(spans), from);
+    assert.equal(find(run(NOW - 4 * DAY, NOW)), from);
+    // A break across it is measured from the value before it, not from it.
+    const across = [...run(NOW - 7 * DAY, from - 20 * MIN), ...run(from + 20 * MIN, NOW)];
+    assert.equal(find(across), from);
+    // A station that stopped before it is asked from there too.
+    assert.equal(find(run(NOW - 7 * DAY, NOW - 6 * DAY)), from);
+  });
+
+  it("asks a station with no values for all of it", () => {
+    assert.equal(find([]), from);
+    assert.equal(find([], { interval_s: null }), from);
+  });
+});
+
 describe("compactRecent", () => {
   const [start, end] = lastDays(NOW);
 
@@ -521,7 +640,7 @@ describe("compactRecent", () => {
     await writeObservations(
       file,
       [
-        at(start - DAY, 30479.695), // before the fold: left for requalify
+        at(start - DAY, 30479.695), // before the fold, and all the file held before it
         at(start + HOUR, 0.6),
         at(start + 2 * HOUR, 30479.695), // USACE's 99,999 ft, which the window doesn't bring again
       ],
@@ -540,11 +659,79 @@ describe("compactRecent", () => {
         r.time - start,
         r.level > 9000 ? "fill" : r.level,
       ]),
-      [
-        [-DAY, "fill"],
-        [HOUR, 0.65],
-      ],
+      // The earlier fill goes too, since the file would otherwise hold fill beside levels.
+      [[HOUR, 0.65]],
     );
+  });
+
+  it("counts the levels a fold leaves out, and says when a year holds nothing else", async () => {
+    setConnections(4);
+    const root = store();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    await writeObservations(file, [at(start + HOUR, 0.6), at(start + 2 * HOUR, 30479.695)], "NAP");
+    await writeDays(root, [
+      [
+        { ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id, epoch: 1 },
+        { ...at(start + 3 * HOUR, -2438.095, start + 4 * HOUR), station: a.id, epoch: 1 },
+      ],
+    ]);
+    const summary = await compactRecent({
+      source: source({}),
+      stations: [a],
+      storeFor: () => root,
+      start,
+      end,
+    });
+    assert.deepEqual([summary.dropped!.below, summary.dropped!.above], [1, 1]);
+    assert.match(formatSummary(summary), /Left out 2 levels outside −500 to 9,000 m/);
+
+    const b = station("b");
+    const only = seriesPath(root, "levels", "test", "b", 2026);
+    await writeObservations(only, [at(start + 2 * HOUR, 30479.695)], "NAP");
+    await writeDays(root, [
+      [{ ...at(start + HOUR, 30479.695, start + 3 * HOUR), station: b.id, epoch: 1 }],
+    ]);
+    const kept = await compactRecent({
+      source: source({}),
+      stations: [b],
+      storeFor: () => root,
+      start,
+      end,
+    });
+    assert.match(kept.warned!.join(), /b 2026: holds only 2 levels outside −500 to 9,000 m/);
+  });
+
+  it("replaces a year of fill with the levels a fold brings, so a file never holds both", async () => {
+    setConnections(4);
+    const root = store();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    // Fill from before the fold's start, as a backfill of a year of nothing else leaves it.
+    await writeObservations(
+      file,
+      [at(start - 3 * DAY, 30479.695), at(start - 2 * DAY, 30479.695)].map((r) => ({
+        ...r,
+        flag: Flag.bad,
+      })),
+      "NAP",
+    );
+    await writeDays(root, [
+      [{ ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id, epoch: 1 }],
+    ]);
+    const folded = await compactRecent({
+      source: source({}),
+      stations: [a],
+      storeFor: () => root,
+      start,
+      end,
+    });
+    assert.deepEqual(
+      (await readObservations(file)).map((r) => r.level),
+      [0.65],
+    );
+    // The two fill rows it replaced are counted.
+    assert.equal(folded.dropped!.count, 2);
   });
 
   it("leaves a year file as it is when every row it would fold is outside the span", async () => {

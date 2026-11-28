@@ -1,13 +1,12 @@
 import { monthlyAgreement, SAME_GAUGE, type Hourly } from "./cross-check.ts";
-import { median } from "./stats.ts";
+import { distanceKm as km, median } from "./stats.ts";
 import type { StoredStation } from "./schema.ts";
 import { comparable, joinsNoGroup } from "./same-as.ts";
 import { FILES } from "./store/files.ts";
 import { isMissing, readHourly, readRows, writeTable } from "./store/parquet.ts";
 import { matchesPath, seriesPath } from "./store/paths.ts";
 import { epochWindow } from "./store/recent.ts";
-import { readYears } from "./store/years.ts";
-import { km } from "./ticon.ts";
+import { readYears, usableHours } from "./store/years.ts";
 
 /**
  * Pairs of stations compared by their hourly levels, for `linkGauges` to link
@@ -222,9 +221,9 @@ export async function compareStations(
     for (const r of rows?.values() ?? [])
       if (r.year === null) marked.add(r.id);
       // Hours in a held epoch, or one the list doesn't have, aren't read, so they choose no year.
-      else if (r.hours && epochWindow(epochsOf.get(r.id) ?? [], r.epoch ?? 1)) {
+      else if (usableHours(r) && epochWindow(epochsOf.get(r.id) ?? [], r.epoch ?? 1)) {
         const key = `${r.id} ${r.year}`;
-        hours.set(key, (hours.get(key) ?? 0) + r.hours);
+        hours.set(key, (hours.get(key) ?? 0) + usableHours(r));
         epochs.set(key, [...(epochs.get(key) ?? []), r.epoch ?? 1]);
       }
   }

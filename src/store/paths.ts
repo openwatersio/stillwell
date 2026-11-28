@@ -21,6 +21,10 @@ import type { Product } from "../schema.ts";
  *   history/stations/<source>/<time>.parquet            the list as each refresh started, less withheld stations
  *   history/stations/<source>/<time>.json               what that refresh changed
  *   history/analysis/<source>/<time>.json               stations whose QC an analysis changed
+ *   fits/<source>.parquet                               each station's harmonic fit: its window, the files it read and its scores
+ *   constituents/<source>.parquet                       each fit's candidate constituents, kept or not, with their constants
+ *   fits/references/<source>.parquet                    slackwater-database's constants for each fitted gauge, scored on the fit's held-out year
+ *   fits/datums/<source>.parquet                        each fit's tidal datums: observed from its levels, and predicted from its constants
  *   recent/<source>/<YYYY-MM-DD>.parquet                one UTC day of every live station's values, for 30 days
  *   obs/<source>/<station>/<year>.parquet               observed levels
  *   extremes/<source>/<station>/<year>.parquet          the source's observed high and low waters
@@ -125,6 +129,22 @@ export function analysisPath(root: string, source: string): string {
 /** The stations an `analyze` run changed QC for, and why. */
 export function analysisHistoryPath(root: string, source: string, time: string): string {
   return `${root}/history/analysis/${source}/${time.replaceAll(":", "").replace(/\.\d+Z$/, "Z")}.json`;
+}
+
+export function fitsPath(root: string, source: string): string {
+  return `${root}/fits/${source}.parquet`;
+}
+
+export function constituentsPath(root: string, source: string): string {
+  return `${root}/constituents/${source}.parquet`;
+}
+
+export function referencesPath(root: string, source: string): string {
+  return `${root}/fits/references/${source}.parquet`;
+}
+
+export function fitDatumsPath(root: string, source: string): string {
+  return `${root}/fits/datums/${source}.parquet`;
 }
 
 export function yearsPath(root: string, source: string): string {

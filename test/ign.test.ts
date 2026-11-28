@@ -168,6 +168,23 @@ describe("IGN", () => {
     );
   });
 
+  it("passes IGN's unusable aggregates through the registered source's span filter", async () => {
+    serve({
+      "ACOR1/procesados/horarios/": listing("ACOR1/procesados/horarios", [
+        "200031_horarios_2001_JM.txt",
+      ]),
+      "ACOR1/procesados/horarios/200031_horarios_2001_JM.txt": hourlyYear(2001, "-9999"),
+    });
+    const station = { id: "ign/ACOR1", source_id: "ACOR1", datum: "JM" } as Station;
+    const rows = await sourceOf("ign").observations!(
+      station,
+      new Date("2001-01-01Z"),
+      new Date("2001-01-02Z"),
+    );
+    assert.equal(rows.length, 24);
+    assert.ok(rows.every((r) => r.withdrawn));
+  });
+
   it("does not treat a missing admitted hourly file as a deliberate coverage exclusion", async () => {
     serve({
       "ACOR1/procesados/horarios/": listing("ACOR1/procesados/horarios", [

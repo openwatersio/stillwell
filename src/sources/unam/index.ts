@@ -32,7 +32,7 @@ export const metadata: SourceMetadata = {
     url: SITE,
     // Reproduction is allowed for non-profit ends only, unaltered (#48).
     commercial_use: false,
-    // Public while SMN's permission is asked for (#48), on the expectation it's given.
+    // Public under the maintainers' decision (#48), though SMN hasn't given the written permission its terms ask for.
     redistribution: true,
   },
   attribution:
@@ -40,7 +40,7 @@ export const metadata: SourceMetadata = {
   // From SMN's contact page, https://www.mareografico.unam.mx/index.php/contacto/.
   contact: { email: "mareografico@igeofisica.unam.mx" },
   terms:
-    "SMN's site says its pages and contents may be reproduced for non-profit ends, unaltered and citing the full source and its address; anything else needs the institution's written permission (Esta página y sus contenidos pueden ser reproducidos con fines no lucrativos, siempre y cuando no se mutile, se cite la fuente completa y su dirección electrónica, de otra forma, se requiere permiso previo por escrito de la Institución). Permission to republish has been asked for (openwatersio/stillwell#48); until it's given, treat the data as non-commercial. Cite it as: SMN <year>: Universidad Nacional Autónoma de México, Instituto de Geofísica, Servicio Mareográfico Nacional, México, http://www.mareografico.unam.mx.",
+    "SMN's site says its pages and contents may be reproduced for non-profit ends, unaltered and citing the full source and its address; anything else needs the institution's written permission (Esta página y sus contenidos pueden ser reproducidos con fines no lucrativos, siempre y cuando no se mutile, se cite la fuente completa y su dirección electrónica, de otra forma, se requiere permiso previo por escrito de la Institución). SMN hasn't given that permission (asked in openwatersio/stillwell#48), so treat the data as non-commercial. Cite it as: SMN <year>: Universidad Nacional Autónoma de México, Instituto de Geofísica, Servicio Mareográfico Nacional, México, http://www.mareografico.unam.mx.",
   // Each file is rewritten every minute, about 15 minutes behind.
   hourly: true,
   // SMN publishes raw values only, and keeps none past 5 days.

@@ -272,7 +272,7 @@ describe("withDatums with measured shifts", () => {
 
   it("carries MSL and LAT along a measured pair", () => {
     const shifts = linkShifts([row({ offset_m: 5 })], stations());
-    const pegel = withDatums(stations(), [], new Map(), shifts).stations[1]!;
+    const pegel = withDatums(stations(), [], shifts).stations[1]!;
     // A level of 6.0 m above PNP is 1.0 m in GESLA's zero, 0.807 m above MSL.
     assert.equal(Math.round((6 + pegel.datums.MSL!) * 1e4) / 1e4, 0.807);
     assert.deepEqual(pegel.datums, { NHN: -5.033, MSL: -5.193, LAT: -2.929 });
@@ -284,7 +284,7 @@ describe("withDatums with measured shifts", () => {
     const [gesla, pegel] = stations();
     gesla!.datums.NHN = -4.9;
     const shifts = linkShifts([row({ offset_m: 5 })], [gesla!, pegel!]);
-    const out = withDatums([gesla!, pegel!], [], new Map(), shifts).stations[1]!;
+    const out = withDatums([gesla!, pegel!], [], shifts).stations[1]!;
     assert.equal(out.datums.MSL, round(-5.033 + 4.9 - 0.193));
   });
 });

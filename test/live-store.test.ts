@@ -16,6 +16,7 @@ import {
   type LiveDb,
   type Statement,
 } from "../workers/live/store.ts";
+import { alert, STALE_MS } from "../workers/live/alert.ts";
 import type { LiveCell } from "../workers/live/types.ts";
 
 /** The D1 binding over SQLite with workers/live/schema.sql. */
@@ -160,5 +161,101 @@ describe("the live store", () => {
     assert.equal((await send("obs/ea/1/2026.parquet")).status, 400);
     assert.equal((await send("recent/ea/../../stations.parquet")).status, 400);
     assert.deepEqual(put, ["recent/ea/2026-11-20.parquet"]);
+  });
+});
+
+describe("the live alert", () => {
+  const HOUR = 3_600_000;
+  /** A pass of `source` that finished at `finished`. */
+  const pass = (db: { db: DatabaseSync }, source: string, finished: number, ok: 0 | 1) =>
+    db.db
+      .prepare(`INSERT INTO polls VALUES (?, ?, ?, '[]', ?, 1, ?, 0, '[]', '[]', 0, 0)`)
+      .run(source, finished - 60_000, finished, ok, ok);
+
+  /** GitHub with `issues` open, refusing the calls `refuse` matches and never answering those `stall` matches. */
+  function github(
+    issues: { number: number; title: string; pull_request?: object }[],
+    refuse = (_: string) => false,
+    stall = (_: string) => false,
+  ) {
+    const calls: string[] = [];
+    const fetcher = (async (url: string | URL | Request, init: RequestInit = {}) => {
+      const path = String(url).replace("https://api.github.com/repos/openwatersio/stillwell/", "");
+      const call = `${init.method ?? "GET"} ${path}`;
+      calls.push(call);
+      if (refuse(call)) return new Response("Resource not accessible", { status: 403 });
+      if (stall(call))
+        return new Promise<Response>((_, reject) =>
+          init.signal?.addEventListener("abort", () => reject(init.signal!.reason)),
+        );
+      return Response.json(path.startsWith("issues?") ? issues : {});
+    }) as typeof fetch;
+    return { calls, fetcher };
+  }
+
+  it("opens an issue for a source with no clean pass and closes one for a source with a clean pass", async () => {
+    const db = d1();
+    pass(db, "ea", T - STALE_MS - HOUR, 1);
+    pass(db, "ea", T - HOUR, 0);
+    pass(db, "rws", T - HOUR, 1);
+    const { calls, fetcher } = github([{ number: 7, title: "Live polling is failing for rws" }]);
+    await alert(db, "token", T, fetcher);
+    assert.deepEqual(calls.slice(1), ["POST issues", "PATCH issues/7"]);
+  });
+
+  it("handles every issue when a GitHub call for one fails, then throws the failure", async () => {
+    const db = d1();
+    for (const source of ["dmi", "ea", "rws"]) pass(db, source, T - HOUR, 1);
+    const { calls, fetcher } = github(
+      [
+        { number: 1, title: "Live polling is failing for dmi" },
+        { number: 2, title: "Live polling is failing for ea" },
+        { number: 3, title: "Live polling is failing for rws" },
+      ],
+      (call) => call === "PATCH issues/1",
+    );
+    await assert.rejects(
+      alert(db, "token", T, fetcher),
+      /^Error: Live polling is failing for dmi: GitHub issues\/1: 403/,
+    );
+    assert.deepEqual(calls.slice(1), ["PATCH issues/1", "PATCH issues/2", "PATCH issues/3"]);
+  });
+
+  it("gives up on a GitHub call that doesn't answer and carries on", async () => {
+    const db = d1();
+    for (const source of ["dmi", "ea"]) pass(db, source, T - HOUR, 1);
+    const { calls, fetcher } = github(
+      [
+        { number: 1, title: "Live polling is failing for dmi" },
+        { number: 2, title: "Live polling is failing for ea" },
+      ],
+      undefined,
+      (call) => call === "PATCH issues/1",
+    );
+    await assert.rejects(alert(db, "token", T, fetcher, 10), /failing for dmi: .*timeout/i);
+    assert.deepEqual(calls.slice(1), ["PATCH issues/1", "PATCH issues/2"]);
+  });
+
+  it("closes every open issue with the title", async () => {
+    const db = d1();
+    pass(db, "rws", T - HOUR, 1);
+    const { calls, fetcher } = github([
+      { number: 3, title: "Live polling is failing for rws" },
+      { number: 4, title: "Live polling is failing for rws" },
+    ]);
+    await alert(db, "token", T, fetcher);
+    assert.deepEqual(calls.slice(1), ["PATCH issues/3", "PATCH issues/4"]);
+  });
+
+  it("takes no pull request with an alert's title for its issue", async () => {
+    const db = d1();
+    pass(db, "ea", T - HOUR, 0);
+    pass(db, "rws", T - HOUR, 1);
+    const { calls, fetcher } = github([
+      { number: 5, title: "Live polling is failing for ea", pull_request: {} },
+      { number: 6, title: "Live polling is failing for rws", pull_request: {} },
+    ]);
+    await alert(db, "token", T, fetcher);
+    assert.deepEqual(calls.slice(1), ["POST issues"]);
   });
 });

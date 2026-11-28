@@ -77,6 +77,46 @@ export const TIDAL = new Set([
 ]);
 
 /**
+ * WDL's stations whose position it lists in NAD27 (`lldatum`), by number: the
+ * position as listed and in NAD83(2011), converted with NOAA's NCAT (NADCON
+ * 5.0). Their NAD83 positions are about 94 m west and 9 m south of the NAD27 numbers.
+ * The adapter has no datum grid, so a station listed in NAD27 at another
+ * position than the one converted fails the refresh.
+ */
+const NAD27: Record<string, { listed: [number, number]; nad83: [number, number] }> = {
+  B91110: { listed: [38.07361111, -121.855], nad83: [38.073533, -121.85607] },
+  B95270: { listed: [37.890297, -121.569892], nad83: [37.890224, -121.570955] },
+  E33510: { listed: [38.07972222, -122.10444444], nad83: [38.079644, -122.105521] },
+};
+
+/**
+ * A station's position in NAD83: converted where it's the NAD27 one in `NAD27`,
+ * whatever `lldatum` says, as it is where WDL lists NAD83 or WGS84. A refresh
+ * fails for a position WDL lists in NAD27 that the table doesn't hold, since
+ * publishing it as NAD83 would put the station about 94 m off.
+ */
+export function inNad83(
+  number: string,
+  lat: number,
+  lon: number,
+  lldatum: string | undefined,
+): [number, number] {
+  const fix = NAD27[number];
+  if (
+    fix &&
+    Math.abs(fix.listed[0] - lat) < SAME_POSITION &&
+    Math.abs(fix.listed[1] - lon) < SAME_POSITION
+  )
+    return fix.nad83;
+  if (/NAD\s*-?\s*(19)?27/i.test(lldatum ?? ""))
+    throw new Error(`WDL lists ${number} in NAD27 at ${lat}, ${lon}, which isn't converted`);
+  return [lat, lon];
+}
+
+/** NAD27 positions' listed numbers as read, to within the listing's own precision (a re-exported listing can round, and a station about 1 m away is the one converted). */
+const SAME_POSITION = 1e-5;
+
+/**
  * A DWR station as listed, with the parameter its levels come from, and its
  * first reading and, once it's inactive, the step after its last, so a
  * backfill asks for nothing outside them.
@@ -132,13 +172,14 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
     }
     if (!trace) continue;
     const parameter = trace.parameter as Parameter;
-    const lat = Number(station.latitude);
-    const lon = Number(station.longitude);
+    let lat = Number(station.latitude);
+    let lon = Number(station.longitude);
     // Some closed stations have none, such as Hood (B91780), closed in 1986.
     if (!lat || !lon || !Number.isFinite(lat) || !Number.isFinite(lon)) {
       console.warn(`WDL lists no position for ${number}, so it's left out`);
       continue;
     }
+    [lat, lon] = inNad83(number, lat, lon, station.lldatum);
     const last = pst(trace.end_time!);
     const active = Date.now() - last < INACTIVE_AFTER_MS;
     out.push({

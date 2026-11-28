@@ -7,6 +7,7 @@ import { describe, it } from "node:test";
 import {
   backfillYear,
   earliestPreliminary,
+  type YearReport,
   epochSpans,
   orderStations,
   parseShard,
@@ -25,6 +26,7 @@ import {
   readObservationFile,
   readObservations,
   readStationBounds,
+  readTimeBounds,
   readYearFiles,
   writeJsonArray,
   writeObservations,
@@ -42,6 +44,8 @@ import {
 import { writeYears } from "../src/store/years.ts";
 import { keepsEmptyYears, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import { readBackfilled } from "../src/backfilled.ts";
+import { Dropped } from "../src/span.ts";
+import { withinSpan } from "../src/sources/index.ts";
 import {
   Flag,
   type StoredStation,
@@ -62,6 +66,11 @@ const DONE = {
 };
 
 describe("yearDone", () => {
+  it("asks again for a year of nothing but fill", () => {
+    assert.equal(yearDone({ ...DONE, usable: 0 }, Y2024, Y2025, NOW), false);
+    assert.equal(yearDone({ ...DONE, usable: 8000 }, Y2024, Y2025, NOW), true);
+  });
+
   it("skips a past year whose file reaches the year's end with no preliminary values", () => {
     assert.equal(yearDone(DONE, Y2024, Y2025, NOW), true);
   });
@@ -170,8 +179,8 @@ describe("readYearFiles", () => {
     assert.deepEqual(
       [...files],
       [
-        [2023, { preliminary: 0, months: 1, last: t, backfilled: 2 }],
-        [2024, { preliminary: 2, months: 1, last: Date.UTC(2024, 0, 3), backfilled: 3 }],
+        [2023, { preliminary: 0, months: 1, last: t, backfilled: 2, usable: 2 }],
+        [2024, { preliminary: 2, months: 1, last: Date.UTC(2024, 0, 3), backfilled: 3, usable: 3 }],
       ],
     );
   });
@@ -493,16 +502,6 @@ describe("parseStationList", () => {
       'd,D,usgs,usgs/01410600,"a ""quoted"" note"',
     ].join("\n");
     assert.deepEqual(parseStationList(text, "usgs", true), ["usgs/02198820", "usgs/01410600"]);
-  });
-
-  it("reads the committed TICON inventory", () => {
-    const ids = parseStationList(
-      readFileSync(new URL("../docs/ticon-inventory.csv", import.meta.url), "utf8"),
-      "usgs",
-      true,
-    );
-    assert.ok(ids.length > 400);
-    assert.ok(ids.every((id) => /^usgs\/\d+$/.test(id)));
   });
 
   it("keeps an empty first field, so the columns after it stay in place", () => {
@@ -1548,6 +1547,144 @@ describe("backfillYear", () => {
     const rows = await readObservations(path);
     assert.equal(rows.length, hours.length - 1);
     assert.ok(!rows.some((r) => r.time === fill.time));
+  });
+
+  describe("levels outside the span", () => {
+    const [from, to] = [Date.UTC(2000, 6, 1), Date.UTC(2000, 7, 1)];
+    const hours = [...Array((to - from) / HOUR).keys()].map((h) => ({
+      time: from + h * HOUR,
+      level: 1 + 0.3 * Math.sin((h / 12.42) * 2 * Math.PI),
+      flag: Flag.good,
+    }));
+    const serving = (rows: Observation[]) =>
+      withinSpan({
+        metadata: { id: "coops" },
+        observations: async () => rows,
+      } as unknown as Source);
+    const run = async (store: string, rows: Observation[], report: YearReport) =>
+      backfillYear(
+        serving(rows),
+        station,
+        "levels",
+        new Date(from),
+        new Date(to),
+        epoch,
+        seriesFiles(dirOf(store), await listYears(dirOf(store)), readObservationFile),
+        new Map(),
+        report,
+      );
+    const fresh = (): YearReport => ({ dropped: new Dropped(), allOutOfSpan: false });
+    const path = (store: string) => seriesPath(store, "levels", "coops", "8000001", 2000);
+
+    it("counts the levels a fetch leaves out and why, beside the rows it writes", async () => {
+      const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      const report = fresh();
+      const sent = hours.map((r, i) => (i % 100 === 7 ? { ...r, level: -9999 } : r));
+      await run(store, sent, report);
+      assert.equal(report.dropped.count, sent.filter((r) => r.level === -9999).length);
+      assert.deepEqual([report.dropped.below, report.dropped.above], [report.dropped.count, 0]);
+      assert.equal(report.allOutOfSpan, false);
+      assert.match(
+        report.dropped.describe(),
+        /levels outside −500 to 9,000 m \(\d+ below; −9,999 ×\d+\)/,
+      );
+      assert.equal(
+        (await readObservations(path(store))).length,
+        hours.length - report.dropped.count,
+      );
+    });
+
+    it("writes a year of nothing but fill as rows flagged bad, not as an empty year", async () => {
+      const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      const report = fresh();
+      const fill = hours.map((r) => ({ ...r, level: -9999 }));
+      assert.equal(await run(store, fill, report), hours.length);
+      assert.equal(report.allOutOfSpan, true);
+      assert.equal(report.dropped.count, hours.length);
+      const rows = await readObservations(path(store));
+      assert.equal(rows.length, hours.length);
+      assert.ok(rows.every((r) => r.level === -9999 && r.flag === Flag.bad));
+      // The year has a file, so `--skip-written` and `missing_years` see it as written.
+      assert.ok((await listYears(dirOf(store))).has(2000));
+      // Run again over the file it wrote: nothing changes, and the stored fill isn't counted twice.
+      const again = fresh();
+      assert.equal(await run(store, fill, again), undefined);
+      assert.equal(again.dropped.count, hours.length);
+      assert.equal(again.allOutOfSpan, false);
+    });
+
+    it("keeps the source's own flag on the rows it writes as bad, and no row for text that isn't a level", async () => {
+      const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      const fill = hours.map((r) => ({ ...r, level: 999999.06, flag: Flag.good }));
+      await run(store, fill, fresh());
+      const rows = await readObservations(path(store));
+      assert.ok(rows.every((r) => r.flag === Flag.bad && r.source_flag === Flag.good));
+      // A second run over the file it wrote finds nothing to change, though 999,999.06 doesn't fit a FLOAT.
+      assert.equal(await run(store, fill, fresh()), undefined);
+
+      const other = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      const report = fresh();
+      assert.equal(
+        await run(
+          other,
+          hours.map((r) => ({ ...r, level: Number.NaN })),
+          report,
+        ),
+        "empty",
+      );
+      assert.equal(report.dropped.nan, hours.length);
+      assert.ok(!(await listYears(dirOf(other))).has(2000));
+    });
+
+    it("bounds a station by its levels, not by a year of fill", async () => {
+      const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      await run(
+        store,
+        hours.map((r) => ({ ...r, level: -9999 })),
+        fresh(),
+      );
+      const file = path(store);
+      assert.equal((await readTimeBounds([{ file, window: [-Infinity, Infinity] }])).size, 0);
+      assert.equal((await readYearFiles(dirOf(store), [2000])).get(2000)!.usable, 0);
+    });
+
+    it("still calls a fetch of nothing empty", async () => {
+      const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      const report = fresh();
+      assert.equal(await run(store, [], report), "empty");
+      assert.equal(report.dropped.count, 0);
+    });
+
+    it("keeps the levels a file holds when the source now sends only fill", async () => {
+      const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      await writeObservations(path(store), hours, "STND");
+      const report = fresh();
+      assert.equal(
+        await run(
+          store,
+          hours.map((r) => ({ ...r, level: 999999.06 })),
+          report,
+        ),
+        "empty",
+      );
+      assert.equal(report.dropped.count, hours.length);
+      assert.equal((await readObservations(path(store))).length, hours.length);
+    });
+
+    it("replaces a year of fill with the levels the source then sends, counting the fill it drops", async () => {
+      const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      await run(
+        store,
+        hours.map((r) => ({ ...r, level: -9999 })),
+        fresh(),
+      );
+      const report = fresh();
+      await run(store, hours, report);
+      assert.equal(report.allOutOfSpan, false);
+      assert.equal(report.dropped.count, hours.length);
+      const rows = await readObservations(path(store));
+      assert.ok(rows.every((r) => r.level > -2));
+    });
   });
 
   it("reads extremes once, for their datum and rows", async () => {

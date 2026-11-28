@@ -20,5 +20,6 @@ export const INGEST_OPTIONS = {
   all: { type: "boolean", default: false },
   requalify: { type: "boolean", default: false },
   budget: { type: "string" },
+  "only-fitted": { type: "boolean", default: false },
   "dry-run": { type: "boolean", default: false },
 } as const satisfies ParseArgsOptionsConfig;
