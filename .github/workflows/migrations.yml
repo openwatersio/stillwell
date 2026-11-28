@@ -75,9 +75,9 @@ jobs:
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
   # A migration that can't run, or a failure, stops every migration not yet done. Each run while stopped says why in
-  # its summary. One issue says so once a day has passed since a failed step last failed, which leaves the merged change's own
-  # follow-up time to handle it, and at once for any other stop. An open one takes each new stop a run finds. It closes
-  # when a run finds nothing left to run, or when a step succeeds (`record`).
+  # its summary. One issue says so once 2 hours have passed since a failed step last failed, which leaves the merged
+  # change's own follow-up time to handle it, and at once for any other stop. An open one takes each new stop a run
+  # finds. It closes when a run finds nothing left to run, or when a step succeeds (`record`).
   stopped:
     needs: plan
     if: github.run_attempt == 1
@@ -113,9 +113,9 @@ jobs:
             esac
             exit 0
           fi
-          # A time that doesn't parse counts as a day old, so the issue still opens.
-          if [ -n "$SINCE" ] && since=$(date -d "$SINCE" +%s) && [ $(( $(date +%s) - since )) -lt 86400 ]; then
-            echo "Stopped since $SINCE, under a day: no issue yet"
+          # A time that doesn't parse counts as over 2 hours old, so the issue still opens.
+          if [ -n "$SINCE" ] && since=$(date -d "$SINCE" +%s) && [ $(( $(date +%s) - since )) -lt 7200 ]; then
+            echo "Stopped since $SINCE, under 2 hours: no issue yet"
             exit 0
           fi
           gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "$body"
