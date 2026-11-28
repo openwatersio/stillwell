@@ -36,7 +36,7 @@ src/migrations/        the store work each merged change needs, which the Migrat
 src/api/               the levels API's parameters, datum conversion and responses
 server/                the poller (ingest.ts), its passes (pass.ts) and its daily-file export (export.ts), which run in workers/live's container
 src/                   shared pieces: HTTP, anonymous FTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
-scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check, the pair check, the cross-station checks and the HRoI evaluations
+scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check, the pair check, the cross-station checks, the HRoI evaluations and the fit calibration
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows, Migrations included
 workers/live/          the Cloudflare Worker and container that run the poller, with the D1 database of live values
@@ -77,6 +77,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm run gesla:contributors`      | Rewrite the [GESLA contributor terms](src/sources/gesla/contributors.md) from GESLA 4.1's metadata and each contributor's terms.                                                                                                                                                        |
 | `npm run gesla:coverage`          | Write the [GESLA coverage report](https://openwatersio.github.io/stillwell/reports/gesla-coverage/) and its CSV to `reports/` from the store: which GESLA records the store also has from their originator, and the years each side lacks. The Site workflow runs it before each build. |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into [`docs/results/`](docs/results/). The RWS one downloads about 50 years of data.                                                                                                                                                                         |
+| `npm run calibrate:fits`          | Compare fits of CO-OPS stations with NOAA's constants, into the [fit calibration](docs/results/fit-calibration.md), described in [Checks](docs/contributing/checks.md#fit-calibration).                                                                                                 |
 | `npm run clock-check -- <args>`   | [`scripts/clock-check.ts`](scripts/clock-check.ts): check a new series' clock against TICON, described in [Checks](docs/contributing/checks.md#clock-check).                                                                                                                            |
 | `npm run pair-check -- <args>`    | [`scripts/pair-check.ts`](scripts/pair-check.ts): compare two originators' records of one gauge for clock and datum, described in [Checks](docs/contributing/checks.md#pair-check).                                                                                                     |
 | `npm run cross-check -- <args>`   | [`scripts/cross-check.ts`](scripts/cross-check.ts): compare a region's gauges with each other and with their own tide, described in [Checks](docs/contributing/checks.md#cross-station-checks).                                                                                         |
@@ -91,7 +92,7 @@ Read the guide for the task at hand before starting it:
 - [Sources](docs/contributing/sources.md): adding a source, recording a source's errata, and withholding stations.
 - [Operations](docs/contributing/operations.md): the scheduled workflows that write to R2, live polling, migrations, and the weekly canary.
 - [Errata runbook](docs/contributing/errata-runbook.md): working the errata report after each Monthly run, for an agent on a schedule.
-- [Checks](docs/contributing/checks.md): the TICON inventory, the clock check, the pair check, the cross-station checks, the HRoI evaluations, and the definitions of published files.
+- [Checks](docs/contributing/checks.md): the TICON inventory, the clock check, the pair check, the cross-station checks, the HRoI evaluations, the fit calibration, and the definitions of published files.
 - [Running the poller](docs/contributing/poller.md): the poller, and the levels API's tests.
 - [Site](site/README.md): building and deploying the site.
 

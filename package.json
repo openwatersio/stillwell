@@ -19,6 +19,7 @@
     "errata:copies": "node scripts/errata-copies.ts",
     "evaluate:bsh": "node scripts/evaluate-bsh.ts",
     "evaluate:rws": "node scripts/evaluate-rws.ts",
+    "calibrate:fits": "node scripts/calibrate-fits.ts",
     "clock-check": "node scripts/clock-check.ts",
     "pair-check": "node scripts/pair-check.ts",
     "cross-check": "node scripts/cross-check.ts",
