@@ -710,7 +710,7 @@ export const source: Source = {
       },
       "rws/goeree.lichteiland": {
         datum: "MSL",
-        note: "RWS's NAP series here is a forecast; its measured levels, from 1990 on, are against MSL. The only files of the epochs the restart replaces are 2024's measured extremes against NAP under extremes/rws/goeree.lichteiland/2/ (1,414 rows in 2024.parquet and one, on 1 January 2025, in 2025.parquet), which go unread, by decision, for the MSL levels from 1990.",
+        note: "RWS's NAP series here is a forecast; its measured levels, from 1990 on, are against MSL. The only files of the epochs the restart replaces are measured extremes against NAP under extremes/rws/goeree.lichteiland/2/ (1,414 rows of 2024 in 2024.parquet and one, on 1 January 2025, in 2025.parquet), which go unread, by decision, for the MSL levels from 1990.",
       },
     },
     // A gauge whose zero moved with no change of datum marked (docs/stations.md, "Unreported zero moves").
