@@ -16,7 +16,7 @@ export default {
       response:
         "UHSLC's series is kept as served and this entry flags nothing. The research-quality version GESLA carries (`gesla/christmas-170a-kir-uhslc_rq`) equals it to 1 mm in the span.",
       evidence:
-        "November 2026, from the comparison in erratum `bom-christmas-island-2009-offset`. `gesla/christmas-170a-kir-uhslc_rq` equals `uhslc/170` to 1 mm at every hour of 2009 from 5 August (3,576 hours), 2010 (8,542) and 2011 (8,583), and differs from BOM's file by up to 0.09, 0.24 and 0.19 m in those years. GESLA's fast-delivery record of the gauge (`gesla/christmas-170-aus-uhslc_fd`) holds no values for 2009 to 2011. Which copy is right wasn't settled; question `uhslc-christmas-island-2009-reference` puts it to UHSLC.",
+        "From the comparison in erratum `bom-christmas-island-2009-offset`. `gesla/christmas-170a-kir-uhslc_rq` equals `uhslc/170` to 1 mm at every hour the two share in 2009 from 5 August (3,576 hours), 2010 (8,542) and 2011 (8,583), and differs from BOM's file by up to 0.09, 0.24 and 0.19 m in those years. GESLA's fast-delivery record of the gauge (`gesla/christmas-170-aus-uhslc_fd`) holds no values for 2009 to 2011. Which copy is right wasn't settled; question `uhslc-christmas-island-2009-reference` puts it to UHSLC.",
       reported: null,
       report: null,
       check: async (store) => {

@@ -706,11 +706,11 @@ export const source: Source = {
     restarts: {
       "rws/europlatform": {
         datum: "MSL",
-        note: "RWS's NAP series here is a forecast; its measured levels, from 1990 on, are against MSL. The store held no files in any product or epoch (November 2026).",
+        note: "RWS's NAP series here is a forecast; its measured levels, from 1990 on, are against MSL. The epochs the restart replaces hold no files in any product, so it gives up none.",
       },
       "rws/goeree.lichteiland": {
         datum: "MSL",
-        note: "RWS's NAP series here is a forecast; its measured levels, from 1990 on, are against MSL. The store held only 2024's measured extremes against NAP (extremes/rws/goeree.lichteiland/2/2024.parquet, 1,415 rows), which go unread after the restart, by decision, for the MSL levels from 1990 (November 2026).",
+        note: "RWS's NAP series here is a forecast; its measured levels, from 1990 on, are against MSL. The only files of the epochs the restart replaces are measured extremes against NAP under extremes/rws/goeree.lichteiland/2/ (1,414 rows of 2024 in 2024.parquet and one, on 1 January 2025, in 2025.parquet), which go unread, by decision, for the MSL levels from 1990.",
       },
     },
     // A gauge whose zero moved with no change of datum marked (docs/stations.md, "Unreported zero moves").
