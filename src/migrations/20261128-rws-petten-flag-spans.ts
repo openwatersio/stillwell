@@ -33,15 +33,33 @@ export default {
           await e.check(reader, e);
         }
         // QC's own rules flag a few percent here; the old span flagged every value.
-        for (const station of STATIONS)
-          for (const [since, until] of RELEASED) {
+        const spread = (rows: { level: number }[]) => {
+          const mean = rows.reduce((a, b) => a + b.level, 0) / rows.length;
+          return Math.sqrt(rows.reduce((a, b) => a + (b.level - mean) ** 2, 0) / rows.length);
+        };
+        for (const [since, until] of RELEASED) {
+          const control = await reader.levels("rws/ijmuiden.buitenhaven", since, until);
+          for (const station of STATIONS) {
             const rows = await reader.levels(station, since, until);
+            const where = `${station} from ${since} to ${until}`;
+            if (rows.length < 300 || control.length < 300)
+              throw new Error(`too few levels to judge ${where}: ${rows.length}`);
             const suspect = rows.filter((o) => o.flag >= Flag.suspect).length;
-            if (!rows.length || suspect > rows.length / 5)
-              throw new Error(
-                `${suspect} of ${station}'s ${rows.length} levels from ${since} to ${until} are suspect`,
-              );
+            if (suspect > rows.length / 5)
+              throw new Error(`${suspect} of ${rows.length} levels of ${where} are suspect`);
+            const ratio = spread(rows) / spread(control);
+            if (!(ratio > 0.75 && ratio < 1.3))
+              throw new Error(`${where} spreads ${ratio.toFixed(2)} times as far as IJmuiden`);
+            const zeros = new Map<number, number>();
+            for (const o of rows)
+              if (o.level === 0) {
+                const day = Math.floor(o.time / 86_400_000);
+                zeros.set(day, (zeros.get(day) ?? 0) + 1);
+              }
+            if (Math.max(0, ...zeros.values()) > 5)
+              throw new Error(`${where} holds a day with more than 5 values of 0.00 m`);
           }
+        }
       },
     },
   ],
