@@ -66,7 +66,7 @@ interface Gauge {
   /** Which monitoring project runs the gauge; none for a gauge BOM runs outside both. */
   project?: "ABSLMP" | "SPSLCMP";
   /**
-   * UHSLC's series of the gauge, by ID; they carry the same hourly values except where BOM's errata say otherwise. BOM
+   * UHSLC's series of the gauge, by ID; they carry the same hourly values except where BOM's or UHSLC's errata say otherwise. BOM
    * numbers its Australian Baseline Array gauges (956 to 959, 992 to 997) in its
    * own series, not UHSLC's, so they're named here rather than found by name.
    */
@@ -504,6 +504,14 @@ export function archiveOf(year: number): Promise<Map<string, Buffer> | null> {
   return got;
 }
 
+/**
+ * What to add to a level of BOM's files, in meters: Stony Point's files for
+ * 2005 to 2014 are 0.090 m below the gauge's zero in its other years
+ * (erratum `bom-stony-point-2005-2014-zero`).
+ */
+export const zeroCorrection = (number: string, year: number): number =>
+  number === "993" && year >= 2005 && year <= 2014 ? 0.09 : 0;
+
 /** Hourly levels in meters above the gauge's tide gauge zero over [start, end). */
 export async function levels(
   number: string,
@@ -532,8 +540,11 @@ export async function levels(
         ? Flag.preliminary
         : Flag.good;
     for (const o of parse(latin1(uncompress(member)), number, year))
-      if (o.time >= start.getTime() && o.time < end.getTime())
-        out.push({ ...o, flag, source_flag: flag });
+      if (o.time >= start.getTime() && o.time < end.getTime()) {
+        // Rounded to the millimeter the files give, so a sum doesn't carry float noise.
+        const level = Math.round((o.level + zeroCorrection(number, year)) * 1000) / 1000;
+        out.push({ ...o, level, flag, source_flag: flag });
+      }
   }
   return out;
 }

@@ -6,6 +6,133 @@ import { lateBy, middle, read, unflagged } from "./checks.ts";
 export default {
   errata: [
     {
+      id: "uhslc-port-vila-2022-march",
+      stations: ["uhslc/046", "gesla/port_vila-046-vut-uhslc_fd"],
+      since: "2022-03-01",
+      until: "2022-04-01",
+      handling: "kept",
+      error:
+        "UHSLC's Port Vila values (046) in March 2022 are 0.015 m lower than the Bureau of Meteorology's. One of the two is off its zero, and the store can't tell which.",
+      response: "Both copies are kept as served and neither is flagged.",
+      evidence:
+        "November 2026. `uhslc/046` minus `bom/046` is -0.019 to -0.012 m at the 5th to 95th percentile of March's 744 hours and within 0.1 mm in the months either side. GESLA's fast-delivery record (`gesla/port_vila-046-vut-uhslc_fd`) equals UHSLC's within 1 mm at all 744, and its record of BOM's gauge holds no values for 2022. A tidal fit and the neighboring gauges can't resolve a difference this small; question `uhslc-bom-small-differences` asks UHSLC.",
+      reported: null,
+      report: null,
+      check: async (store) => {
+        const gap = await medianGap(store, "bom/046", "uhslc/046", "2022-03-01", "2022-04-01");
+        if (gap < -0.019 || gap > -0.011)
+          throw new Error(
+            `UHSLC's Port Vila is ${gap.toFixed(3)} m from BOM's, not -0.019 to -0.011 m`,
+          );
+      },
+    },
+    {
+      id: "uhslc-esperance-1993-1996",
+      stations: [
+        "uhslc/176",
+        "gesla/esperance-176-aus-uhslc_fd",
+        "gesla/esperance-176a-aus-uhslc_rq",
+      ],
+      since: "1993-01-01",
+      until: "1997-01-01",
+      handling: "kept",
+      error:
+        "UHSLC's Esperance values (176) from 1993 to 1996 are 0.017 m higher than the Bureau of Meteorology's. One of the two is off its zero, and the store can't tell which.",
+      response: "Both copies are kept as served and neither is flagged.",
+      evidence:
+        "November 2026. `uhslc/176` minus GESLA's record of BOM's gauge (`gesla/esperance-62080-aus-bom`) has a median of 0.017 to 0.018 m in each year from 1993 to 1996 (8,760, 8,760, 8,760 and 8,784 hours) and of 0.000 m in 1985 to 1992 and 1997 to 2005. `uhslc/176` minus `bom/176` is 0.013 to 0.022 m at the 5th to 95th percentile of 1996, and GESLA's record equals BOM's file at all 8,784 hours of it. GESLA's two UHSLC records equal UHSLC's. A tidal fit and the neighboring gauges can't resolve a difference this small; question `uhslc-bom-small-differences` asks UHSLC.",
+      reported: null,
+      report: null,
+      check: async (store) => {
+        const gap = await medianGap(
+          store,
+          "gesla/esperance-62080-aus-bom",
+          "uhslc/176",
+          "1993-01-01",
+          "1997-01-01",
+        );
+        if (gap < 0.014 || gap > 0.021)
+          throw new Error(
+            `UHSLC's Esperance is ${gap.toFixed(3)} m from BOM's, not 0.014 to 0.021 m`,
+          );
+      },
+    },
+    {
+      id: "uhslc-suva-2023-august-offset",
+      stations: ["uhslc/018", "gesla/suva-018-fji-uhslc_fd"],
+      since: "2023-08-11",
+      until: "2023-09-01",
+      handling: "flagged",
+      error:
+        "UHSLC's Suva values (018) from 11 to 31 August 2023 are 0.079 m higher than the Bureau of Meteorology's files and GESLA's record of the Bureau's gauge.",
+      response:
+        "11 to 31 August 2023 is flagged `suspect`. BOM's series (`bom/018`) covers the same days.",
+      evidence:
+        "November 2026. `uhslc/018` minus `bom/018` is 0.079 to 0.080 m at the 5th to 95th percentile of the 504 hours, and 0 to 1 mm in the months either side. GESLA's record of the Bureau's gauge (`gesla/suva-67050-fji-bom`) equals the Bureau's values within 0.033 m, and its fast-delivery record (`gesla/suva-018-fji-uhslc_fd`) equals UHSLC's within 1 mm at all 504 shared hours of the span's 21 days. Suva minus Lautoka (`bom/402`) on the same island averages -0.031 to -0.059 m in July to September of 2019 to 2022 and -0.039 m from 11 to 31 August 2023 with the Bureau's Suva, and +0.040 m with UHSLC's.",
+      reported: null,
+      report: null,
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        const gap = await medianGap(store, "bom/018", "uhslc/018", e.since!, e.until!);
+        if (gap < 0.075 || gap > 0.083)
+          throw new Error(`UHSLC's Suva is ${gap.toFixed(3)} m from BOM's, not 0.075 to 0.083 m`);
+      },
+    },
+    {
+      id: "uhslc-honiara-2023-offsets",
+      stations: ["uhslc/009", "gesla/honiara-009-slb-uhslc_fd"],
+      since: "2023-09-01",
+      until: "2023-11-01",
+      handling: "flagged",
+      error:
+        "UHSLC's Honiara values (009) are 0.029 m lower than the Bureau of Meteorology's from 1 September to 3 October 2023, and 0.090 m lower from 4 to 31 October 2023.",
+      response:
+        "1 September to 31 October 2023 is flagged `suspect`. BOM's series (`bom/009`) covers the same days.",
+      evidence:
+        "November 2026. `uhslc/009` minus `bom/009` is -0.030 to -0.027 m at the 5th to 95th percentile of the hours from 1 September, and -0.091 to -0.089 m from 4 October. GESLA's record of the Bureau's gauge (`gesla/honiara-56670-slb-bom`) equals the Bureau's values within 0.018 m, and its fast-delivery record (`gesla/honiara-009-slb-uhslc_fd`) equals UHSLC's within 1 mm at every one of the 1,175 shared hours. A tidal fit to the Bureau's year leaves residuals that step by under 0.01 m at 1 September, 4 October and 1 November, while UHSLC's step by -0.069 m at 4 October and 0.108 m at 1 November; a fit to UHSLC's own year steps by -0.027 m at 1 September.",
+      reported: null,
+      report: null,
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        const september = await medianGap(
+          store,
+          "bom/009",
+          "uhslc/009",
+          "2023-09-02",
+          "2023-10-01",
+        );
+        if (september < -0.033 || september > -0.025)
+          throw new Error(
+            `UHSLC's Honiara is ${september.toFixed(3)} m from BOM's in September 2023`,
+          );
+        const gap = await medianGap(store, "bom/009", "uhslc/009", "2023-10-04", e.until!);
+        if (gap < -0.095 || gap > -0.085)
+          throw new Error(
+            `UHSLC's Honiara is ${gap.toFixed(3)} m from BOM's, not -0.095 to -0.085 m`,
+          );
+      },
+    },
+    {
+      id: "uhslc-honiara-2024-march",
+      stations: ["uhslc/009", "gesla/honiara-009-slb-uhslc_fd"],
+      since: "2024-03-01",
+      until: "2024-04-01",
+      handling: "flagged",
+      error:
+        "UHSLC's Honiara values (009) in March 2024 are 0.06 to 0.14 m higher than the Bureau of Meteorology's, by a median of 0.10 m.",
+      response: "March 2024 is flagged `suspect`. BOM's series (`bom/009`) covers the month.",
+      evidence:
+        "November 2026. `uhslc/009` minus `bom/009` is 0.057 to 0.139 m at the 5th to 95th percentile of March's 702 shared hours, and within 1 mm in April. GESLA's fast-delivery record (`gesla/honiara-009-slb-uhslc_fd`) equals UHSLC's within 1 mm at all 744 shared hours of the span's 31 days. A tidal fit to the Bureau's year leaves residuals that step by 0.016 m at 1 April, while UHSLC's step by -0.092 m. The step at 1 March couldn't be read from the Bureau's file, which has almost no values in late February, and in a fit to UHSLC's own year the daily residuals before 1 March stay within 0.04 m of zero, the size of the noise there, and rise to 0.11 m by 5 March; the flag starts at 1 March, where the two copies first can be compared.",
+      reported: null,
+      report: null,
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        const gap = await medianGap(store, "bom/009", "uhslc/009", e.since!, e.until!);
+        if (gap < 0.07 || gap > 0.13)
+          throw new Error(`UHSLC's Honiara is ${gap.toFixed(3)} m from BOM's, not 0.07 to 0.13 m`);
+      },
+    },
+    {
       id: "uhslc-christmas-island-2009-offset",
       stations: ["uhslc/170", "gesla/christmas-170a-kir-uhslc_rq"],
       since: "2009-08-05",
@@ -529,6 +656,17 @@ export default {
     },
   ],
   questions: [
+    {
+      id: "uhslc-bom-small-differences",
+      stations: ["uhslc/046", "uhslc/176"],
+      question:
+        "Two differences from the Bureau of Meteorology's files of the same gauges: Port Vila (046) is 0.015 m lower than the Bureau's in March 2022, and Esperance (176) is 0.017 m higher from 1993 to 1996 than the Bureau's records of those years, where it equals them in 1985 to 1992 and from 1997. Did you apply a datum adjustment in those periods, or did the Bureau send them that way?",
+      why: "The answer says which copy is off, so the store can flag it. Either difference is too small for the neighbors to settle.",
+      meanwhile:
+        "Both copies are kept as served (errata `uhslc-port-vila-2022-march` and `uhslc-esperance-1993-1996`).",
+      asked: null,
+      answer: null,
+    },
     {
       id: "uhslc-christmas-island-2009-reference",
       stations: ["uhslc/170"],

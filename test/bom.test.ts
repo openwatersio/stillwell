@@ -249,6 +249,21 @@ describe("bom", () => {
     assert.ok(out.every((o) => o.level > 0 && o.level < 4));
   });
 
+  it("raises Stony Point's 2005 to 2014 levels by 0.090 m and no others", () => {
+    for (const year of [2005, 2014]) assert.equal(bom.zeroCorrection("993", year), 0.09);
+    for (const year of [2004, 2015, 2025]) assert.equal(bom.zeroCorrection("993", year), 0);
+    assert.equal(bom.zeroCorrection("992", 2010), 0);
+  });
+
+  it("adds the correction to the levels it reads", async () => {
+    // BOM's 2005 file for Stony Point starts 745 and 746 mm.
+    const out = await bom.levels("993", new Date("2005-01-01Z"), new Date("2005-01-02Z"));
+    assert.deepEqual(
+      out.slice(0, 2).map((o) => o.level),
+      [0.835, 0.836],
+    );
+  });
+
   it("reads a member BOM compressed with gzip under a .Z name", async () => {
     const out = await bom.levels("002", new Date("1996-03-01Z"), new Date("1996-03-02Z"));
     assert.equal(out.length, 24);
