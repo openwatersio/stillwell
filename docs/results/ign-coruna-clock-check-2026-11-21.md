@@ -93,6 +93,6 @@ Each fit uses a whole year, so it does not by itself exclude a shift confined to
 
 ## Stored flags and replay
 
-The 21 November local run stored 209,544 levels: 209,543 good and 1 suspect, with reviewed source flag 0 throughout. Those are historical snapshot counts, not the current policy. `ign-coruna-clock` retains the direct archive’s full clock flag; native CMEMS and GESLA have separately controlled timing windows. [The complete identity and clock validation](ign-coruna-identity-2026-11-22.md) records the current readbacks and detection limits.
+The 21 November local run stored 209,544 levels: 209,543 good and 1 suspect, with reviewed source flag 0 throughout. Those are historical snapshot counts, not the current policy. The store flags only the offset spans in [the weekly clock fits](ign-coruna-windows-2026-11-28.md).
 
 These annual fits predate the clock flags. The CLI now excludes suspect values and cannot replay them directly. The numeric monthly generator documented in the complete validation deliberately includes flagged values. Annual agreement does not clear shorter timing discrepancies.

@@ -117,7 +117,7 @@ export default {
     { ingest: "publish" },
     {
       check:
-        "IGN's years file holds the 24 year files of ign/ACOR1, and every retained level has its suspect clock flag and reviewed source flag",
+        "IGN's years file holds the 24 year files of ign/ACOR1, its clock windows are suspect and the rest is not, and every level has its reviewed source flag",
       async verify(store) {
         const rows = await readRows(yearsPath(store, "ign"));
         const files = rows.filter((r) => r.year !== null);

@@ -53,6 +53,14 @@ describe("IGN", () => {
       .sort();
     assert.deepEqual(ids, [
       "ign-coruna-clock",
+      "ign-coruna-clock-2000-10",
+      "ign-coruna-clock-2000-11",
+      "ign-coruna-clock-2004-03",
+      "ign-coruna-clock-2004-09",
+      "ign-coruna-clock-2006-03",
+      "ign-coruna-clock-2006-11",
+      "ign-coruna-clock-2007-12",
+      "ign-coruna-clock-2011-11",
       "ign-coruna-hourly-gaps",
       "ign-coruna-hourly-grid",
       "ign-release-coverage",
@@ -73,14 +81,20 @@ describe("IGN", () => {
     );
   });
 
-  it("flags the entire unconfirmed clock interval", () => {
+  it("flags only the spans the weekly clock fits' rule derives", () => {
     assert.deepEqual(ign.CORUNA_PERIOD, [Date.UTC(2000, 0, 1), Date.UTC(2024, 0, 1)]);
-    const clock = errata.find((e) => e.id === "ign-coruna-clock")!;
-    assert.equal(clock.handling, "flagged");
-    assert.deepEqual([clock.since, clock.until], ["2000-01-01", "2024-01-01"]);
-    assert.deepEqual(spans({ id: "ign/ACOR1" }, errata), [
-      [Date.UTC(2000, 0, 1), Date.UTC(2024, 0, 1)],
-    ]);
+    assert.equal(errata.find((e) => e.id === "ign-coruna-clock")!.handling, "kept");
+    const { spans: derived } = JSON.parse(
+      readFileSync(
+        new URL("../docs/results/ign-coruna-windows-2026-11-28/lags.json", import.meta.url),
+        "utf8",
+      ),
+    ) as { spans: [string, string][] };
+    assert.equal(derived.length, 8);
+    assert.deepEqual(
+      spans({ id: "ign/ACOR1" }, errata),
+      derived.map(([from, to]) => [Date.parse(from), Date.parse(to)]),
+    );
   });
 
   it("keeps native copy timing episodes separate from archive-label uncertainty", () => {
@@ -140,7 +154,12 @@ describe("IGN", () => {
     );
     assert.equal(rows.length, 210384);
     assert.ok(rows.every((r) => r.source_flag === Flag.good));
-    assert.equal(rows.filter((r) => r.flag === Flag.suspect).length, rows.length);
+    // The clock spans' hours, and nothing else.
+    const hours = spans({ id: "ign/ACOR1" }, errata).reduce(
+      (n, [from, to]) => n + (to - from) / 3_600_000,
+      0,
+    );
+    assert.equal(rows.filter((r) => r.flag === Flag.suspect).length, hours);
     assert.equal(rows[0]!.time, Date.UTC(2000, 0, 1));
     assert.equal(rows.at(-1)!.time, Date.UTC(2023, 11, 31, 23));
     assert.ok(

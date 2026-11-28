@@ -1,5 +1,6 @@
-import { verifyCorunaIdentities, checkCorunaQuality } from "./check.ts";
-import { type ErrataFile, type StoreReader } from "../../errata.ts";
+import { CORUNA_CLOCK_WINDOWS, verifyCorunaIdentities, checkCorunaQuality } from "./check.ts";
+import { dayAfter, flaggedSpan, type ErrataFile, type StoreReader } from "../../errata.ts";
+import { compare } from "../gesla/check.ts";
 
 /** Coruña's levels over the admitted interval, read once per check. */
 const held = (store: StoreReader) => store.levels("ign/ACOR1", "2000-01-01", "2024-01-01");
@@ -130,18 +131,47 @@ export default {
         "The 17 November 2026 audit records unit variants in annual-audit.json. TN031 2021 BM ends at 1 January 2022 00:00. IGN Leeme.txt documents millimeters. These are supported export conventions, not inferred clock corrections.",
       check: (store) => absent(store, ["ign/ACOR1-0302", "ign/TN031"]),
     },
+    ...CORUNA_CLOCK_WINDOWS.map((w) => ({
+      id: w.id,
+      stations: ["ign/ACOR1"],
+      since: w.since,
+      until: w.until,
+      handling: "flagged" as const,
+      error: `IGN's Coruña hourly levels run ${w.offset} in this span, against ${w.gauges}.`,
+      response:
+        "Keep the span suspect without moving any timestamp or changing a reviewed source flag. The edges are week boundaries from weekly fits, and smaller or single-reference offsets can continue past them. No correction is inferred: the offset changes through the span.",
+      evidence:
+        "Each week of 2000 to 2023 was fitted to the minute against IEO's gauge (uhslc/830) and Puertos del Estado's REDMAR gauge (cmems/CorunaTG). A week counts where every gauge with data puts IGN at least 8 minutes off in one direction; a span is at least 4 such weeks, at most 1 week apart. Method and limits: https://github.com/openwatersio/stillwell/blob/main/docs/results/ign-coruna-windows-2026-11-28.md.",
+      check: async (store: StoreReader, e: Parameters<typeof flaggedSpan>[1]) => {
+        await flaggedSpan(store, e);
+        const until = dayAfter(w.probe, 7);
+        const reference = await store.levels(w.reference, w.probe, until);
+        if (!reference.length) throw new Error(`the store holds no ${w.reference} control`);
+        const observed = await store.levels("ign/ACOR1", w.probe, until);
+        const zero = compare(observed, reference, 0);
+        const shifted = compare(observed, reference, w.lag * 60_000);
+        if (zero.n < 72 || !Number.isFinite(zero.spread))
+          throw new Error("ign/ACOR1 lacks a usable zero-lag control");
+        if (
+          shifted.n < 72 ||
+          !Number.isFinite(shifted.spread) ||
+          shifted.spread >= zero.spread * 0.85
+        )
+          throw new Error("ign/ACOR1 no longer shows the recorded offset; review the erratum");
+      },
+    })),
     {
       id: "ign-coruna-clock",
       stations: ["ign/ACOR1"],
       since: "2000-01-01",
       until: "2024-01-01",
-      handling: "flagged",
+      handling: "kept",
       error:
-        "IGN has not confirmed the historical time convention. Monthly harmonic fits show sustained offsets in September 2000–January 2001, October 2003–November 2004, July 2005–October 2008 and October 2011–May 2012. Seven monthly harmonic fits reach +20 minutes: April 2006, January–February 2007 and February–May 2012. Independent observed comparisons show discrepancies beyond those months; the evidence does not identify complete fault boundaries or establish which reference is wrong in every comparison.",
+        "IGN has not confirmed the historical time convention of these hourly labels. Outside the offset spans, the ign-coruna-clock errata named for their start months, IGN mostly fits REDMAR's gauge within 10 minutes.",
       response:
-        "Keep the entire admitted 2000–2023 interval suspect, storing the labels as UTC without a shift and preserving reviewed source flags. Annual agreement does not establish the historical convention or justify marking unverified months good. The native CMEMS product declares UTC and has its own processing; full independent controls identify separate discrepancies handled by cmems-coruna-clock-2020 and cmems-coruna-clock-2022, including the GESLA copy. It does not inherit this archive-format uncertainty blanket. The check also compares 2020 with IGN's CMEMS copy for processing consistency, not independent clock certification.",
+        "Store the labels as UTC without a shift and keep reviewed source flags. Values outside the offset spans keep their ordinary flags. The check compares 2020 with IGN's CMEMS copy for processing consistency, not independent clock certification, and reads back which values are suspect.",
       evidence:
-        "Each of the 24 years, 2000 to 2023, was cross-correlated with the TICON constants of IEO's Coruña gauge about 0.44 km away, UHSLC's La Coruña and CMEMS's Coruna2TG, at lags of up to 3 hours: best lag 0 minutes in 57 of the 72 fits and ±10 minutes in the rest, K1 phase −9 to +16 minutes, zero-lag correlation 0.987 to 0.995. The annual fits support excluding a persistent whole-hour shift; annual aggregation alone does not exclude a shift confined to part of a year. IEO's gauge is the independent reference: CMEMS's record is named ‘A Coruña ACOR1 TG tide gauge’ after IGN's code, so it is IGN's data, and UHSLC's qa830a.dmt names IEO as contributor, so those references are not independent of each other. All 288 months have harmonic fits; March–April 2007 and July/November 2013 fail day coverage. Independent IEO comparisons were attempted over 204 overlapping months, 2000–2016: 202 had pairs and 193 had at least 445; the full additional controls against UHSLC/830 and REDMAR cover every admitted year, with gaps explicit in independent-clock.json. See docs/results/ign-coruna-clock-check-2026-11-21.md and docs/results/ign-coruna-identity-2026-11-22.md.",
+        "No week of 2000 to 2023 that has another gauge to compare with shows IGN 25 minutes or more from every one. Outside the offset spans, 1,127 of 1,147 weeks with REDMAR data fit it within 10 minutes; 11 weeks there meet the offset rule in runs too short to make a span, and from late April to late September 2004 IGN is 7 to 11 minutes early against REDMAR while IEO's erratic record keeps those weeks from counting; IEO's own gauge differs from REDMAR about as often as IGN differs from IEO. IGN's server README describes temporal-phase correction without naming UTC. See docs/results/ign-coruna-windows-2026-11-28.md, docs/results/ign-coruna-clock-check-2026-11-21.md and docs/results/ign-coruna-identity-2026-11-22.md.",
       check: async (store) => {
         await listed(store);
         // The CMEMS copy of the gauge, hourly from November 2019: its levels fit IGN's at zero lag, not an hour either way.

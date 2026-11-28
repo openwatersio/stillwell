@@ -239,7 +239,7 @@ export const UNLINKS: Decision[] = [
 /** Stations chosen as their group's preferred series, with why. */
 export const PREFER: Record<string, string> = {
   "cmems/Coruna2TG":
-    "The native UTC CMEMS product has independently checked coverage with its own two clock uncertainty windows (cmems-coruna-clock-2020 and cmems-coruna-clock-2022); direct IGN remains entirely suspect for unqualified historical labels (ign-coruna-clock). Revisit with the dated clock validation tracked in #181.",
+    "The native UTC CMEMS product has independently checked coverage with its own two clock uncertainty windows (cmems-coruna-clock-2020 and cmems-coruna-clock-2022); its coverage runs past 2023, where the admitted direct IGN record ends. Direct IGN has its own offset spans (the ign-coruna-clock errata named for their start months). Revisit the preference with #181.",
   "uhslc/071":
     "LINZ's Wellington reference gauge, which LINZ's README for its tsunami gauge says to use for long-term analysis. Both sensors at the tsunami gauge (linz/WLGT) move against it by tenths of a metre, in turn (erratum `linz-wellington-drift`).",
 };

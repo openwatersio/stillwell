@@ -41,7 +41,7 @@ export default {
       handling: "flagged" as const,
       error: `Coruna2TG and its GESLA copy have timing discrepancies against REDMAR's separate Coruña instrument during the ${year} episode.`,
       response:
-        "Keep the conservative uncertainty window suspect without changing timestamps or native source flags. These are observation-based windows, not inferred exact correction epochs. The native UTC product is checked separately from IGN's unqualified historical hourly-label format.",
+        "Keep the conservative uncertainty window suspect without changing timestamps or native source flags. These are observation-based windows, not inferred exact correction epochs. The native UTC product is checked separately from IGN's own hourly files, whose clock has its own errata.",
       evidence:
         "Complete 2019–2024 controls against both REDMAR CorunaTG and UHSLC/830, and weekly REDMAR controls, are at https://github.com/openwatersio/stillwell/blob/main/docs/results/ign-coruna-identity-2026-11-22.md (copy-controls.json and copy-windows.json). The windows include adjacent weak-offset weeks and padding around the strong discrepancies. Most other well-paired months favor zero lag against REDMAR. UHSLC diverges after mid-2020, so it is not treated as sole ground truth. The GESLA copy has the same stored numeric series as CMEMS over 2019–2023. No correction is inferred.",
       check: async (store: StoreReader, e: Parameters<typeof flaggedSpan>[1]) => {

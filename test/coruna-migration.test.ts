@@ -122,33 +122,65 @@ it("reads published Coruña identities back and refuses cross-gauge links or pre
   }
 });
 
-it("keeps the entire unconfirmed record suspect and accepts source withdrawals", async () => {
+it("keeps the clock windows suspect, the rest unflagged, and accepts source withdrawals", async () => {
   const { checkCorunaQuality } = await import("../src/sources/ign/check.ts");
-  const levels = [
-    { time: Date.parse("2006-04-10"), level: 1, flag: 3 as const, source_flag: 0 as const },
-    { time: Date.parse("2013-01-01"), level: 1, flag: 3 as const, source_flag: 0 as const },
-  ];
-  assert.doesNotThrow(() => checkCorunaQuality(levels));
+  const at = (day: string, flag: 0 | 3 | 4, source_flag: 0 | 3 | 4 = 0) => ({
+    time: Date.parse(day),
+    level: 1,
+    flag,
+    source_flag,
+  });
+  const inside = at("2006-04-10", 3);
+  const outside = Array.from({ length: 200 }, (_, i) => ({
+    ...at("2013-01-01", 0),
+    time: Date.parse("2013-01-01") + i * 3_600_000,
+  }));
+  assert.doesNotThrow(() => checkCorunaQuality([inside, ...outside]));
   assert.doesNotThrow(() =>
-    checkCorunaQuality([
-      ...levels,
-      { ...levels[0]!, flag: 4, source_flag: 4 },
-      { ...levels[1]!, flag: 4, source_flag: 4 },
-      { ...levels[0]!, flag: 4, source_flag: 0 },
-    ]),
+    checkCorunaQuality([inside, ...outside, at("2006-04-11", 4, 4), at("2014-01-01", 4, 4)]),
   );
+  assert.throws(() => checkCorunaQuality([at("2006-04-10", 0), ...outside]), /clock windows/);
   assert.throws(
-    () => checkCorunaQuality([levels[0]!, { ...levels[1]!, flag: 0 }]),
-    /must remain suspect/,
+    () => checkCorunaQuality([inside, ...outside.map((o) => ({ ...o, flag: 3 as const }))]),
+    /outside its clock windows/,
   );
-  assert.throws(
-    () => checkCorunaQuality([{ ...levels[0]!, flag: 0 }, levels[1]!]),
-    /must remain suspect/,
-  );
-  assert.throws(
-    () => checkCorunaQuality([levels[0]!, { ...levels[1]!, source_flag: 3 }]),
-    /source flags/,
-  );
+  assert.throws(() => checkCorunaQuality([inside, ...outside, at("2013-06-01", 0, 3)]), /source/);
+  assert.throws(() => checkCorunaQuality([]), /no ign\/ACOR1/);
+});
+
+it("checks each IGN clock window's flags and its offset against another gauge", async () => {
+  const { CORUNA_CLOCK_WINDOWS } = await import("../src/sources/ign/check.ts");
+  for (const w of CORUNA_CLOCK_WINDOWS) {
+    const e = errata.find((e) => e.id === w.id)!;
+    let flagged = true;
+    let shift: number = w.lag;
+    const store = {
+      levels: async (station: string, since: string, until: string) => {
+        const reference = station !== "ign/ACOR1";
+        const out = [];
+        for (let time = Date.parse(since); time < Date.parse(until); time += 3_600_000) {
+          const spanned = time >= Date.parse(w.since) && time < Date.parse(w.until);
+          out.push({
+            time,
+            // The reference leads or lags by the recorded offset.
+            level: Math.sin(
+              (((time - (reference ? 0 : -shift * 60_000)) / 3_600_000) * 2 * Math.PI) / 12.42,
+            ),
+            flag: !reference && flagged && spanned ? 3 : 0,
+            source_flag: 0,
+            epoch: 1,
+          });
+        }
+        return out;
+      },
+    } as StoreReader;
+    await e.check!(store, e);
+    flagged = false;
+    await assert.rejects(e.check!(store, e), /aren't suspect/, w.id);
+    flagged = true;
+    shift = 0;
+    await assert.rejects(e.check!(store, e), /no longer shows/, w.id);
+  }
 });
 
 it("requalifies direct and copied histories before publication", () => {

@@ -1,6 +1,6 @@
 # Flagged Coruña release, 18 November 2026
 
-This records the approved release with every row flagged `suspect`. The [21 November annual check](ign-coruna-clock-check-2026-11-21.md) does not establish the historical clock convention; the interval retains its clock flag.
+This records the approved release with every row flagged `suspect`. The [21 November annual check](ign-coruna-clock-check-2026-11-21.md) does not establish the historical clock convention. The store flags only the offset spans in [the weekly clock fits](ign-coruna-windows-2026-11-28.md).
 
 The maintainer approved one bounded release: `ign/ACOR1` reviewed hourly JM records for 2000–2023, with every row suspect for unconfirmed historical clock labels. This is not a release of the rest of IGN’s network, raw instruments or current-year data. The public source refuses other station IDs and admits only the 24 exact hourly JM filenames in this interval. Source-level withholding also keeps excluded stations out of lists, bounds and publication. No live polling or monthly refetch is enabled. Excluded coverage and agency questions remain in [issue #181](https://github.com/openwatersio/stillwell/issues/181).
 

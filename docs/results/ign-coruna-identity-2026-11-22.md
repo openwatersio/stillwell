@@ -1,5 +1,7 @@
 # Coruña identity and clock validation
 
+This report records the validation run with IGN's whole interval flagged; its statements about IGN's flags, preference reason and stored counts describe that run, not the store. The store flags only the offset spans in [the weekly clock fits](ign-coruna-windows-2026-11-28.md).
+
 The admitted IGN Coruña hourly record, 2000–2023, is retained with a suspect clock flag over its entire interval (`ign-coruna-clock`). IGN has not confirmed the historical time convention, and independent comparisons show timing discrepancies beyond isolated monthly warnings. Labels are stored as UTC without a shift. This implements the approved flagged-subset policy; no statistical lag is applied as a timestamp correction.
 
 ## Instrument identity
