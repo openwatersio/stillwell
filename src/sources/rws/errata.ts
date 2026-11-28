@@ -8,15 +8,30 @@ import {
 import { Flag } from "../../schema.ts";
 import { distanceKm, median } from "../../stats.ts";
 
-/** The span is flagged, and at least one value in twenty is exactly 0.00 m. */
+/** Every level each station holds in the span, all of them flagged. */
+async function allFlagged(store: StoreReader, e: Erratum, station: string) {
+  const rows = await store.levels(station, e.since!, e.until!);
+  if (!rows.length) throw new Error(`the store holds no ${station} levels in the span`);
+  const not = rows.filter((o) => o.flag < Flag.suspect).length;
+  if (not) throw new Error(`${not} of ${station}'s levels in the span aren't flagged suspect`);
+  return rows;
+}
+
+/** At least one value in twenty of each record's span is exactly 0.00 m. */
 async function pettenZeros(store: StoreReader, e: Erratum): Promise<void> {
+  for (const station of e.stations!) {
+    const rows = await store.levels(station, e.since!, e.until!);
+    const zeros = rows.filter((o) => o.level === 0).length;
+    if (!rows.length || zeros < rows.length / 20)
+      throw new Error(`${zeros} of ${station}'s ${rows.length} values in the span are 0.00 m`);
+  }
+}
+
+/** A span held at zero: flagged throughout, with the zeros still there. */
+async function heldAtZero(store: StoreReader, e: Erratum): Promise<void> {
   await flaggedSpan(store, e);
-  const rows = await store.levels(e.stations![0]!, e.since!, e.until!);
-  const not = rows.filter((o) => o.flag < Flag.suspect);
-  if (not.length) throw new Error(`${not.length} Petten values in the span aren't flagged suspect`);
-  const zeros = rows.filter((o) => o.level === 0).length;
-  if (zeros < rows.length / 20)
-    throw new Error(`${zeros} of Petten's ${rows.length} values in the span are 0.00 m`);
+  for (const station of e.stations!) await allFlagged(store, e, station);
+  await pettenZeros(store, e);
 }
 
 export default {
@@ -78,41 +93,32 @@ export default {
       id: "rws-petten-meetraai3-2012-zero",
       stations: ["rws/petten.meetraai3", "gesla/petten_meetraai_03-pet-nld-rws"],
       since: "2012-10-22",
-      until: "2012-11-15",
+      until: "2012-12-14",
       handling: "flagged",
       error:
-        "From 22 October to 14 November 2012, RWS's Petten meetraai 03 series holds exactly 0.00 m NAP over and over, in runs of up to hours, a fill value rather than the sea. GESLA's copy of the series carries the same values.",
+        "From 22 October to 13 December 2012, RWS's Petten meetraai 03 series doesn't give the sea level. Until 16 November it holds exactly 0.00 m NAP over and over, a fill value, and on 16 November stays near zero until mid-afternoon. From 17 November into the early hours of 13 December it swings about twice as far as the levels at IJmuiden Buitenhaven. GESLA's copy of the series carries the same values, and holds none from 17 November until 13 December.",
       response:
-        "22 October to 14 November 2012 is flagged `suspect`, keeping each record's own flag as `source_flag`. The zeros come and go among gaps and other values, which don't follow the tide either, so the whole span is flagged.",
+        "22 October to 13 December 2012 is flagged `suspect`, keeping each record's own flag as `source_flag`. The span ends with the whole of 13 December, though the series follows the tide from about 06:00 UTC that day, where GESLA's values start again.",
       evidence:
-        "Found from the station's analysis: the held values counted as drains and judged it not tidal. Counted in the store's levels files for `rws/petten.meetraai3`, which hold 10-minute values with gaps: 633 of the span's 2,127 values are 0.00 m, and 21 UTC days hold 15 or more. From 2005 to 2011, 0.00 m appears 96 to 148 times a year as the tide passes through it, never more than 6 times a day. Hourly means from 22 October to 13 November don't correlate with those at IJmuiden Buitenhaven (`rws/ijmuiden.buitenhaven`): the daily correlation is below 0.5 on every day compared, against 0.91 from January to 21 October 2012. GESLA's copy (`gesla/petten_meetraai_03-pet-nld-rws`) holds the same 2,127 values.",
-      check: pettenZeros,
-    },
-    {
-      id: "rws-petten-meetraai3-2012-range",
-      stations: ["rws/petten.meetraai3"],
-      since: "2012-11-17",
-      until: "2012-12-13",
-      handling: "flagged",
-      error:
-        "From 17 November to 12 December 2012, RWS's Petten meetraai 03 levels swing about twice as far as the sea does at the gauges nearby.",
-      response:
-        "17 November to 12 December 2012 is flagged `suspect`, keeping the source flag as `source_flag`.",
-      evidence:
-        "Counted in the store's levels: the span's 2,294 values run from −1.89 to 2.14 m NAP, and their standard deviation is 1.14 m against 0.59 m at IJmuiden Buitenhaven (`rws/ijmuiden.buitenhaven`) over the same days. From 13 to 31 December it is 0.66 m against 0.64 m. Hourly means still follow IJmuiden's in time, with a daily regression slope of 1.45 to 2.4 on the days compared, against 0.9 from January to 21 October 2012. GESLA's copy holds no values in the span.",
+        "Found from the station's analysis: the held values counted as drains and judged it not tidal. Counted in the store's levels files for `rws/petten.meetraai3`, which hold 10-minute values with gaps. 22 October to 16 November: 639 of 2,203 values are 0.00 m, and 21 UTC days hold 15 or more, where from 2005 to 2011 0.00 m appears 96 to 148 times a year as the tide passes through it, never more than 6 times a day. Until about 15:45 UTC on 16 November the levels stay within 0.2 m of zero. 17 November to 13 December: 2,430 values run from −1.89 to 2.14 m NAP, and their standard deviation is 1.12 m against 0.59 m at IJmuiden Buitenhaven (`rws/ijmuiden.buitenhaven`) over the same days, against 0.65 m and 0.64 m from 14 to 31 December. Hourly means still follow IJmuiden's in time, with a daily regression slope of 1.45 to 2.4 on the days from 17 November to 12 December, against 0.9 from January to 21 October 2012. GESLA's copy (`gesla/petten_meetraai_03-pet-nld-rws`) holds 639 values of 0.00 m among 2,159 from 22 October to 16 November, none from 17 November to 12 December, and 99 on 13 December from 06:15 UTC. From 14 December 2012 to 7 March 2013, 10 March to 13 April and 4 to 15 May, outside the flagged spans, hourly means in both records correlate with IJmuiden's at 0.76 to 0.92 with a regression slope of 0.75 to 0.93, against 0.91 and 0.9 from January to 21 October 2012, and no day holds more than 5 values of 0.00 m.",
       check: async (store, e) => {
         await flaggedSpan(store, e);
-        const [id, since, until] = [e.stations![0]!, e.since!, e.until!];
-        const spread = async (station: string) => {
-          const levels = (await store.levels(station, since, until)).map((o) => o.level);
-          if (!levels.length) throw new Error(`the store holds no ${station} levels in the span`);
-          const mean = levels.reduce((a, b) => a + b, 0) / levels.length;
-          return Math.sqrt(levels.reduce((a, b) => a + (b - mean) ** 2, 0) / levels.length);
+        for (const station of e.stations!) await allFlagged(store, e, station);
+        await pettenZeros(store, { ...e, until: "2012-11-17" });
+        const spread = (levels: { level: number }[]) => {
+          const mean = levels.reduce((a, b) => a + b.level, 0) / levels.length;
+          return Math.sqrt(levels.reduce((a, b) => a + (b.level - mean) ** 2, 0) / levels.length);
         };
-        const ratio = (await spread(id)) / (await spread("rws/ijmuiden.buitenhaven"));
-        if (ratio < 1.5)
+        const [petten, ijmuiden] = await Promise.all(
+          [e.stations![0]!, "rws/ijmuiden.buitenhaven"].map((id) =>
+            store.levels(id, "2012-11-17", "2012-12-13"),
+          ),
+        );
+        const ratio = spread(petten!) / spread(ijmuiden!);
+        // Written so an empty or constant control, which gives NaN or Infinity, fails.
+        if (!(ratio >= 1.5 && ratio < 3))
           throw new Error(
-            `Petten's levels spread ${ratio.toFixed(2)} times as far as IJmuiden's in the span, not about 1.9`,
+            `Petten's levels spread ${ratio.toFixed(2)} times as far as IJmuiden's, not about 1.9`,
           );
       },
     },
@@ -128,7 +134,7 @@ export default {
         "8 and 9 March 2013 are flagged `suspect`, keeping each record's own flag as `source_flag`.",
       evidence:
         "Counted in the store's levels files: 33 of the two days' 273 values are 0.00 m, 18 on 8 March and 15 on 9 March. From 2005 to 2011, 0.00 m never appears more than 6 times a day. GESLA's copy holds the same 273 values.",
-      check: pettenZeros,
+      check: heldAtZero,
     },
     {
       id: "rws-petten-meetraai3-2013-april-zero",
@@ -141,8 +147,8 @@ export default {
       response:
         "14 April to 3 May 2013 is flagged `suspect`, keeping each record's own flag as `source_flag`. The zeros come and go among gaps and sound tide, so the whole span is flagged.",
       evidence:
-        "Counted in the store's levels files: 380 of the span's 1,163 values are 0.00 m, and 10 UTC days hold 15 or more. The longest unbroken run is 32 values (5 hours 20 minutes), on 15 and 16 April. 14 April holds 8, more than any day from 2005 to 2011. GESLA's copy holds 896 values in the span, 379 of them 0.00 m.",
-      check: pettenZeros,
+        "Counted in the store's levels files: 380 of the span's 1,163 values are 0.00 m, and 10 UTC days hold 15 or more. The longest unbroken run is 32 values (5 hours 20 minutes), on 15 and 16 April. 14 April holds 8, more than any day from 2005 to 2011. GESLA's copy holds 896 values in the span, 379 of them 0.00 m, each as RWS has it.",
+      check: heldAtZero,
     },
     {
       id: "rws-hourly-means-weirs",
