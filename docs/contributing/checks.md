@@ -80,6 +80,12 @@ npm run evaluate:rws
 
 Each writes `docs/results/<source>.json` and prints a Markdown table for the [HRoI evaluation](../hroi-evaluation.md). The RWS one downloads about 50 years of 10-minute data in total the first time, which takes 20–30 minutes.
 
+```bash
+STILLWELL_STORE=<copy> npm run evaluate:residual-spectra -- --cache <dir>
+```
+
+This one measures the spectra of fits' residuals on years the fits didn't read, for [residual spectra](../residual-spectra.md) and its [tables](../results/residual-spectra.md). It reads a local copy of the store that nothing is writing to, holding the gauges in `GAUGES` ([`src/fit/residual-spectrum.ts`](../../src/fit/residual-spectrum.ts)). It stops where a gauge's rows in the copy's years file don't describe the gauge's files, so copy a station's files and the years file together. The fits take about three hours on four workers. It writes `docs/results/residual-spectra.json`, the report and its figures. The fits are kept in the cache directory, and a run that finishes records there which files it rests on; `--report` writes again from those files without fitting or reading the store, and stops if one of them isn't the finished run's.
+
 ## Fit calibration
 
 ```bash
