@@ -80,6 +80,12 @@ npm run evaluate:rws
 
 Each writes `docs/results/<source>.json` and prints a Markdown table for the [HRoI evaluation](../hroi-evaluation.md). The RWS one downloads about 50 years of 10-minute data in total the first time, which takes 20–30 minutes.
 
+```bash
+STILLWELL_STORE=<copy> npm run evaluate:residual-spectra -- --cache <dir>
+```
+
+This one measures the spectra of fits' residuals on years the fits didn't read, for [residual spectra](../residual-spectra.md) and its [tables](../results/residual-spectra.md). It reads a local copy of the store that nothing is writing to, holding the gauges in `GAUGES` ([`src/fit/residual-spectrum.ts`](../../src/fit/residual-spectrum.ts)). It stops where a gauge's rows in the copy's years file don't describe the gauge's files, so copy a station's files and the years file together. The fits take about three hours on four workers. It writes `docs/results/residual-spectra.json`, the report and its figures. The fits are kept in the cache directory, and a run that finishes records there which files it rests on; `--report` writes again from those files without fitting or reading the store, and stops if one of them isn't the finished run's.
+
 ## Published files
 
 [`src/store/files.ts`](../../src/store/files.ts) defines every file the store publishes: its path, each column's DuckDB type, whether it can be null, a one-line description, and the sort order, with JSON Schemas for `sources.json` and `errata.json`. The writers in [`src/store/parquet.ts`](../../src/store/parquet.ts) take their columns and types from it, [`test/files.test.ts`](../../test/files.test.ts) writes each file and compares it with its definition, and publish writes it to the store as `datapackage.json`, `sources.schema.json` and `errata.schema.json`. To add or change a column, change its definition there, and the docs that describe it. The site's reference pages render their schema tables from the published `datapackage.json`, so they follow once publish has run. The series files (`obs/`, `predictions/`, `extremes/`, `predicted-extremes/` and `recent/`) are copied out of a scratch table in `parquet.ts` (`createTable`, `appendRows`, `copyOut`), and their readers and the `version` hash (`YEAR_STATS`) name its columns too, so a change to one of those columns needs them changed as well. A column older files lack is `optional`, so readers know to use `union_by_name`. The weekly bucket check runs [`scripts/check-files.ts`](../../scripts/check-files.ts) against the public store, which you can run too:
